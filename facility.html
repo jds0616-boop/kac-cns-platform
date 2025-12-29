@@ -2,6 +2,13 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<script>
+  // 로그인 체크: 세션에 토큰이 없으면 로그인 페이지로 튕겨냄
+  if(sessionStorage.getItem('kac_access_token') !== 'granted') {
+    alert("로그인이 필요합니다.");
+    location.replace('login.html');
+  }
+</script>
 <meta charset="UTF-8" />
 <title>시설 관리 - KAC CNS Training Platform</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>

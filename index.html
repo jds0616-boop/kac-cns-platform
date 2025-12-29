@@ -4,6 +4,13 @@
 <head>
 <meta charset="UTF-8" />
 <title>KAC CNS Training Platform</title>
+<!-- 로그인 체크 스크립트 (로그인 안했으면 튕겨냄) -->
+<script>
+  if(sessionStorage.getItem('kac_access_token') !== 'granted') {
+    // 로컬 환경이나 테스트 시 불편하면 아래 줄을 주석 처리하세요.
+    location.replace('login.html'); 
+  }
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -52,7 +59,7 @@
   }
   .settings-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
 
-  /* [수정] 중앙 정렬용 래퍼 */
+  /* 중앙 정렬용 래퍼 */
   .content-wrapper {
     flex: 1;
     display: flex;
@@ -61,15 +68,15 @@
     align-items: center;     /* 수평 중앙 정렬 */
     width: 100%;
     overflow-y: auto;
-    padding-bottom: 60px; /* 시각적 균형을 위한 하단 여백 */
+    padding-bottom: 60px;
   }
 
   /* 검색창 컨테이너 */
   .search-wrapper-outer {
     width: 100%; display: flex; justify-content: center; 
-    margin-bottom: 40px; /* 카드와의 간격 */
+    margin-bottom: 40px; 
     flex-shrink: 0;
-    z-index: 2000; position: relative; /* 오버레이보다 높게 */
+    z-index: 2000; position: relative;
   }
   .search-container {
     width: 600px; max-width: 90%; position: relative; transition: 0.3s;
@@ -90,27 +97,29 @@
   }
   .search-results.active { display: block; animation: slideDown 0.2s ease-out; }
 
-  /* 검색 딤드 오버레이 (z-index 1500) */
+  /* 검색 딤드 오버레이 */
   #searchOverlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1500;
     display: none; backdrop-filter: blur(2px); animation: fadeIn 0.3s;
   }
   #searchOverlay.active { display: block; }
 
-  /* 메인 레이아웃 (Main은 이제 위치 잡는 용도가 아니라 컨텐츠 컨테이너 역할) */
+  /* 메인 레이아웃 */
   main { 
     display: flex; flex-direction: column; align-items: center; justify-content: center; 
     width: 100%; perspective: 1000px;
   }
 
-  /* 카드 그리드 */
+  /* 카드 컨테이너 [수정: Flexbox로 변경하여 갯수 상관없이 중앙 정렬] */
   #cardContainer { 
-    display: grid; 
-    grid-template-columns: repeat(5, 280px); /* 5개 고정 */
+    display: flex;             /* Grid 대신 Flex 사용 */
+    flex-wrap: wrap;           /* 줄바꿈 허용 */
     gap: 30px; 
-    width: auto;
-    justify-content: center;
+    width: 100%;               /* 전체 너비 */
+    max-width: 1600px;         /* 5개가 들어갈 정도의 최대 너비 제한 */
+    justify-content: center;   /* 아이템들을 가운데로 모음 */
     padding: 20px; 
+    min-height: 450px;
     transform-style: preserve-3d;
   }
   
@@ -172,7 +181,7 @@
   .add-card-btn { border: 3px dashed #cbd5e1; background: transparent; color: #94a3b8; justify-content: center; }
   .add-card-btn:hover { border-color: var(--navy); color: var(--navy); transform: translateY(-5px); }
 
-  /* [수정] 페이지네이션 (Dot Style & 위치 조정) */
+  /* 페이지네이션 (Dot Style & 위치 조정) */
   .pagination { 
     display: flex; gap: 12px; 
     margin-top: 35px; /* 카드에서 약 1cm 아래 */
@@ -278,7 +287,7 @@
   </div>
 </div>
 
-<!-- [수정] 래퍼로 묶어서 중앙 정렬 -->
+<!-- 래퍼로 묶어서 중앙 정렬 -->
 <div class="content-wrapper">
   <div class="search-wrapper-outer">
     <div class="search-container">
