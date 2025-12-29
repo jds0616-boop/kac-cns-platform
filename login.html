@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Login - KAC CNS Training Platform</title>
+<style>
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+  * { box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
+  body { 
+    background: #0f172a; height: 100vh; display: flex; flex-direction: column; 
+    align-items: center; justify-content: center; margin: 0; color: #fff;
+  }
+  .login-card {
+    background: #1e293b; padding: 40px; border-radius: 20px; width: 400px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5); text-align: center;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .logo { font-size: 24px; font-weight: 800; margin-bottom: 30px; display: block; }
+  input {
+    width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #334155;
+    background: #0f172a; color: #fff; margin-bottom: 15px; font-size: 16px;
+  }
+  button {
+    width: 100%; padding: 15px; border-radius: 10px; border: none;
+    background: #2563eb; color: #fff; font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: 0.3s;
+  }
+  button:hover { background: #1d4ed8; }
+</style>
+</head>
+<body>
+  <div class="login-card">
+    <div class="logo">KAC CNS Platform</div>
+    <input type="password" id="pwInput" placeholder="접속 비밀번호 입력" onkeyup="if(window.event.keyCode==13){checkPw()}">
+    <button onclick="checkPw()">접속하기</button>
+  </div>
+
+  <script>
+    function checkPw() {
+      const input = document.getElementById('pwInput').value;
+      // [설정] 원하는 접속 비밀번호를 아래 "CATC1234" 대신 입력하세요.
+      const correctPw = "CATC1234"; 
+
+      if(input === correctPw) {
+        // 인증 성공 시 세션에 기록 (브라우저 닫으면 삭제됨)
+        sessionStorage.setItem('kac_access_token', 'granted');
+        location.replace('index.html'); // 뒤로가기 방지를 위해 replace 사용
+      } else {
+        alert("비밀번호가 올바르지 않습니다.");
+        document.getElementById('pwInput').value = '';
+      }
+    }
+    
+    // 이미 로그인 되어있으면 바로 이동
+    if(sessionStorage.getItem('kac_access_token') === 'granted') {
+        location.replace('index.html');
+    }
+  </script>
+</body>
+</html>
