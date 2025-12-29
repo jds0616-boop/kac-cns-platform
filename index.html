@@ -4,13 +4,6 @@
 <head>
 <meta charset="UTF-8" />
 <title>KAC CNS Training Platform</title>
-<!-- 로그인 체크 스크립트 (로그인 안했으면 튕겨냄) -->
-<script>
-  if(sessionStorage.getItem('kac_access_token') !== 'granted') {
-    // 로컬 환경이나 테스트 시 불편하면 아래 줄을 주석 처리하세요.
-    location.replace('login.html'); 
-  }
-</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -64,8 +57,8 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* 수직 중앙 정렬 */
-    align-items: center;     /* 수평 중앙 정렬 */
+    justify-content: center;
+    align-items: center;
     width: 100%;
     overflow-y: auto;
     padding-bottom: 60px;
@@ -97,7 +90,7 @@
   }
   .search-results.active { display: block; animation: slideDown 0.2s ease-out; }
 
-  /* 검색 딤드 오버레이 */
+  /* 검색 딤드 오버레이 (z-index 1500) */
   #searchOverlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1500;
     display: none; backdrop-filter: blur(2px); animation: fadeIn 0.3s;
@@ -110,14 +103,11 @@
     width: 100%; perspective: 1000px;
   }
 
-  /* 카드 컨테이너 [수정: Flexbox로 변경하여 갯수 상관없이 중앙 정렬] */
+  /* 카드 컨테이너 [Flex로 변경: 중앙 정렬] */
   #cardContainer { 
-    display: flex;             /* Grid 대신 Flex 사용 */
-    flex-wrap: wrap;           /* 줄바꿈 허용 */
-    gap: 30px; 
-    width: 100%;               /* 전체 너비 */
-    max-width: 1600px;         /* 5개가 들어갈 정도의 최대 너비 제한 */
-    justify-content: center;   /* 아이템들을 가운데로 모음 */
+    display: flex; flex-wrap: wrap; gap: 30px; 
+    width: 100%; max-width: 1600px;
+    justify-content: center;
     padding: 20px; 
     min-height: 450px;
     transform-style: preserve-3d;
@@ -257,6 +247,13 @@
 </style>
 </head>
 <body>
+<!-- 로그인 체크 -->
+<script>
+  if(sessionStorage.getItem('kac_access_token') !== 'granted') {
+    location.replace('login.html'); 
+  }
+</script>
+
 <div id="searchOverlay"></div>
 
 <header>
@@ -313,7 +310,7 @@
       <label class="setting-label">🛠️ 시스템 관리</label>
       <div style="display:flex; gap:10px; margin-bottom:10px;">
         <button id="btnAdmin" class="btn-modal btn-secondary" onclick="toggleAdmin()">관리자 로그인</button>
-        <button id="btnInitView" class="btn-modal btn-secondary" onclick="toggleInitialLoader()">초기화면 보기</button>
+        <button id="btnInitView" class="btn-modal btn-secondary" onclick="toggleInitialLoader(true)">초기화면 보기</button>
       </div>
       <div style="display:flex; gap:10px;">
         <button id="btnPreview" class="btn-modal btn-secondary" style="display:none" onclick="togglePreview()">미리보기 모드</button>
@@ -413,7 +410,15 @@
     renderCards();
     buildSearchIndex();
     
-    if(!isAdmin && menuOrder.length === 0) toggleInitialLoader(true);
+    // [중요] 초기화 플래그가 없으면 팝업 띄움 (기본값 데이터와 상관없이)
+    if(!localStorage.getItem('kac_setup_complete')) {
+       toggleInitialLoader(true);
+       // 강제로 게스트 모드로 시작
+       if(isAdmin) {
+           localStorage.setItem('kac_admin_mode', '0');
+           document.body.classList.remove('admin-mode');
+       }
+    }
   }
 
   // 페이지네이션 관련
@@ -590,7 +595,7 @@
       return false;
   }
 
-  // --- 기존 백업/복원 함수 ---
+  // --- [수정] 백업 시 관리자 권한 제외 ---
   function exportFullData() {
     if(!confirm("현재 설정을 백업하시겠습니까?\n(미디어 파일은 제외됩니다)")) return;
     const modal = document.getElementById('backupLoadingModal');
@@ -604,6 +609,9 @@
             const keys = Object.keys(localStorage);
             for(let i=0; i<keys.length; i++) {
                 const key = keys[i];
+                // [중요] 관리자 모드, 비밀번호 키는 백업에서 제외
+                if(key === 'kac_admin_mode' || key === 'kac_admin_pw') continue;
+                
                 data[key] = localStorage.getItem(key);
                 if(i % 10 === 0) {
                     percent.textContent = Math.round((i / keys.length) * 90) + '%';
@@ -626,6 +634,7 @@
     }, 100);
   }
 
+  // --- [수정] 복원 시 완료 플래그 설정 및 게스트 모드 강제 ---
   async function importFullData(input) {
     if(!input.files[0]) return;
     if(!confirm("데이터를 복원하시겠습니까?\n기존 데이터는 모두 덮어씌워집니다.")) return;
@@ -643,6 +652,12 @@
             localStorage.setItem(keys[i], data[keys[i]]);
             percent.textContent = Math.round((i/keys.length)*100) + '%';
         }
+        
+        // [중요] 초기화 완료 플래그 설정
+        localStorage.setItem('kac_setup_complete', 'true');
+        // [중요] 복원 후 강제로 게스트 모드 설정
+        localStorage.setItem('kac_admin_mode', '0');
+        
         setTimeout(() => { modal.style.display = 'none'; location.reload(); }, 500);
     } catch(e) {
         alert("복원 실패: 올바른 백업 파일이 아닙니다.");
@@ -860,7 +875,6 @@
   
   function setTheme(m) { document.body.className = (document.body.className.replace('dark-mode','').trim() + (m==='dark'?' dark-mode':'')).trim(); localStorage.setItem('kac_theme', m); document.getElementById('btnDay').classList.toggle('active', m==='light'); document.getElementById('btnNight').classList.toggle('active', m==='dark'); }
 
-  // [수정] 검색창 포커스 시 딤드 오버레이 (z-index 조정)
   const sInput = document.getElementById('mainSearch'), sRes = document.getElementById('searchResults'), sOverlay = document.getElementById('searchOverlay');
   sInput.addEventListener('focus', () => { sOverlay.classList.add('active'); if(sInput.value) sRes.classList.add('active'); });
   sOverlay.addEventListener('click', () => { sOverlay.classList.remove('active'); sRes.classList.remove('active'); });
