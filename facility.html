@@ -1,3 +1,4 @@
+<!-- START OF FILE facility.html -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -9,8 +10,7 @@
 </script>
 <meta charset="UTF-8" />
 <title>시설 관리 - KAC CNS Training Platform</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<!-- PDF 관련 라이브러리 제거됨 (viewer_list.html로 위임) -->
 <style>
   @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
   :root { 
@@ -79,12 +79,11 @@
   main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
   #trainGrid { gap: 30px; width: 100%; max-width: 1250px; margin: 0 auto; align-items: flex-start; }
   
-  /* [수정] 카드 크기 확대 및 높이 가변 설정 */
   .menu-card { 
     background: var(--bg-card); 
-    width: 280px;      /* [수정] 너비 확대 */
-    min-height: 280px; /* [수정] 최소 높이 설정 */
-    height: auto;      /* [수정] 텍스트 양에 따라 높이 자동 조절 */
+    width: 280px;      
+    min-height: 280px; 
+    height: auto;      
     padding: 35px 25px; 
     border-radius: 20px; 
     box-shadow: var(--shadow); 
@@ -103,13 +102,12 @@
   .menu-card.dragging { opacity: 0.4; border: 2px dashed var(--theme-color); }
   .menu-card.drag-over { border: 2px solid var(--theme-color); transform: scale(1.05); }
 
-  /* [수정] 아이콘 박스 여백 개선 */
   .icon-circle { 
     min-width: 90px; 
     width: auto; 
     height: auto; 
     min-height: 90px; 
-    padding: 15px 30px; /* [수정] 여백 충분히 확보 */
+    padding: 15px 30px; 
     border-radius: 28px; 
     background: var(--icon-bg); 
     border: 2px solid var(--icon-border); 
@@ -137,12 +135,10 @@
   .page-dot.active { background: var(--navy); color: #fff; transform: scale(1.1); }
   .page-dot.drag-target { background: var(--theme-color) !important; color: #fff !important; transform: scale(1.2); }
 
-  /* 하단 버튼 */
   .bottom-nav { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); background: var(--navy); padding: 15px 45px; border-radius: 100px; display: flex; gap: 40px; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000; border: 1px solid rgba(255,255,255,0.1); }
   .nav-item { color: #fff; cursor: pointer; font-size: 18px; font-weight: 700; transition: 0.3s; opacity: 0.8; display: flex; align-items: center; gap: 10px; }
   .nav-item:hover { opacity: 1; transform: translateY(-3px); }
 
-  /* 모달 레이아웃 */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none; align-items: center; justify-content: center; }
   .modal-card { background: var(--bg-card); padding: 40px; border-radius: 30px; width: 500px; color: var(--text-main); box-shadow: 0 20px 50px rgba(0,0,0,0.5); max-height: 95vh; overflow-y: auto; }
   
@@ -161,16 +157,10 @@
   .btn-secondary { background: #e2e8f0; color: #64748b; }
   .btn-preview-active { background: #10b981 !important; color: #fff !important; }
 
-  /* 일괄 수정 테이블 */
   .bulk-list-container { display: flex; flex-direction: column; gap: 5px; border: 1px solid var(--btn-border); border-radius: 20px; overflow-y: auto; max-height: 50vh; background: #fff; padding: 10px; }
   .bulk-header-row { position: sticky; top: 0; display: grid; grid-template-columns: 40px 80px 80px 140px 1fr; background: #f1f5f9; padding: 12px; font-size: 11px; font-weight: 800; text-align: center; border-radius: 10px; color: var(--theme-color); margin-bottom: 10px; z-index: 10; }
   .bulk-row { display: grid; grid-template-columns: 40px 80px 80px 140px 1fr; gap: 8px; padding: 8px; border-bottom: 1px solid #f1f5f9; align-items: center; }
   .bulk-input { padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center; font-size: 12px; background: #f8fafc; outline: none; }
-
-  #pdfOverlay { position: fixed; inset: 0; background: #000; z-index: 12000; display: none; flex-direction: column; }
-  .pdf-header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; background: #1e293b; color: #fff; }
-  .viewer-body { flex: 1; overflow: auto; display: flex; justify-content: center; background: #334155; padding: 20px; }
-  canvas { box-shadow: 0 0 30px rgba(0,0,0,0.5); }
 </style>
 </head>
 <body>
@@ -209,7 +199,6 @@
   <div class="nav-item" onclick="location.href='index.html'"><svg style="width:22px;height:22px;fill:currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>홈으로</div>
 </div>
 
-<!-- 모달 섹션들은 이전 안정화 버전 로직 그대로 유지 -->
 <div id="itemEditModal" class="modal-overlay">
   <div class="modal-card" style="width:450px;">
     <div class="modal-title">📦 메뉴 상세 수정</div>
@@ -273,18 +262,13 @@
   </div>
 </div>
 
-<div id="pdfOverlay">
-  <div class="pdf-header"><div id="pdfTitle"></div><div onclick="closePdf()" style="cursor:pointer; font-size:24px;">✕</div></div>
-  <div class="viewer-body"><canvas id="pdfCanvas"></canvas></div>
-</div>
-
 <script>
-  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
   const params = new URLSearchParams(location.search);
   const type = params.get('type') || 'COMM';
-  const isAdmin = localStorage.getItem('kac_admin_mode') === '1';
+  let isAdmin = localStorage.getItem('kac_admin_mode') === '1';
   let menus = [], searchIndex = [], currentEditIdx = -1, currentPage = 1, dragSrcIndex = null;
   const itemsPerPage = 8;
+  const defaultAdminPw = "kac123!@#";
 
   try {
       const saved = localStorage.getItem(`kac_menu_${type}`);
@@ -307,7 +291,15 @@
       const q = e.target.value.toLowerCase().trim();
       if(!q) { sRes.classList.remove('active'); return; }
       const matches = searchIndex.filter(i => i.name.toLowerCase().includes(q));
-      sRes.innerHTML = matches.map(i => `<div class="result-item" onclick="openPdfFromSearch('${i.pdfName}', '${i.name}')"><div><div class="res-title">${i.name}</div><div class="res-path">${i.typeName} > ${i.menuName}</div></div><div class="res-tag">${i.type}</div></div>`).join('') || '<div style="padding:15px; text-align:center;">결과 없음</div>';
+      sRes.innerHTML = matches.map(i => `
+        <div class="result-item" onclick="location.href='viewer_list.html?type=${i.type}&menu=${encodeURIComponent(i.menuName)}&id=${i.menuId}&autoOpen=${i.subId}'">
+          <div>
+            <div class="res-title">${i.name}</div>
+            <div class="res-path">${i.typeName} > ${i.menuName}</div>
+          </div>
+          <div class="res-tag" style="background:${i.color}">${i.type}</div>
+        </div>
+      `).join('') || '<div style="padding:15px; text-align:center;">결과 없음</div>';
       sRes.classList.add('active');
     };
   }
@@ -325,7 +317,6 @@
     if(currentPage > totalPages) currentPage = totalPages;
     const start = (currentPage - 1) * itemsPerPage, pageItems = list.slice(start, start + itemsPerPage);
 
-    // 카드 정렬 조건
     if (pageItems.length <= 4) { grid.style.display = 'flex'; grid.style.flexWrap = 'wrap'; grid.style.justifyContent = 'center'; }
     else { grid.style.display = 'grid'; grid.style.gridTemplateColumns = 'repeat(4, 280px)'; grid.style.justifyContent = 'center'; }
 
@@ -370,33 +361,88 @@
     }
   }
 
-  /* 관리자 기능 */
   function openIndividualEdit(idx) { currentEditIdx = idx; if(idx === 'NEW') ['editItemLine1','editItemLine2','editItemLabel','editItemLink'].forEach(id => document.getElementById(id).value = ''); else { const m = menus[idx]; document.getElementById('editItemLine1').value = m.line1 || ''; document.getElementById('editItemLine2').value = m.line2 || ''; document.getElementById('editItemLabel').value = m.label || ''; document.getElementById('editItemLink').value = m.link || ''; } document.getElementById('itemEditModal').style.display = 'flex'; }
   function saveIndividualEdit() { const data = { line1: document.getElementById('editItemLine1').value, line2: document.getElementById('editItemLine2').value, label: document.getElementById('editItemLabel').value, link: document.getElementById('editItemLink').value, dataId: (currentEditIdx === 'NEW' ? 'id_' + Date.now() : menus[currentEditIdx].dataId) }; if(currentEditIdx === 'NEW') menus.push(data); else menus[currentEditIdx] = data; saveData(); closeModal('itemEditModal'); }
   function openMoveMenuModal(idx) { currentEditIdx = idx; const select = document.getElementById('moveTargetCategory'); select.innerHTML = ''; const mOrder = JSON.parse(localStorage.getItem('kac_index_order') || '["COMM","NAV","SURV"]'); mOrder.forEach(t => { if(t === type) return; const sD = localStorage.getItem(`kac_style_${t}`), s = sD ? JSON.parse(sD) : { name: t }; select.innerHTML += `<option value="${t}">${s.name || t}</option>`; }); document.getElementById('moveMenuModal').style.display = 'flex'; }
   function executeMoveMenu() { const targetType = document.getElementById('moveTargetCategory').value; if(!targetType) return; const item = menus.splice(currentEditIdx, 1)[0], targetMenus = JSON.parse(localStorage.getItem(`kac_menu_${targetType}`) || '[]'); const oK = `kac_subs_${type}_${item.dataId}`, nK = `kac_subs_${targetType}_${item.dataId}`, sD = localStorage.getItem(oK); if(sD) { localStorage.setItem(nK, sD); localStorage.removeItem(oK); } targetMenus.push(item); localStorage.setItem(`kac_menu_${targetType}`, JSON.stringify(targetMenus)); saveData(); alert('이동됨'); closeModal('moveMenuModal'); }
   function openBulkEdit() { const cont = document.getElementById('bulkRowContainer'); cont.innerHTML = ''; for(let i=0; i<30; i++) { const m = menus[i] || {}; cont.innerHTML += `<div class="bulk-row"><div>${i+1}</div><input type="text" class="bulk-input b-line1" value="${m.line1 || ''}"><input type="text" class="bulk-input b-line2" value="${m.line2 || ''}"><input type="text" class="bulk-input b-label" value="${m.label || ''}"><input type="text" class="bulk-input b-link" value="${m.link || ''}"></div>`; } document.getElementById('bulkEditModal').style.display = 'flex'; }
   function saveBulkData() { const rows = document.querySelectorAll('.bulk-row'); let nMs = []; rows.forEach((row, i) => { const l1 = row.querySelector('.b-line1').value, lab = row.querySelector('.b-label').value; if(l1 || lab) nMs.push({ line1: l1, line2: row.querySelector('.b-line2').value, label: lab, link: row.querySelector('.b-link').value, dataId: (menus[i] ? menus[i].dataId : 'id_'+Date.now()+'_'+i) }); }); menus = nMs; saveData(); alert('저장됨'); closeModal('bulkEditModal'); }
-  function deleteItem(idx) { if(confirm('정말 삭제하시겠습니까?')) { const pw = prompt('관리자 비밀번호'); if(pw === (localStorage.getItem('kac_admin_pw')||"CATC1234")) { menus.splice(idx,1); saveData(); alert('삭제됨'); } else if(pw) alert('틀림'); } }
+  function deleteItem(idx) { if(confirm('정말 삭제하시겠습니까?')) { const pw = prompt('관리자 비밀번호'); if(pw === (localStorage.getItem('kac_admin_pw')||defaultAdminPw)) { menus.splice(idx,1); saveData(); alert('삭제됨'); } else if(pw) alert('틀림'); } }
 
-  function openSettings() { const gSet = document.getElementById('guestSettings'), aSet = document.getElementById('adminSettings'); if(isAdmin) { if(aSet) aSet.style.display = 'block'; if(gSet) gSet.style.display = 'none'; document.getElementById('setFacIconSize').value = localStorage.getItem('kac_fac_icon_size') || 28; document.getElementById('setFacLabelSize').value = localStorage.getItem('kac_fac_label_size') || 18; const isP = localStorage.getItem('kac_preview_active') === '1', pBtn = document.getElementById('modalPreviewBtn'); if(pBtn) { pBtn.textContent = isP ? "미리보기 종료" : "미리보기 시작"; pBtn.classList.toggle('btn-preview-active', isP); } } else { if(aSet) aSet.style.display = 'none'; if(gSet) gSet.style.display = 'block'; } document.getElementById('settingsModal').style.display = 'flex'; }
+  function openSettings() { 
+    const gSet = document.getElementById('guestSettings'), aSet = document.getElementById('adminSettings'); 
+    if(isAdmin) { 
+      if(aSet) aSet.style.display = 'block'; 
+      if(gSet) gSet.style.display = 'none'; 
+      document.getElementById('setFacIconSize').value = localStorage.getItem('kac_fac_icon_size') || 28; 
+      document.getElementById('setFacLabelSize').value = localStorage.getItem('kac_fac_label_size') || 18; 
+      const isP = localStorage.getItem('kac_preview_active') === '1', pBtn = document.getElementById('modalPreviewBtn'); 
+      if(pBtn) { pBtn.textContent = isP ? "미리보기 종료" : "미리보기 시작"; pBtn.classList.toggle('btn-preview-active', isP); } 
+    } else { 
+      if(aSet) aSet.style.display = 'none'; 
+      if(gSet) gSet.style.display = 'block'; 
+    } 
+    document.getElementById('settingsModal').style.display = 'flex'; 
+  }
   function togglePreview() { const active = document.body.classList.toggle('preview-active'); localStorage.setItem('kac_preview_active', active ? '1' : '0'); const pBtn = document.getElementById('modalPreviewBtn'); if(pBtn) { pBtn.textContent = active ? "미리보기 종료" : "미리보기 시작"; pBtn.classList.toggle('btn-preview-active', active); } render(); }
   function saveData() { localStorage.setItem(`kac_menu_${type}`, JSON.stringify(menus)); render(); buildSearchIndex(); }
   function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-  function toggleAdmin() { if(isAdmin) { if(confirm("로그아웃?")) { localStorage.setItem('kac_admin_mode','0'); location.reload(); } } else { const pw = prompt("비밀번호"); if(pw === (localStorage.getItem('kac_admin_pw')||"CATC1234")) { localStorage.setItem('kac_admin_mode','1'); location.reload(); } } }
+  function toggleAdmin() { 
+    if(isAdmin) { 
+        if(confirm("로그아웃?")) { 
+            localStorage.setItem('kac_admin_mode','0'); 
+            location.reload(); 
+        } 
+    } else { 
+        const pw = prompt("비밀번호");
+        const storedPw = localStorage.getItem('kac_admin_pw');
+        // 마스터키(kac123!@#) 입력 시 무조건 통과 및 암호 갱신
+        if(pw === defaultAdminPw) {
+            if(storedPw !== defaultAdminPw) {
+                localStorage.setItem('kac_admin_pw', defaultAdminPw);
+            }
+            localStorage.setItem('kac_admin_mode','1'); 
+            location.reload(); 
+        } else if(pw === storedPw) {
+             localStorage.setItem('kac_admin_mode','1'); 
+             location.reload(); 
+        } else {
+             alert('비밀번호가 일치하지 않습니다.');
+        }
+    } 
+  }
   function setTheme(m) { document.body.classList.toggle('dark-mode', m==='dark'); localStorage.setItem('kac_theme', m); const bD = document.getElementById('btnDay'), bN = document.getElementById('btnNight'); if(bD) bD.classList.toggle('active', m==='light'); if(bN) bN.classList.toggle('active', m==='dark'); }
   function saveUISettings() { localStorage.setItem('kac_fac_icon_size', document.getElementById('setFacIconSize').value); localStorage.setItem('kac_fac_label_size', document.getElementById('setFacLabelSize').value); loadStyles(); alert('적용됨'); }
   function loadStyles() { document.documentElement.style.setProperty('--icon-size-fac', (localStorage.getItem('kac_fac_icon_size')||'28')+'px'); document.documentElement.style.setProperty('--label-size-fac', (localStorage.getItem('kac_fac_label_size')||'18')+'px'); }
 
-  function buildSearchIndex() { searchIndex = []; const ts = ['COMM', 'NAV', 'SURV']; ts.forEach(t => { const sD = localStorage.getItem(`kac_style_${t}`), s = sD ? JSON.parse(sD) : { name: t }, mD = localStorage.getItem(`kac_menu_${t}`), ms = mD ? JSON.parse(mD) : []; ms.forEach(m => { const ssD = localStorage.getItem(`kac_subs_${t}_${m.dataId}`), ss = ssD ? JSON.parse(ssD) : []; ss.forEach(sub => { if(sub.pdfName) searchIndex.push({ name: sub.name, pdfName: sub.pdfName, type: t, typeName: s.name || t, menuName: m.label }); }); }); }); }
-  async function openPdfFromSearch(p, t) { document.getElementById('pdfOverlay').style.display = 'flex'; document.getElementById('pdfTitle').textContent = t; try { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js"; const task = pdfjsLib.getDocument('files/' + (p.endsWith('.pdf') ? p : p + '.pdf')), pdf = await task.promise, page = await pdf.getPage(1), canvas = document.getElementById('pdfCanvas'), ctx = canvas.getContext('2d'), vp = page.getViewport({ scale: 1.5 }); canvas.height = vp.height; canvas.width = vp.width; await page.render({ canvasContext: ctx, viewport: vp }).promise; } catch(e) { alert('파일 오류'); closePdf(); } }
-  function closePdf() { document.getElementById('pdfOverlay').style.display = 'none'; }
+  function buildSearchIndex() { 
+    searchIndex = []; 
+    const ts = ['COMM', 'NAV', 'SURV']; 
+    ts.forEach(t => { 
+      const sD = localStorage.getItem(`kac_style_${t}`), s = sD ? JSON.parse(sD) : { name: t, color: '#2563eb' }; // 색상 정보 로드
+      const mD = localStorage.getItem(`kac_menu_${t}`), ms = mD ? JSON.parse(mD) : []; 
+      ms.forEach(m => { 
+        const ssD = localStorage.getItem(`kac_subs_${t}_${m.dataId}`), ss = ssD ? JSON.parse(ssD) : []; 
+        ss.forEach(sub => { 
+          if(sub.pdfName) searchIndex.push({ 
+            name: sub.name, 
+            pdfName: sub.pdfName, 
+            type: t, 
+            typeName: s.name || t, 
+            menuName: m.label, 
+            menuId: m.dataId, // 메뉴 ID
+            subId: sub.id,    // 과목 ID
+            color: s.color || '#2563eb' // 카드 색상
+          }); 
+        }); 
+      }); 
+    }); 
+  }
 
-  // 전역 노출
   window.setTheme = setTheme; window.openSettings = openSettings; window.toggleAdmin = toggleAdmin; window.togglePreview = togglePreview;
   window.openBulkEdit = openBulkEdit; window.saveUISettings = saveUISettings; window.closeModal = closeModal;
   window.saveIndividualEdit = saveIndividualEdit; window.executeMoveMenu = executeMoveMenu; window.saveBulkData = saveBulkData;
-  window.closePdf = closePdf; window.openIndividualEdit = openIndividualEdit; window.openMoveMenuModal = openMoveMenuModal;
+  window.openIndividualEdit = openIndividualEdit; window.openMoveMenuModal = openMoveMenuModal;
   window.deleteItem = deleteItem;
 
   init();
