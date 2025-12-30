@@ -72,10 +72,10 @@
 
   main { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; perspective: 1000px; }
   
-  /* [수정] 5개 카드 가로 배치 + 간격 고려 (280*5 + 30*4 = 1520px 이상) */
+  /* [수정] 다시 center로 변경하여 화면 중앙 정렬 */
   #cardContainer { 
     display: flex; flex-wrap: wrap; gap: 30px; width: 100%; max-width: 1700px; 
-    justify-content: flex-start; /* 왼쪽 정렬로 변경하여 빈자리 유지 */
+    justify-content: center; /* 다시 중앙 정렬 */
     padding: 20px; min-height: 450px; transform-style: preserve-3d; 
   }
   
@@ -86,14 +86,12 @@
   .card.empty-slot {
     background: transparent; border: 2px dashed #cbd5e1; box-shadow: none; opacity: 0.3; pointer-events: none;
   }
-  /* 관리자 모드에서 빈 슬롯은 드롭 가능하도록 */
   body.admin-mode .card.empty-slot {
     opacity: 0.7; pointer-events: auto; cursor: default;
   }
   body.admin-mode .card.empty-slot:hover {
     border-color: var(--comm); opacity: 1;
   }
-  /* 일반 유저에게 빈 슬롯은 투명인간 취급 */
   body:not(.admin-mode) .card.empty-slot {
     opacity: 0; pointer-events: none; border: none;
   }
@@ -279,7 +277,6 @@
 
 <script>
   let isAdmin = localStorage.getItem('kac_admin_mode') === '1';
-  // [수정] menuOrder가 항상 빈자리(null)를 포함한 배열로 관리됨
   let menuOrder = JSON.parse(localStorage.getItem('kac_index_order') || '[]');
   
   const defaultAdminPw = "kac123!@#";
@@ -292,7 +289,6 @@
     if(isAdmin) document.body.classList.add('admin-mode');
     if(localStorage.getItem('kac_preview_active') === '1') document.body.classList.add('preview-active');
     
-    // 데이터 초기화 및 슬롯 보정 (5의 배수로 맞춤)
     if(menuOrder.length % itemsPerPage !== 0) {
         const needed = itemsPerPage - (menuOrder.length % itemsPerPage);
         for(let i=0; i<needed; i++) menuOrder.push(null);
@@ -310,26 +306,21 @@
     const isP = document.body.classList.contains('preview-active');
     const showAdmin = isAdmin && !isP;
 
-    // 페이지네이션 계산
-    // 전체 슬롯 개수 기준 (빈자리 포함)
     let totalPages = Math.ceil(menuOrder.length / itemsPerPage);
     if(totalPages < 1) totalPages = 1;
     if(currentPage > totalPages) currentPage = totalPages;
 
     const start = (currentPage - 1) * itemsPerPage;
     
-    // 무조건 5개를 렌더링 (빈자리 포함)
     for(let i=0; i < itemsPerPage; i++) {
       const idx = start + i;
       const id = menuOrder[idx];
       
-      // 데이터 범위를 벗어나면 강제 확장 (페이지 끝 처리)
       if(idx >= menuOrder.length) {
           menuOrder.push(null);
       }
 
       if(id) {
-        // 실제 카드 렌더링
         const style = JSON.parse(localStorage.getItem(`kac_style_${id}`) || '{}');
         const card = document.createElement('div');
         card.className = 'card'; card.style.setProperty('--card-color', style.color || '#64748b');
@@ -355,15 +346,13 @@
         `;
         container.appendChild(card);
       } else {
-        // 빈 슬롯 렌더링 (관리자 모드일 때 추가 버튼 역할 가능)
         const emptyCard = document.createElement('div');
         emptyCard.className = 'card empty-slot';
         
         if(showAdmin) {
             emptyCard.innerHTML = `<div style="font-size:30px; color:#cbd5e1;">+</div><div style="font-size:12px; color:#cbd5e1;">빈 슬롯</div>`;
-            emptyCard.onclick = () => openCardEdit('NEW', idx); // 클릭 시 해당 위치에 추가
+            emptyCard.onclick = () => openCardEdit('NEW', idx); 
             
-            // 빈 슬롯도 드롭 대상이 되어야 함
             emptyCard.dataset.index = idx;
             emptyCard.ondragover = handleDragOver;
             emptyCard.ondrop = handleDrop;
@@ -372,14 +361,12 @@
       }
     }
 
-    // 페이지네이션 UI
     if(totalPages > 1 || showAdmin) {
       for(let i=1; i<=totalPages; i++) {
         const dot = document.createElement('div'); dot.className = `dot-nav ${i===currentPage?'active':''}`;
         dot.onclick = () => { currentPage = i; renderCards(); };
         pagination.appendChild(dot);
       }
-      // 관리자일 때 페이지 추가 버튼
       if(showAdmin) {
           const addPageBtn = document.createElement('div');
           addPageBtn.className = 'dot-nav';
@@ -390,7 +377,6 @@
           addPageBtn.style.lineHeight = '10px';
           addPageBtn.style.fontSize = '10px';
           addPageBtn.onclick = () => {
-              // 빈 페이지 추가 (null 5개 추가)
               for(let k=0; k<itemsPerPage; k++) menuOrder.push(null);
               localStorage.setItem('kac_index_order', JSON.stringify(menuOrder));
               currentPage = Math.ceil(menuOrder.length / itemsPerPage);
@@ -401,7 +387,6 @@
     }
   }
 
-  // 드래그 앤 드롭 로직
   let dragSrcIndex = null;
 
   function handleDragStart(e) {
@@ -423,7 +408,6 @@
     
     const targetIndex = parseInt(this.dataset.index);
     if (dragSrcIndex !== null && dragSrcIndex !== targetIndex) {
-        // 위치 교환 (Swap)
         const temp = menuOrder[targetIndex];
         menuOrder[targetIndex] = menuOrder[dragSrcIndex];
         menuOrder[dragSrcIndex] = temp;
@@ -519,10 +503,8 @@
     } catch(e) { alert("파일 오류가 발생했습니다."); document.getElementById('backupLoadingModal').style.display='none'; }
   }
 
-  // [수정] 추가 시 특정 인덱스 지정 가능
   function openCardEdit(id, index = null) {
     editingId = id;
-    // 신규 추가일 때, 클릭한 위치(index)를 기억
     if(index !== null) editingId = 'NEW:' + index;
 
     if(id === 'NEW') {
@@ -547,7 +529,6 @@
     let id = editingId;
     
     if(editingId.startsWith('NEW')) {
-        // 특정 위치에 추가
         const parts = editingId.split(':');
         const targetIdx = parts.length > 1 ? parseInt(parts[1]) : -1;
         id = 'M_' + Date.now();
@@ -555,7 +536,6 @@
         if(targetIdx !== -1) {
             menuOrder[targetIdx] = id;
         } else {
-            // 빈 공간 찾기
             const emptyIdx = menuOrder.indexOf(null);
             if(emptyIdx !== -1) menuOrder[emptyIdx] = id;
             else menuOrder.push(id);
@@ -576,7 +556,6 @@
       const opt = document.createElement('option'); opt.value = i; opt.textContent = i + " 페이지";
       select.appendChild(opt);
     }
-    // 새 페이지로 이동 옵션
     const newPageOpt = document.createElement('option');
     newPageOpt.value = 'NEW'; newPageOpt.textContent = "새 페이지로 이동";
     select.appendChild(newPageOpt);
@@ -589,12 +568,9 @@
     const item = menuOrder[moveSrcIndex];
     
     if(val === 'NEW') {
-        // 현재 자리는 비움
         menuOrder[moveSrcIndex] = null;
-        // 새 페이지 공간 확보 (5개)
         const currentLen = menuOrder.length;
         const newStart = Math.ceil(currentLen / itemsPerPage) * itemsPerPage;
-        // 부족한 만큼 채우고 새 페이지 추가
         for(let i=currentLen; i<newStart + itemsPerPage; i++) {
             menuOrder.push(null);
         }
@@ -604,15 +580,14 @@
         const startIdx = (page-1) * itemsPerPage;
         const endIdx = startIdx + itemsPerPage;
         
-        // 해당 페이지의 첫 번째 빈자리 찾기
         let foundEmpty = -1;
         for(let i=startIdx; i<endIdx; i++) {
             if(menuOrder[i] === null) { foundEmpty = i; break; }
         }
         
         if(foundEmpty !== -1) {
-            menuOrder[moveSrcIndex] = null; // 원래 자리 비움
-            menuOrder[foundEmpty] = item; // 새 자리 채움
+            menuOrder[moveSrcIndex] = null; 
+            menuOrder[foundEmpty] = item; 
         } else {
             alert("해당 페이지에 빈 공간이 없습니다.");
             return;
@@ -625,9 +600,9 @@
 
   function deleteCard(idx) {
     if(confirm("정말 삭제하시겠습니까?")) {
-        menuOrder[idx] = null; // 배열에서 제거하지 않고 null로 만듦 (빈자리 유지)
+        menuOrder[idx] = null; 
         localStorage.setItem('kac_index_order', JSON.stringify(menuOrder));
-        renderCards(); // 리로드 없이 다시 그리기
+        renderCards(); 
     }
   }
 
