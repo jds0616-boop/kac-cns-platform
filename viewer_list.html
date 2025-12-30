@@ -4,7 +4,6 @@
 <head>
 <meta charset="UTF-8" />
 <title>과목 리스트 - KAC CNS Training Platform</title>
-<!-- 로그인 체크 -->
 <script>
   if(sessionStorage.getItem('kac_access_token') !== 'granted') {
     location.replace('login.html'); 
@@ -15,15 +14,12 @@
 <style>
   @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
   :root { 
-    --theme-color: #2563eb; 
-    --theme-rgb: 37, 99, 235;
-
+    --theme-color: #2563eb; --theme-rgb: 37, 99, 235;
     --navy: #0f172a; --bg-main: #f0f4f8; --bg-card: #ffffff; 
     --text-main: #000000; --text-sub: #334155; 
     --border-card: transparent; --shadow: 0 5px 15px rgba(0,0,0,0.05);
     --btn-bg: #f8fafc; --btn-border: #e2e8f0; --btn-text: #64748b;
     --pill-bg: #f1f5f9; --pill-text: #94a3b8; --pill-border: #e2e8f0;
-    --title-color: #1e293b;
     --header-h: 75px;
   }
   body.dark-mode {
@@ -33,939 +29,357 @@
     --shadow: 0 5px 20px rgba(0,0,0,0.5);
     --btn-bg: rgba(255,255,255,0.05); --btn-border: rgba(255,255,255,0.2); --btn-text: #e2e8f0;
     --pill-bg: rgba(255,255,255,0.05); --pill-text: #cbd5e1; --pill-border: rgba(255,255,255,0.2);
-    --title-color: #ffffff;
   }
   
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
   body { background: var(--bg-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: var(--text-main); transition: 0.3s; }
 
-  /* 헤더 스타일 */
+  /* [수정] 헤더 레이아웃 최적화: 충돌 방지 로직 강화 */
   header { 
-    height: var(--header-h); background: var(--navy); 
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 40px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 1000; transition: 0.3s; 
-    flex-shrink: 0; gap: 20px; position: relative;
+    height: var(--header-h); background: var(--navy); display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 2000; flex-shrink: 0; position: relative; transition: 0.3s;
   }
-  
-  .header-left { display: flex; align-items: center; min-width: 250px; z-index: 10; }
-  .header-center { position: absolute; left: 50%; transform: translateX(-50%); width: 600px; max-width: 100%; z-index: 5; }
-  .header-right { display: flex; align-items: center; gap: 15px; min-width: 250px; justify-content: flex-end; z-index: 10; }
+  .header-left { display: flex; align-items: center; flex: 1; min-width: 400px; transition: 0.3s; }
+  .header-center { flex: 2; max-width: 650px; display: flex; justify-content: center; z-index: 2001; position: relative; }
+  .header-right { display: flex; align-items: center; gap: 15px; flex: 1; min-width: 350px; justify-content: flex-end; transition: 0.3s; }
 
-  @media (max-width: 1100px) {
+  /* [수정] 브레이크포인트를 1400px로 높여서 겹침 현상 원천 차단 */
+  @media (max-width: 1400px) {
     .header-left, .header-right { display: none !important; }
-    .header-center { position: relative; left: auto; transform: none; width: 100%; max-width: 100%; }
+    .header-center { max-width: 100%; width: 100%; flex: 1; }
     header { padding: 0 20px; }
-    .header-search { width: 100% !important; }
   }
-  
+
+  /* 로고 크기 고정 (Height 30px, Text 20px) */
   .logo-text { font-size: 20px; font-weight: 800; white-space: nowrap; cursor: pointer; transition: opacity 0.2s; }
   .logo-text:hover { opacity: 0.8; }
-  
-  .breadcrumb { display: flex; align-items: center; color: #94a3b8; font-weight: 500; font-size: 16px; margin-left: 10px; }
-  .crumb-link { cursor: pointer; transition: color 0.2s; }
-  .crumb-link:hover { color: #fff; } 
-  .crumb-current { cursor: default; } 
-
-  .header-search {
-    width: 100%; 
-    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 50px; padding: 12px 30px; color: #fff; font-size: 16px; font-weight: 600;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'%3E%3Cpath d='M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: 25px center; background-size: 20px;
-    padding-left: 55px; transition: 0.3s;
-  }
-  .header-search:focus { outline: none; background-color: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.5); box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-  .header-search::placeholder { color: rgba(255,255,255,0.5); font-weight: 400; }
-
-  .search-dropdown {
-    position: absolute; top: 110%; left: 0; right: 0; width: 400px; margin: 0 auto;
-    background: var(--bg-card); border-radius: 15px; 
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 1px solid var(--border-card);
-    overflow: hidden; display: none; max-height: 400px; overflow-y: auto; z-index: 2000;
-  }
-  .search-dropdown.active { display: block; }
-  .result-item { padding: 12px 20px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--btn-border); transition: 0.2s; }
-  .result-item:hover { background: rgba(var(--theme-rgb), 0.05); }
-  .result-info { display: flex; flex-direction: column; gap: 2px; text-align: left; }
-  .res-title { font-weight: 700; color: var(--text-main); font-size: 14px; }
-  .res-path { font-size: 11px; color: var(--text-sub); opacity: 0.7; }
-  .res-tag { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; color: #fff; min-width: 45px; text-align: center; }
-  
   .kac-logo-img { height: 30px; width: auto; display: block; object-fit: contain; }
 
-  .theme-toggle { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); margin-right: 10px; }
-  .theme-btn { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; opacity: 0.5; }
-  .theme-btn:hover { opacity: 1; background: rgba(255,255,255,0.1); }
-  .theme-btn.active { background: #fff; opacity: 1; color: var(--navy); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-  .theme-btn svg { width: 16px; height: 16px; fill: currentColor; }
+  .breadcrumb { display: flex; align-items: center; color: #94a3b8; font-weight: 500; font-size: 16px; margin-left: 10px; white-space: nowrap; }
+  .crumb-link { cursor: pointer; transition: color 0.2s; }
+  .crumb-link:hover { color: #fff; }
 
-  .settings-btn { 
-    display: flex; padding: 8px; width: 34px; height: 34px; 
-    border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); 
-    align-items: center; justify-content: center; font-size: 18px; 
-    cursor: pointer; transition: 0.3s; color: #cbd5e1;
+  #searchOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1500; display: none; backdrop-filter: blur(4px); animation: fadeIn 0.3s; }
+  #searchOverlay.active { display: block; }
+  body.search-mode .header-left, body.search-mode .header-right { opacity: 0.1; pointer-events: none; }
+
+  .header-search {
+    width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50px; padding: 12px 30px; color: #fff; font-size: 16px; font-weight: 600;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'%3E%3Cpath d='M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: 25px center; background-size: 20px; padding-left: 55px; transition: 0.3s;
   }
-  .settings-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+  .header-search:focus { outline: none; background-color: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.5); }
 
-  body.preview-active .add-card { display: none !important; }
-  body.preview-active .ctrl-btns { visibility: hidden; }
+  .search-dropdown { position: absolute; top: calc(100% + 8px); left: 0; right: 0; width: 100%; background: var(--bg-card); border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); border: 1px solid var(--border-card); overflow: hidden; display: none; max-height: 400px; overflow-y: auto; z-index: 2002; }
+  .search-dropdown.active { display: block; }
+  .result-item { padding: 15px 20px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--btn-border); transition: 0.2s; }
+  .result-item:hover { background: rgba(var(--theme-rgb), 0.05); }
+  .res-title { font-weight: 700; color: var(--text-main); font-size: 14px; }
+  .res-path { font-size: 11px; color: var(--text-sub); opacity: 0.6; margin-top: 4px; }
+  .res-tag { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; color: #fff; background: var(--theme-color); }
 
+  /* 리스트 스타일 */
   main { flex: 1; overflow-y: auto; padding: 40px; padding-bottom: 150px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
-
   .subject-card { 
     background: var(--bg-card); width: 100%; max-width: 900px; padding: 25px 35px; border-radius: 18px; 
-    box-shadow: var(--shadow); 
-    border: 1px solid transparent;
-    display: flex; justify-content: space-between; align-items: center; transition: 0.3s;
-    border-left: 10px solid var(--theme-color); 
-    cursor: pointer; color: var(--text-main);
-    position: relative;
+    box-shadow: var(--shadow); border: 1px solid transparent; display: flex; justify-content: space-between; align-items: center; 
+    transition: 0.3s; border-left: 10px solid var(--theme-color); cursor: pointer; color: var(--text-main); position: relative;
   }
   .subject-card:hover { transform: translateX(10px); border-color: var(--theme-color); box-shadow: 0 5px 20px rgba(var(--theme-rgb), 0.2); }
-  .subject-card.inactive { border-left-color: #94a3b8 !important; opacity: 0.7; background: #f8fafc; }
-  body.dark-mode .subject-card.inactive { background: #1e293b; opacity: 0.6; }
-  .subject-card.dragging { opacity: 0.5; border: 2px dashed #94a3b8; background: rgba(255,255,255,0.05); }
-  .subject-card.drag-over { border: 2px solid var(--theme-color); transform: scale(1.02); box-shadow: 0 0 15px rgba(var(--theme-rgb), 0.2); z-index: 10; }
+  .subject-card.last-viewed::after { content: '✓'; position: absolute; right: -40px; top: 50%; transform: translateY(-50%); color: #10b981; font-size: 24px; font-weight: bold; }
+  .subject-card.dragging { opacity: 0.5; border: 2px dashed #94a3b8; }
+  .subject-card.drag-over { border: 2px solid var(--theme-color); transform: scale(1.02); }
 
-  /* [수정] 방금 본 파일 아이콘 (체크표시) */
-  .last-viewed-icon {
-    position: absolute; right: 0; top: 50%; transform: translateY(-50%);
-    width: 40px; height: 100%;
-    display: flex; align-items: center; justify-content: center;
-    color: #10b981; /* 초록색 */
-    opacity: 0; transition: 0.3s;
-  }
-  .subject-card.last-viewed .last-viewed-icon { opacity: 1; right: -40px; }
-  .last-viewed-icon svg { width: 24px; height: 24px; fill: currentColor; }
-
-  .subj-title { font-size: 20px; font-weight: 800; color: var(--title-color); transition: 0.3s; }
-  body.dark-mode .subj-title { text-shadow: 0 0 15px rgba(255,255,255,0.15); }
-
-  .add-card { border: 2px dashed #cbd5e1; background: transparent; justify-content: center; color: #94a3b8; font-weight: 800; }
-  .add-card:hover { border-color: #64748b; color: #64748b; background: rgba(255,255,255,0.5); transform: none; box-shadow: none; }
-
+  .subj-title { font-size: 20px; font-weight: 800; color: var(--text-main); }
   .status-group { display: flex; gap: 8px; margin-top: 8px; }
   .status-pill { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 6px; background: var(--pill-bg); color: var(--pill-text); border: 1px solid var(--pill-border); }
   .status-pill.on { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
-  body.dark-mode .status-pill.on { background: rgba(22, 163, 74, 0.2); color: #86efac; border-color: #166534; }
-  .status-pill.dev { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
-  body.dark-mode .status-pill.dev { background: rgba(255,255,255,0.1); color: #94a3b8; border-color: rgba(255,255,255,0.1); }
+  .status-pill.link { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
 
   .ctrl-btns { display: flex; gap: 10px; }
-  .btn-action { 
-    padding: 8px 14px; border-radius: 8px; border: 1px solid var(--btn-border); background: var(--btn-bg); 
-    font-size: 12px; font-weight: 700; color: var(--btn-text); cursor: pointer; transition: 0.2s; 
-    display: flex; align-items: center; gap: 5px;
-  }
-  .btn-action:hover { background: rgba(128,128,128,0.2); color: var(--text-main); }
-  .btn-del { color: #ef4444; border-color: #fee2e2; }
-  .btn-del:hover { background: #fee2e2; }
+  .btn-action { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--btn-border); background: var(--btn-bg); font-size: 12px; font-weight: 700; color: var(--btn-text); cursor: pointer; transition: 0.2s; }
+  .btn-action:hover { background: rgba(128,128,128,0.15); color: var(--text-main); }
 
-  #pdfOverlay { 
-    position: fixed; inset: 0; background: #000; display: none; z-index: 7000; overflow: hidden; 
-    transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-  
-  .v-header { position: absolute; top: 0; left: 0; right: 0; height: 80px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 8000; color: #fff; background: transparent; }
-  .v-header-left { display: flex; align-items: center; gap: 25px; }
-  .close-v { font-size: 32px; cursor: pointer; transition: 0.3s; z-index: 8100; opacity: 0.8; }
-  .close-v:hover { color: #ef4444; opacity: 1; }
-  .v-title-box { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); padding: 10px 25px; border-radius: 100px; backdrop-filter: blur(5px); font-weight: 800; font-size: 16px; letter-spacing: -0.5px; }
-  .v-header-right { display: flex; align-items: center; gap: 20px; }
-  
-  .v-icon-btn { cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; z-index: 8100; opacity: 0.8; padding: 5px; position: relative; }
-  .v-icon-btn:hover { opacity: 1; transform: scale(1.05); }
-  .v-icon-btn.active { color: #facc15; opacity: 1; transform: scale(1.1); }
-  .v-icon-btn.disabled { opacity: 0.2; pointer-events: none; cursor: default; }
-  .v-icon-btn svg { width: 26px; height: 26px; fill: currentColor; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
-  
-  #audioPanel { position: absolute; top: -110px; left: 50%; transform: translateX(-50%); width: 480px; height: 80px; background: #fff; border-radius: 0 0 20px 20px; display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 10px 25px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 7900; box-shadow: 0 10px 30px rgba(0,0,0,0.5); color: #000; }
-  #audioPanel.open { top: 0px; }
-  .audio-ctrl-row { display: flex; align-items: center; gap: 15px; }
-  .audio-btn { background: var(--navy); color: #fff; border: none; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; flex-shrink: 0; }
-  #audioProgress { flex: 1; accent-color: var(--navy); cursor: pointer; }
-  .volume-row { display: flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 800; color: #666; margin-left: 45px; }
-  #volumeControl { width: 80px; accent-color: #64748b; height: 4px; }
-  
-  .progress-hit-area { position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; z-index: 9000; cursor: pointer; display: flex; align-items: flex-end; }
-  .progress-track { width: 100%; height: 6px; background: rgba(255,255,255,0.3); position: relative; transition: height 0.2s, background 0.2s; }
-  .progress-hit-area:hover .progress-track { background: rgba(255,255,255,0.5); height: 8px; }
-  .progress-fill { height: 100%; width: 0%; background: #ef4444; position: relative; }
-  .progress-handle { position: absolute; right: -7px; bottom: 0; width: 14px; height: 9px; background: #ef4444; border-radius: 7px 7px 0 0; border: 2px solid #fff; border-bottom: none; box-shadow: 0 -2px 10px rgba(0,0,0,0.3); z-index: 9100; }
-  .progress-flag { position: absolute; right: -30px; bottom: 35px; background: #1e293b; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 800; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; transform: translateY(10px); box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 9200; }
-  .progress-flag::after { content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); border-width: 5px 5px 0; border-style: solid; border-color: #1e293b transparent transparent transparent; }
-  .progress-hit-area:hover .progress-flag, .progress-hit-area.dragging .progress-flag { opacity: 1; transform: translateY(0); }
-  
-  .side-nav { position: absolute; top: 0; bottom: 0; width: 12%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 7500; background: transparent; border: none; transition: 0.3s; }
-  .side-nav svg { width: 50px; height: 50px; fill: #fff; opacity: 0.15; transition: 0.3s; }
-  .side-nav:hover svg { opacity: 0.7; }
-  .nav-L { left: 0; } .nav-R { right: 0; }
-  
-  .viewer-body { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; cursor: default; overflow: auto; scroll-behavior: smooth; }
-  
-  canvas { box-shadow: 0 0 50px rgba(0,0,0,0.8); pointer-events: none; }
-  #pageContainer { position: relative; display: flex; justify-content: center; align-items: center; }
-
-  .bottom-nav { 
-    position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); 
-    background: var(--navy); padding: 15px 45px; border-radius: 100px; 
-    display: flex; gap: 40px; align-items: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000; border: 1px solid rgba(255,255,255,0.1); 
-  }
-  .nav-item { 
-    color: #fff; cursor: pointer; font-size: 18px; font-weight: 700; transition: 0.3s; opacity: 0.8; 
-    display: flex; align-items: center; gap: 10px;
-  }
-  .nav-item:hover { opacity: 1; transform: translateY(-3px); }
-  .nav-icon { width: 24px; height: 24px; fill: currentColor; }
-
-  .creator-info { position: fixed; bottom: 5px; width: 100%; text-align: center; font-size: 11px; color: var(--text-sub); opacity: 0.5; font-weight: 500; z-index: 500; pointer-events: none; }
-  .creator-info b { font-weight: 700; }
-  body.dark-mode .creator-info { color: #fff; opacity: 0.3; }
-
-  /* 범용 모달 스타일 */
+  /* 설정 및 관리 모달 */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none; align-items: center; justify-content: center; }
   .modal-card { background: var(--bg-card); padding: 35px; border-radius: 25px; width: 500px; color: var(--text-main); box-shadow: 0 20px 50px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
-  .modal-title { font-size: 20px; font-weight: 800; margin-bottom: 20px; border-bottom: 1px solid var(--btn-border); padding-bottom: 10px; }
+  .modal-title { font-size: 20px; font-weight: 800; margin-bottom: 20px; border-bottom: 1px solid var(--btn-border); padding-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+  
   .setting-group { margin-bottom: 25px; }
-  .setting-label { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; display: block; }
-  .setting-input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--text-main); font-size: 14px; }
-  .btn-row { display: flex; gap: 10px; margin-top: 30px; }
-  .btn-modal { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; }
-  .btn-primary { background: var(--navy); color: #fff; }
-  .btn-secondary { background: var(--btn-border); color: var(--text-sub); }
+  .setting-label { font-size: 13px; font-weight: 700; color: var(--text-sub); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .btn-row-flex { display: flex; gap: 10px; margin-bottom: 10px; }
+  .btn-modal { padding: 14px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 14px; text-align: center; }
+  
+  .btn-primary-dark { background: #0f172a; color: #fff; }
   .btn-danger { background: #ef4444; color: #fff; }
+  .btn-grey { background: #e2e8f0; color: #64748b; }
+  .btn-preview-active { background: #10b981 !important; color: #fff !important; }
 
-  /* 일괄 등록 테이블 스타일 */
-  .batch-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .batch-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
   .batch-table th, .batch-table td { padding: 8px; border: 1px solid var(--btn-border); text-align: center; }
-  .batch-table th { background: var(--btn-bg); font-weight: 700; color: var(--text-sub); }
-  .batch-input { width: 100%; border: none; background: transparent; color: var(--text-main); }
+  .batch-input { width: 100%; border: 1px solid transparent; background: transparent; color: var(--text-main); text-align: center; outline: none; border-radius: 4px; padding: 4px; }
+  .batch-input:focus { border-color: var(--theme-color); background: #fff; }
+
+  /* PDF 뷰어 */
+  #pdfOverlay { position: fixed; inset: 0; background: #000; z-index: 10000; display: none; flex-direction: column; }
+  .pdf-header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; background: #1e293b; color: #fff; }
+  .viewer-body { flex: 1; overflow: auto; display: flex; justify-content: center; align-items: flex-start; background: #334155; padding: 40px; }
+  canvas { box-shadow: 0 0 50px rgba(0,0,0,0.8); }
+
+  /* 하단 네비게이션 */
+  .bottom-nav { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); background: var(--navy); padding: 15px 45px; border-radius: 100px; display: flex; gap: 40px; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000; border: 1px solid rgba(255,255,255,0.1); }
+  .nav-item { color: #fff; cursor: pointer; font-size: 18px; font-weight: 700; transition: 0.3s; opacity: 0.8; display: flex; align-items: center; gap: 10px; }
+  .nav-item:hover { opacity: 1; transform: translateY(-3px); }
+
+  .theme-toggle { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); margin-right: 10px; }
+  .theme-btn { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; opacity: 0.5; }
+  .theme-btn.active { background: #fff; opacity: 1; color: var(--navy); }
+  .theme-btn svg { width: 16px; height: 16px; fill: currentColor; }
+  .settings-btn { display: flex; padding: 8px; width: 34px; height: 34px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.3s; color: #cbd5e1; }
 </style>
 </head>
 <body oncontextmenu="return false;">
+
+<div id="searchOverlay"></div>
 
 <header>
   <div class="header-left">
     <div class="logo-text" onclick="location.href='index.html'">KAC CNS Training Platform</div>
     <div class="breadcrumb" id="breadcrumbContainer"></div>
   </div>
-
   <div class="header-center">
-    <input type="text" id="searchInput" class="header-search" placeholder="예시) 항공통신용 데이터링크, VOR, ILS..." autocomplete="off">
+    <input type="text" id="searchInput" class="header-search" placeholder="예시) VOR, ILS, 단거리 이동통신..." autocomplete="off">
     <div id="searchDropdown" class="search-dropdown"></div>
   </div>
-
   <div class="header-right">
     <div class="theme-toggle">
-      <div class="theme-btn" id="btnDay" onclick="setTheme('light')" title="주간 모드"><svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg></div>
-      <div class="theme-btn" id="btnNight" onclick="setTheme('dark')" title="야간 모드"><svg viewBox="0 0 24 24"><path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C6.94,10.39 9.79,16.87 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z"/></svg></div>
+      <div class="theme-btn" id="btnDay" onclick="setTheme('light')" title="주간">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg>
+      </div>
+      <div class="theme-btn" id="btnNight" onclick="setTheme('dark')" title="야간">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C6.94,10.39 9.79,16.87 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z"/></svg>
+      </div>
     </div>
-    
-    <div class="settings-btn" onclick="openSettings()" title="설정">⚙️</div>
+    <div class="settings-btn" onclick="openSettings()">⚙️</div>
     <img src="logo.png" alt="KAC Logo" class="kac-logo-img">
   </div>
 </header>
 
-<main id="subjectList" style="padding-top: 40px;"></main>
+<main id="subjectList"></main>
 
-<!-- 개별 업로드 모달 -->
-<div id="uploadModal" class="modal-overlay">
-  <div class="modal-card">
-    <div class="modal-title">자료 등록 및 수정</div>
-    <input type="text" id="editSubjectName" placeholder="과목명을 입력하세요" class="setting-input" style="margin-bottom:15px;">
-    <label class="setting-label">상태 설정</label>
-    <select id="editActiveStatus" class="setting-input" style="margin-bottom:15px;">
-        <option value="true">🟢 활성 (서비스 중)</option>
-        <option value="false">🚧 비활성 (개발 중)</option>
-    </select>
-    
-    <label class="setting-label">📄 PDF 파일 경로 (예: COMM/manual.pdf)</label>
-    <input type="text" id="inputPdfName" class="setting-input" placeholder="예: COMM/manual.pdf" style="margin-bottom:20px;">
-    
-    <label class="setting-label">🎵 오디오 파일 경로 (예: COMM/audio.mp3)</label>
-    <input type="text" id="inputAudioName" class="setting-input" placeholder="예: COMM/audio.mp3" style="margin-bottom:20px;">
-    
-    <div class="btn-row">
-      <button onclick="saveFiles()" class="btn-modal btn-primary">저장</button>
-      <button onclick="document.getElementById('uploadModal').style.display='none'" class="btn-modal btn-secondary">취소</button>
-    </div>
-  </div>
-</div>
-
-<!-- 이동 모달 -->
-<div id="moveModal" class="modal-overlay">
-  <div class="modal-card">
-    <div class="modal-title">📂 과목 이동</div>
-    <p style="font-size:13px; color:var(--text-sub); margin-bottom:20px;">
-      선택한 과목을 다른 메뉴로 이동합니다.
-    </p>
-    <select id="moveTargetSelect" class="setting-input" style="margin-bottom:20px;"></select>
-    <div class="btn-row">
-      <button onclick="executeMove()" class="btn-modal btn-primary">이동 확인</button>
-      <button onclick="document.getElementById('moveModal').style.display='none'" class="btn-modal btn-secondary">취소</button>
-    </div>
-  </div>
+<div class="bottom-nav">
+  <div class="nav-item" onclick="history.back()"><svg style="width:24px;height:24px;fill:currentColor" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>뒤로가기</div>
+  <div class="nav-item" onclick="location.href='index.html'"><svg style="width:24px;height:24px;fill:currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>홈으로</div>
 </div>
 
 <!-- 설정 모달 -->
 <div id="settingsModal" class="modal-overlay">
   <div class="modal-card">
     <div class="modal-title">⚙️ 설정 및 관리</div>
-    
-    <div class="setting-group">
-      <label class="setting-label">🛠️ 시스템 관리</label>
-      <div style="display:flex; gap:10px;">
-        <button id="modalAdminBtn" class="btn-modal btn-secondary" onclick="toggleAdmin()">관리자 로그인</button>
-        <button id="modalPreviewBtn" class="btn-modal btn-secondary" onclick="togglePreview()" style="display:none;">👁️ 미리보기</button>
+    <div id="guestSettings" style="display:none;"><button class="btn-modal btn-primary-dark" style="width:100%" onclick="toggleAdmin()">관리자 로그인</button></div>
+    <div id="adminSettings" style="display:none;">
+      <div class="setting-group">
+        <label class="setting-label">🛠️ 시스템 관리</label>
+        <div class="btn-row-flex">
+          <button class="btn-modal btn-danger" style="flex:1" onclick="toggleAdmin()">관리자 로그아웃</button>
+          <button id="modalPreviewBtn" class="btn-modal btn-grey" style="flex:1" onclick="togglePreview()">미리보기 시작</button>
+        </div>
+      </div>
+      <div class="setting-group">
+        <label class="setting-label">📦 대량 등록 관리</label>
+        <div class="btn-row-flex">
+          <button class="btn-modal btn-primary-dark" style="flex:1" onclick="openBatchAddModal()">일괄 입력 (신규)</button>
+          <button class="btn-modal btn-grey" style="flex:1" onclick="openBatchEditModal()">일괄 수정 (기존)</button>
+        </div>
+        <p style="font-size:11px; color:#94a3b8; margin-top:8px;">* GitHub files 폴더 내의 경로를 입력하세요.</p>
       </div>
     </div>
-
-    <div class="setting-group">
-      <label class="setting-label">📦 대량 등록 관리</label>
-      <div style="display:flex; gap:10px; margin-bottom:10px;">
-        <button class="btn-modal btn-primary" style="flex:1" onclick="openBatchAddModal()">일괄 입력 (신규)</button>
-        <button class="btn-modal btn-secondary" style="flex:1" onclick="openBatchEditModal()">일괄 수정 (기존)</button>
-      </div>
-      <p style="font-size:11px; color:var(--text-sub);">* GitHub files 폴더 내의 경로를 입력하세요.</p>
-    </div>
-
-    <div class="btn-row">
-      <button class="btn-modal btn-secondary" onclick="document.getElementById('settingsModal').style.display='none'">닫기</button>
-    </div>
+    <button class="btn-modal btn-grey" style="width:100%; margin-top:10px;" onclick="closeModal('settingsModal')">닫기</button>
   </div>
 </div>
 
-<!-- 일괄 등록/수정 모달 -->
+<div id="uploadModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-title">자료 등록 및 수정</div>
+    <input type="text" id="editSubjectName" class="batch-input" style="border:1px solid #ddd; height:45px; margin-bottom:15px; border-radius:10px; width:100%;" placeholder="과목명">
+    <select id="editActiveStatus" class="batch-input" style="border:1px solid #ddd; height:45px; margin-bottom:15px; border-radius:10px; width:100%;">
+        <option value="true">🟢 활성 (서비스 중)</option>
+        <option value="false">🚧 비활성 (개발 중)</option>
+    </select>
+    <input type="text" id="inputPdfName" class="batch-input" style="border:1px solid #ddd; height:45px; margin-bottom:15px; border-radius:10px; width:100%;" placeholder="PDF 경로 (예: COMM/manual.pdf)">
+    <input type="text" id="inputAudioName" class="batch-input" style="border:1px solid #ddd; height:45px; margin-bottom:15px; border-radius:10px; width:100%;" placeholder="오디오 경로 (예: COMM/audio.mp3)">
+    <input type="text" id="inputExternalLink" class="batch-input" style="border:1px solid #ddd; height:45px; margin-bottom:15px; border-radius:10px; width:100%;" placeholder="외부 링크 (예: https://...)">
+    <div class="btn-row-flex"><button onclick="saveFiles()" class="btn-modal btn-primary-dark" style="flex:1">저장</button><button onclick="closeModal('uploadModal')" class="btn-modal btn-grey" style="flex:1">취소</button></div>
+  </div>
+</div>
+
 <div id="batchModal" class="modal-overlay">
-  <div class="modal-card" style="width: 800px; max-width: 95%;">
-    <div class="modal-title" id="batchModalTitle">📋 일괄 자료 등록</div>
-    <div style="overflow-y:auto; max-height:50vh; border:1px solid var(--btn-border); margin-bottom:20px;">
-        <table class="batch-table" id="batchTable">
-            <thead>
-                <tr>
-                    <th style="width:40px;">No.</th>
-                    <th>과목명</th>
-                    <th style="width:200px;">PDF 경로</th>
-                    <th style="width:200px;">오디오 경로</th>
-                </tr>
-            </thead>
-            <tbody id="batchTbody"></tbody>
-        </table>
+  <div class="modal-card" style="width: 950px; max-width:95%;">
+    <div class="modal-title" id="batchModalTitle">일괄 작업</div>
+    <div style="overflow-y:auto; max-height:50vh; border:1px solid var(--btn-border); border-radius:10px;">
+      <table class="batch-table">
+        <thead><tr><th>No</th><th>과목명</th><th>PDF 경로</th><th>오디오 경로</th><th>외부 링크</th></tr></thead>
+        <tbody id="batchTbody"></tbody>
+      </table>
     </div>
-    <div class="btn-row">
-      <button id="batchSaveBtn" class="btn-modal btn-primary">저장</button>
-      <button onclick="document.getElementById('batchModal').style.display='none'" class="btn-modal btn-secondary">취소</button>
+    <div class="btn-row-flex" style="margin-top:20px;">
+      <button id="batchSaveBtn" class="btn-modal btn-primary-dark" style="flex:1">저장</button>
+      <button onclick="closeModal('batchModal')" class="btn-modal btn-grey" style="flex:1">취소</button>
     </div>
   </div>
 </div>
 
-<div id="pdfOverlay" onmousedown="handleMouseNav(event)">
-  <div class="v-header" onmousedown="event.stopPropagation()">
-    <div class="v-header-left">
-      <div class="close-v" onclick="closeViewer()">✕</div>
-      <div id="vTitle" class="v-title-box"></div>
-    </div>
-    <div class="v-header-right">
-      <div class="v-icon-btn" id="fsBtn" onmousedown="event.stopPropagation()" onclick="toggleFullScreen(event)" title="전체화면 전환">
-        <svg id="iconExpand" viewBox="0 0 24 24"><path d="M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17H7V14H5V19H10V17Z"/></svg>
-        <svg id="iconCompress" viewBox="0 0 24 24" style="display:none;"><path d="M14,14H19V16H16V19H14V14M5,14H10V19H8V16H5V14M8,5H10V10H5V8H8V5M14,5H16V8H19V10H14V5Z"/></svg>
-      </div>
-      <div class="v-icon-btn" onmousedown="event.stopPropagation()" onclick="downloadPdf(event)" title="다운로드">
-        <svg viewBox="0 0 24 24"><path d="M14,2L20,8V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V4A2,2 0 0,1 6,2H14M18,20V9H13V4H6V20H18M12,19L8,15H10.5V11H13.5V15H16L12,19Z"/></svg>
-      </div>
-      <div id="audioBtn" class="v-icon-btn" onmousedown="event.stopPropagation()" onclick="toggleAudioPanel(event)" title="오디오">
-        <svg viewBox="0 0 24 24"><path d="M12,2A3,3 0 0,0 9,5V11A3,3 0 0,0 12,14A3,3 0 0,0 15,11V5A3,3 0 0,0 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,1 12,16A5,5 0 0,1 17,11H19Z"/></svg>
-        <span>(Audio)</span>
-      </div>
-    </div>
-  </div>
-
-  <div id="audioPanel" onmousedown="event.stopPropagation()">
-    <div class="audio-ctrl-row">
-      <button id="playBtn" class="audio-btn">▶</button>
-      <input type="range" id="audioProgress" value="0">
-      <span id="audioTime" style="font-size:11px; font-weight:800; color:var(--navy); width:40px;">00:00</span>
-    </div>
-    <div class="volume-row">
-      🔊 <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="1">
-    </div>
-  </div>
-
-  <button id="btnPrev" class="side-nav nav-L" onmousedown="event.stopPropagation(); prevPage()"><svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
-  <button id="btnNext" class="side-nav nav-R" onmousedown="event.stopPropagation(); nextPage()"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></button>
-
-  <div id="viewerBody" class="viewer-body">
-    <div id="pageContainer"></div>
-  </div>
-
-  <div id="progressHitArea" class="progress-hit-area" onmousedown="event.stopPropagation()">
-    <div class="progress-track">
-      <div id="pageFill" class="progress-fill">
-        <div class="progress-handle"></div>
-        <div id="progressFlag" class="progress-flag">0 / 0</div>
-      </div>
-    </div>
+<div id="moveModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-title">📂 과목 이동</div>
+    <select id="moveTargetSelect" class="batch-input" style="border:1px solid #ddd; height:45px; margin-bottom:20px; border-radius:10px; width:100%;"></select>
+    <div class="btn-row-flex"><button onclick="executeMove()" class="btn-modal btn-primary-dark" style="flex:1">이동 확인</button><button onclick="closeModal('moveModal')" class="btn-modal btn-grey" style="flex:1">취소</button></div>
   </div>
 </div>
 
-<audio id="mainAudio"></audio>
-
-<div class="bottom-nav">
-  <div class="nav-item" onclick="history.back()">
-    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-    뒤로가기
-  </div>
-  <div class="nav-item" onclick="location.href='index.html'">
-    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-    홈으로
-  </div>
+<div id="pdfOverlay">
+  <div class="pdf-header"><div id="pdfTitle" style="font-weight:bold;"></div><div onclick="closePdf()" style="cursor:pointer; font-size:24px;">✕</div></div>
+  <div class="viewer-body"><canvas id="pdfCanvas"></canvas></div>
 </div>
-
-<div class="creator-info">Developed by <b>DooSeok, JANG</b> (jds0616@airport.co.kr)</div>
 
 <script>
   pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
-  
-  const params = new URLSearchParams(location.search);
-  const type = params.get('type'), menuName = params.get('menu'), menuId = params.get('id');
+  const params = new URLSearchParams(location.search), type = params.get('type'), menuName = params.get('menu'), menuId = params.get('id');
   const isAdmin = localStorage.getItem('kac_admin_mode') === '1';
-
-  const defaultStyles = {
-    COMM: { name: '통신시설', code: 'C', color: '#2563eb' },
-    NAV:  { name: '항법시설', code: 'N', color: '#16a34a' },
-    SURV: { name: '감시시설', code: 'S', color: '#ea580c' }
-  };
-
-  const savedStyle = JSON.parse(localStorage.getItem(`kac_style_${type}`) || '{}');
-  const finalStyle = { ...defaultStyles[type], ...savedStyle }; 
-  const typeName = finalStyle.name || type;
-  
-  const hexToRgb = (hex) => {
-    let c;
-    if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
-        c= hex.substring(1).split('');
-        if(c.length== 3){
-            c= [c[0], c[0], c[1], c[1], c[2], c[2]];
-        }
-        c= '0x'+c.join('');
-        return [(c>>16)&255, (c>>8)&255, c&255].join(',');
-    }
-    return '37, 99, 235'; 
-  };
-
-  const themeColor = finalStyle.color || '#2563eb';
-  document.documentElement.style.setProperty('--theme-color', themeColor);
-  document.documentElement.style.setProperty('--theme-rgb', hexToRgb(themeColor));
-
-  const bc = document.getElementById('breadcrumbContainer');
-  const midSpan = document.createElement('span');
-  midSpan.innerHTML = ` &nbsp;>&nbsp; ${typeName}`;
-  midSpan.className = 'crumb-link';
-  midSpan.onclick = () => location.href = `facility.html?type=${type}`;
-  const currSpan = document.createElement('span');
-  currSpan.innerHTML = ` &nbsp;>&nbsp; ${menuName}`;
-  currSpan.className = 'crumb-current';
-  bc.appendChild(midSpan);
-  bc.appendChild(currSpan);
-
-  document.body.className = document.body.className + ' ' + type;
-
-  const theme = localStorage.getItem('kac_theme') || 'light';
-  setTheme(theme);
-
-  if(localStorage.getItem('kac_preview_active') === '1') {
-    document.body.classList.add('preview-active');
-  }
-
-  function setTheme(mode) {
-    document.body.className = (document.body.className.replace('dark-mode','').trim() + (mode==='dark' ? ' dark-mode' : '')).trim();
-    localStorage.setItem('kac_theme', mode);
-    document.getElementById('btnDay').classList.toggle('active', mode==='light');
-    document.getElementById('btnNight').classList.toggle('active', mode==='dark');
-  }
-
-  function toggleAdmin() {
-    if(isAdmin) { if(confirm("관리자 모드를 종료하시겠습니까?")) { localStorage.setItem('kac_admin_mode','0'); location.reload(); } }
-    else { if(prompt("비밀번호") === (localStorage.getItem('kac_admin_pw')||"CATC1234")) { localStorage.setItem('kac_admin_mode','1'); location.reload(); } }
-  }
-
-  function togglePreview() {
-    document.body.classList.toggle('preview-active');
-    const isActive = document.body.classList.contains('preview-active');
-    localStorage.setItem('kac_preview_active', isActive ? '1' : '0');
-    location.reload();
-  }
-
   let subjects = JSON.parse(localStorage.getItem(`kac_subs_${type}_${menuId}`) || '[]');
-  let currentEditIdx = -1;
-  let viewingIndex = -1; 
+  let lastViewedIdx = -1, dragSrcIndex = null, currentEditIdx = -1;
 
-  async function render() {
+  function init() {
+    const style = JSON.parse(localStorage.getItem(`kac_style_${type}`) || '{}');
+    document.documentElement.style.setProperty('--theme-color', style.color || '#2563eb');
+    document.documentElement.style.setProperty('--theme-rgb', hexToRgb(style.color || '#2563eb'));
+    setTheme(localStorage.getItem('kac_theme') || 'light');
+    document.getElementById('breadcrumbContainer').innerHTML = `<span class="crumb-link" onclick="location.href='facility.html?type=${type}'"> > ${style.name || type}</span><span> > ${menuName}</span>`;
+    if(localStorage.getItem('kac_preview_active') === '1') document.body.classList.add('preview-active');
+    render(); buildSearchIndex(); setupSearch();
+  }
+
+  function render() {
     const list = document.getElementById('subjectList'); list.innerHTML = '';
-    
-    for (let i = 0; i < subjects.length; i++) {
-      const sub = subjects[i];
-      const isActive = sub.active !== false; 
-      
-      const hasPdf = !!sub.pdfName;
-      const hasAudio = !!sub.audioName;
-      
-      const card = document.createElement('div'); 
-      card.className = `subject-card ${isActive ? '' : 'inactive'}`;
-      card.id = `card-${i}`; 
+    const isP = document.body.classList.contains('preview-active');
 
-      if(isAdmin) {
+    subjects.forEach((sub, i) => {
+      const card = document.createElement('div'); card.className = `subject-card ${sub.active!==false?'':'inactive'}`; card.id = `sub-${i}`;
+      if(i === lastViewedIdx) card.classList.add('last-viewed');
+      
+      if(isAdmin && !isP) {
         card.setAttribute('draggable', 'true');
-        card.ondragstart = (e) => handleDragStart(e, i);
-        card.ondragover = (e) => handleDragOver(e);
-        card.ondrop = (e) => handleDrop(e, i);
-        card.ondragend = (e) => handleDragEnd(e);
-        card.ondragleave = (e) => handleDragLeave(e);
+        card.ondragstart = (e) => { dragSrcIndex = i; card.classList.add('dragging'); };
+        card.ondragover = (e) => { e.preventDefault(); card.classList.add('drag-over'); };
+        card.ondragleave = () => card.classList.remove('drag-over');
+        card.ondrop = (e) => { e.preventDefault(); if(dragSrcIndex!==i) { const moved = subjects.splice(dragSrcIndex, 1)[0]; subjects.splice(i, 0, moved); saveSubjects(); } };
+        card.ondragend = () => card.classList.remove('dragging', 'drag-over');
       }
-      card.onclick = () => { if(!isActive && !isAdmin) { alert("현재 교재 개발 중입니다."); return; } openViewer(i); };
 
-      const statusTag = isActive ? '' : '<span class="status-pill dev">🚧 개발중</span>';
-      const moveBtn = isAdmin ? `<button class="btn-action" onclick="event.stopPropagation(); openMoveModal(${i})" title="다른 메뉴로 이동"><svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M20,6h-8l-2-2H4C2.89,4,2,4.89,2,6v12c0,1.1,0.89,2,2,2h16c1.1,0,2-0.9,2-2V8C22,6.9,21.1,6,20,6z M20,18H4V6h5.17l2,2H20V18z M12,14h2v2h-2v2l-3.5-3.5L12,11V14z"/></svg> 이동</button>` : '';
-
-      card.innerHTML = `
-        <div class="last-viewed-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
-        <div><div class="subj-title">${statusTag} ${sub.name}</div>
-        <div class="status-group"><span class="status-pill ${hasPdf?'on':''}">📄 PDF ${hasPdf?sub.pdfName:'미등록'}</span><span class="status-pill ${hasAudio?'on':''}">🎧 오디오 ${hasAudio?sub.audioName:'미등록'}</span></div></div>
-        <div class="ctrl-btns">${isAdmin ? `${moveBtn}<button class="btn-action" onclick="event.stopPropagation(); openUploadMenu(${i})">수정</button><button class="btn-action btn-del" onclick="event.stopPropagation(); deleteSubject(${i})">삭제</button>` : `<button class="btn-action" style="visibility:hidden">.</button>`}</div>`;
+      const hasPdf = !!sub.pdfName, hasAudio = !!sub.audioName, hasLink = !!sub.link;
+      card.innerHTML = `<div><div class="subj-title">${sub.active!==false?'':'🚧 '}${sub.name}</div>
+        <div class="status-group">
+          <span class="status-pill ${hasPdf?'on':''}">📄 PDF ${hasPdf?sub.pdfName:'미등록'}</span>
+          <span class="status-pill ${hasAudio?'on':''}">🎧 오디오 ${hasAudio?sub.audioName:'미등록'}</span>
+          ${hasLink ? `<span class="status-pill link">🔗 링크 연결됨</span>` : ''}
+        </div></div>
+        ${(isAdmin && !isP)? `<div class="ctrl-btns" onclick="event.stopPropagation()"><button class="btn-action" onclick="openUploadMenu(${i})">수정</button><button class="btn-action" onclick="openMoveModal(${i})">이동</button><button class="btn-action" style="color:#ef4444" onclick="deleteSubject(${i})">삭제</button></div>`:''}`;
+      card.onclick = () => { 
+        if(sub.active===false && !isAdmin) return alert('개발중'); 
+        if(hasLink) { lastViewedIdx = i; window.open(sub.link, '_blank'); render(); return; }
+        openViewer(i); 
+      };
       list.appendChild(card);
-    }
+    });
 
-    if(isAdmin) {
-      const addBtn = document.createElement('div');
-      addBtn.className = 'subject-card add-card';
-      addBtn.innerHTML = '+ 새로운 교육 과정(Subject) 추가';
-      addBtn.onclick = () => { const n = prompt("새 과목명을 입력하세요"); if(n) { subjects.push({ id: Date.now().toString(), name: n, active: true }); saveSubjects(); } };
-      list.appendChild(addBtn);
+    if(isAdmin && !isP) {
+      const add = document.createElement('div'); add.className = 'subject-card'; add.style.border = '2px dashed #94a3b8'; add.style.background = 'transparent'; add.style.justifyContent = 'center'; add.innerHTML = '<b>+ 새로운 교육 과정 추가</b>';
+      add.onclick = () => { const n = prompt('과목명'); if(n) { subjects.push({id:Date.now().toString(), name:n, active:true}); saveSubjects(); } };
+      list.appendChild(add);
     }
-    checkAutoOpen();
+    const auto = params.get('autoOpen'); if(auto) { const idx = subjects.findIndex(s=>s.id===auto); if(idx!==-1) setTimeout(()=>openViewer(idx), 500); }
   }
 
-  function openSettings() {
-    const adminBtn = document.getElementById('modalAdminBtn');
-    if(isAdmin) {
-        adminBtn.textContent = "관리자 로그아웃";
-        adminBtn.className = "btn-modal btn-danger";
-        document.getElementById('modalPreviewBtn').style.display = 'block';
-    } else {
-        adminBtn.textContent = "관리자 로그인";
-        adminBtn.className = "btn-modal btn-primary";
-        document.getElementById('modalPreviewBtn').style.display = 'none';
-    }
-
-    const previewBtn = document.getElementById('modalPreviewBtn');
-    if(document.body.classList.contains('preview-active')) {
-        previewBtn.textContent = "미리보기 종료";
-        previewBtn.style.background = "#10b981";
-        previewBtn.style.color = "#fff";
-    } else {
-        previewBtn.textContent = "미리보기 시작";
-        previewBtn.style.background = "";
-        previewBtn.style.color = "";
-    }
-    document.getElementById('settingsModal').style.display = 'flex';
+  async function openViewer(idx) {
+    const sub = subjects[idx]; if(!sub.pdfName) return alert('PDF 미등록');
+    lastViewedIdx = idx; document.getElementById('pdfOverlay').style.display = 'flex'; document.getElementById('pdfTitle').textContent = sub.name;
+    try {
+      const task = pdfjsLib.getDocument('files/' + (sub.pdfName.endsWith('.pdf')?sub.pdfName:sub.pdfName+'.pdf'));
+      const pdf = await task.promise; const page = await pdf.getPage(1);
+      const canvas = document.getElementById('pdfCanvas'), ctx = canvas.getContext('2d'), vp = page.getViewport({scale:1.5});
+      canvas.height = vp.height; canvas.width = vp.width; await page.render({canvasContext:ctx, viewport:vp}).promise;
+    } catch(e) { alert('파일 오류'); closePdf(); }
   }
+  function closePdf() { document.getElementById('pdfOverlay').style.display = 'none'; render(); const t = document.getElementById(`sub-${lastViewedIdx}`); if(t) t.scrollIntoView({behavior:'smooth', block:'center'}); }
+
+  function openUploadMenu(i) { currentEditIdx = i; const s = subjects[i]; document.getElementById('editSubjectName').value = s.name; document.getElementById('editActiveStatus').value = (s.active!==false).toString(); document.getElementById('inputPdfName').value = s.pdfName||''; document.getElementById('inputAudioName').value = s.audioName||''; document.getElementById('inputExternalLink').value = s.link||''; document.getElementById('uploadModal').style.display = 'flex'; }
+  function saveFiles() { const s = subjects[currentEditIdx]; s.name = document.getElementById('editSubjectName').value; s.active = document.getElementById('editActiveStatus').value==='true'; s.pdfName = document.getElementById('inputPdfName').value.trim(); s.audioName = document.getElementById('inputAudioName').value.trim(); s.link = document.getElementById('inputExternalLink').value.trim(); saveSubjects(); closeModal('uploadModal'); }
+  function deleteSubject(i) { if(confirm('삭제?')) { const pw = prompt('삭제 비번'); if(pw === (localStorage.getItem('kac_admin_pw')||'CATC1234')) { subjects.splice(i,1); saveSubjects(); } else alert('틀림'); } }
 
   function openBatchAddModal() {
-    if(!isAdmin) return alert("관리자 권한이 필요합니다.");
-    document.getElementById('batchModalTitle').textContent = "📋 일괄 자료 등록 (신규 추가)";
-    const tbody = document.getElementById('batchTbody');
-    tbody.innerHTML = '';
-    
-    for(let i=0; i<30; i++) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${i+1}</td>
-            <td><input type="text" class="batch-input" placeholder="과목명" name="name"></td>
-            <td><input type="text" class="batch-input" placeholder="예: COMM/file.pdf" name="pdf"></td>
-            <td><input type="text" class="batch-input" placeholder="예: COMM/file.mp3" name="audio"></td>
-        `;
-        tbody.appendChild(tr);
-    }
-    document.getElementById('batchSaveBtn').onclick = saveBatchAddData;
-    document.getElementById('settingsModal').style.display = 'none';
+    const tb = document.getElementById('batchTbody'); tb.innerHTML = '';
+    for(let i=0; i<30; i++) tb.innerHTML += `<tr><td>${i+1}</td><td><input type="text" class="batch-input b-name" placeholder="과목명"></td><td><input type="text" class="batch-input b-pdf" placeholder="예: COMM/file.pdf"></td><td><input type="text" class="batch-input b-audio" placeholder="예: COMM/file.mp3"></td><td><input type="text" class="batch-input b-link" placeholder="예: https://..."></td></tr>`;
+    document.getElementById('batchSaveBtn').onclick = () => {
+      const rows = document.querySelectorAll('#batchTbody tr');
+      rows.forEach(r => { const n = r.querySelector('.b-name').value; if(n) subjects.push({id:Date.now().toString()+Math.random(), name:n, pdfName:r.querySelector('.b-pdf').value.trim(), audioName:r.querySelector('.b-audio').value.trim(), link:r.querySelector('.b-link').value.trim(), active:true}); });
+      saveSubjects(); closeModal('batchModal');
+    };
     document.getElementById('batchModal').style.display = 'flex';
   }
-
   function openBatchEditModal() {
-    if(!isAdmin) return alert("관리자 권한이 필요합니다.");
-    document.getElementById('batchModalTitle').textContent = "📋 일괄 자료 수정 (기존 목록)";
-    const tbody = document.getElementById('batchTbody');
-    tbody.innerHTML = '';
-    
-    subjects.forEach((sub, i) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${i+1}</td>
-            <td><input type="text" class="batch-input" value="${sub.name}" name="name" data-idx="${i}"></td>
-            <td><input type="text" class="batch-input" value="${sub.pdfName || ''}" name="pdf" data-idx="${i}"></td>
-            <td><input type="text" class="batch-input" value="${sub.audioName || ''}" name="audio" data-idx="${i}"></td>
-        `;
-        tbody.appendChild(tr);
-    });
-    
-    document.getElementById('batchSaveBtn').onclick = saveBatchEditData;
-    document.getElementById('settingsModal').style.display = 'none';
+    const tb = document.getElementById('batchTbody'); tb.innerHTML = '';
+    subjects.forEach((s, i) => tb.innerHTML += `<tr><td>${i+1}</td><td><input type="text" class="batch-input b-name" value="${s.name}"></td><td><input type="text" class="batch-input b-pdf" value="${s.pdfName||''}"></td><td><input type="text" class="batch-input b-audio" value="${s.audioName||''}"></td><td><input type="text" class="batch-input b-link" value="${s.link||''}"></td></tr>`);
+    document.getElementById('batchSaveBtn').onclick = () => {
+      const rows = document.querySelectorAll('#batchTbody tr');
+      rows.forEach((r, i) => { if(subjects[i]) { subjects[i].name = r.querySelector('.b-name').value; subjects[i].pdfName = r.querySelector('.b-pdf').value.trim(); subjects[i].audioName = r.querySelector('.b-audio').value.trim(); subjects[i].link = r.querySelector('.b-link').value.trim(); } });
+      saveSubjects(); closeModal('batchModal');
+    };
     document.getElementById('batchModal').style.display = 'flex';
   }
 
-  function saveBatchAddData() {
-    const rows = document.querySelectorAll('#batchTbody tr');
-    let addedCount = 0;
-    for(const row of rows) {
-        const name = row.querySelector('input[name="name"]').value.trim();
-        const pdf = row.querySelector('input[name="pdf"]').value.trim();
-        const audio = row.querySelector('input[name="audio"]').value.trim();
-        
-        if(name) {
-            const newId = Date.now().toString() + Math.random().toString(36).substr(2, 5);
-            subjects.push({ id: newId, name: name, active: true, pdfName: pdf, audioName: audio });
-            addedCount++;
-        }
-    }
-    if(addedCount > 0) { saveSubjects(); alert(`${addedCount}개 과목이 등록되었습니다.`); document.getElementById('batchModal').style.display = 'none'; } 
-    else { alert("입력된 과목이 없습니다."); }
-  }
-
-  function saveBatchEditData() {
-    const rows = document.querySelectorAll('#batchTbody tr');
-    let updatedCount = 0;
-    for(const row of rows) {
-        const nameInput = row.querySelector('input[name="name"]');
-        const pdfInput = row.querySelector('input[name="pdf"]');
-        const audioInput = row.querySelector('input[name="audio"]');
-        const idx = parseInt(nameInput.getAttribute('data-idx'));
-        
-        if(subjects[idx]) {
-            subjects[idx].name = nameInput.value.trim();
-            subjects[idx].pdfName = pdfInput.value.trim();
-            subjects[idx].audioName = audioInput.value.trim();
-            updatedCount++;
-        }
-    }
-    if(updatedCount > 0) { saveSubjects(); alert("수정되었습니다."); document.getElementById('batchModal').style.display = 'none'; }
-  }
-
-  // --- 기존 로직 ---
-  let allSubjectsIndex = [];
-  function buildSearchIndex() {
-    allSubjectsIndex = [];
-    ['COMM', 'NAV', 'SURV'].forEach(t => {
+  function openMoveModal(i) {
+    currentEditIdx = i; const sel = document.getElementById('moveTargetSelect'); sel.innerHTML = '';
+    ['COMM','NAV','SURV'].forEach(t => {
       const ms = JSON.parse(localStorage.getItem(`kac_menu_${t}`) || '[]');
-      ms.forEach(m => {
-        const subData = localStorage.getItem(`kac_subs_${t}_${m.dataId}`);
-        if(subData) {
-          JSON.parse(subData).forEach(sub => {
-            allSubjectsIndex.push({ name: sub.name, type: t, menuName: m.label, menuId: m.dataId, subId: sub.id, active: sub.active !== false });
-          });
-        }
-      });
+      ms.forEach(m => { if(t!==type || m.dataId!==menuId) sel.innerHTML += `<option value="${t}|${m.dataId}">${t} > ${m.label}</option>`; });
     });
-  }
-  const searchInput = document.getElementById('searchInput'), searchDropdown = document.getElementById('searchDropdown');
-  searchInput.addEventListener('input', (e) => {
-    const query = e.target.value.trim().toLowerCase();
-    if(query.length === 0) { searchDropdown.classList.remove('active'); return; }
-    const matches = allSubjectsIndex.filter(item => item.name.toLowerCase().includes(query) || item.menuName.toLowerCase().includes(query));
-    renderSearchResults(matches, query);
-  });
-  searchInput.addEventListener('focus', () => { if(searchInput.value.trim().length > 0) searchDropdown.classList.add('active'); });
-  document.addEventListener('click', (e) => { if(!e.target.closest('.header-center')) searchDropdown.classList.remove('active'); });
-
-  function renderSearchResults(list, query) {
-    searchDropdown.innerHTML = ''; searchDropdown.classList.add('active');
-    if(list.length === 0) { searchDropdown.innerHTML = `<div style="padding:15px; text-align:center; opacity:0.6;">검색 결과 없음</div>`; return; }
-    list.forEach(item => {
-      const div = document.createElement('div'); div.className = 'result-item';
-      
-      const itemStyle = JSON.parse(localStorage.getItem(`kac_style_${item.type}`) || '{}');
-      const defaultStyles = {
-        COMM: { color: '#2563eb' },
-        NAV:  { color: '#16a34a' },
-        SURV: { color: '#ea580c' }
-      };
-      const finalItemStyle = { ...defaultStyles[item.type], ...itemStyle };
-      const itemColor = finalItemStyle.color || '#2563eb';
-
-      const highlightName = item.name.replace(new RegExp(`(${query})`, 'gi'), `<span style="color:${itemColor}; font-weight:900;">$1</span>`);
-      div.innerHTML = `<div class="result-info"><div class="res-title">${highlightName}</div><div class="res-path">${item.typeName} > ${item.menuName}</div></div><div class="res-tag" style="background:${itemColor}">${item.type}</div>`;
-      div.onclick = () => { if(!item.active && !isAdmin) { alert("개발중"); return; } location.href = `viewer_list.html?type=${item.type}&menu=${encodeURIComponent(item.menuName)}&id=${item.menuId}&autoOpen=${item.subId}`; };
-      searchDropdown.appendChild(div);
-    });
-  }
-
-  function checkAutoOpen() {
-    const autoId = params.get('autoOpen');
-    if(autoId) { const targetIdx = subjects.findIndex(s => s.id === autoId); if(targetIdx !== -1) setTimeout(() => openViewer(targetIdx), 300); }
-  }
-
-  let dragSrcIndex = null;
-  function handleDragStart(e, index) { dragSrcIndex = index; e.target.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
-  function handleDragOver(e) { if (e.preventDefault) e.preventDefault(); e.target.closest('.subject-card').classList.add('drag-over'); e.dataTransfer.dropEffect = 'move'; return false; }
-  function handleDrop(e, index) { if (e.stopPropagation) e.stopPropagation(); e.target.closest('.subject-card').classList.remove('drag-over'); if (dragSrcIndex !== null && dragSrcIndex !== index) { const movedItem = subjects.splice(dragSrcIndex, 1)[0]; subjects.splice(index, 0, movedItem); saveSubjects(); } return false; }
-  function handleDragEnd(e) { document.querySelectorAll('.subject-card').forEach(card => { card.classList.remove('dragging'); card.classList.remove('drag-over'); }); }
-
-  function saveSubjects() { localStorage.setItem(`kac_subs_${type}_${menuId}`, JSON.stringify(subjects)); render(); }
-  
-  function deleteSubject(i) {
-    if(confirm("정말 삭제하시겠습니까?")) {
-        const pw = prompt("삭제를 승인하려면 관리자 비밀번호를 입력하세요.");
-        const adminPw = localStorage.getItem('kac_admin_pw') || "CATC1234";
-        
-        if(pw === adminPw) {
-            subjects.splice(i, 1); 
-            saveSubjects(); 
-            alert("삭제되었습니다.");
-        } else {
-            alert("비밀번호가 일치하지 않습니다.");
-        }
-    }
-  }
-
-  function saveFiles() {
-    const idx = currentEditIdx;
-    const name = document.getElementById('editSubjectName').value;
-    const isActiveStr = document.getElementById('editActiveStatus').value; 
-    const pdfName = document.getElementById('inputPdfName').value.trim();
-    const audioName = document.getElementById('inputAudioName').value.trim();
-
-    if(!name) return alert("과목명은 필수입니다.");
-    
-    subjects[idx].name = name;
-    subjects[idx].active = (isActiveStr === 'true');
-    subjects[idx].pdfName = pdfName;
-    subjects[idx].audioName = audioName;
-    
-    saveSubjects();
-    document.getElementById('uploadModal').style.display = 'none';
-  }
-
-  function openUploadMenu(idx) { 
-    currentEditIdx = idx; 
-    const sub = subjects[idx];
-    document.getElementById('editSubjectName').value = sub.name; 
-    document.getElementById('editActiveStatus').value = (sub.active !== false).toString();
-    document.getElementById('inputPdfName').value = sub.pdfName || '';
-    document.getElementById('inputAudioName').value = sub.audioName || '';
-    document.getElementById('uploadModal').style.display = 'flex'; 
-  }
-
-  let movingSubjectIndex = -1;
-
-  function openMoveModal(idx) {
-    movingSubjectIndex = idx;
-    const select = document.getElementById('moveTargetSelect');
-    select.innerHTML = '<option value="">-- 이동할 메뉴 선택 --</option>';
-    
-    ['COMM', 'NAV', 'SURV'].forEach(t => {
-      const menus = JSON.parse(localStorage.getItem(`kac_menu_${t}`) || '[]');
-      if(menus.length > 0) {
-        const typeName = {COMM:'통신시설', NAV:'항법시설', SURV:'감시시설'}[t];
-        const group = document.createElement('optgroup');
-        group.label = typeName;
-        
-        menus.forEach(m => {
-          if (t === type && m.dataId === menuId) return;
-          const option = document.createElement('option');
-          option.value = `${t}|${m.dataId}`;
-          option.textContent = m.label;
-          group.appendChild(option);
-        });
-        
-        if (group.children.length > 0) select.appendChild(group);
-      }
-    });
-    
     document.getElementById('moveModal').style.display = 'flex';
   }
+  function executeMove() { const [t, mid] = document.getElementById('moveTargetSelect').value.split('|'); const sub = subjects.splice(currentEditIdx,1)[0]; const targetKey = `kac_subs_${t}_${mid}`; const ts = JSON.parse(localStorage.getItem(targetKey)||'[]'); ts.push(sub); localStorage.setItem(targetKey, JSON.stringify(ts)); saveSubjects(); closeModal('moveModal'); }
 
-  function executeMove() {
-    const select = document.getElementById('moveTargetSelect');
-    const value = select.value;
-    
-    if(!value) return alert("이동할 메뉴를 선택해주세요.");
-    
-    const [targetType, targetMenuId] = value.split('|');
-    const subjectToMove = subjects[movingSubjectIndex];
-    
-    const targetKey = `kac_subs_${targetType}_${targetMenuId}`;
-    const targetSubjects = JSON.parse(localStorage.getItem(targetKey) || '[]');
-    
-    targetSubjects.push(subjectToMove);
-    localStorage.setItem(targetKey, JSON.stringify(targetSubjects));
-    
-    subjects.splice(movingSubjectIndex, 1);
-    localStorage.setItem(`kac_subs_${type}_${menuId}`, JSON.stringify(subjects));
-    
-    alert("이동되었습니다.");
-    location.reload();
+  let searchIndex = [];
+  function buildSearchIndex() {
+    searchIndex = []; ['COMM','NAV','SURV'].forEach(t => {
+      const s = JSON.parse(localStorage.getItem(`kac_style_${t}`)||'{}'), ms = JSON.parse(localStorage.getItem(`kac_menu_${t}`)||'[]');
+      ms.forEach(m => { const ss = JSON.parse(localStorage.getItem(`kac_subs_${t}_${m.dataId}`)||'[]'); ss.forEach(sub => searchIndex.push({name:sub.name, type:t, typeName:s.name||t, menuName:m.label, menuId:m.dataId, subId:sub.id, active:sub.active!==false})); });
+    });
   }
+  function setupSearch() {
+    const i = document.getElementById('searchInput'), o = document.getElementById('searchOverlay'), r = document.getElementById('searchDropdown');
+    i.onfocus = () => { document.body.classList.add('search-mode'); o.classList.add('active'); if(i.value.trim()) r.classList.add('active'); };
+    o.onclick = () => { document.body.classList.remove('search-mode'); o.classList.remove('active'); r.classList.remove('active'); };
+    i.oninput = (e) => { const q = e.target.value.toLowerCase().trim(); if(!q) { r.classList.remove('active'); return; } const matches = searchIndex.filter(x => x.name.toLowerCase().includes(q)); r.innerHTML = matches.map(x => `<div class="result-item" onclick="handleSearchClick('${x.type}','${x.menuId}','${x.menuName}','${x.subId}',${x.active})"><div><div class="res-title">${x.name}</div><div class="res-path">${x.typeName} > ${x.menuName}</div></div><div class="res-tag" style="background:var(--theme-color)">${x.type}</div></div>`).join('') || '<div style="padding:15px; text-align:center;">없음</div>'; r.classList.add('active'); };
+  }
+  function handleSearchClick(t, mid, mname, sid, active) { if(!active && !isAdmin) return alert('개발중'); if(t===type && mid===menuId) { document.getElementById('searchOverlay').click(); openViewer(subjects.findIndex(x=>x.id===sid)); } else location.href = `viewer_list.html?type=${t}&menu=${encodeURIComponent(mname)}&id=${mid}&autoOpen=${sid}`; }
 
-  let pdfDoc = null, pageNum = 1, isRendering = false, isDragging = false;
-  
-  const canvasContainer = document.getElementById('pageContainer'), viewerBody = document.getElementById('viewerBody'), overlay = document.getElementById('pdfOverlay'), hitArea = document.getElementById('progressHitArea'), audioPlayer = document.getElementById('mainAudio');
-
-  // .pdf 자동 완성 기능 추가
-  async function openViewer(idx) {
-    document.querySelectorAll('.subject-card').forEach(c => c.classList.remove('last-viewed'));
-    viewingIndex = idx; 
-
-    const sub = subjects[idx];
-    let pdfName = sub.pdfName;
-    
-    if(!pdfName) return alert("등록된 PDF 파일이 없습니다.");
-
-    if (!pdfName.toLowerCase().endsWith('.pdf')) {
-        pdfName += '.pdf';
+  function openSettings() { 
+    if(isAdmin) { 
+      document.getElementById('adminSettings').style.display='block'; 
+      document.getElementById('guestSettings').style.display='none'; 
+      const isP = localStorage.getItem('kac_preview_active') === '1', pBtn = document.getElementById('modalPreviewBtn'); 
+      pBtn.textContent = isP ? "미리보기 종료" : "미리보기 시작"; pBtn.classList.toggle('btn-preview-active', isP); 
     }
-
-    const pdfUrl = `files/${pdfName}`;
-    const audioUrl = sub.audioName ? `files/${sub.audioName}` : null;
-
-    overlay.style.display = 'block';
-    
-    try {
-      if (overlay.requestFullscreen) await overlay.requestFullscreen();
-      else if (overlay.webkitRequestFullscreen) await overlay.webkitRequestFullscreen();
-    } catch(e) { console.log(e); }
-
-    document.getElementById('vTitle').textContent = sub.name;
-    
-    try {
-        pdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
-        viewerBody.innerHTML = ''; viewerBody.appendChild(canvasContainer); canvasContainer.innerHTML = '';
-        pageNum = 1; renderPage('none');
-    } catch(e) {
-        alert("PDF 파일을 불러올 수 없습니다.\n파일명이 정확한지, files 폴더에 있는지 확인해주세요.\n(" + pdfUrl + ")");
-        closeViewer();
-        return;
-    }
-    
-    const audioBtn = document.getElementById('audioBtn');
-    if(audioUrl) {
-        audioPlayer.src = audioUrl;
-        audioPlayer.load();
-        audioBtn.classList.remove('disabled');
-    } else {
-        audioPlayer.src = "";
-        audioBtn.classList.add('disabled');
-    }
-    updateIconState(); 
+    else { document.getElementById('adminSettings').style.display='none'; document.getElementById('guestSettings').style.display='block'; }
+    document.getElementById('settingsModal').style.display = 'flex'; 
   }
-
-  function toggleFullScreen(e) {
-    e.stopPropagation();
-    if (!document.fullscreenElement) {
-        document.getElementById('pdfOverlay').requestFullscreen().catch(err => {});
-    } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-    }
-  }
-
-  function updateIconState() {
-    const isFs = !!document.fullscreenElement;
-    document.getElementById('iconExpand').style.display = isFs ? 'none' : 'block';
-    document.getElementById('iconCompress').style.display = isFs ? 'block' : 'none';
-  }
-
-  document.addEventListener('fullscreenchange', updateIconState);
-
-  function closeViewer() { 
-    if (document.fullscreenElement) document.exitFullscreen(); 
-    overlay.style.display = 'none'; 
-    document.getElementById('audioPanel').classList.remove('open'); 
-    audioPlayer.pause(); 
-    
-    if(viewingIndex !== -1) {
-        const card = document.getElementById(`card-${viewingIndex}`);
-        if(card) {
-            card.classList.add('last-viewed');
-            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    }
-  }
-
-  function downloadPdf(e) { 
-      e.stopPropagation(); 
-      if(pdfDoc) {
-          const sub = subjects[viewingIndex];
-          let pdfName = sub.pdfName;
-          if (!pdfName.toLowerCase().endsWith('.pdf')) pdfName += '.pdf';
-          
-          const a = document.createElement('a'); 
-          a.href = `files/${pdfName}`; 
-          a.download = pdfName; 
-          a.click(); 
-      }
-  }
-  
-  function toggleAudioPanel(e) { 
-    if(document.getElementById('audioBtn').classList.contains('disabled')) return;
-    e.stopPropagation(); 
-    document.getElementById('audioPanel').classList.toggle('open'); 
-  }
-
-  async function renderPage(dir) {
-    if(isRendering) return; isRendering = true;
-    if(pdfDoc) { document.getElementById('pageFill').style.width = `${((pageNum-1)/(pdfDoc.numPages-1))*100}%`; document.getElementById('progressFlag').textContent = `${pageNum} / ${pdfDoc.numPages}`; }
-    
-    const newCanvas = document.createElement('canvas'); 
-    const ctx = newCanvas.getContext('2d');
-    const page = await pdfDoc.getPage(pageNum);
-    const baseScale = window.innerHeight / page.getViewport({scale:1}).height * 0.98;
-    const viewport = page.getViewport({ scale: baseScale }); 
-    newCanvas.width = viewport.width; newCanvas.height = viewport.height;
-    
-    await page.render({ canvasContext: ctx, viewport }).promise;
-    
-    canvasContainer.innerHTML = ''; 
-    canvasContainer.appendChild(newCanvas);
-    isRendering = false;
-  }
-
-  function nextPage() { if(pdfDoc && pageNum < pdfDoc.numPages) { pageNum++; renderPage('next'); } }
-  function prevPage() { if(pdfDoc && pageNum > 1) { pageNum--; renderPage('prev'); } }
-  
-  function handleMouseNav(e) { 
-    if(isDragging) return; 
-    if(e.button === 0) nextPage(); 
-    if(e.button === 2) prevPage(); 
-  }
-
-  hitArea.addEventListener('mousedown', (e) => { e.preventDefault(); e.stopPropagation(); isDragging = true; hitArea.classList.add('dragging'); updateProgress(e); });
-  window.addEventListener('mousemove', (e) => { if(!isDragging || !pdfDoc) return; updateProgress(e); });
-  window.addEventListener('mouseup', () => { if(isDragging) { isDragging = false; hitArea.classList.remove('dragging'); renderPage('none'); } });
-
-  function updateProgress(e) {
-    const rect = hitArea.getBoundingClientRect(); const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-    const newPage = Math.max(1, Math.min(Math.round((x/rect.width) * (pdfDoc.numPages - 1)) + 1, pdfDoc.numPages));
-    if(newPage !== pageNum) { pageNum = newPage; document.getElementById('pageFill').style.width = `${((pageNum-1)/(pdfDoc.numPages-1))*100}%`; document.getElementById('progressFlag').textContent = `${pageNum} / ${pdfDoc.numPages}`; renderPage('none'); }
-  }
-
-  document.getElementById('playBtn').onclick = (e) => { e.stopPropagation(); if(audioPlayer.paused) { audioPlayer.play(); document.getElementById('playBtn').textContent = "⏸"; } else { audioPlayer.pause(); document.getElementById('playBtn').textContent = "▶"; } };
-  audioPlayer.ontimeupdate = () => { document.getElementById('audioProgress').value = (audioPlayer.currentTime / audioPlayer.duration) * 100 || 0; const m = Math.floor(audioPlayer.currentTime/60), s = Math.floor(audioPlayer.currentTime%60); document.getElementById('audioTime').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; };
-  document.getElementById('audioProgress').oninput = (e) => { audioPlayer.currentTime = (e.target.value / 100) * audioPlayer.duration; };
-  document.getElementById('volumeControl').oninput = (e) => { audioPlayer.volume = e.target.value; };
-  
-  window.onkeydown = (e) => { 
-    if(overlay.style.display === 'block') { 
-        if(e.key === "ArrowRight") nextPage(); 
-        if(e.key === "ArrowLeft") prevPage(); 
-        if(e.key === "Escape") {
-            if (!document.fullscreenElement) {
-                closeViewer();
-            }
-        }
-    } 
-  };
-  
-  render();
-  buildSearchIndex();
+  function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+  function saveSubjects() { localStorage.setItem(`kac_subs_${type}_${menuId}`, JSON.stringify(subjects)); render(); buildSearchIndex(); }
+  function toggleAdmin() { if(isAdmin) { if(confirm("로그아웃?")) { localStorage.setItem('kac_admin_mode','0'); location.reload(); } } else { const pw = prompt("비밀번호"); if(pw === (localStorage.getItem('kac_admin_pw')||"CATC1234")) { localStorage.setItem('kac_admin_mode','1'); location.reload(); } } }
+  function togglePreview() { const active = document.body.classList.toggle('preview-active'); localStorage.setItem('kac_preview_active', active ? '1' : '0'); render(); closeModal('settingsModal'); }
+  function setTheme(m) { document.body.classList.toggle('dark-mode', m==='dark'); localStorage.setItem('kac_theme', m); document.getElementById('btnDay').classList.toggle('active', m==='light'); document.getElementById('btnNight').classList.toggle('active', m==='dark'); }
+  const hexToRgb = (h) => { let c = h.substring(1).split(''); if(c.length==3) c=[c[0],c[0],c[1],c[1],c[2],c[2]]; c='0x'+c.join(''); return [(c>>16)&255, (c>>8)&255, c&255].join(','); };
+  init();
 </script>
 </body>
 </html>
