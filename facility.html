@@ -1,9 +1,7 @@
-<!-- START OF FILE facility.html -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <script>
-  // 로그인 체크: 세션에 토큰이 없으면 로그인 페이지로 튕겨냄
   if(sessionStorage.getItem('kac_access_token') !== 'granted') {
     alert("로그인이 필요합니다.");
     location.replace('login.html');
@@ -11,13 +9,12 @@
 </script>
 <meta charset="UTF-8" />
 <title>시설 관리 - KAC CNS Training Platform</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
   :root { 
-    --theme-color: #2563eb; 
-    --theme-rgb: 37, 99, 235;
-
+    --theme-color: #2563eb; --theme-rgb: 37, 99, 235;
     --navy: #0f172a; --bg-main: #f0f4f8; --bg-card: #ffffff; 
     --text-main: #000000; --text-sub: #334155; 
     --border-card: transparent; --shadow: 0 10px 25px rgba(0,0,0,0.05);
@@ -37,215 +34,109 @@
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
   body { background: var(--bg-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: var(--text-main); transition: 0.3s; }
 
-  /* [수정] 검색 오버레이 */
-  #searchOverlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1500;
-    display: none; backdrop-filter: blur(2px); animation: fadeIn 0.3s;
-  }
+  /* 미리보기/관리자 UI 제어 */
+  body.preview-active .admin-ctrl, body.preview-active .add-btn-wrap { display: none !important; }
+
+  #searchOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1500; display: none; backdrop-filter: blur(4px); animation: fadeIn 0.3s; }
   #searchOverlay.active { display: block; }
-
-  /* 헤더 스타일 */
-  header { 
-    height: var(--header-h); background: var(--navy); 
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 40px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-    z-index: 2000; /* 오버레이보다 높게 설정 */
-    transition: 0.3s; flex-shrink: 0; gap: 20px; position: relative;
-  }
-  
-  .header-left { display: flex; align-items: center; min-width: 250px; z-index: 10; transition: opacity 0.3s; }
-  
-  .header-center { 
-    position: absolute; left: 50%; transform: translateX(-50%); 
-    width: 600px; max-width: 100%; z-index: 20; 
-  }
-  
-  .header-right { display: flex; align-items: center; gap: 15px; min-width: 250px; justify-content: flex-end; z-index: 10; transition: opacity 0.3s; }
-
-  /* [수정] 검색 활성화 시 주변 흐리게 처리 */
   body.search-mode .header-left, body.search-mode .header-right { opacity: 0.1; pointer-events: none; }
 
-  @media (max-width: 1100px) {
+  header { height: var(--header-h); background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 2000; flex-shrink: 0; position: relative; }
+  .header-left { display: flex; align-items: center; flex: 1; min-width: 300px; }
+  .header-center { flex: 2; max-width: 650px; display: flex; justify-content: center; z-index: 2001; position: relative; }
+  .header-right { display: flex; align-items: center; gap: 15px; flex: 1; min-width: 300px; justify-content: flex-end; }
+
+  @media (max-width: 1300px) {
     .header-left, .header-right { display: none !important; }
-    .header-center { position: relative; left: auto; transform: none; width: 100%; }
+    .header-center { max-width: 100%; width: 100%; flex: 1; }
     header { padding: 0 20px; }
-    .header-search { width: 100% !important; }
   }
 
-  .logo-text { font-size: 20px; font-weight: 800; white-space: nowrap; cursor: pointer; transition: opacity 0.2s; }
-  .logo-text:hover { opacity: 0.8; }
-  
-  .breadcrumb { color: #94a3b8; font-weight: 500; font-size: 16px; margin-left: 10px; cursor: default; pointer-events: none; }
-  
-  .header-search {
-    width: 100%; 
-    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 50px; padding: 12px 30px; color: #fff; font-size: 16px; font-weight: 600;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'%3E%3Cpath d='M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: 25px center; background-size: 20px;
-    padding-left: 55px; transition: 0.3s;
-  }
-  .header-search:focus { outline: none; background-color: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.5); box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-  .header-search::placeholder { color: rgba(255,255,255,0.5); font-weight: 400; }
+  .logo-text { font-size: 20px; font-weight: 800; white-space: nowrap; cursor: pointer; }
+  .breadcrumb { color: #94a3b8; font-weight: 500; font-size: 16px; margin-left: 10px; pointer-events: none; }
+  .header-search { width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; padding: 12px 30px; color: #fff; font-size: 16px; font-weight: 600; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'%3E%3Cpath d='M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: 25px center; background-size: 20px; padding-left: 55px; transition: 0.3s; }
+  .header-search:focus { outline: none; background-color: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.5); }
 
-  .search-dropdown {
-    position: absolute; top: 110%; left: 0; right: 0; margin: 0 auto;
-    background: var(--bg-card); border-radius: 15px; 
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 1px solid var(--border-card);
-    overflow: hidden; display: none; max-height: 400px; overflow-y: auto; z-index: 2001;
-  }
+  .search-dropdown { position: absolute; top: calc(100% + 8px); left: 0; right: 0; width: 100%; background: var(--bg-card); border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); border: 1px solid var(--border-card); overflow: hidden; display: none; max-height: 400px; overflow-y: auto; z-index: 2002; }
   .search-dropdown.active { display: block; }
-  .result-item { padding: 12px 20px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--btn-border); transition: 0.2s; }
-  .result-item:last-child { border-bottom: none; }
+  .result-item { padding: 15px 20px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--btn-border); transition: 0.2s; }
   .result-item:hover { background: rgba(var(--theme-rgb), 0.05); }
-  .result-info { display: flex; flex-direction: column; gap: 2px; text-align: left; }
   .res-title { font-weight: 700; color: var(--text-main); font-size: 14px; }
-  .res-path { font-size: 11px; color: var(--text-sub); opacity: 0.7; }
-  .res-tag { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; color: #fff; min-width: 45px; text-align: center; }
-  
+  .res-path { font-size: 11px; color: var(--text-sub); opacity: 0.6; margin-top: 4px; }
+  .res-tag { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; color: #fff; background: var(--theme-color); }
+
   .theme-toggle { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); margin-right: 10px; }
   .theme-btn { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; opacity: 0.5; }
-  .theme-btn:hover { opacity: 1; background: rgba(255,255,255,0.1); }
-  .theme-btn.active { background: #fff; opacity: 1; color: var(--navy); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+  .theme-btn.active { background: #fff; opacity: 1; color: var(--navy); }
   .theme-btn svg { width: 16px; height: 16px; fill: currentColor; }
+
+  .settings-btn { display: flex; padding: 8px; width: 34px; height: 34px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.3s; color: #cbd5e1; }
   .kac-logo-img { height: 30px; width: auto; display: block; object-fit: contain; }
-  
-  .settings-btn { 
-    display: flex; padding: 8px; width: 34px; height: 34px; 
-    border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); 
-    align-items: center; justify-content: center; font-size: 18px; 
-    cursor: pointer; transition: 0.3s; color: #cbd5e1;
-  }
-  .settings-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
 
-  /* Main Layout */
-  main { 
-    flex: 1; 
-    display: flex;
-    flex-direction: column; 
-    align-items: center; 
-    justify-content: center; 
-    overflow: hidden; 
-    width: 100%;
-    padding: 20px;
-    padding-bottom: 120px;
-    perspective: 1000px;
-  }
+  main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; overflow: hidden; }
+  #trainGrid { display: flex; flex-wrap: wrap; justify-content: center; gap: 25px; width: 100%; max-width: 1250px; margin: 0 auto; min-height: 450px; }
+  
+  .menu-card { background: var(--bg-card); width: 280px; padding: 30px 20px; border-radius: 20px; box-shadow: var(--shadow); border: 2px solid transparent; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; position: relative; border-top: 6px solid var(--theme-color); color: var(--text-main); }
+  .menu-card:hover { border-color: var(--theme-color); transform: translateY(-5px); }
+  .menu-card.dragging { opacity: 0.4; border: 2px dashed var(--theme-color); }
+  .menu-card.drag-over { border: 2px solid var(--theme-color); transform: scale(1.05); }
 
-  /* [수정] Grid/Flex 동적 적용을 위한 컨테이너 스타일 */
-  #trainGrid {
-    /* 기본은 Grid지만 JS에서 Flex로 변경될 수 있음 */
-    display: grid;
-    grid-template-columns: repeat(4, 280px);
-    grid-auto-rows: auto;
-    gap: 30px;
-    width: auto;
-    justify-content: center;
-    margin-bottom: 30px;
-    transform-style: preserve-3d;
-  }
-  
-  .slide-in-right { animation: slideInRight 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
-  .slide-in-left { animation: slideInLeft 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
-  
+  .slide-in-right { animation: slideInRight 0.4s ease-out; }
+  .slide-in-left { animation: slideInLeft 0.4s ease-out; }
   @keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
   @keyframes slideInLeft { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-  .menu-card {
-    background: var(--bg-card); 
-    width: 280px; 
-    padding: 40px 20px; 
-    border-radius: 20px;
-    box-shadow: var(--shadow); 
-    border: 2px solid transparent; 
-    cursor: pointer; transition: 0.3s;
-    display: flex; flex-direction: column; align-items: center; position: relative; 
-    border-top: 6px solid var(--theme-color); 
-    color: var(--text-main);
-  }
-  
-  .menu-card:hover { 
-    border-color: var(--theme-color); 
-    box-shadow: 0 10px 25px rgba(var(--theme-rgb), 0.2); 
-    transform: translateY(-5px); 
-  }
-
-  .menu-card.dragging { opacity: 0.4; border: 2px dashed #94a3b8; transform: scale(0.95); }
-  .menu-card.drag-over { border: 2px solid var(--theme-color); transform: scale(1.05); box-shadow: 0 0 20px rgba(var(--theme-rgb), 0.3); z-index: 10; }
-  
   .icon-circle { 
-    min-width: 85px; width: auto; height: 85px; padding: 0 25px;
-    border-radius: 24px; background: var(--icon-bg); 
-    border: 2px solid var(--icon-border);
-    display: flex; align-items: center; justify-content: center; 
-    font-size: var(--icon-size-fac, 28px); font-weight: 900; margin-bottom: 20px; transition: 0.3s; 
-    color: var(--theme-color); 
+    min-width: 85px; height: 85px; padding: 10px 15px; border-radius: 24px; background: var(--icon-bg); 
+    border: 2px solid var(--icon-border); display: flex; flex-direction: column; align-items: center; justify-content: center; 
+    font-size: var(--icon-size-fac, 28px); font-weight: 900; margin-bottom: 20px; color: var(--theme-color); 
+    text-align: center; line-height: 1.1; word-break: keep-all; 
   }
-  .menu-label { font-weight: 800; font-size: var(--label-size-fac, 19px); color: inherit; }
+  .menu-label { font-weight: 800; font-size: var(--label-size-fac, 19px); text-align: center; }
 
-  body.dark-mode .icon-circle { 
-    color: #fff; 
-    text-shadow: 0 0 15px var(--theme-color); 
-    border-color: rgba(var(--theme-rgb), 0.5); 
-  }
-
-  .pagination { display: flex; gap: 10px; align-items: center; justify-content: center; min-height: 40px; }
-  .page-btn { 
-    width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; 
-    border-radius: 50%; font-weight: 700; cursor: pointer; transition: 0.2s; 
-    background: transparent; border: 1px solid var(--btn-border); color: var(--text-sub);
-  }
-  .page-btn:hover { background: rgba(0,0,0,0.05); }
-  .page-btn.active { background: var(--navy); color: #fff; border-color: var(--navy); }
-  .page-btn.drag-target { transform: scale(1.2); background: var(--theme-color); color:#fff; box-shadow: 0 0 15px rgba(var(--theme-rgb),0.5); border-color:transparent; }
-
-  body.dark-mode .page-btn.active { background: #fff; color: var(--navy); border-color: #fff; }
-
-  .admin-ctrl { display: flex; gap: 5px; margin-top: 15px; width: 100%; justify-content: center; flex-wrap: wrap; }
-  .btn-sm { 
-    padding: 6px 12px; font-size: 11px; border-radius: 8px; border: 1px solid var(--btn-border); 
-    background: var(--btn-bg); font-weight: 700; cursor: pointer; transition: 0.2s; color: var(--btn-text); white-space: nowrap;
-  }
-  .btn-sm:hover { background: rgba(128,128,128,0.2); color: var(--text-main); }
-  .btn-del { color: #ef4444; border-color: #fee2e2; }
-  .btn-del:hover { background: #fee2e2; }
+  .admin-ctrl { display: flex; gap: 6px; margin-top: 15px; width: 100%; justify-content: center; flex-wrap: wrap; }
+  .btn-sm { padding: 6px 10px; font-size: 11px; border-radius: 8px; border: 1px solid var(--btn-border); background: var(--btn-bg); font-weight: 700; cursor: pointer; color: var(--btn-text); transition: 0.2s; }
   .btn-move { color: #2563eb; border-color: #dbeafe; }
-  .btn-move:hover { background: #eff6ff; }
-  body.dark-mode .btn-move { color: #60a5fa; border-color: rgba(96, 165, 250, 0.3); }
-  body.dark-mode .btn-move:hover { background: rgba(96, 165, 250, 0.1); }
 
-  .bottom-nav { 
-    position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); 
-    background: var(--navy); padding: 15px 45px; border-radius: 100px; 
-    display: flex; gap: 40px; align-items: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000; border: 1px solid rgba(255,255,255,0.1); 
-  }
-  .nav-item { 
-    color: #fff; cursor: pointer; font-size: 18px; font-weight: 700; transition: 0.3s; opacity: 0.8; 
-    display: flex; align-items: center; gap: 10px;
-  }
+  .pagination { display: flex; gap: 10px; margin-top: 30px; justify-content: center; align-items: center; }
+  .page-dot { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--bg-card); color: var(--text-sub); border: 1px solid var(--btn-border); cursor: pointer; font-weight: 700; transition: 0.3s; }
+  .page-dot.active { background: var(--navy); color: #fff; transform: scale(1.1); }
+  .page-dot.drag-target { background: var(--theme-color) !important; color: #fff !important; transform: scale(1.2); }
+
+  .bottom-nav { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); background: var(--navy); padding: 15px 45px; border-radius: 100px; display: flex; gap: 40px; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000; border: 1px solid rgba(255,255,255,0.1); }
+  .nav-item { color: #fff; cursor: pointer; font-size: 18px; font-weight: 700; transition: 0.3s; opacity: 0.8; display: flex; align-items: center; gap: 10px; }
   .nav-item:hover { opacity: 1; transform: translateY(-3px); }
-  .nav-icon { width: 24px; height: 24px; fill: currentColor; }
-
-  .creator-info { position: fixed; bottom: 5px; width: 100%; text-align: center; font-size: 11px; color: var(--text-sub); opacity: 0.5; font-weight: 500; z-index: 500; pointer-events: none; }
-  .creator-info b { font-weight: 700; }
-  body.dark-mode .creator-info { color: #fff; opacity: 0.3; }
 
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none; align-items: center; justify-content: center; }
-  .modal-card { background: var(--bg-card); padding: 35px; border-radius: 25px; width: 500px; color: var(--text-main); box-shadow: 0 20px 50px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
-  .modal-title { font-size: 20px; font-weight: 800; margin-bottom: 20px; border-bottom: 1px solid var(--btn-border); padding-bottom: 10px; }
+  .modal-card { background: var(--bg-card); padding: 35px; border-radius: 25px; width: 600px; color: var(--text-main); box-shadow: 0 20px 50px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
+  
+  /* 모달 레이어 우선순위 확실히 지정 */
+  #settingsModal { z-index: 10000; }
+  #bulkEditModal { z-index: 11000; }
+  #itemEditModal { z-index: 11000; }
+  #moveMenuModal { z-index: 11000; }
+
+  .modal-title { font-size: 20px; font-weight: 800; margin-bottom: 20px; border-bottom: 1px solid var(--btn-border); padding-bottom: 10px; display: flex; align-items: center; gap: 10px; }
   .setting-group { margin-bottom: 25px; }
   .setting-label { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; display: block; }
-  .setting-input, .setting-textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--text-main); font-size: 14px; }
-  body.dark-mode select.setting-input { background-color: var(--bg-card); color: var(--text-main); }
-  body.dark-mode select.setting-input option { background-color: var(--bg-card); color: var(--text-main); }
-  .setting-textarea { height: 100px; line-height: 1.4; resize: vertical; }
-  .btn-row { display: flex; gap: 10px; margin-top: 30px; }
-  .btn-modal { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; }
+  .setting-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--text-main); font-size: 14px; text-align: center; outline: none; }
+
+  .bulk-list-container { display: flex; flex-direction: column; gap: 5px; border: 1px solid var(--btn-border); border-radius: 15px; overflow-y: auto; max-height: 50vh; background: rgba(0,0,0,0.02); }
+  .bulk-header-row { position: sticky; top: 0; display: grid; grid-template-columns: 40px 80px 80px 140px 1fr; background: var(--btn-bg); padding: 10px; font-size: 11px; font-weight: 800; text-align: center; border-bottom: 2px solid var(--btn-border); color: var(--theme-color); z-index: 10; }
+  .bulk-row { display: grid; grid-template-columns: 40px 80px 80px 140px 1fr; gap: 5px; padding: 10px; border-bottom: 1px solid var(--btn-border); align-items: center; }
+  .bulk-input { padding: 8px; border-radius: 6px; border: 1px solid var(--btn-border); text-align: center; font-size: 12px; background: #fff; width: 100%; }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 20px; }
+  .btn-modal { flex: 1; padding: 14px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; }
   .btn-primary { background: var(--navy); color: #fff; }
   .btn-secondary { background: var(--btn-border); color: var(--text-sub); }
   .btn-danger { background: #ef4444; color: #fff; }
+  .btn-preview-active { background: #10b981 !important; color: #fff !important; }
+
+  #pdfOverlay { position: fixed; inset: 0; background: #000; z-index: 12000; display: none; flex-direction: column; }
+  .pdf-header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; background: #1e293b; color: #fff; }
+  .viewer-body { flex: 1; overflow: auto; display: flex; justify-content: center; background: #334155; padding: 20px; }
+  canvas { box-shadow: 0 0 30px rgba(0,0,0,0.5); }
 </style>
 </head>
 <body>
@@ -256,577 +147,347 @@
     <div class="logo-text" onclick="location.href='index.html'">KAC CNS Training Platform</div>
     <span class="breadcrumb" id="bc"></span>
   </div>
-
   <div class="header-center">
-    <input type="text" id="searchInput" class="header-search" placeholder="예시) 항공통신용 데이터링크, VOR, ILS..." autocomplete="off">
+    <input type="text" id="searchInput" class="header-search" placeholder="예시) VOR, ILS, 단거리 이동통신..." autocomplete="off">
     <div id="searchDropdown" class="search-dropdown"></div>
   </div>
-
   <div class="header-right">
     <div class="theme-toggle">
-      <div class="theme-btn" id="btnDay" onclick="setTheme('light')" title="주간"><svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg></div>
-      <div class="theme-btn" id="btnNight" onclick="setTheme('dark')" title="야간"><svg viewBox="0 0 24 24"><path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C6.94,10.39 9.79,16.87 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z"/></svg></div>
+      <div class="theme-btn" id="btnDay" onclick="setTheme('light')" title="주간">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg>
+      </div>
+      <div class="theme-btn" id="btnNight" onclick="setTheme('dark')" title="야간">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C6.94,10.39 9.79,16.87 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z"/></svg>
+      </div>
     </div>
-    
-    <div class="settings-btn" onclick="openSettings()" title="설정">⚙️</div>
+    <div class="settings-btn" onclick="openSettings()">⚙️</div>
     <img src="logo.png" alt="KAC Logo" class="kac-logo-img">
   </div>
 </header>
 
-<main id="mainContainer">
+<main>
   <div id="trainGrid"></div>
   <div id="pagination" class="pagination"></div>
 </main>
 
 <div class="bottom-nav">
-  <div class="nav-item" onclick="history.back()">
-    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-    뒤로가기
-  </div>
-  <div class="nav-item" onclick="location.href='index.html'">
-    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-    홈으로
-  </div>
+  <div class="nav-item" onclick="history.back()"><svg style="width:24px;height:24px;fill:currentColor" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>뒤로가기</div>
+  <div class="nav-item" onclick="location.href='index.html'"><svg style="width:24px;height:24px;fill:currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>홈으로</div>
 </div>
 
-<div class="creator-info">Developed by <b>DooSeok, JANG</b> (jds0616@airport.co.kr)</div>
-
-<div id="itemModal" class="modal-overlay">
-  <div class="modal-card">
-    <div class="modal-title" id="itemModalTitle">메뉴 추가</div>
-    <input type="hidden" id="editItemIndex">
-    <div class="setting-group">
-      <label class="setting-label">메뉴 명칭 (예: 계기착륙시설)</label>
-      <input type="text" id="inputItemLabel" class="setting-input">
-    </div>
-    <div class="setting-group">
-      <label class="setting-label">아이콘 문구 (예: ILS)</label>
-      <input type="text" id="inputItemCode" class="setting-input">
-    </div>
+<!-- 모달 섹션 -->
+<div id="itemEditModal" class="modal-overlay">
+  <div class="modal-card" style="width:450px;">
+    <div class="modal-title">📦 메뉴 상세 수정</div>
+    <div class="setting-group"><label class="setting-label">아이콘(1행)</label><input type="text" id="editItemLine1" class="setting-input"></div>
+    <div class="setting-group"><label class="setting-label">아이콘(2행)</label><input type="text" id="editItemLine2" class="setting-input"></div>
+    <div class="setting-group"><label class="setting-label">메뉴 명칭</label><input type="text" id="editItemLabel" class="setting-input"></div>
+    <div class="setting-group"><label class="setting-label">연동 링크</label><input type="text" id="editItemLink" class="setting-input"></div>
     <div class="btn-row">
-      <button class="btn-modal btn-primary" onclick="saveItemData()">저장</button>
-      <button class="btn-modal btn-secondary" onclick="closeModal('itemModal')">취소</button>
+      <button class="btn-modal btn-primary" onclick="saveIndividualEdit()">저장</button>
+      <button class="btn-modal btn-secondary" onclick="closeModal('itemEditModal')">취소</button>
     </div>
   </div>
 </div>
 
 <div id="moveMenuModal" class="modal-overlay">
-  <div class="modal-card">
+  <div class="modal-card" style="width:400px;">
     <div class="modal-title">📂 메뉴 이동</div>
-    <p style="font-size:13px; color:var(--text-sub); margin-bottom:20px; line-height:1.4;">
-      선택한 메뉴와 포함된 모든 교육자료(Subject)를 다른 시설 카테고리로 이동합니다.
-    </p>
-    <div class="setting-group">
-      <label class="setting-label">이동할 목적지 (Category)</label>
-      <select id="moveTargetCategory" class="setting-input">
-        <!-- JS로 동적 생성 -->
-      </select>
-    </div>
+    <div class="setting-group"><label class="setting-label">목적지 시설 선택</label><select id="moveTargetCategory" class="setting-input" style="text-align-last:center;"></select></div>
     <div class="btn-row">
-      <button class="btn-modal btn-primary" onclick="executeMoveMenu()">이동 확인</button>
+      <button class="btn-modal btn-primary" onclick="executeMoveMenu()">이동</button>
       <button class="btn-modal btn-secondary" onclick="closeModal('moveMenuModal')">취소</button>
     </div>
   </div>
 </div>
 
-<div id="settingsModal" class="modal-overlay">
-  <div class="modal-card">
-    <div class="modal-title">⚙️ 설정 및 관리</div>
-    
-    <div class="setting-group">
-      <label class="setting-label">🛠️ 시스템 관리</label>
-      <div style="display:flex; gap:10px;">
-        <button id="modalAdminBtn" class="btn-modal btn-secondary" onclick="toggleAdmin()">관리자 로그인</button>
-        <button id="modalPreviewBtn" class="btn-modal btn-secondary" onclick="togglePreview()" style="display:none;">👁️ 미리보기</button>
-      </div>
-    </div>
-
-    <div class="setting-group">
-      <label class="setting-label">🔤 텍스트 일괄 수정 (엔터로 구분)</label>
-      <div style="display:flex; gap:10px;">
-        <div style="flex:1;">
-          <span class="setting-label">아이콘 문구</span>
-          <textarea id="bulkCode" class="setting-textarea" placeholder="ILS&#10;VOR..."></textarea>
-        </div>
-        <div style="flex:1;">
-          <span class="setting-label">메뉴 명칭</span>
-          <textarea id="bulkLabel" class="setting-textarea" placeholder="계기착륙시설&#10;전방향표지..."></textarea>
-        </div>
-      </div>
-    </div>
-    <div class="setting-group">
-      <label class="setting-label">🎨 폰트 크기 일괄 설정 (px)</label>
-      <div style="display:flex; gap:10px;">
-        <input type="number" id="setFacIconSize" class="setting-input" placeholder="아이콘 (28)">
-        <input type="number" id="setFacLabelSize" class="setting-input" placeholder="라벨 (19)">
-      </div>
+<div id="bulkEditModal" class="modal-overlay">
+  <div class="modal-card" style="width:900px;">
+    <div class="modal-title">📋 일괄 자료 수정</div>
+    <div class="bulk-list-container">
+      <div class="bulk-header-row"><div>No.</div><div>아이콘(1)</div><div>아이콘(2)</div><div>메뉴 명칭</div><div>외부 연동 링크</div></div>
+      <div id="bulkRowContainer"></div>
     </div>
     <div class="btn-row">
-      <button class="btn-modal btn-primary" onclick="saveSettings()">저장 및 적용</button>
-      <button class="btn-modal btn-secondary" onclick="closeModal('settingsModal')">닫기</button>
+      <button class="btn-modal btn-primary" onclick="saveBulkData()">전체 저장</button>
+      <button class="btn-modal btn-secondary" onclick="closeModal('bulkEditModal')">닫기</button>
     </div>
   </div>
 </div>
 
+<div id="settingsModal" class="modal-overlay">
+  <div class="modal-card" style="width:400px;">
+    <div class="modal-title">⚙️ 설정 및 관리</div>
+    <div id="guestSettings" style="display:none;"><button class="btn-modal btn-primary" onclick="toggleAdmin()">관리자 로그인</button></div>
+    <div id="adminSettings" style="display:none;">
+      <div class="setting-group">
+        <label class="setting-label">🛠️ 시스템 관리</label>
+        <button class="btn-modal btn-danger" onclick="toggleAdmin()" style="width:100%">로그아웃</button>
+        <button id="modalPreviewBtn" class="btn-modal btn-secondary" onclick="togglePreview()" style="width:100%; margin-top:10px;">미리보기 시작</button>
+      </div>
+      <div class="setting-group"><button class="btn-modal btn-primary" onclick="openBulkEdit()" style="width:100%">일괄 수정 팝업 열기</button></div>
+      <div class="setting-group">
+        <label class="setting-label">🎨 UI 설정 (px)</label>
+        <div style="display:flex; gap:10px;">
+          <input type="number" id="setFacIconSize" class="setting-input" placeholder="아이콘">
+          <input type="number" id="setFacLabelSize" class="setting-input" placeholder="라벨">
+        </div>
+      </div>
+      <button class="btn-modal btn-primary" style="width:100%" onclick="saveUISettings()">UI 적용</button>
+    </div>
+    <div class="btn-row"><button class="btn-modal btn-secondary" onclick="closeModal('settingsModal')">닫기</button></div>
+  </div>
+</div>
+
+<div id="pdfOverlay">
+  <div class="pdf-header"><div id="pdfTitle"></div><div onclick="closePdf()" style="cursor:pointer; font-size:24px;">✕</div></div>
+  <div class="viewer-body"><canvas id="pdfCanvas"></canvas></div>
+</div>
+
 <script>
+  // 초기 데이터 로드 및 마이그레이션
   const params = new URLSearchParams(location.search);
   const type = params.get('type') || 'COMM';
   const isAdmin = localStorage.getItem('kac_admin_mode') === '1';
-  document.body.className = document.body.className + ' ' + type;
-  
-  const defaultStyles = {
-    COMM: { name: '통신시설', code: 'C', color: '#2563eb' },
-    NAV:  { name: '항법시설', code: 'N', color: '#16a34a' },
-    SURV: { name: '감시시설', code: 'S', color: '#ea580c' }
-  };
+  let menus = [];
+  try {
+      const saved = localStorage.getItem(`kac_menu_${type}`);
+      menus = saved ? JSON.parse(saved) : [];
+      // 구버전(code) 데이터 신버전(line1)으로 자동 이전
+      menus = menus.map(m => {
+          if (!m.line1 && m.code) m.line1 = m.code;
+          return m;
+      });
+  } catch(e) { menus = []; }
 
-  const savedStyle = JSON.parse(localStorage.getItem(`kac_style_${type}`) || '{}');
-  const finalStyle = { ...defaultStyles[type], ...savedStyle }; 
-  
-  const typeName = finalStyle.name || type;
-  document.getElementById('bc').textContent = ` > ${typeName}`;
-
-  const hexToRgb = (hex) => {
-    let c;
-    if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
-        c= hex.substring(1).split('');
-        if(c.length== 3){
-            c= [c[0], c[0], c[1], c[1], c[2], c[2]];
-        }
-        c= '0x'+c.join('');
-        return [(c>>16)&255, (c>>8)&255, c&255].join(',');
-    }
-    return '37, 99, 235'; 
-  };
-
-  const themeColor = finalStyle.color || '#2563eb';
-  document.documentElement.style.setProperty('--theme-color', themeColor);
-  document.documentElement.style.setProperty('--theme-rgb', hexToRgb(themeColor));
-
-  const theme = localStorage.getItem('kac_theme') || 'light';
-  setTheme(theme);
-  
-  loadStyles();
-
-  if(localStorage.getItem('kac_preview_active') === '1') {
-    document.body.classList.add('preview-active');
-  }
-
-  function setTheme(mode) {
-    document.body.className = (document.body.className.replace('dark-mode','').trim() + (mode==='dark' ? ' dark-mode' : '')).trim();
-    localStorage.setItem('kac_theme', mode);
-    document.getElementById('btnDay').classList.toggle('active', mode==='light');
-    document.getElementById('btnNight').classList.toggle('active', mode==='dark');
-  }
-
-  function toggleAdmin() {
-    if(isAdmin) { 
-      if(confirm("관리자 모드를 종료하시겠습니까?")) { 
-        localStorage.setItem('kac_admin_mode','0'); 
-        location.reload(); 
-      } 
-    } else { 
-      if(prompt("비밀번호") === (localStorage.getItem('kac_admin_pw')||"CATC1234")) { 
-        localStorage.setItem('kac_admin_mode','1'); 
-        location.reload(); 
-      } 
-    }
-  }
-
-  function togglePreview() {
-    document.body.classList.toggle('preview-active');
-    const isActive = document.body.classList.contains('preview-active');
-    localStorage.setItem('kac_preview_active', isActive ? '1' : '0');
-    location.reload();
-  }
-
-  let menus = JSON.parse(localStorage.getItem(`kac_menu_${type}`) || '[]');
-
-  (function migrateData() {
-    let updated = false;
-    menus.forEach((m, idx) => {
-      if (!m.dataId) {
-        const newId = 'id_' + Date.now() + '_' + idx;
-        const oldKey = `kac_subs_${type}_${idx}`;
-        if (localStorage.getItem(oldKey)) { localStorage.setItem(`kac_subs_${type}_${newId}`, localStorage.getItem(oldKey)); }
-        m.dataId = newId; updated = true;
-      }
-    });
-    if (updated) localStorage.setItem(`kac_menu_${type}`, JSON.stringify(menus));
-  })();
-
-  // --- 페이지네이션 로직 ---
+  let searchIndex = [];
+  let currentEditIdx = -1;
   let currentPage = 1;
-  const itemsPerPage = 8; 
+  const itemsPerPage = 8;
+  let dragSrcIndex = null;
+
+  function init() {
+    if(localStorage.getItem('kac_preview_active') === '1') document.body.classList.add('preview-active');
+    
+    // 헤더 및 스타일 설정
+    const styleData = localStorage.getItem(`kac_style_${type}`);
+    const style = styleData ? JSON.parse(styleData) : { name: type, color: '#2563eb' };
+    document.getElementById('bc').textContent = ` > ${style.name || type}`;
+    document.documentElement.style.setProperty('--theme-color', style.color || '#2563eb');
+    
+    setTheme(localStorage.getItem('kac_theme') || 'light');
+    loadStyles();
+    render();
+    buildSearchIndex();
+
+    // 검색 로직
+    const sInput = document.getElementById('searchInput'), sOverlay = document.getElementById('searchOverlay'), sRes = document.getElementById('searchDropdown');
+    sInput.onfocus = () => { document.body.classList.add('search-mode'); sOverlay.classList.add('active'); if(sInput.value.trim()) sRes.classList.add('active'); };
+    sOverlay.onclick = () => { document.body.classList.remove('search-mode'); sOverlay.classList.remove('active'); sRes.classList.remove('active'); };
+    sInput.oninput = (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if(!q) { sRes.classList.remove('active'); return; }
+      const matches = searchIndex.filter(i => i.name.toLowerCase().includes(q));
+      sRes.innerHTML = matches.map(i => `<div class="result-item" onclick="openPdfFromSearch('${i.pdfName}', '${i.name}')"><div><div class="res-title">${i.name}</div><div class="res-path">${i.typeName} > ${i.menuName}</div></div><div class="res-tag">${i.type}</div></div>`).join('') || '<div style="padding:15px; text-align:center;">결과 없음</div>';
+      sRes.classList.add('active');
+    };
+  }
 
   function render(direction = 'none') {
     const grid = document.getElementById('trainGrid');
+    const paginCont = document.getElementById('pagination');
+    if(!grid || !paginCont) return;
+    grid.innerHTML = ''; 
+    paginCont.innerHTML = '';
     
     if(direction !== 'none') {
-        grid.className = ''; 
-        void grid.offsetWidth; 
-        grid.classList.add(direction === 'next' ? 'slide-in-right' : 'slide-in-left');
+      grid.classList.remove('slide-in-right', 'slide-in-left');
+      void grid.offsetWidth;
+      grid.classList.add(direction === 'next' ? 'slide-in-right' : 'slide-in-left');
     }
 
-    grid.innerHTML = '';
-    const pagination = document.getElementById('pagination');
-    pagination.innerHTML = '';
-    
-    let totalList = [...menus];
-    
-    // [수정] 미리보기 모드일 경우 추가 버튼 제외
-    const isPreview = document.body.classList.contains('preview-active');
-    if(isAdmin && !isPreview) totalList.push({ isAddButton: true });
+    const isP = document.body.classList.contains('preview-active');
+    let list = [...menus];
+    if(isAdmin && !isP) list.push({ isAddButton: true });
 
-    // [수정] 4개 이하일 경우 Flex(중앙 정렬), 5개 이상일 경우 Grid(4열, 좌측 정렬)
-    // 현재 페이지에 표시될 아이템 수만 고려하는 것이 아니라, 전체 레이아웃을 결정
-    // 하지만 페이지네이션이 있으므로 '현재 페이지 아이템 수'가 중요.
-    // 사용자가 "카드가 3개이던 2개이던... 가운데 정렬" -> Flexbox justify-content:center
-    // "2번째줄 부터는 좌측부터" -> Grid Layout.
-    // 따라서, 전체 itemsPerPage(8) 기준으로, 현재 페이지 아이템 갯수에 따라 스타일 분기.
-    
-    const totalPages = Math.ceil(totalList.length / itemsPerPage);
-    if(currentPage > totalPages && totalPages > 0) currentPage = totalPages; 
+    const totalPages = Math.ceil(list.length / itemsPerPage) || 1;
+    if(currentPage > totalPages) currentPage = totalPages;
+    if(currentPage < 1) currentPage = 1;
 
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const currentItems = totalList.slice(startIndex, endIndex);
+    const start = (currentPage - 1) * itemsPerPage;
+    const pageItems = list.slice(start, start + itemsPerPage);
 
-    // [수정] 레이아웃 결정
-    if (currentItems.length <= 4) {
-        grid.style.display = 'flex';
-        grid.style.flexWrap = 'wrap';
-        grid.style.justifyContent = 'center';
-        grid.style.maxWidth = '1250px'; // 4개 너비 제한
-    } else {
-        grid.style.display = 'grid';
-        grid.style.gridTemplateColumns = 'repeat(4, 280px)';
-        grid.style.justifyContent = 'center';
-        grid.style.maxWidth = 'none';
-    }
-
-    currentItems.forEach((item) => {
-      if(item.isAddButton) {
-        const addBtn = document.createElement('div'); 
-        addBtn.className = 'menu-card add-btn-wrap';
-        addBtn.style.border = '2px dashed #cbd5e1'; addBtn.style.background = 'transparent';
-        addBtn.onclick = () => openItemModal('add');
-        addBtn.innerHTML = `<div class="icon-circle" style="background:none; border:2px solid #cbd5e1; color:#cbd5e1">+</div><div style="color:#94a3b8; font-weight:800;">메뉴 추가</div>`;
-        grid.appendChild(addBtn);
-      } else {
-        const globalIndex = menus.indexOf(item); 
-        const card = document.createElement('div'); card.className = 'menu-card';
-        if(isAdmin) {
-          card.setAttribute('draggable', 'true');
-          card.ondragstart = (e) => handleDragStart(e, globalIndex);
-          card.ondragover = (e) => handleDragOver(e);
-          card.ondrop = (e) => handleDrop(e, globalIndex);
-          card.ondragend = (e) => handleDragEnd(e);
-          card.ondragleave = (e) => handleDragLeave(e);
-        }
-        card.onclick = () => location.href = `viewer_list.html?type=${type}&menu=${encodeURIComponent(item.label)}&id=${item.dataId}`;
-        
-        const adminCtrlHtml = isAdmin ? `
-            <div class="admin-ctrl" onclick="event.stopPropagation()">
-              <button class="btn-sm" onclick="openItemModal('edit', ${globalIndex})">수정</button>
-              <button class="btn-sm btn-move" onclick="openMoveMenuModal(${globalIndex})">이동</button>
-              <button class="btn-sm btn-del" onclick="deleteMenu(${globalIndex})">삭제</button>
-            </div>` : '';
-
-        card.innerHTML = `
-            <div class="icon-circle">${item.code}</div>
-            <div class="menu-label">${item.label}</div>
-            ${adminCtrlHtml}`;
-        grid.appendChild(card);
+    pageItems.forEach((item, idx) => {
+      const globalIdx = start + idx;
+      const card = document.createElement('div');
+      card.className = item.isAddButton ? 'menu-card add-btn-wrap' : 'menu-card';
+      
+      if(isAdmin && !isP && !item.isAddButton) {
+        card.setAttribute('draggable', 'true');
+        card.ondragstart = (e) => { dragSrcIndex = globalIdx; e.target.classList.add('dragging'); };
+        card.ondragover = (e) => { e.preventDefault(); card.classList.add('drag-over'); };
+        card.ondragleave = () => card.classList.remove('drag-over');
+        card.ondrop = (e) => { e.preventDefault(); card.classList.remove('drag-over'); if(dragSrcIndex !== globalIdx) { const moved = menus.splice(dragSrcIndex, 1)[0]; menus.splice(globalIdx, 0, moved); saveData(); } };
+        card.ondragend = () => card.classList.remove('dragging');
       }
+
+      if(item.isAddButton) {
+        card.style.border = '2px dashed #cbd5e1';
+        card.innerHTML = `<div class="icon-circle" style="background:none; border:2px solid #cbd5e1; color:#cbd5e1">+</div><div style="color:#94a3b8; font-weight:800;">메뉴 추가</div>`;
+        card.onclick = () => openIndividualEdit('NEW');
+      } else {
+        const ctrl = (isAdmin && !isP) ? `<div class="admin-ctrl" onclick="event.stopPropagation()"><button class="btn-sm" onclick="openIndividualEdit(${globalIdx})">수정</button><button class="btn-sm btn-move" onclick="openMoveMenuModal(${globalIdx})">이동</button><button class="btn-sm" style="color:#ef4444" onclick="deleteItem(${globalIdx})">삭제</button></div>` : '';
+        const line1 = item.line1 || '';
+        const line2 = item.line2 ? `<div>${item.line2}</div>` : '';
+        card.innerHTML = `<div class="icon-circle"><div>${line1}</div>${line2}</div><div class="menu-label">${item.label || '제목없음'}</div>${ctrl}`;
+        card.onclick = () => item.link ? window.open(item.link, '_blank') : location.href = `viewer_list.html?type=${type}&menu=${encodeURIComponent(item.label)}&id=${item.dataId}`;
+      }
+      grid.appendChild(card);
     });
 
     if(totalPages > 1) {
       for(let i=1; i<=totalPages; i++) {
-        const btn = document.createElement('div');
-        btn.className = `page-btn ${i===currentPage ? 'active' : ''}`;
-        btn.textContent = i;
-        btn.onclick = () => { 
-            if(i === currentPage) return;
-            const dir = i > currentPage ? 'next' : 'prev';
-            currentPage = i; 
-            render(dir); 
-        };
-        if(isAdmin) {
-            btn.ondragover = (e) => { e.preventDefault(); btn.classList.add('drag-target'); };
-            btn.ondragleave = (e) => { btn.classList.remove('drag-target'); };
-            btn.ondrop = (e) => {
-                e.preventDefault();
-                btn.classList.remove('drag-target');
-                moveItemToPage(i);
-            };
+        const dot = document.createElement('div');
+        dot.className = `page-dot ${i === currentPage ? 'active' : ''}`;
+        dot.textContent = i;
+        dot.onclick = () => { if(i === currentPage) return; const dir = i > currentPage ? 'next' : 'prev'; currentPage = i; render(dir); };
+        if(isAdmin && !isP) {
+          dot.ondragover = (e) => { e.preventDefault(); dot.classList.add('drag-target'); };
+          dot.ondragleave = () => dot.classList.remove('drag-target');
+          dot.ondrop = (e) => { e.preventDefault(); dot.classList.remove('drag-target'); const moved = menus.splice(dragSrcIndex, 1)[0]; menus.splice((i-1)*itemsPerPage, 0, moved); currentPage = i; saveData(); };
         }
-        pagination.appendChild(btn);
+        paginCont.appendChild(dot);
       }
     }
   }
 
-  function loadStyles() {
-    const iSize = localStorage.getItem('kac_fac_icon_size') || '28';
-    const lSize = localStorage.getItem('kac_fac_label_size') || '19';
-    document.documentElement.style.setProperty('--icon-size-fac', iSize + 'px');
-    document.documentElement.style.setProperty('--label-size-fac', lSize + 'px');
-  }
-
-  let editMode = '';
-  let editIndex = -1;
-
-  function openItemModal(mode, idx) {
-    editMode = mode;
-    editIndex = idx;
-    const modal = document.getElementById('itemModal');
-    const title = document.getElementById('itemModalTitle');
-    
-    if (mode === 'add') {
-      title.textContent = "메뉴 추가";
-      document.getElementById('inputItemLabel').value = "";
-      document.getElementById('inputItemCode').value = finalStyle.code || type[0];
+  function openIndividualEdit(idx) {
+    currentEditIdx = idx;
+    if(idx === 'NEW') {
+        ['editItemLine1','editItemLine2','editItemLabel','editItemLink'].forEach(id => document.getElementById(id).value = '');
     } else {
-      title.textContent = "메뉴 수정";
-      document.getElementById('inputItemLabel').value = menus[idx].label;
-      document.getElementById('inputItemCode').value = menus[idx].code;
+        const m = menus[idx];
+        document.getElementById('editItemLine1').value = m.line1 || '';
+        document.getElementById('editItemLine2').value = m.line2 || '';
+        document.getElementById('editItemLabel').value = m.label || '';
+        document.getElementById('editItemLink').value = m.link || '';
     }
-    modal.style.display = 'flex';
+    document.getElementById('itemEditModal').style.display = 'flex';
   }
 
-  function saveItemData() {
-    const label = document.getElementById('inputItemLabel').value;
-    const code = document.getElementById('inputItemCode').value;
-    
-    if (!label) return alert("명칭을 입력하세요.");
-
-    if (editMode === 'add') {
-      menus.push({code: code, label: label, dataId: 'id_' + Date.now()});
-    } else {
-      menus[editIndex].label = label;
-      menus[editIndex].code = code;
-    }
-    saveData();
-    closeModal('itemModal');
+  function saveIndividualEdit() {
+    const data = { line1: document.getElementById('editItemLine1').value, line2: document.getElementById('editItemLine2').value, label: document.getElementById('editItemLabel').value, link: document.getElementById('editItemLink').value, dataId: (currentEditIdx === 'NEW' ? 'id_' + Date.now() : menus[currentEditIdx].dataId) };
+    if(currentEditIdx === 'NEW') menus.push(data); else menus[currentEditIdx] = data;
+    saveData(); closeModal('itemEditModal');
   }
 
-  let moveMenuIndex = -1;
   function openMoveMenuModal(idx) {
-    moveMenuIndex = idx;
-    const select = document.getElementById('moveTargetCategory');
-    select.innerHTML = '';
-    
+    currentEditIdx = idx;
+    const select = document.getElementById('moveTargetCategory'); select.innerHTML = '';
     const menuOrder = JSON.parse(localStorage.getItem('kac_index_order') || '["COMM","NAV","SURV"]');
-    menuOrder.forEach(targetType => {
-        if(targetType === type) return; 
-        
-        const style = JSON.parse(localStorage.getItem(`kac_style_${targetType}`) || '{}');
-        const defaultName = (defaultStyles[targetType] && defaultStyles[targetType].name) ? defaultStyles[targetType].name : targetType;
-        const name = style.name || defaultName;
-        
-        const option = document.createElement('option');
-        option.value = targetType;
-        option.textContent = name;
-        select.appendChild(option);
+    menuOrder.forEach(t => {
+      if(t === type) return;
+      const sData = localStorage.getItem(`kac_style_${t}`);
+      const s = sData ? JSON.parse(sData) : { name: t };
+      const opt = document.createElement('option'); opt.value = t; opt.textContent = s.name || t;
+      select.appendChild(opt);
     });
-
-    if(select.children.length === 0) {
-        alert("이동할 수 있는 다른 카테고리가 없습니다.");
-        return;
-    }
-    
     document.getElementById('moveMenuModal').style.display = 'flex';
   }
 
   function executeMoveMenu() {
     const targetType = document.getElementById('moveTargetCategory').value;
     if(!targetType) return;
-    if(!confirm("이동하시겠습니까?")) return;
-
-    const itemToMove = menus[moveMenuIndex];
+    const item = menus.splice(currentEditIdx, 1)[0];
     const targetMenus = JSON.parse(localStorage.getItem(`kac_menu_${targetType}`) || '[]');
-    
-    const oldSubKey = `kac_subs_${type}_${itemToMove.dataId}`;
-    const newSubKey = `kac_subs_${targetType}_${itemToMove.dataId}`;
+    const oldSubKey = `kac_subs_${type}_${item.dataId}`, newSubKey = `kac_subs_${targetType}_${item.dataId}`;
     const subData = localStorage.getItem(oldSubKey);
-    
-    if(subData) {
-        localStorage.setItem(newSubKey, subData);
-        localStorage.removeItem(oldSubKey);
-    }
-
-    targetMenus.push(itemToMove);
-    menus.splice(moveMenuIndex, 1);
-
+    if(subData) { localStorage.setItem(newSubKey, subData); localStorage.removeItem(oldSubKey); }
+    targetMenus.push(item);
     localStorage.setItem(`kac_menu_${targetType}`, JSON.stringify(targetMenus));
-    saveData(); 
-    closeModal('moveMenuModal');
-    alert("이동되었습니다.");
+    saveData(); alert('이동되었습니다.'); closeModal('moveMenuModal');
+  }
+
+  function openBulkEdit() {
+    const cont = document.getElementById('bulkRowContainer'); cont.innerHTML = '';
+    for(let i=0; i<30; i++) {
+      const m = menus[i] || {};
+      cont.innerHTML += `<div class="bulk-row"><div>${i+1}</div><input type="text" class="bulk-input b-line1" value="${m.line1 || ''}"><input type="text" class="bulk-input b-line2" value="${m.line2 || ''}"><input type="text" class="bulk-input b-label" value="${m.label || ''}"><input type="text" class="bulk-input b-link" value="${m.link || ''}"></div>`;
+    }
+    document.getElementById('bulkEditModal').style.display = 'flex';
+  }
+
+  function saveBulkData() {
+    const rows = document.querySelectorAll('.bulk-row'); let newMenus = [];
+    rows.forEach((row, i) => {
+      const l1 = row.querySelector('.b-line1').value, lab = row.querySelector('.b-label').value;
+      if(l1 || lab) newMenus.push({ line1: l1, line2: row.querySelector('.b-line2').value, label: lab, link: row.querySelector('.b-link').value, dataId: (menus[i] ? menus[i].dataId : 'id_'+Date.now()+'_'+i) });
+    });
+    menus = newMenus; saveData(); alert('저장되었습니다.'); closeModal('bulkEditModal');
   }
 
   function openSettings() {
-    // 관리자 버튼 텍스트 설정
-    const adminBtn = document.getElementById('modalAdminBtn');
     if(isAdmin) {
-        adminBtn.textContent = "관리자 로그아웃";
-        adminBtn.className = "btn-modal btn-danger";
-        document.getElementById('modalPreviewBtn').style.display = 'block';
-    } else {
-        adminBtn.textContent = "관리자 로그인";
-        adminBtn.className = "btn-modal btn-primary";
-        document.getElementById('modalPreviewBtn').style.display = 'none';
-    }
-
-    // 프리뷰 버튼 텍스트 설정
-    const previewBtn = document.getElementById('modalPreviewBtn');
-    if(document.body.classList.contains('preview-active')) {
-        previewBtn.textContent = "미리보기 종료";
-        previewBtn.style.background = "#10b981";
-        previewBtn.style.color = "#fff";
-    } else {
-        previewBtn.textContent = "미리보기 시작";
-        previewBtn.style.background = "";
-        previewBtn.style.color = "";
-    }
-
-    document.getElementById('setFacIconSize').value = parseInt(localStorage.getItem('kac_fac_icon_size') || '28');
-    document.getElementById('setFacLabelSize').value = parseInt(localStorage.getItem('kac_fac_label_size') || '19');
-    document.getElementById('bulkCode').value = menus.map(m => m.code).join('\n');
-    document.getElementById('bulkLabel').value = menus.map(m => m.label).join('\n');
+      document.getElementById('adminSettings').style.display = 'block'; document.getElementById('guestSettings').style.display = 'none';
+      document.getElementById('setFacIconSize').value = localStorage.getItem('kac_fac_icon_size') || 28;
+      document.getElementById('setFacLabelSize').value = localStorage.getItem('kac_fac_label_size') || 19;
+      const isP = localStorage.getItem('kac_preview_active') === '1', pBtn = document.getElementById('modalPreviewBtn');
+      pBtn.textContent = isP ? "미리보기 종료" : "미리보기 시작"; pBtn.classList.toggle('btn-preview-active', isP);
+    } else { document.getElementById('adminSettings').style.display = 'none'; document.getElementById('guestSettings').style.display = 'block'; }
     document.getElementById('settingsModal').style.display = 'flex';
   }
 
-  function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-  function saveSettings() {
-    const iSize = document.getElementById('setFacIconSize').value;
-    const lSize = document.getElementById('setFacLabelSize').value;
-    if(iSize) localStorage.setItem('kac_fac_icon_size', iSize);
-    if(lSize) localStorage.setItem('kac_fac_label_size', lSize);
-    loadStyles();
-
-    const codes = document.getElementById('bulkCode').value.split('\n').map(s=>s.trim()).filter(s=>s!=='');
-    const labels = document.getElementById('bulkLabel').value.split('\n').map(s=>s.trim()).filter(s=>s!=='');
-    
-    const count = Math.min(menus.length, codes.length, labels.length);
-    if(count > 0 && confirm(`상위 ${count}개 항목의 텍스트를 일괄 수정하시겠습니까?`)) {
-        for(let i=0; i<count; i++) {
-            menus[i].code = codes[i];
-            menus[i].label = labels[i];
-        }
-        saveData();
-    }
-    closeModal('settingsModal');
+  function togglePreview() {
+    const active = document.body.classList.toggle('preview-active');
+    localStorage.setItem('kac_preview_active', active ? '1' : '0');
+    const pBtn = document.getElementById('modalPreviewBtn');
+    pBtn.textContent = active ? "미리보기 종료" : "미리보기 시작";
+    pBtn.classList.toggle('btn-preview-active', active);
+    render();
   }
 
-  let allSubjectsIndex = [];
+  function saveData() { localStorage.setItem(`kac_menu_${type}`, JSON.stringify(menus)); render(); buildSearchIndex(); }
+  function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+  function toggleAdmin() { if(isAdmin) { if(confirm("로그아웃?")) { localStorage.setItem('kac_admin_mode','0'); location.reload(); } } else { const pw = prompt("비밀번호"); if(pw === (localStorage.getItem('kac_admin_pw')||"CATC1234")) { localStorage.setItem('kac_admin_mode','1'); location.reload(); } else if(pw) alert("틀림"); } }
+  function setTheme(m) { document.body.classList.toggle('dark-mode', m==='dark'); localStorage.setItem('kac_theme', m); const bD = document.getElementById('btnDay'), bN = document.getElementById('btnNight'); if(bD) bD.classList.toggle('active', m==='light'); if(bN) bN.classList.toggle('active', m==='dark'); }
+  function saveUISettings() { localStorage.setItem('kac_fac_icon_size', document.getElementById('setFacIconSize').value); localStorage.setItem('kac_fac_label_size', document.getElementById('setFacLabelSize').value); loadStyles(); alert('적용되었습니다.'); }
+  function loadStyles() { document.documentElement.style.setProperty('--icon-size-fac', (localStorage.getItem('kac_fac_icon_size')||'28')+'px'); document.documentElement.style.setProperty('--label-size-fac', (localStorage.getItem('kac_fac_label_size')||'19')+'px'); }
+  function deleteItem(idx) { if(confirm('정말 삭제하시겠습니까?')) { const pw = prompt('관리자 비밀번호를 입력하세요.'); if(pw === (localStorage.getItem('kac_admin_pw')||"CATC1234")) { menus.splice(idx,1); saveData(); alert('삭제되었습니다.'); } else if(pw) alert('비밀번호가 틀렸습니다.'); } }
+
   function buildSearchIndex() {
-    allSubjectsIndex = [];
-    const types = ['COMM', 'NAV', 'SURV'];
-    types.forEach(t => {
-      const s = JSON.parse(localStorage.getItem(`kac_style_${t}`) || '{}');
-      const tName = s.name || t;
-      const ms = JSON.parse(localStorage.getItem(`kac_menu_${t}`) || '[]');
+    searchIndex = []; const ts = ['COMM', 'NAV', 'SURV'];
+    ts.forEach(t => {
+      const sData = localStorage.getItem(`kac_style_${t}`);
+      const s = sData ? JSON.parse(sData) : { name: t };
+      const msData = localStorage.getItem(`kac_menu_${t}`);
+      const ms = msData ? JSON.parse(msData) : [];
       ms.forEach(m => {
-        const subData = localStorage.getItem(`kac_subs_${t}_${m.dataId}`);
-        if(subData) {
-          JSON.parse(subData).forEach(sub => {
-            allSubjectsIndex.push({
-              name: sub.name, type: t, typeName: tName, menuName: m.label, menuId: m.dataId, subId: sub.id, active: sub.active !== false
-            });
-          });
-        }
+        const ssData = localStorage.getItem(`kac_subs_${t}_${m.dataId}`);
+        const ss = ssData ? JSON.parse(ssData) : [];
+        ss.forEach(sub => { if(sub.pdfName) searchIndex.push({ name: sub.name, pdfName: sub.pdfName, type: t, typeName: s.name || t, menuName: m.label }); });
       });
     });
   }
-  
-  // [수정] 검색창 포커스 시 딤드 오버레이 (z-index 조정)
-  const sInput = document.getElementById('searchInput'), sRes = document.getElementById('searchDropdown'), sOverlay = document.getElementById('searchOverlay');
-  sInput.addEventListener('focus', () => { 
-      document.body.classList.add('search-mode');
-      sOverlay.classList.add('active'); 
-      if(sInput.value.trim().length > 0) sRes.classList.add('active'); 
-  });
-  sOverlay.addEventListener('click', () => { 
-      document.body.classList.remove('search-mode');
-      sOverlay.classList.remove('active'); 
-      sRes.classList.remove('active'); 
-  });
 
-  sInput.addEventListener('input', (e) => {
-    const query = e.target.value.trim().toLowerCase();
-    if(query.length === 0) { sRes.classList.remove('active'); return; }
-    document.body.classList.add('search-mode');
-    sOverlay.classList.add('active'); 
-    const matches = allSubjectsIndex.filter(item => item.name.toLowerCase().includes(query) || item.menuName.toLowerCase().includes(query));
-    renderSearchResults(matches, query);
-  });
-
-  function renderSearchResults(list, query) {
-    sRes.innerHTML = ''; sRes.classList.add('active');
-    if(list.length === 0) { sRes.innerHTML = `<div style="padding:15px; text-align:center; color:var(--text-sub); opacity:0.6; font-size:13px;">검색 결과가 없습니다.</div>`; return; }
-    list.forEach(item => {
-      const div = document.createElement('div'); div.className = 'result-item';
-      
-      const itemStyle = JSON.parse(localStorage.getItem(`kac_style_${item.type}`) || '{}');
-      const defaultStyles = {
-        COMM: { color: '#2563eb' },
-        NAV:  { color: '#16a34a' },
-        SURV: { color: '#ea580c' }
-      };
-      const finalItemStyle = { ...defaultStyles[item.type], ...itemStyle };
-      const itemColor = finalItemStyle.color || '#2563eb';
-
-      const highlightName = item.name.replace(new RegExp(`(${query})`, 'gi'), `<span style="color:${itemColor}; font-weight:900;">$1</span>`);
-      div.innerHTML = `<div class="result-info"><div class="res-title">${highlightName}</div><div class="res-path">${item.typeName} > ${item.menuName}</div></div><div class="res-tag" style="background:${itemColor}">${item.type}</div>`;
-      div.onclick = () => { location.href = `viewer_list.html?type=${item.type}&menu=${encodeURIComponent(item.menuName)}&id=${item.menuId}&autoOpen=${item.subId}`; };
-      sRes.appendChild(div);
-    });
+  async function openPdfFromSearch(p, t) {
+    document.getElementById('pdfOverlay').style.display = 'flex'; document.getElementById('pdfTitle').textContent = t;
+    try {
+      const task = pdfjsLib.getDocument('files/' + (p.endsWith('.pdf') ? p : p + '.pdf'));
+      const pdf = await task.promise; const page = await pdf.getPage(1);
+      const canvas = document.getElementById('pdfCanvas'), ctx = canvas.getContext('2d'), vp = page.getViewport({ scale: 1.5 });
+      canvas.height = vp.height; canvas.width = vp.width; await page.render({ canvasContext: ctx, viewport: vp }).promise;
+    } catch(e) { alert('파일 오류'); closePdf(); }
   }
+  function closePdf() { document.getElementById('pdfOverlay').style.display = 'none'; }
 
-  let dragSrcIndex = null;
-  function handleDragStart(e, index) { dragSrcIndex = index; e.target.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
-  function handleDragOver(e) { if (e.preventDefault) e.preventDefault(); e.target.closest('.menu-card').classList.add('drag-over'); e.dataTransfer.dropEffect = 'move'; return false; }
-  function handleDragLeave(e) { e.target.closest('.menu-card').classList.remove('drag-over'); }
-  function handleDrop(e, index) { 
-    if (e.stopPropagation) e.stopPropagation(); 
-    e.target.closest('.menu-card').classList.remove('drag-over'); 
-    if (dragSrcIndex !== null && dragSrcIndex !== index) { 
-        const movedItem = menus.splice(dragSrcIndex, 1)[0]; 
-        menus.splice(index, 0, movedItem); 
-        saveData(); 
-    } 
-    return false; 
-  }
-  function handleDragEnd(e) { document.querySelectorAll('.menu-card').forEach(card => { card.classList.remove('dragging'); card.classList.remove('drag-over'); }); }
+  // 전역 노출
+  window.setTheme = setTheme; window.openSettings = openSettings; window.toggleAdmin = toggleAdmin; window.togglePreview = togglePreview;
+  window.openBulkEdit = openBulkEdit; window.saveUISettings = saveUISettings; window.closeModal = closeModal;
+  window.saveIndividualEdit = saveIndividualEdit; window.executeMoveMenu = executeMoveMenu; window.saveBulkData = saveBulkData;
+  window.closePdf = closePdf; window.openIndividualEdit = openIndividualEdit; window.openMoveMenuModal = openMoveMenuModal;
+  window.deleteItem = deleteItem;
 
-  function moveItemToPage(targetPage) {
-    // 페이지 이동 로직 (필요 시 구현)
-    // 여기서는 단순 드래그 앤 드롭 정렬만 사용 중
-  }
-
-  function deleteMenu(i) { 
-    if(confirm("⚠️ 경고: 이 메뉴를 삭제하면 포함된 모든 하위 과목과 파일 데이터가 영구적으로 삭제됩니다.\n계속하시겠습니까?")) {
-        const pw = prompt("삭제를 승인하려면 관리자 비밀번호를 입력하세요.");
-        const adminPw = localStorage.getItem('kac_admin_pw') || "CATC1234";
-        
-        if(pw === adminPw) {
-            menus.splice(i,1); 
-            const totalItems = isAdmin ? menus.length + 1 : menus.length;
-            const maxPage = Math.ceil(totalItems / itemsPerPage);
-            if(currentPage > maxPage && maxPage > 0) currentPage = maxPage;
-            
-            saveData();
-            alert("삭제되었습니다.");
-        } else {
-            alert("비밀번호가 일치하지 않습니다.");
-        }
-    } 
-  }
-  function saveData() { localStorage.setItem(`kac_menu_${type}`, JSON.stringify(menus)); render(); }
-  
-  render();
-  buildSearchIndex();
+  init();
 </script>
 </body>
 </html>
