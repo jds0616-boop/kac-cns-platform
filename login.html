@@ -31,27 +31,27 @@
 <body>
   <div class="login-card">
     <div class="logo">KAC CNS Platform</div>
+    <!-- 입력 편의를 위해 소문자로 입력해도 자동으로 대문자로 취급되도록 logic 처리됨 -->
     <input type="password" id="pwInput" placeholder="접속 비밀번호 입력" onkeyup="if(window.event.keyCode==13){checkPw()}">
     <button onclick="checkPw()">접속하기</button>
   </div>
 
   <script>
     function checkPw() {
-      const input = document.getElementById('pwInput').value;
-      // [설정] 원하는 접속 비밀번호를 아래 "CATC1234" 대신 입력하세요.
+      // .trim()으로 공백 제거, .toUpperCase()로 대소문자 구분 없이 비교
+      const input = document.getElementById('pwInput').value.trim().toUpperCase();
       const correctPw = "CATC1234"; 
 
       if(input === correctPw) {
-        // 인증 성공 시 세션에 기록 (브라우저 닫으면 삭제됨)
+        // 인증 성공 시 세션에 기록
         sessionStorage.setItem('kac_access_token', 'granted');
-        location.replace('index.html'); // 뒤로가기 방지를 위해 replace 사용
+        location.replace('index.html');
       } else {
         alert("비밀번호가 올바르지 않습니다.");
         document.getElementById('pwInput').value = '';
       }
     }
     
-    // 이미 로그인 되어있으면 바로 이동
     if(sessionStorage.getItem('kac_access_token') === 'granted') {
         location.replace('index.html');
     }
