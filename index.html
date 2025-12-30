@@ -75,7 +75,7 @@
   /* [수정] 다시 center로 변경하여 화면 중앙 정렬 */
   #cardContainer { 
     display: flex; flex-wrap: wrap; gap: 30px; width: 100%; max-width: 1700px; 
-    justify-content: center; /* 다시 중앙 정렬 */
+    justify-content: center; 
     padding: 20px; min-height: 450px; transform-style: preserve-3d; 
   }
   
@@ -289,12 +289,23 @@
     if(isAdmin) document.body.classList.add('admin-mode');
     if(localStorage.getItem('kac_preview_active') === '1') document.body.classList.add('preview-active');
     
+    // [핵심 수정] 데이터가 비어있으면(완전 초기 상태) 설정창을 먼저 띄운다.
+    // 기존에는 null을 먼저 채워서 길이가 0이 아니게 되어 설정창이 안 떴음.
+    if(menuOrder.length === 0) {
+        document.getElementById('initialSetupOverlay').classList.add('active');
+    }
+
+    // 그 후, 5의 배수가 되도록 빈자리(null)를 채워준다. (화면 레이아웃 유지용)
     if(menuOrder.length % itemsPerPage !== 0) {
         const needed = itemsPerPage - (menuOrder.length % itemsPerPage);
         for(let i=0; i<needed; i++) menuOrder.push(null);
     }
     
-    if(menuOrder.length === 0) document.getElementById('initialSetupOverlay').classList.add('active');
+    // 혹시라도 데이터가 아예 없어서 루프를 안 돌 수도 있으니 최소 1페이지(5개)는 확보
+    if(menuOrder.length === 0) {
+        for(let i=0; i<itemsPerPage; i++) menuOrder.push(null);
+    }
+
     renderCards(); buildSearchIndex();
   }
 
