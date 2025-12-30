@@ -16,6 +16,8 @@
     --shadow: 0 10px 25px rgba(0,0,0,0.05);
     --btn-bg: #f8fafc; --btn-border: #e2e8f0; --btn-text: #64748b;
     --header-h: 75px;
+    --search-border: #cbd5e1;
+    --search-shadow: 0 8px 30px rgba(15, 23, 42, 0.12);
   }
 
   body.dark-mode {
@@ -24,65 +26,51 @@
     --border-card: 2px solid rgba(255,255,255,0.1); 
     --shadow: 0 10px 30px rgba(0,0,0,0.5);
     --btn-bg: rgba(255,255,255,0.05); --btn-border: rgba(255,255,255,0.2); --btn-text: #e2e8f0;
+    --search-border: rgba(255,255,255,0.1);
+    --search-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
   body { background: var(--bg-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: var(--text-main); transition: 0.3s; }
 
+  /* 미리보기 모드 시 CSS로도 한 번 더 차단 */
+  body.preview-active .card-ctrl, 
+  body.preview-active .add-card-btn { display: none !important; }
+
   header { height: var(--header-h); background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.15); z-index: 1000; transition: 0.3s; flex-shrink: 0; }
   .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; cursor: pointer; }
-
   .header-right { display: flex; align-items: center; gap: 15px; }
-
   .theme-toggle { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); margin-right: 10px; }
   .theme-btn { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; opacity: 0.5; }
-  .theme-btn:hover { opacity: 1; background: rgba(255,255,255,0.1); }
-  .theme-btn.active { background: #fff; opacity: 1; color: var(--navy); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+  .theme-btn.active { background: #fff; opacity: 1; color: var(--navy); }
   .theme-btn svg { width: 16px; height: 16px; fill: currentColor; }
-
   .kac-logo-img { height: 30px; width: auto; display: block; object-fit: contain; }
-
-  .settings-btn { 
-    display: flex; padding: 8px; width: 34px; height: 34px; 
-    border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); 
-    align-items: center; justify-content: center; font-size: 18px; 
-    cursor: pointer; transition: 0.3s; color: #cbd5e1;
-  }
+  .settings-btn { display: flex; padding: 8px; width: 34px; height: 34px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.3s; color: #cbd5e1; }
   .settings-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
 
   .content-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; overflow-y: auto; padding: 40px 20px; }
-
-  .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 50px; flex-shrink: 0; z-index: 2000; position: relative; }
+  .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 40px; flex-shrink: 0; z-index: 2000; position: relative; }
   .search-container { width: 600px; max-width: 90%; position: relative; transition: 0.3s; }
-  .search-bar {
-    width: 100%; padding: 18px 30px; border-radius: 50px; border: 1px solid var(--btn-border);
-    background: var(--bg-card); color: var(--text-main); font-size: 16px; font-weight: 600;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: 0.3s;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'%3E%3Cpath d='M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: 25px center; background-size: 24px; padding-left: 60px;
-  }
-  .search-bar:focus { outline: none; box-shadow: 0 4px 25px rgba(37, 99, 235, 0.25); border-color: var(--comm); }
   
-  .search-results {
-    position: absolute; top: 110%; left: 0; right: 0; background: var(--bg-card);
-    border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); border: 1px solid var(--border-card);
-    overflow: hidden; display: none; max-height: 400px; overflow-y: auto; z-index: 2001;
+  /* [개선] 주간 모드에서도 잘 보이는 검색바 디자인 */
+  .search-bar { 
+    width: 100%; padding: 18px 30px; border-radius: 50px; border: 2px solid var(--search-border);
+    background: var(--bg-card); color: var(--text-main); font-size: 16px; font-weight: 600; 
+    box-shadow: var(--search-shadow); transition: 0.3s; 
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'%3E%3Cpath d='M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z'/%3E%3C/svg%3E"); 
+    background-repeat: no-repeat; background-position: 25px center; background-size: 24px; padding-left: 65px; 
   }
-  .search-results.active { display: block; animation: slideDown 0.2s ease-out; }
+  .search-bar:focus { outline: none; border-color: var(--comm); box-shadow: 0 12px 40px rgba(37, 99, 235, 0.18); transform: translateY(-2px); }
 
+  .search-results { position: absolute; top: 110%; left: 0; right: 0; background: var(--bg-card); border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); border: 1px solid var(--border-card); overflow: hidden; display: none; max-height: 400px; overflow-y: auto; z-index: 2001; }
+  .search-results.active { display: block; animation: slideDown 0.2s ease-out; }
   #searchOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1500; display: none; backdrop-filter: blur(2px); animation: fadeIn 0.3s; }
   #searchOverlay.active { display: block; }
 
-  main { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
-
-  #cardContainer { display: flex; flex-wrap: wrap; gap: 30px; width: 100%; max-width: 1600px; justify-content: center; padding: 10px; }
-
-  .card {
-    background: var(--bg-card); width: 280px; height: 360px; padding: 40px 20px; border-radius: 25px;
-    box-shadow: var(--shadow); border: var(--border-card); cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;
-    border-left: 10px solid transparent; color: var(--text-main); --card-color: #64748b; border-left-color: var(--card-color);
-  }
+  main { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; perspective: 1000px; }
+  #cardContainer { display: flex; flex-wrap: wrap; gap: 30px; width: 100%; max-width: 1600px; justify-content: center; padding: 20px; min-height: 450px; transform-style: preserve-3d; }
+  
+  .card { background: var(--bg-card); width: 280px; height: 360px; padding: 40px 20px; border-radius: 25px; box-shadow: var(--shadow); border: var(--border-card); cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; border-left: 10px solid transparent; color: var(--text-main); --card-color: #64748b; border-left-color: var(--card-color); }
   .card:hover { transform: translateY(-10px); border-color: var(--card-color); box-shadow: 0 15px 30px -5px var(--card-color); }
   
   .card-ctrl { position: absolute; top: 15px; width: 100%; display: none; gap: 5px; justify-content: center; }
@@ -91,52 +79,70 @@
   .btn-sm { padding: 6px 12px; font-size: 11px; border-radius: 8px; border: 1px solid var(--btn-border); background: var(--btn-bg); font-weight: 700; cursor: pointer; transition: 0.2s; color: var(--btn-text); white-space: nowrap; }
   .btn-sm:hover { background: rgba(128,128,128,0.2); color: var(--text-main); }
   .btn-del { color: #ef4444; border-color: #fee2e2; }
+  .btn-move { color: #2563eb; border-color: #dbeafe; }
 
-  .icon-box { 
-    width: 100px; height: 100px; border-radius: 30px; margin-bottom: 25px; font-weight: 900; 
-    display: flex; align-items: center; justify-content: center; background: var(--btn-bg); border: 1px solid var(--btn-border);
-    font-size: var(--icon-size-idx, 50px); color: var(--card-color); transition: 0.3s; pointer-events: none;
-  }
+  .icon-box { width: 100px; height: 100px; border-radius: 30px; margin-bottom: 25px; font-weight: 900; display: flex; align-items: center; justify-content: center; background: var(--btn-bg); border: 1px solid var(--btn-border); font-size: var(--icon-size-idx, 50px); color: var(--card-color); transition: 0.3s; pointer-events: none; }
   .card h2 { font-size: var(--label-size-idx, 22px); font-weight: 800; text-align: center; pointer-events: none; }
-
-  .pagination { display: flex; gap: 12px; margin-top: 40px; align-items: center; justify-content: center; }
+  
+  .pagination { display: flex; gap: 12px; margin-top: 35px; align-items: center; justify-content: center; }
   .dot-nav { width: 12px; height: 12px; border-radius: 50%; background: var(--btn-border); cursor: pointer; transition: 0.3s; }
   .dot-nav.active { background: var(--navy); transform: scale(1.2); }
 
   .result-item { padding: 15px 25px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--btn-border); transition: 0.2s; }
-  .result-item:hover { background: rgba(37, 99, 235, 0.05); }
   .result-info { display: flex; flex-direction: column; gap: 4px; flex: 1; text-align: left; }
   .res-title { font-weight: 700; font-size: 15px; }
   .res-path { font-size: 11px; opacity: 0.7; }
   .res-tag { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; color: #fff; min-width: 45px; text-align: center; }
 
+  #backupLoadingModal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; color: #fff; }
+  .backup-spinner { width: 60px; height: 60px; border: 6px solid rgba(255,255,255,0.2); border-top: 6px solid #fff; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+  .backup-percent { font-size: 32px; font-weight: 900; color: #4ade80; }
+
   #initialSetupOverlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); z-index: 5000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
   #initialSetupOverlay.active { display: flex; }
-  .setup-box { width: 550px; padding: 50px; border-radius: 30px; background: var(--bg-card); text-align: center; color: var(--text-main); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
-  .drop-zone { margin-top: 30px; padding: 40px; border: 3px dashed #cbd5e1; border-radius: 20px; background: var(--btn-bg); cursor: pointer; transition: 0.3s; }
-  .drop-zone:hover { border-color: var(--comm); background: rgba(37, 99, 235, 0.05); }
+  .setup-box { width: 550px; padding: 50px; border-radius: 30px; background: var(--bg-card); text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+  .drop-zone { margin-top: 30px; padding: 40px; border: 3px dashed #cbd5e1; border-radius: 20px; background: var(--btn-bg); cursor: pointer; }
 
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none; align-items: center; justify-content: center; }
   .modal-card { background: var(--bg-card); padding: 35px; border-radius: 25px; width: 500px; color: var(--text-main); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
   .modal-title { font-size: 20px; font-weight: 800; margin-bottom: 20px; border-bottom: 1px solid var(--btn-border); padding-bottom: 10px; }
   .setting-group { margin-bottom: 20px; }
   .setting-label { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; display: block; }
-  .setting-input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--text-main); font-size: 14px; }
-  .btn-row { display: flex; gap: 10px; margin-top: 30px; }
-  .btn-modal { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; }
+  .setting-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--text-main); font-size: 14px; outline: none; transition: 0.3s; }
+  .setting-input:focus { border-color: var(--comm); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+  .btn-modal { width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; margin-top: 10px; }
   .btn-primary { background: var(--navy); color: #fff; }
   .btn-secondary { background: var(--btn-border); color: var(--text-sub); }
   .btn-danger { background: #ef4444; color: #fff; }
+  
+  /* [개선] 미리보기 버튼 활성 상태 디자인 */
+  .btn-preview-active { 
+    background: #10b981 !important; /* 에메랄드 그린 */
+    color: #fff !important; 
+    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4) !important;
+  }
 
-  #backupLoadingModal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; color: #fff; }
-  .backup-spinner { width: 60px; height: 60px; border: 6px solid rgba(255,255,255,0.2); border-top: 6px solid #fff; border-radius: 50%; animation: spin 1s linear infinite; }
-  @keyframes spin { 100% { transform: rotate(360deg); } }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
   .creator-info { position: fixed; bottom: 5px; width: 100%; text-align: center; font-size: 11px; color: var(--text-sub); opacity: 0.5; pointer-events: none; }
+  @keyframes spin { 100% { transform: rotate(360deg); } }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 </style>
 </head>
 <body>
+
+<script>
+  function checkLogin() {
+    const loginTime = localStorage.getItem('kac_login_time');
+    const now = new Date().getTime();
+    const expiry = 5 * 60 * 60 * 1000; // 5시간
+    if(!loginTime || (now - loginTime > expiry)) {
+      localStorage.removeItem('kac_login_time');
+      location.replace('login.html'); 
+    }
+  }
+  checkLogin();
+</script>
 
 <div id="searchOverlay"></div>
 
@@ -183,16 +189,17 @@
     <div class="modal-title">⚙️ 시스템 설정</div>
     <div id="guestSettings" style="display:none;">
       <p style="margin-bottom:20px; font-size:14px; color:var(--text-sub);">관리자 로그인을 통해 데이터를 관리할 수 있습니다.</p>
-      <button class="btn-modal btn-primary" style="margin-bottom:10px; width:100%;" onclick="toggleAdmin()">관리자 로그인</button>
-      <button class="btn-modal btn-secondary" style="width:100%;" onclick="document.getElementById('initialSetupOverlay').classList.add('active'); closeModal('settingsModal');">백업 파일 불러오기</button>
+      <button class="btn-modal btn-primary" onclick="toggleAdmin()">관리자 로그인</button>
+      <button class="btn-modal btn-secondary" onclick="document.getElementById('initialSetupOverlay').classList.add('active'); closeModal('settingsModal');">백업 파일 불러오기</button>
     </div>
     <div id="adminSettings" style="display:none;">
       <div class="setting-group">
         <label class="setting-label">🛠️ 시스템 관리</label>
-        <div style="display:flex; gap:10px;">
+        <div style="display:flex; gap:10px; margin-bottom:10px;">
           <button class="btn-modal btn-danger" onclick="toggleAdmin()">로그아웃</button>
           <button class="btn-modal btn-secondary" onclick="changePasswordStep1()">비밀번호 변경</button>
         </div>
+        <button id="previewBtn" class="btn-modal btn-secondary" onclick="togglePreview()">미리보기 모드 시작</button>
       </div>
       <div class="setting-group">
         <label class="setting-label">📦 데이터 관리</label>
@@ -202,28 +209,58 @@
           <input type="file" id="importFile" style="display:none" onchange="importFullData(this)">
         </div>
       </div>
+      <div class="setting-group" style="background: rgba(0,0,0,0.02); padding: 15px; border-radius: 15px; border: 1px solid var(--btn-border);">
+        <label class="setting-label">🎨 카드 UI 크기 설정 (px)</label>
+        <div style="display:flex; gap:15px; align-items: center; margin-bottom: 15px;">
+          <div style="flex:1"><span style="font-size:11px; color:var(--text-sub); display:block; margin-bottom:5px;">아이콘</span><input type="number" id="setIconSize" class="setting-input" placeholder="60"></div>
+          <div style="flex:1"><span style="font-size:11px; color:var(--text-sub); display:block; margin-bottom:5px;">라벨</span><input type="number" id="setLabelSize" class="setting-input" placeholder="24"></div>
+        </div>
+        <button class="btn-modal btn-primary" onclick="saveSettings()" style="margin-top:0;">설정 저장</button>
+      </div>
     </div>
-    <div class="btn-row"><button class="btn-modal btn-secondary" style="width:100%;" onclick="closeModal('settingsModal')">닫기</button></div>
+    <div class="btn-row"><button class="btn-modal btn-secondary" onclick="closeModal('settingsModal')">닫기</button></div>
   </div>
 </div>
 
-<div id="backupLoadingModal"><div class="backup-spinner"></div><div style="margin-top:20px;">처리 중...</div></div>
+<div id="cardEditModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-title" id="cardModalTitle">메뉴 추가/수정</div>
+    <div class="setting-group"><label class="setting-label">메뉴 명칭</label><input type="text" id="inputCardName" class="setting-input"></div>
+    <div class="setting-group"><label class="setting-label">아이콘 문구</label><input type="text" id="inputCardCode" class="setting-input"></div>
+    <div class="setting-group" style="display:flex; align-items:center; gap:15px;">
+      <label class="setting-label" style="margin-bottom:0;">카드 테마 색상</label>
+      <input type="color" id="inputCardColor" style="width:34px; height:34px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 5px rgba(0,0,0,0.2); background:none; cursor:pointer; padding:0; overflow:hidden;">
+    </div>
+    <div class="btn-row">
+      <button class="btn-modal btn-primary" onclick="saveCardData()">저장</button>
+      <button class="btn-modal btn-secondary" onclick="closeModal('cardEditModal')">취소</button>
+    </div>
+  </div>
+</div>
+
+<div id="movePageModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-title">📂 페이지 이동</div>
+    <select id="moveTargetPage" class="setting-input" style="margin-bottom:20px;"></select>
+    <div class="btn-row"><button class="btn-modal btn-primary" onclick="executeMovePage()">이동</button><button class="btn-modal btn-secondary" onclick="closeModal('movePageModal')">취소</button></div>
+  </div>
+</div>
+
+<div id="backupLoadingModal"><div class="backup-spinner"></div><div style="margin-bottom:10px;">처리 중...</div><div class="backup-percent" id="backupPercent">0%</div></div>
 <div class="creator-info">Developed by <b>DooSeok, JANG</b> (jds0616@airport.co.kr)</div>
 
 <script>
   let isAdmin = localStorage.getItem('kac_admin_mode') === '1';
   let menuOrder = JSON.parse(localStorage.getItem('kac_index_order') || '[]');
   const itemsPerPage = 5; let currentPage = 1;
+  let editingId = null; let moveSrcIndex = -1;
 
   function init() {
-    loadStyles(); 
-    setTheme(localStorage.getItem('kac_theme') || 'light');
+    loadStyles(); setTheme(localStorage.getItem('kac_theme') || 'light');
     if(isAdmin) document.body.classList.add('admin-mode');
-    
+    if(localStorage.getItem('kac_preview_active') === '1') document.body.classList.add('preview-active');
     if(menuOrder.length === 0) document.getElementById('initialSetupOverlay').classList.add('active');
-    
-    renderCards(); 
-    buildSearchIndex();
+    renderCards(); buildSearchIndex();
   }
 
   function renderCards() {
@@ -231,13 +268,15 @@
     const pagination = document.getElementById('pagination');
     container.innerHTML = ''; pagination.innerHTML = '';
 
-    // 게스트 모드일 때는 유효한(null이 아닌) 카드만 렌더링
-    const visibleCards = isAdmin ? menuOrder : menuOrder.filter(id => id !== null);
+    // [중요] 미리보기 상태를 실시간 체크하여 반영
+    const isP = document.body.classList.contains('preview-active');
+    const showAdmin = isAdmin && !isP;
+
+    const visibleCards = showAdmin ? menuOrder : menuOrder.filter(id => id !== null);
     const effectiveLength = visibleCards.length;
     let totalPages = Math.ceil(effectiveLength / itemsPerPage) || 1;
-    
-    // 관리자 모드일 때만 'Add New'를 위한 추가 페이지 허용
-    if(isAdmin && effectiveLength % itemsPerPage === 0 && effectiveLength > 0) totalPages++;
+    if(showAdmin && effectiveLength % itemsPerPage === 0 && effectiveLength > 0) totalPages++;
+    if(currentPage > totalPages) currentPage = totalPages;
 
     const start = (currentPage - 1) * itemsPerPage;
     for(let i=start; i < start + itemsPerPage; i++) {
@@ -245,119 +284,174 @@
       if(id) {
         const style = JSON.parse(localStorage.getItem(`kac_style_${id}`) || '{}');
         const card = document.createElement('div');
-        card.className = 'card'; 
-        card.style.setProperty('--card-color', style.color || '#64748b');
+        card.className = 'card'; card.style.setProperty('--card-color', style.color || '#64748b');
         card.onclick = () => location.href = `facility.html?type=${id}`;
         card.innerHTML = `
           <div class="card-ctrl" onclick="event.stopPropagation()">
-            <button class="btn-sm" onclick="alert('관리자 모드에서 시설 관리가 가능합니다.')">수정</button>
+            <button class="btn-sm" onclick="openCardEdit('${id}')">수정</button>
+            <button class="btn-sm btn-move" onclick="openMovePageModal(${i})">이동</button>
             <button class="btn-sm btn-del" onclick="deleteCard(${i})">삭제</button>
           </div>
           <div class="icon-box">${style.code || '?'}</div>
           <h2>${style.name || ''}</h2>
         `;
         container.appendChild(card);
-      } else if (isAdmin && i === effectiveLength) {
-        const addBtn = document.createElement('div'); 
-        addBtn.className = 'card add-card-btn';
-        addBtn.style.border = "3px dashed #cbd5e1";
-        addBtn.innerHTML = `<div style="font-size:50px; color:#94a3b8;">+</div><div style="font-weight:700; color:#94a3b8; margin-top:10px;">Add New</div>`;
-        addBtn.onclick = () => alert('메뉴 관리 기능은 시설 페이지에서 수행 가능합니다.');
+      } else if (showAdmin && i === effectiveLength) {
+        const addBtn = document.createElement('div'); addBtn.className = 'card add-card-btn';
+        addBtn.innerHTML = `<div style="font-size:50px; color:#94a3b8;">+</div><div style="font-weight:700; color:#94a3b8;">Add New</div>`;
+        addBtn.onclick = () => openCardEdit('NEW');
         container.appendChild(addBtn);
       }
     }
-    
     if(totalPages > 1) {
       for(let i=1; i<=totalPages; i++) {
-        const dot = document.createElement('div'); 
-        dot.className = `dot-nav ${i===currentPage?'active':''}`;
+        const dot = document.createElement('div'); dot.className = `dot-nav ${i===currentPage?'active':''}`;
         dot.onclick = () => { currentPage = i; renderCards(); };
         pagination.appendChild(dot);
       }
     }
   }
 
-  function changePasswordStep1() {
-    const currentPw = localStorage.getItem('kac_admin_pw') || "CATC1234";
-    const input = prompt("현재 비밀번호를 입력하세요.");
-    if(input === null) return;
-    if(input !== currentPw) return alert("현재 비밀번호가 틀립니다.");
+  function togglePreview() {
+    const isP = document.body.classList.toggle('preview-active');
+    localStorage.setItem('kac_preview_active', isP ? '1' : '0');
     
-    const newPw = prompt("새 비밀번호를 입력하세요.");
-    if(!newPw) return alert("비밀번호를 입력해야 합니다.");
-    
-    const confirmPw = prompt("새 비밀번호 확인을 위해 한 번 더 입력하세요.");
-    if(newPw !== confirmPw) return alert("입력하신 비밀번호가 서로 일치하지 않습니다.");
-    
-    localStorage.setItem('kac_admin_pw', newPw); 
-    alert("비밀번호가 성공적으로 변경되었습니다.");
+    // 버튼 상태 즉시 업데이트
+    const pBtn = document.getElementById('previewBtn');
+    pBtn.textContent = isP ? "미리보기 모드 종료" : "미리보기 모드 시작";
+    pBtn.classList.toggle('btn-preview-active', isP);
+
+    renderCards(); // 카드 재배치
+    closeModal('settingsModal');
   }
 
   function toggleAdmin() {
-    if(isAdmin) { 
-        if(confirm("관리자 모드를 종료하시겠습니까?")) { 
-            localStorage.setItem('kac_admin_mode','0'); 
-            location.reload(); 
-        } 
-    } else { 
-        const pw = prompt("관리자 비밀번호를 입력하세요."); 
-        if(pw === (localStorage.getItem('kac_admin_pw')||"CATC1234")) { 
-            localStorage.setItem('kac_admin_mode','1'); 
-            location.reload(); 
-        } else if(pw!==null) alert("비밀번호가 올바르지 않습니다."); 
-    }
+    if(isAdmin) { if(confirm("로그아웃?")) { localStorage.setItem('kac_admin_mode','0'); location.reload(); } }
+    else { const pw = prompt("비밀번호"); if(pw === (localStorage.getItem('kac_admin_pw')||"CATC1234")) { localStorage.setItem('kac_admin_mode','1'); location.reload(); } }
   }
 
-  function handleInitFile(input) { if(input.files[0]) importFullData(input); }
-  
+  function changePasswordStep1() {
+    const currentPw = localStorage.getItem('kac_admin_pw') || "CATC1234";
+    const input = prompt("현재 비밀번호를 입력하세요.");
+    if(input === currentPw) {
+      const newPw = prompt("새 비밀번호 입력");
+      if(newPw === prompt("새 비밀번호 확인")) {
+        localStorage.setItem('kac_admin_pw', newPw); alert("변경됨");
+      } else alert("불일치");
+    } else if(input !== null) alert("틀림");
+  }
+
+  async function exportFullData() {
+    const modal = document.getElementById('backupLoadingModal');
+    const percentTxt = document.getElementById('backupPercent');
+    modal.style.display = 'flex';
+    const zip = new JSZip(); const data = {};
+    const keys = Object.keys(localStorage);
+    for(let i=0; i<keys.length; i++){
+      const k = keys[i];
+      if(k !== 'kac_admin_mode' && k !== 'kac_admin_pw') data[k] = localStorage.getItem(k);
+      if(i % 5 === 0 || i === keys.length - 1) {
+          percentTxt.textContent = Math.round((i / keys.length) * 100) + "%";
+          await new Promise(r => setTimeout(r, 10));
+      }
+    }
+    zip.file("kac_data.json", JSON.stringify(data));
+    const content = await zip.generateAsync({type:"blob"});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(content);
+    a.download = `KAC_Backup_${new Date().toISOString().slice(0,10)}.kac`; a.click();
+    modal.style.display = 'none';
+  }
+
   async function importFullData(input) {
+    if(!input.files[0]) return;
     document.getElementById('backupLoadingModal').style.display='flex';
     try {
       const zip = await JSZip.loadAsync(input.files[0]);
       const data = JSON.parse(await zip.file("kac_data.json").async("string"));
-      const pw = localStorage.getItem('kac_admin_pw'); 
-      localStorage.clear();
+      const pw = localStorage.getItem('kac_admin_pw'); localStorage.clear();
       Object.keys(data).forEach(k => localStorage.setItem(k, data[k]));
       if(pw) localStorage.setItem('kac_admin_pw', pw);
-      localStorage.setItem('kac_admin_mode','0'); 
+      localStorage.setItem('kac_admin_mode', '0');
+      localStorage.setItem('kac_login_time', new Date().getTime());
       location.reload();
-    } catch(e) { 
-        alert("올바른 백업 파일이 아닙니다."); 
-        document.getElementById('backupLoadingModal').style.display='none'; 
-    }
+    } catch(e) { alert("파일 오류"); document.getElementById('backupLoadingModal').style.display='none'; }
   }
 
-  function exportFullData() {
-    const zip = new JSZip(); const data = {};
-    for(let i=0; i<localStorage.length; i++){
-      const k = localStorage.key(i); 
-      if(k!=='kac_admin_mode' && k!=='kac_admin_pw') data[k] = localStorage.getItem(k);
+  function openCardEdit(id) {
+    editingId = id;
+    if(id === 'NEW') {
+      document.getElementById('inputCardName').value = ""; document.getElementById('inputCardCode').value = ""; document.getElementById('inputCardColor').value = "#3b82f6";
+    } else {
+      const s = JSON.parse(localStorage.getItem(`kac_style_${id}`));
+      document.getElementById('inputCardName').value = s.name; document.getElementById('inputCardCode').value = s.code; document.getElementById('inputCardColor').value = s.color;
     }
-    zip.file("kac_data.json", JSON.stringify(data));
-    zip.generateAsync({type:"blob"}).then(c => {
-      const a = document.createElement('a'); 
-      a.href = URL.createObjectURL(c);
-      a.download = `KAC_Backup_${new Date().toISOString().slice(0,10)}.kac`; 
-      a.click();
-    });
+    document.getElementById('cardEditModal').style.display='flex';
+  }
+
+  function saveCardData() {
+    const name = document.getElementById('inputCardName').value;
+    const code = document.getElementById('inputCardCode').value;
+    const color = document.getElementById('inputCardColor').value;
+    if(!name) return;
+    const id = editingId === 'NEW' ? 'M_' + Date.now() : editingId;
+    if(editingId === 'NEW') menuOrder.push(id);
+    localStorage.setItem(`kac_style_${id}`, JSON.stringify({name, code, color}));
+    localStorage.setItem('kac_index_order', JSON.stringify(menuOrder));
+    location.reload();
+  }
+
+  function openMovePageModal(idx) {
+    moveSrcIndex = idx;
+    const select = document.getElementById('moveTargetPage'); select.innerHTML = '';
+    const totalPages = Math.ceil(menuOrder.length / itemsPerPage) + 1;
+    for(let i=1; i<=totalPages; i++) {
+      const opt = document.createElement('option'); opt.value = i; opt.textContent = i + " 페이지";
+      select.appendChild(opt);
+    }
+    document.getElementById('movePageModal').style.display='flex';
+  }
+
+  function executeMovePage() {
+    const page = parseInt(document.getElementById('moveTargetPage').value);
+    const item = menuOrder.splice(moveSrcIndex, 1)[0];
+    menuOrder.splice((page-1)*itemsPerPage, 0, item);
+    localStorage.setItem('kac_index_order', JSON.stringify(menuOrder));
+    location.reload();
   }
 
   function openSettings() { 
     document.getElementById(isAdmin?'adminSettings':'guestSettings').style.display='block'; 
     document.getElementById(isAdmin?'guestSettings':'adminSettings').style.display='none'; 
+    if(isAdmin) {
+      document.getElementById('setIconSize').value = localStorage.getItem('kac_idx_icon_size') || 60;
+      document.getElementById('setLabelSize').value = localStorage.getItem('kac_idx_label_size') || 24;
+      const isP = localStorage.getItem('kac_preview_active') === '1';
+      const pBtn = document.getElementById('previewBtn');
+      pBtn.textContent = isP ? "미리보기 모드 종료" : "미리보기 모드 시작";
+      pBtn.classList.toggle('btn-preview-active', isP);
+    }
     document.getElementById('settingsModal').style.display='flex'; 
   }
   
+  function saveSettings() {
+    const i = document.getElementById('setIconSize').value;
+    const l = document.getElementById('setLabelSize').value;
+    if(i) localStorage.setItem('kac_idx_icon_size', i);
+    if(l) localStorage.setItem('kac_idx_label_size', l);
+    loadStyles(); renderCards(); closeModal('settingsModal');
+  }
+
   function closeModal(id) { document.getElementById(id).style.display='none'; }
   function setTheme(m) { document.body.className = m==='dark'?'dark-mode':''; localStorage.setItem('kac_theme', m); document.getElementById('btnDay').classList.toggle('active', m==='light'); document.getElementById('btnNight').classList.toggle('active', m==='dark'); }
   function loadStyles() { document.documentElement.style.setProperty('--icon-size-idx', (localStorage.getItem('kac_idx_icon_size')||60)+'px'); document.documentElement.style.setProperty('--label-size-idx', (localStorage.getItem('kac_idx_label_size')||24)+'px'); }
-
-  function deleteCard(idx) { if(confirm("이 항목을 삭제하시겠습니까?")) { menuOrder.splice(idx,1); localStorage.setItem('kac_index_order', JSON.stringify(menuOrder)); location.reload(); } }
+  function deleteCard(idx) { if(confirm("삭제?")) { menuOrder.splice(idx,1); localStorage.setItem('kac_index_order', JSON.stringify(menuOrder)); location.reload(); } }
+  function handleInitFile(input) { if(input.files[0]) importFullData(input); }
 
   let allIdx = [];
   function buildSearchIndex() {
     allIdx = [];
     menuOrder.forEach(type => {
+      if(!type) return;
       const style = JSON.parse(localStorage.getItem(`kac_style_${type}`)||'{}');
       const menus = JSON.parse(localStorage.getItem(`kac_menu_${type}`) || '[]');
       menus.forEach(m => {
@@ -368,18 +462,14 @@
   }
 
   document.getElementById('mainSearch').addEventListener('input', e => {
-    const q = e.target.value.toLowerCase(); 
-    const res = document.getElementById('searchResults');
+    const q = e.target.value.toLowerCase(); const res = document.getElementById('searchResults');
     if(!q) return res.classList.remove('active');
     const matches = allIdx.filter(i => i.name.toLowerCase().includes(q));
     res.innerHTML = matches.map(i => `
-      <div class="result-item" onclick="location.href='viewer_list.html?type=${i.type}&menu=${encodeURIComponent(i.menuName)}&id=${i.menuId}&autoOpen=${i.subId}'">
-        <div class="result-info">
-          <div class="res-title">${i.name}</div>
-          <div class="res-path">${i.typeName} > ${i.menuName}</div>
-        </div>
+      <div class="result-item" onclick="location.href='viewer_list.html?type=${i.type}&menu=${encodeURIComponent(i.menuName)}&id=${i.menuId}&autoOpen=${i.subId}&full=true'">
+        <div class="result-info"><div class="res-title">${i.name}</div><div class="res-path">${i.typeName} > ${i.menuName}</div></div>
         <div class="res-tag" style="background:${i.color || '#2563eb'}">${i.type.substring(0,4)}</div>
-      </div>`).join('') || '<div style="padding:20px; text-align:center; opacity:0.5;">결과 없음</div>';
+      </div>`).join('') || '<div style="padding:20px; text-align:center;">결과 없음</div>';
     res.classList.add('active'); document.getElementById('searchOverlay').classList.add('active');
   });
 

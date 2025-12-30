@@ -18,8 +18,9 @@
   .logo { font-size: 24px; font-weight: 800; margin-bottom: 30px; display: block; }
   input {
     width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #334155;
-    background: #0f172a; color: #fff; margin-bottom: 15px; font-size: 16px;
+    background: #0f172a; color: #fff; margin-bottom: 15px; font-size: 16px; outline: none;
   }
+  input:focus { border-color: #2563eb; }
   button {
     width: 100%; padding: 15px; border-radius: 10px; border: none;
     background: #2563eb; color: #fff; font-size: 16px; font-weight: 700;
@@ -31,20 +32,23 @@
 <body>
   <div class="login-card">
     <div class="logo">KAC CNS Platform</div>
-    <!-- 입력 편의를 위해 소문자로 입력해도 자동으로 대문자로 취급되도록 logic 처리됨 -->
     <input type="password" id="pwInput" placeholder="접속 비밀번호 입력" onkeyup="if(window.event.keyCode==13){checkPw()}">
     <button onclick="checkPw()">접속하기</button>
   </div>
 
   <script>
     function checkPw() {
-      // .trim()으로 공백 제거, .toUpperCase()로 대소문자 구분 없이 비교
       const input = document.getElementById('pwInput').value.trim().toUpperCase();
       const correctPw = "CATC1234"; 
 
       if(input === correctPw) {
-        // 인증 성공 시 세션에 기록
+        // [수정] 현재 시간을 기록 (5시간 유효성 체크용)
+        const loginTime = new Date().getTime();
+        localStorage.setItem('kac_login_time', loginTime);
+        
+        // 세션 토큰도 같이 발행
         sessionStorage.setItem('kac_access_token', 'granted');
+        
         location.replace('index.html');
       } else {
         alert("비밀번호가 올바르지 않습니다.");
@@ -52,8 +56,16 @@
       }
     }
     
-    if(sessionStorage.getItem('kac_access_token') === 'granted') {
-        location.replace('index.html');
+    // [추가] 이미 로그인된 상태이고 5시간이 안 지났다면 바로 index로 이동
+    window.onload = function() {
+        const loginTime = localStorage.getItem('kac_login_time');
+        const now = new Date().getTime();
+        const expiry = 5 * 60 * 60 * 1000; // 5시간 (밀리초)
+
+        if(loginTime && (now - loginTime < expiry)) {
+            sessionStorage.setItem('kac_access_token', 'granted');
+            location.replace('index.html');
+        }
     }
   </script>
 </body>
