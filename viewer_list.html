@@ -39,19 +39,40 @@
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
   body { background: var(--bg-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: var(--text-main); transition: 0.3s; }
 
+  /* 검색 오버레이 스타일 */
+  #searchOverlay { 
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
+    z-index: 1500; display: none; backdrop-filter: blur(2px); animation: fadeIn 0.3s; 
+  }
+  #searchOverlay.active { display: block; }
+  
+  /* [핵심 수정] 검색 모드일 때 헤더 전체를 오버레이(1500) 위로 올림 */
+  body.search-mode header { z-index: 2000; }
+  
+  /* 검색 모드일 때 좌우측 요소 흐리게 처리 */
+  body.search-mode .header-left, 
+  body.search-mode .header-right { opacity: 0.1; pointer-events: none; }
+
   /* 헤더 스타일 */
   header { 
     height: var(--header-h); background: var(--navy); 
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0 40px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 1000; transition: 0.3s; 
+    padding: 0 40px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+    z-index: 1000; /* 평소에는 1000 */
+    transition: 0.3s; 
     flex-shrink: 0; gap: 20px; position: relative;
   }
   
   .header-left { display: flex; align-items: center; min-width: 250px; z-index: 10; white-space: nowrap; transition: opacity 0.2s; }
-  .header-center { position: absolute; left: 50%; transform: translateX(-50%); width: 600px; max-width: 100%; z-index: 5; transition: width 0.3s; }
+  
+  .header-center { 
+    position: absolute; left: 50%; transform: translateX(-50%); 
+    width: 600px; max-width: 100%; z-index: 20; transition: width 0.3s; 
+  }
+  
   .header-right { display: flex; align-items: center; gap: 15px; min-width: 250px; justify-content: flex-end; z-index: 10; }
 
-  /* [수정] 헤더 겹침 방지용 클래스 */
+  /* 헤더 겹침 방지용 클래스 */
   body.header-overlap .header-left { opacity: 0; pointer-events: none; width: 0; overflow: hidden; min-width: 0; }
   body.header-overlap .header-center { width: 80%; }
 
@@ -77,12 +98,14 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'%3E%3Cpath d='M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z'/%3E%3C/svg%3E");
     background-repeat: no-repeat; background-position: 25px center; background-size: 20px;
     padding-left: 55px; transition: 0.3s;
+    background-color: var(--navy);
   }
-  .header-search:focus { outline: none; background-color: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.5); box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+  .header-search:focus { outline: none; background-color: var(--navy); border-color: rgba(255,255,255,0.5); box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
   .header-search::placeholder { color: rgba(255,255,255,0.5); font-weight: 400; }
 
+  /* 검색창과 너비 맞춤 */
   .search-dropdown {
-    position: absolute; top: 110%; left: 0; right: 0; width: 400px; margin: 0 auto;
+    position: absolute; top: 110%; left: 0; right: 0; width: 100%; margin: 0 auto;
     background: var(--bg-card); border-radius: 15px; 
     box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 1px solid var(--border-card);
     overflow: hidden; display: none; max-height: 400px; overflow-y: auto; z-index: 2000;
@@ -131,7 +154,6 @@
   .subject-card.dragging { opacity: 0.5; border: 2px dashed #94a3b8; background: rgba(255,255,255,0.05); }
   .subject-card.drag-over { border: 2px solid var(--theme-color); transform: scale(1.02); box-shadow: 0 0 15px rgba(var(--theme-rgb), 0.2); z-index: 10; }
 
-  /* [수정] 방금 본 파일 아이콘 + 텍스트 */
   .last-viewed-icon {
     position: absolute; right: 0; top: 50%; transform: translateY(-50%);
     width: auto; height: 100%; padding-right: 10px;
@@ -250,6 +272,9 @@
 </style>
 </head>
 <body oncontextmenu="return false;">
+
+<!-- 검색 배경 오버레이 -->
+<div id="searchOverlay"></div>
 
 <header>
   <div class="header-left" id="headerLeft">
@@ -787,14 +812,37 @@
     });
   }
   const searchInput = document.getElementById('searchInput'), searchDropdown = document.getElementById('searchDropdown');
+  
+  // [추가] 검색 배경 오버레이 및 z-index 제어
+  const sOverlay = document.getElementById('searchOverlay');
+  
   searchInput.addEventListener('input', (e) => {
     const query = e.target.value.trim().toLowerCase();
     if(query.length === 0) { searchDropdown.classList.remove('active'); return; }
     const matches = allSubjectsIndex.filter(item => item.name.toLowerCase().includes(query) || item.menuName.toLowerCase().includes(query));
     renderSearchResults(matches, query);
   });
-  searchInput.addEventListener('focus', () => { if(searchInput.value.trim().length > 0) searchDropdown.classList.add('active'); });
-  document.addEventListener('click', (e) => { if(!e.target.closest('.header-center')) searchDropdown.classList.remove('active'); });
+  
+  searchInput.addEventListener('focus', () => { 
+      document.body.classList.add('search-mode');
+      sOverlay.classList.add('active');
+      if(searchInput.value.trim().length > 0) searchDropdown.classList.add('active'); 
+  });
+  
+  sOverlay.addEventListener('click', () => {
+      document.body.classList.remove('search-mode');
+      sOverlay.classList.remove('active');
+      searchDropdown.classList.remove('active');
+  });
+
+  // 드롭다운 외부 클릭 시 닫기
+  document.addEventListener('click', (e) => { 
+      if(!e.target.closest('.header-center') && !e.target.closest('#searchOverlay')) {
+          searchDropdown.classList.remove('active');
+          document.body.classList.remove('search-mode');
+          sOverlay.classList.remove('active');
+      } 
+  });
 
   function renderSearchResults(list, query) {
     searchDropdown.innerHTML = ''; searchDropdown.classList.add('active');
@@ -812,7 +860,7 @@
       const itemColor = finalItemStyle.color || '#2563eb';
 
       const highlightName = item.name.replace(new RegExp(`(${query})`, 'gi'), `<span style="color:${itemColor}; font-weight:900;">$1</span>`);
-      div.innerHTML = `<div class="result-info"><div class="res-title">${highlightName}</div><div class="res-path">${item.typeName} > ${item.menuName}</div></div><div class="res-tag" style="background:${itemColor}">${item.type}</div>`;
+      div.innerHTML = `<div class="result-info"><div class="res-title">${highlightName}</div><div class="res-path">${item.typeName || item.type} > ${item.menuName}</div></div><div class="res-tag" style="background:${itemColor}">${item.type}</div>`;
       
       div.onclick = () => { 
         if(!item.active && !isAdmin) { 
