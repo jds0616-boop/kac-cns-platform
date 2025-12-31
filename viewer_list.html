@@ -163,10 +163,11 @@
     pointer-events: none; /* 클릭 통과 (버튼 클릭 방해 금지) */
   }
   
-  /* 관리자 모드일 때는 버튼들과 겹치지 않게 왼쪽으로 밀기 */
-  body.admin-mode .last-viewed-icon {
-    right: 280px; 
-  }
+/* 관리자 모드일 때는 버튼들과 겹치지 않게 왼쪽으로 밀기 */
+body.admin-mode .last-viewed-icon {
+  right: 350px !important;  /* 280px -> 350px로 변경하고 !important 추가 */
+  opacity: 0.5; /* 겹치는 느낌 없애기 위해 약간 흐리게 */
+}
 
   .subject-card.last-viewed { border: 2px solid #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
   .subject-card.last-viewed .last-viewed-icon { opacity: 1; }
