@@ -269,7 +269,6 @@
       const data = await res.json();
       globalData = data;
       
-      // 보안 설정 기본값 (없을 경우 대비)
       if(!globalData.security) {
           globalData.security = {
               entry_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c", // CATC1234
@@ -295,6 +294,28 @@
 
     if(isAdmin) document.body.classList.add('admin-mode');
   }
+
+  // [수정] 페이지가 다시 보일 때(뒤로가기 포함) 동기화
+  window.addEventListener('pageshow', () => {
+      const savedStatus = localStorage.getItem('kac_admin_mode') === '1';
+      // 현재 변수(isAdmin)와 저장된 상태(savedStatus)가 다르면 새로고침
+      if (isAdmin !== savedStatus) {
+          location.reload();
+      }
+      
+      // 미리보기 상태도 동기화
+      const savedPreview = localStorage.getItem('kac_preview_active') === '1';
+      if(isPreview !== savedPreview) {
+          location.reload();
+      }
+  });
+
+  // [추가] 다른 탭에서 변경 시 실시간 동기화
+  window.addEventListener('storage', (e) => {
+      if (e.key === 'kac_admin_mode' || e.key === 'kac_preview_active') {
+          location.reload();
+      }
+  });
 
   function ensurePageSlots() {
     const cleanList = globalData.categories.filter(c => c !== null);
