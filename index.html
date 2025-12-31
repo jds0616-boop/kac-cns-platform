@@ -177,8 +177,16 @@
           <button id="modalPreviewBtn" class="btn-modal btn-secondary" onclick="togglePreview()">미리보기 모드 시작</button>
         </div>
         <button class="btn-modal btn-success" onclick="exportJsonData()">변경사항 저장 (data.json 다운로드)</button>
-        <p style="font-size:11px; color:red; margin-top:5px;">* 중요: 비밀번호 변경 또는 데이터 수정 후 반드시 [변경사항 저장]을 눌러 파일을 다운로드하고, 깃허브에 업로드해야 적용됩니다.</p>
-        <!-- [추가] 초기화 버튼 -->
+        
+        <!-- GitHub 업로드 버튼 추가 -->
+        <button class="btn-modal btn-primary" style="background:#24292f; margin-top:10px;" onclick="openGithubModal()">
+          <svg style="width:16px;height:16px;vertical-align:middle;margin-right:5px;fill:white;" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+          GitHub에 바로 업로드
+        </button>
+
+        <p style="font-size:11px; color:red; margin-top:5px;">* 중요: 비밀번호 변경 또는 데이터 수정 후 반드시 [변경사항 저장] 또는 [GitHub 업로드]를 해야 적용됩니다.</p>
+        
+        <!-- 초기화 버튼 -->
         <button class="btn-modal btn-danger" style="margin-top:15px; background:#ef4444; opacity:0.8;" onclick="resetToDataJson()">⚠️ 서버 원본으로 초기화 (수정취소)</button>
       </div>
       <div class="setting-group" style="background: rgba(0,0,0,0.02); padding: 15px; border-radius: 15px; border: 1px solid var(--btn-border);">
@@ -191,6 +199,33 @@
       </div>
     </div>
     <button class="btn-modal btn-secondary" onclick="document.getElementById('settingsModal').style.display='none'">닫기</button>
+  </div>
+</div>
+
+<!-- GitHub 업로드 설정 모달 -->
+<div id="githubModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-title">🐙 GitHub 연동 설정</div>
+    <p style="font-size:12px; color:#64748b; margin-bottom:15px;">
+      깃허브 저장소 정보를 입력하세요. 정보는 브라우저에만 저장됩니다.
+    </p>
+    <div class="setting-group">
+      <label class="setting-label">GitHub 아이디 (Owner)</label>
+      <input type="text" id="ghOwner" class="setting-input" placeholder="예: MyGitID">
+    </div>
+    <div class="setting-group">
+      <label class="setting-label">저장소 이름 (Repo)</label>
+      <input type="text" id="ghRepo" class="setting-input" placeholder="예: kac-training-platform">
+    </div>
+    <div class="setting-group">
+      <label class="setting-label">Personal Access Token</label>
+      <input type="password" id="ghToken" class="setting-input" placeholder="ghp_..." autocomplete="new-password">
+      <p style="font-size:11px; color:red; margin-top:5px;">* 토큰은 절대 타인에게 공유하지 마세요.</p>
+    </div>
+    <div class="btn-row">
+      <button id="btnGhUpload" class="btn-modal btn-primary" onclick="uploadToGithub()">업로드 실행</button>
+      <button class="btn-modal btn-secondary" onclick="document.getElementById('githubModal').style.display='none'">취소</button>
+    </div>
   </div>
 </div>
 
@@ -264,37 +299,44 @@
     setTheme(localStorage.getItem('kac_theme') || 'light');
     if(isPreview) document.body.classList.add('preview-active');
 
-    // [수정] 로컬에 저장된 데이터가 있는지 확인 (편집 유지 기능)
+    // [중요 수정] 1. 서버(data.json) 데이터를 무조건 먼저 읽어옴 (비밀번호 확보)
+    let serverData = null;
+    try {
+        const res = await fetch('data.json?v=' + Date.now());
+        if(res.ok) serverData = await res.json();
+    } catch(e) { console.log("data.json 로드 실패"); }
+
+    // 2. 서버 데이터가 있으면 보안정보 메모리에 로드
+    if(serverData) {
+        if(serverData.security) globalData.security = serverData.security;
+        if(serverData.config) globalData.config = serverData.config;
+        applyConfig(globalData.config);
+    } else {
+        // 서버 데이터 없으면 기본 보안 설정
+        globalData.security = {
+            entry_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c",
+            admin_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c"
+        };
+    }
+
+    // 3. 로컬 편집 데이터가 있는지 확인
     const hasLocalData = localStorage.getItem('kac_index_order');
 
     if (hasLocalData) {
-        console.log("로컬 데이터를 복원하여 사용합니다.");
+        console.log("로컬 편집 데이터를 복원합니다.");
+        // 로컬 데이터로 구조를 재조립하되,
+        // reconstruct 함수 내부에서 globalData.security가 이미 있다면 유지하도록 처리됨
         reconstructGlobalDataFromLocal();
-        // data.json fetch를 하지 않음으로써 로컬 변경사항 유지
-    } else {
-        // 로컬 데이터가 없을 때만 서버(data.json)에서 로드
-        console.log("서버 데이터(data.json)를 로드합니다.");
-        try {
-          const res = await fetch('data.json?v=' + new Date().getTime());
-          if(!res.ok) throw new Error("data.json not found");
-          
-          const data = await res.json();
-          globalData = data;
-          
-          if(!globalData.security) {
-              globalData.security = {
-                  entry_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c", // CATC1234
-                  admin_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c"
-              };
-          }
-
-          syncToLocalStorage(data);
-          applyConfig(data.config);
-
-        } catch(e) {
-          alert("데이터 로딩 실패: data.json 파일을 확인해주세요.\n" + e.message);
-          document.getElementById('loadingSpinner').innerHTML = '<div style="color:red">시스템 로딩 실패</div>';
+        
+        // 만약 reconstruct 과정에서 security가 덮어써졌다면 다시 서버 데이터로 복구
+        if(serverData && serverData.security) {
+            globalData.security = serverData.security;
         }
+    } else if (serverData) {
+        // 로컬 데이터가 없으면 서버 데이터로 완전히 초기화
+        console.log("서버 데이터로 초기화합니다.");
+        globalData = serverData;
+        syncToLocalStorage(globalData);
     }
 
     ensurePageSlots();
@@ -309,24 +351,26 @@
     if(isAdmin) document.body.classList.add('admin-mode');
   }
   
-  // [추가] 로컬스토리지 내용을 globalData로 역조립하는 함수
+  // [수정] 로컬스토리지 내용을 globalData로 역조립하는 함수 (비밀번호 보존)
   function reconstructGlobalDataFromLocal() {
-    globalData = { meta: { version: "2.0" }, config: {}, categories: [], security: {} };
+    // 현재 메모리에 있는 보안 설정 백업 (없으면 기본값)
+    const currentSecurity = globalData.security || {
+        entry_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c",
+        admin_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c"
+    };
+
+    // globalData 객체 새로 생성
+    globalData = { 
+        meta: { version: "2.0", lastUpdated: new Date().toISOString() }, 
+        config: {}, 
+        categories: [], 
+        security: currentSecurity // 백업해둔 보안 설정 적용 (초기화 방지)
+    };
     
     // Config 복원
     globalData.config.iconSize = parseInt(localStorage.getItem('kac_idx_icon_size') || 60);
     globalData.config.labelSize = parseInt(localStorage.getItem('kac_idx_label_size') || 24);
     applyConfig(globalData.config);
-
-    // Security 복원 (현재 세션에 저장된 비번이 없으므로, 기본값 혹은 data.json 로드 필요하나, 
-    // 여기서는 로컬 편집 모드이므로 비밀번호 변경 기능 사용 시 주의 필요. 
-    // *안전한 방식: Export시에는 현재 로컬의 값 대신 기본값이나 사용자 입력값을 쓰게 할 수도 있음.
-    // 여기서는 기본값을 할당하되, 비밀번호 변경을 하려면 초기화 후 다시 하라고 안내하거나 data.json을 별도로 읽어야 함.
-    // 편의상 기본값 할당)
-    globalData.security = {
-        entry_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c",
-        admin_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c"
-    };
 
     // Categories 복원
     const orderRaw = localStorage.getItem('kac_index_order');
@@ -347,36 +391,24 @@
     }
   }
 
-  // [추가] 로컬 데이터 초기화 및 서버 원본 복구
+  // 로컬 데이터 초기화 및 서버 원본 복구
   function resetToDataJson() {
     if(confirm("현재까지 수정한 모든 내용이 사라지고 서버의 원본 파일(data.json) 상태로 되돌아갑니다.\n계속하시겠습니까?")) {
         localStorage.clear();
-        // 테마와 로그인 정보는 유지하고 싶다면 아래처럼 다시 세팅 (선택사항)
-        // localStorage.setItem('kac_admin_mode', isAdmin ? '1' : '0'); 
         location.reload();
     }
   }
 
-  // [수정] 페이지가 다시 보일 때(뒤로가기 포함) 동기화
+  // 동기화 이벤트
   window.addEventListener('pageshow', () => {
       const savedStatus = localStorage.getItem('kac_admin_mode') === '1';
-      // 현재 변수(isAdmin)와 저장된 상태(savedStatus)가 다르면 새로고침
-      if (isAdmin !== savedStatus) {
-          location.reload();
-      }
-      
-      // 미리보기 상태도 동기화
+      if (isAdmin !== savedStatus) location.reload();
       const savedPreview = localStorage.getItem('kac_preview_active') === '1';
-      if(isPreview !== savedPreview) {
-          location.reload();
-      }
+      if(isPreview !== savedPreview) location.reload();
   });
 
-  // [추가] 다른 탭에서 변경 시 실시간 동기화
   window.addEventListener('storage', (e) => {
-      if (e.key === 'kac_admin_mode' || e.key === 'kac_preview_active') {
-          location.reload();
-      }
+      if (e.key === 'kac_admin_mode' || e.key === 'kac_preview_active') location.reload();
   });
 
   function ensurePageSlots() {
@@ -554,7 +586,7 @@
     globalData.config.iconSize = parseInt(is);
     globalData.config.labelSize = parseInt(ls);
     applyConfig(globalData.config);
-    // [중요] 설정 변경사항을 로컬스토리지에도 저장해야 새로고침 시 유지됨
+    // [중요] 설정 변경사항을 로컬스토리지에도 저장
     localStorage.setItem('kac_idx_icon_size', globalData.config.iconSize);
     localStorage.setItem('kac_idx_label_size', globalData.config.labelSize);
     document.getElementById('settingsModal').style.display='none';
@@ -595,6 +627,89 @@
     }
   }
 
+  // --- GitHub 업로드 기능 ---
+  function openGithubModal() {
+    document.getElementById('ghOwner').value = localStorage.getItem('kac_gh_owner') || '';
+    document.getElementById('ghRepo').value = localStorage.getItem('kac_gh_repo') || '';
+    document.getElementById('ghToken').value = localStorage.getItem('kac_gh_token') || '';
+    document.getElementById('settingsModal').style.display = 'none';
+    document.getElementById('githubModal').style.display = 'flex';
+  }
+
+  async function uploadToGithub() {
+    const owner = document.getElementById('ghOwner').value.trim();
+    const repo = document.getElementById('ghRepo').value.trim();
+    const token = document.getElementById('ghToken').value.trim();
+    const path = "data.json"; 
+    const branch = "main"; // 브랜치 이름 (master 또는 main 확인 필요)
+
+    if(!owner || !repo || !token) return alert("모든 정보를 입력해주세요.");
+
+    localStorage.setItem('kac_gh_owner', owner);
+    localStorage.setItem('kac_gh_repo', repo);
+    localStorage.setItem('kac_gh_token', token);
+
+    const btn = document.getElementById('btnGhUpload');
+    const originalText = btn.textContent;
+    btn.textContent = "업로드 중...";
+    btn.disabled = true;
+
+    try {
+        // 최신 데이터 조립 (비밀번호 보존 로직 포함)
+        reconstructGlobalDataFromLocal();
+        globalData.meta.lastUpdated = new Date().toISOString().split('T')[0];
+        const jsonString = JSON.stringify(globalData, null, 2);
+        
+        // 한글 깨짐 방지 인코딩
+        const contentBase64 = btoa(unescape(encodeURIComponent(jsonString)));
+
+        // 기존 파일 SHA 가져오기
+        const getUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
+        let sha = "";
+        const getRes = await fetch(getUrl, {
+            method: "GET",
+            headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json" }
+        });
+        if (getRes.ok) {
+            const getData = await getRes.json();
+            sha = getData.sha;
+        }
+
+        // 파일 업데이트 (PUT)
+        const putUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+        const bodyData = {
+            message: `Update data.json via Web (${new Date().toLocaleString()})`,
+            content: contentBase64,
+            branch: branch
+        };
+        if (sha) bodyData.sha = sha;
+
+        const putRes = await fetch(putUrl, {
+            method: "PUT",
+            headers: {
+                "Authorization": `token ${token}`,
+                "Accept": "application/vnd.github.v3+json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(bodyData)
+        });
+
+        if (putRes.ok) {
+            alert("✅ 성공적으로 GitHub에 저장되었습니다!\n잠시 후(약 1~3분) 페이지에 반영됩니다.");
+            document.getElementById('githubModal').style.display = 'none';
+        } else {
+            const errData = await putRes.json();
+            throw new Error(errData.message);
+        }
+    } catch (e) {
+        alert("❌ 업로드 실패: " + e.message);
+        console.error(e);
+    } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+    }
+  }
+
   // --- 비밀번호 변경 로직 ---
   function openPwChangeModal() {
       document.getElementById('settingsModal').style.display='none';
@@ -603,30 +718,21 @@
   }
 
   async function executePwChange() {
-      const target = document.getElementById('pwTarget').value; // 'entry' or 'admin'
+      const target = document.getElementById('pwTarget').value;
       const newPw = document.getElementById('newPw').value.trim().toUpperCase();
       
       if(!newPw) return alert("변경할 비밀번호를 입력하세요.");
       
-      // 재확인
       const confirmPw = prompt(`[${target==='entry'?'교육생':'관리자'} 비밀번호]를 변경하시겠습니까?\n확인을 위해 새 비밀번호를 다시 입력해주세요.`);
       if(newPw !== confirmPw) return alert("비밀번호가 일치하지 않습니다.");
 
-      // 해시 생성 및 데이터 업데이트
       const newHash = await sha256(newPw);
       if(target === 'entry') globalData.security.entry_pw = newHash;
       else globalData.security.admin_pw = newHash;
 
-      // [중요] 변경된 비밀번호를 '잠시' 로컬 globalData에 반영 (나중에 export할 때 포함됨)
-      // 하지만 페이지 새로고침 시 이 변수는 사라지고 reconstructFromLocal이 실행되면 다시 초기화될 수 있음.
-      // 따라서 비밀번호 변경은 export 직전에 하는 것이 가장 안전하거나, 
-      // 이 코드에서는 일단 알림만 줍니다.
-      
       document.getElementById('pwChangeModal').style.display='none';
-      
-      // 안내 및 내보내기 유도
-      alert("비밀번호가 변경되었습니다.\n\n⚠️ 주의: [변경사항 저장] 버튼을 눌러 data.json을 다운로드하고,\n반드시 깃허브에 업로드해야 실제로 적용됩니다!");
-      openSettings(); // 다시 설정창 열어서 내보내기 유도
+      alert("✅ 비밀번호가 내부적으로 변경되었습니다.\n\n⚠️ 주의: [변경사항 저장] 또는 [GitHub 업로드]를 눌러야 완전히 적용됩니다!");
+      openSettings(); 
   }
 
   let tempSlotIdx = -1;
@@ -706,7 +812,7 @@
     }
     document.getElementById('movePageModal').style.display='none';
     renderCards();
-    syncToLocalStorage(globalData); // 이동 후에도 로컬스토리지 동기화 필수
+    syncToLocalStorage(globalData);
   }
 
   function deleteCard(idx) {
@@ -718,9 +824,8 @@
   }
 
   function exportJsonData() {
-    // 현재 globalData는 로컬 변경사항을 반영하고 있어야 함
-    // (reconstructGlobalDataFromLocal 함수가 최신 상태로 조립해 둠)
-    reconstructGlobalDataFromLocal(); 
+    // 최신 상태 재조립 (비밀번호 포함)
+    reconstructGlobalDataFromLocal();
     
     globalData.meta.lastUpdated = new Date().toISOString().split('T')[0];
     const str = JSON.stringify(globalData, null, 2);
