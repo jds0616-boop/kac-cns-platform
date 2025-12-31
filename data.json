@@ -3,6 +3,10 @@
     "version": "2.0",
     "lastUpdated": "2025-12-31"
   },
+  "security": {
+    "entry_pw": "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c",
+    "admin_pw": "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c"
+  },
   "config": {
     "iconSize": "110",
     "labelSize": "28",

@@ -53,14 +53,10 @@
   .settings-btn { display: flex; padding: 8px; width: 34px; height: 34px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.3s; color: #cbd5e1; }
   .settings-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
 
-  /* [수정] 상단 여백을 120px로 늘려 전체적으로 2cm 정도 내림 */
   .content-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; width: 100%; overflow-y: auto; padding: 120px 20px 80px 20px; position: relative; }
-  
   .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 30px; flex-shrink: 0; z-index: 2000; position: relative; }
-  
-  /* [수정] 검색창과 결과창의 정렬을 위한 컨테이너 */
   .search-container { position: relative; width: 600px; max-width: 90%; }
-
+  
   .search-bar { 
     width: 100%; padding: 18px 30px; border-radius: 50px; border: 2px solid var(--search-border);
     background: var(--bg-card); color: var(--text-main); font-size: 16px; font-weight: 600; 
@@ -70,35 +66,16 @@
   }
   .search-bar:focus { outline: none; border-color: #2563eb; box-shadow: 0 12px 40px rgba(37, 99, 235, 0.18); transform: translateY(-2px); }
 
-  /* [수정] 검색 결과창 정렬 보정 */
-  .search-results { 
-    position: absolute; top: calc(100% + 15px); left: 0; right: 0; width: 100%;
-    background: var(--bg-card); border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); 
-    border: 1px solid var(--border-card); overflow: hidden; display: none; 
-    max-height: 400px; overflow-y: auto; z-index: 2001; 
-  }
+  .search-results { position: absolute; top: calc(100% + 15px); left: 0; right: 0; width: 100%; background: var(--bg-card); border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); border: 1px solid var(--border-card); overflow: hidden; display: none; max-height: 400px; overflow-y: auto; z-index: 2001; }
   .search-results.active { display: block; animation: slideDown 0.2s ease-out; }
-  
   #searchOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1500; display: none; backdrop-filter: blur(2px); animation: fadeIn 0.3s; }
   #searchOverlay.active { display: block; }
 
   /* 메인 카드 영역 */
-  #cardContainer { 
-    display: flex; flex-wrap: wrap; gap: 30px; width: 100%; max-width: 1700px; 
-    justify-content: center; padding: 20px; transform-style: preserve-3d; min-height: 400px;
-  }
+  #cardContainer { display: flex; flex-wrap: wrap; gap: 30px; width: 100%; max-width: 1700px; justify-content: center; padding: 20px; transform-style: preserve-3d; min-height: 400px; }
   
-  /* 카드 크기는 이전 요청사항(높이 줄임) 유지 */
-  .card { 
-    background: var(--bg-card); width: 280px; height: 280px; padding: 30px 20px; 
-    border-radius: 25px; box-shadow: var(--shadow); border: var(--border-card); 
-    cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-    display: flex; flex-direction: column; align-items: center; justify-content: center; 
-    position: relative; border-left: 10px solid transparent; color: var(--text-main); 
-    --card-color: #64748b; border-left-color: var(--card-color); 
-  }
+  .card { background: var(--bg-card); width: 280px; height: 280px; padding: 30px 20px; border-radius: 25px; box-shadow: var(--shadow); border: var(--border-card); cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; border-left: 10px solid transparent; color: var(--text-main); --card-color: #64748b; border-left-color: var(--card-color); }
   .card:hover { transform: translateY(-10px); border-color: var(--card-color); box-shadow: 0 15px 30px -5px var(--card-color); }
-  
   .card.dragging { opacity: 0.4; border: 2px dashed #94a3b8; }
   .card.drag-over { transform: scale(1.05); box-shadow: 0 0 20px rgba(37, 99, 235, 0.3); border-color: #2563eb; z-index: 10; }
 
@@ -112,12 +89,10 @@
   .icon-box { width: 100px; height: 100px; border-radius: 30px; margin-bottom: 20px; font-weight: 900; display: flex; align-items: center; justify-content: center; background: var(--btn-bg); border: 1px solid var(--btn-border); font-size: var(--icon-size-idx, 60px); color: var(--card-color); pointer-events: none; }
   .card h2 { font-size: var(--label-size-idx, 24px); font-weight: 800; text-align: center; pointer-events: none; }
 
-  /* 페이지네이션 */
   .pagination { display: flex; gap: 10px; margin-top: 20px; align-items: center; justify-content: center; padding-bottom: 20px; }
   .page-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--btn-border); cursor: pointer; transition: 0.3s; }
   .page-dot.active { background: var(--navy); transform: scale(1.3); }
 
-  /* 로딩/모달 등 */
   #loadingSpinner { position: fixed; inset: 0; background: var(--bg-main); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
   .spinner { width: 50px; height: 50px; border: 5px solid #cbd5e1; border-top-color: #2563eb; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
 
@@ -136,7 +111,6 @@
   .btn-secondary { background: var(--btn-border); color: var(--text-sub); }
   .btn-danger { background: #ef4444; color: #fff; }
   .btn-success { background: #10b981; color: #fff; }
-  
   .btn-preview-active { background: #10b981 !important; color: #fff !important; box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4) !important; }
 
   .result-item { padding: 15px 25px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--btn-border); transition: 0.2s; }
@@ -145,15 +119,7 @@
   .res-path { font-size: 11px; opacity: 0.7; }
   .res-tag { font-size: 12px; font-weight: 900; padding: 4px 10px; border-radius: 6px; color: #fff; min-width: 50px; text-align: center; }
 
-  /* [수정] 푸터 스타일 개선 */
-  .creator-info { 
-    position: fixed; bottom: 0; left: 0; width: 100%; 
-    text-align: center; padding: 15px;
-    background: var(--bg-main); /* 배경색을 주어 겹침 방지 */
-    font-size: 12px; color: var(--text-sub); opacity: 0.8; 
-    pointer-events: none; z-index: 100;
-    line-height: 1.6;
-  }
+  .creator-info { position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; padding: 15px; background: var(--bg-main); font-size: 12px; color: var(--text-sub); opacity: 0.8; pointer-events: none; z-index: 100; line-height: 1.6; }
   .creator-info p { margin: 0; }
   .creator-info .copyright { font-weight: 700; margin-top: 4px; color: #64748b; }
   body.dark-mode .creator-info { color: #cbd5e1; background: var(--bg-main); }
@@ -207,10 +173,11 @@
         <label class="setting-label">🛠️ 시스템 관리</label>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
           <button class="btn-modal btn-danger" onclick="toggleAdmin()">로그아웃</button>
-          <button class="btn-modal btn-secondary" onclick="changePassword()">비밀번호 변경</button>
+          <button class="btn-modal btn-secondary" onclick="openPwChangeModal()">비밀번호 변경</button>
           <button id="modalPreviewBtn" class="btn-modal btn-secondary" onclick="togglePreview()">미리보기 모드 시작</button>
         </div>
         <button class="btn-modal btn-success" onclick="exportJsonData()">변경사항 저장 (data.json 다운로드)</button>
+        <p style="font-size:11px; color:red; margin-top:5px;">* 중요: 비밀번호 변경 후 반드시 data.json을 다운받아 깃허브에 업로드해야 적용됩니다.</p>
       </div>
       <div class="setting-group" style="background: rgba(0,0,0,0.02); padding: 15px; border-radius: 15px; border: 1px solid var(--btn-border);">
         <label class="setting-label">🎨 카드 UI 크기 설정 (px)</label>
@@ -222,6 +189,28 @@
       </div>
     </div>
     <button class="btn-modal btn-secondary" onclick="document.getElementById('settingsModal').style.display='none'">닫기</button>
+  </div>
+</div>
+
+<!-- 비밀번호 변경 모달 -->
+<div id="pwChangeModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-title">🔐 비밀번호 변경</div>
+    <div class="setting-group">
+      <label class="setting-label">변경할 대상</label>
+      <select id="pwTarget" class="setting-input">
+        <option value="entry">교육생 (접속용) 비밀번호</option>
+        <option value="admin">관리자 (설정용) 비밀번호</option>
+      </select>
+    </div>
+    <div class="setting-group">
+      <label class="setting-label">새로운 비밀번호</label>
+      <input type="password" id="newPw" class="setting-input" placeholder="변경할 비밀번호 입력">
+    </div>
+    <div class="btn-row">
+      <button class="btn-modal btn-primary" onclick="executePwChange()">변경 실행</button>
+      <button class="btn-modal btn-secondary" onclick="document.getElementById('pwChangeModal').style.display='none'">취소</button>
+    </div>
   </div>
 </div>
 
@@ -248,7 +237,6 @@
   </div>
 </div>
 
-<!-- [수정] 푸터 내용 변경 -->
 <div class="creator-info">
   <p>본 웹사이트는 한국공항공사 항공기술훈련원의 항행안전시설 분야 교육 관련 플랫폼입니다.</p>
   <p>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)</p>
@@ -256,7 +244,7 @@
 </div>
 
 <script>
-  let globalData = { categories: [], config: {} };
+  let globalData = { categories: [], config: {}, security: {} };
   let isAdmin = localStorage.getItem('kac_admin_mode') === '1';
   let isPreview = localStorage.getItem('kac_preview_active') === '1';
   let searchIndex = [];
@@ -281,12 +269,17 @@
       const data = await res.json();
       globalData = data;
       
+      // 보안 설정 기본값 (없을 경우 대비)
+      if(!globalData.security) {
+          globalData.security = {
+              entry_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c", // CATC1234
+              admin_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c"
+          };
+      }
+
       syncToLocalStorage(data);
       applyConfig(data.config);
-      
-      // 페이지 초기화: 카테고리 개수에 맞춰 빈 슬롯(null) 채우기
       ensurePageSlots();
-      
       renderCards();
       buildSearchIndex();
       
@@ -303,19 +296,13 @@
     if(isAdmin) document.body.classList.add('admin-mode');
   }
 
-  // 페이지네이션을 위해 데이터를 5의 배수로 맞춤 (null로 채움)
   function ensurePageSlots() {
-    // 실제 데이터만 남김 (null 제거)
     const cleanList = globalData.categories.filter(c => c !== null);
     globalData.categories = cleanList;
-
-    // 5의 배수가 되도록 null 추가
     if (globalData.categories.length % itemsPerPage !== 0) {
         const needed = itemsPerPage - (globalData.categories.length % itemsPerPage);
         for(let i=0; i<needed; i++) globalData.categories.push(null);
     }
-    // 데이터가 아예 없거나 페이지가 꽉 찼을때 관리자용으로 여유 페이지가 필요하면? 
-    // 기본적으로 데이터 개수만큼만 페이지 생성
     if(globalData.categories.length === 0) {
         for(let i=0; i<itemsPerPage; i++) globalData.categories.push(null);
     }
@@ -357,7 +344,7 @@
     pageItems.forEach((cat, i) => {
       const globalIdx = startIdx + i;
       
-      if(cat) { // 데이터 있는 카드
+      if(cat) { 
         const card = document.createElement('div');
         card.className = 'card';
         card.style.setProperty('--card-color', cat.color);
@@ -380,17 +367,15 @@
             <h2>${cat.name}</h2>
           `;
         } else {
-            // 일반 모드
             card.innerHTML = `<div class="icon-box">${cat.code}</div><h2>${cat.name}</h2>`;
         }
         container.appendChild(card);
-      } else { // 빈 슬롯
+      } else { 
         const empty = document.createElement('div');
         empty.className = 'card add-slot';
         if(isAdmin && !isPreview) {
            empty.innerHTML = '<div style="font-size:40px;">+</div><div>카테고리 추가</div>';
            empty.onclick = () => openEdit('NEW', globalIdx);
-           // 빈 슬롯도 드롭 대상
            empty.ondragover = (e) => handleDragOver(e);
            empty.ondrop = (e) => handleDrop(e, globalIdx);
         }
@@ -398,7 +383,6 @@
       }
     });
 
-    // 페이지네이션 렌더링
     for(let i=1; i<=totalPages; i++) {
         const dot = document.createElement('div');
         dot.className = `page-dot ${i === currentPage ? 'active' : ''}`;
@@ -406,7 +390,6 @@
         pagination.appendChild(dot);
     }
     
-    // 관리자일 경우 페이지 추가 버튼
     if(isAdmin && !isPreview) {
         const addPageBtn = document.createElement('div');
         addPageBtn.className = 'page-dot';
@@ -424,36 +407,11 @@
     }
   }
 
-  // --- 드래그 앤 드롭 로직 ---
-  function handleDragStart(e, idx) {
-    dragSrcIndex = idx;
-    e.target.classList.add('dragging');
-    e.dataTransfer.effectAllowed = 'move';
-  }
-  function handleDragOver(e) {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    return false;
-  }
-  function handleDrop(e, targetIdx) {
-    e.stopPropagation();
-    if(dragSrcIndex !== null && dragSrcIndex !== targetIdx) {
-        const srcItem = globalData.categories[dragSrcIndex];
-        const targetItem = globalData.categories[targetIdx];
-        
-        // 배열 위치 교환
-        globalData.categories[targetIdx] = srcItem;
-        globalData.categories[dragSrcIndex] = targetItem;
-        
-        renderCards();
-    }
-    return false;
-  }
-  function handleDragEnd(e) {
-    document.querySelectorAll('.card').forEach(c => c.classList.remove('dragging'));
-  }
+  function handleDragStart(e, idx) { dragSrcIndex = idx; e.target.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
+  function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; return false; }
+  function handleDrop(e, targetIdx) { e.stopPropagation(); if(dragSrcIndex !== null && dragSrcIndex !== targetIdx) { const srcItem = globalData.categories[dragSrcIndex]; const targetItem = globalData.categories[targetIdx]; globalData.categories[targetIdx] = srcItem; globalData.categories[dragSrcIndex] = targetItem; renderCards(); } return false; }
+  function handleDragEnd(e) { document.querySelectorAll('.card').forEach(c => c.classList.remove('dragging')); }
 
-  // --- 검색 로직 ---
   function buildSearchIndex() {
     searchIndex = [];
     globalData.categories.forEach(cat => {
@@ -461,15 +419,8 @@
       cat.menus.forEach(menu => {
         menu.subjects.forEach(sub => {
           searchIndex.push({
-            name: sub.name, 
-            type: cat.id, 
-            code: cat.code, // [수정] 코드(B, C, N...) 저장
-            typeName: cat.name,
-            menuName: menu.label, 
-            menuId: menu.id, 
-            subId: sub.id, 
-            color: cat.color, 
-            active: sub.active
+            name: sub.name, type: cat.id, code: cat.code, typeName: cat.name,
+            menuName: menu.label, menuId: menu.id, subId: sub.id, color: cat.color, active: sub.active
           });
         });
       });
@@ -488,7 +439,6 @@
     searchRes.innerHTML = matches.map(i => `
       <div class="result-item" onclick="location.href='viewer_list.html?type=${i.type}&menu=${encodeURIComponent(i.menuName)}&id=${i.menuId}&autoOpen=${i.subId}'">
         <div><div class="res-title">${i.name}</div><div class="res-path">${i.typeName} > ${i.menuName}</div></div>
-        <!-- [수정] type 대신 code 표시 -->
         <div class="res-tag" style="background:${i.color}">${i.code}</div>
       </div>
     `).join('') || '<div style="padding:15px;text-align:center;">결과 없음</div>';
@@ -499,14 +449,12 @@
   searchInput.onfocus = () => { sOverlay.classList.add('active'); if(searchInput.value) searchRes.classList.add('active'); };
   sOverlay.onclick = () => { sOverlay.classList.remove('active'); searchRes.classList.remove('active'); };
 
-  // --- 관리자 기능 ---
   function openSettings() {
     const gSet = document.getElementById('guestSettings');
     const aSet = document.getElementById('adminSettings');
     gSet.style.display = isAdmin ? 'none' : 'block';
     aSet.style.display = isAdmin ? 'block' : 'none';
     
-    // UI 값 채우기
     if(isAdmin) {
         document.getElementById('setIconSize').value = globalData.config.iconSize || 60;
         document.getElementById('setLabelSize').value = globalData.config.labelSize || 24;
@@ -522,7 +470,6 @@
     const ls = document.getElementById('setLabelSize').value;
     globalData.config.iconSize = parseInt(is);
     globalData.config.labelSize = parseInt(ls);
-    
     applyConfig(globalData.config);
     document.getElementById('settingsModal').style.display='none';
   }
@@ -535,7 +482,6 @@
     renderCards();
   }
 
-  // SHA-256
   async function sha256(message) {
       const msgBuffer = new TextEncoder().encode(message);
       const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -549,11 +495,10 @@
         location.reload();
       }
     } else {
-      const pw = prompt("비밀번호 입력");
+      const pw = prompt("관리자 비밀번호 입력");
       if(!pw) return;
-      
       const inputHash = await sha256(pw.toUpperCase());
-      const storedHash = localStorage.getItem('kac_access_pw_hash');
+      const storedHash = globalData.security.admin_pw;
 
       if(inputHash === storedHash) {
         localStorage.setItem('kac_admin_mode','1');
@@ -564,37 +509,39 @@
     }
   }
 
-  // 비밀번호 변경 함수
-  async function changePassword() {
-    const currentHash = localStorage.getItem('kac_access_pw_hash');
-    const inputCurrent = prompt("현재 비밀번호를 입력하세요.");
-    if(!inputCurrent) return;
+  // --- 비밀번호 변경 로직 ---
+  function openPwChangeModal() {
+      document.getElementById('settingsModal').style.display='none';
+      document.getElementById('pwChangeModal').style.display='flex';
+      document.getElementById('newPw').value = '';
+  }
 
-    const inputHash = await sha256(inputCurrent.toUpperCase());
-    if(inputHash !== currentHash) {
-        alert("현재 비밀번호가 틀렸습니다.");
-        return;
-    }
+  async function executePwChange() {
+      const target = document.getElementById('pwTarget').value; // 'entry' or 'admin'
+      const newPw = document.getElementById('newPw').value.trim().toUpperCase();
+      
+      if(!newPw) return alert("변경할 비밀번호를 입력하세요.");
+      
+      // 재확인
+      const confirmPw = prompt(`[${target==='entry'?'교육생':'관리자'} 비밀번호]를 변경하시겠습니까?\n확인을 위해 새 비밀번호를 다시 입력해주세요.`);
+      if(newPw !== confirmPw) return alert("비밀번호가 일치하지 않습니다.");
 
-    const newPw = prompt("새로운 비밀번호를 입력하세요.");
-    if(!newPw) return;
+      // 해시 생성 및 데이터 업데이트
+      const newHash = await sha256(newPw);
+      if(target === 'entry') globalData.security.entry_pw = newHash;
+      else globalData.security.admin_pw = newHash;
 
-    const confirmPw = prompt("새로운 비밀번호 확인 (한 번 더 입력)");
-    if(newPw !== confirmPw) {
-        alert("비밀번호가 일치하지 않습니다.");
-        return;
-    }
-
-    const newHash = await sha256(newPw.toUpperCase());
-    localStorage.setItem('kac_access_pw_hash', newHash);
-    alert("비밀번호가 성공적으로 변경되었습니다.");
+      document.getElementById('pwChangeModal').style.display='none';
+      
+      // 안내 및 내보내기 유도
+      alert("비밀번호가 변경되었습니다.\n\n⚠️ 주의: [변경사항 저장] 버튼을 눌러 data.json을 다운로드하고,\n반드시 깃허브에 업로드해야 실제로 적용됩니다!");
+      openSettings(); // 다시 설정창 열어서 내보내기 유도
   }
 
   let tempSlotIdx = -1;
   function openEdit(id, slotIdx = -1) {
     editingCardId = id;
     tempSlotIdx = slotIdx;
-    
     if(id === 'NEW') {
       document.getElementById('editName').value = '';
       document.getElementById('editCode').value = '';
@@ -612,13 +559,10 @@
     const name = document.getElementById('editName').value;
     const code = document.getElementById('editCode').value;
     const color = document.getElementById('editColor').value;
-    
     if(editingCardId === 'NEW') {
       const newCat = { id: 'CAT_' + Date.now(), name, code, color, menus: [] };
-      if(tempSlotIdx !== -1) {
-          globalData.categories[tempSlotIdx] = newCat;
-      } else {
-          // 빈 슬롯 찾기
+      if(tempSlotIdx !== -1) { globalData.categories[tempSlotIdx] = newCat; } 
+      else {
           const emptyIdx = globalData.categories.indexOf(null);
           if(emptyIdx !== -1) globalData.categories[emptyIdx] = newCat;
           else globalData.categories.push(newCat);
@@ -627,19 +571,16 @@
       const t = globalData.categories.find(c => c && c.id === editingCardId);
       if(t) { t.name = name; t.code = code; t.color = color; }
     }
-    
     syncToLocalStorage(globalData);
     renderCards();
     document.getElementById('cardEditModal').style.display='none';
   }
 
-  // --- 페이지 이동 로직 ---
   function openMovePageModal(idx) {
     moveSrcIndex = idx;
     const select = document.getElementById('moveTargetPage'); 
     select.innerHTML = '';
     const totalPages = Math.ceil(globalData.categories.length / itemsPerPage);
-    
     for(let i=1; i<=totalPages; i++) {
         const opt = document.createElement('option');
         opt.value = i; opt.textContent = `${i} 페이지로 이동`;
@@ -648,56 +589,37 @@
     const newPageOpt = document.createElement('option');
     newPageOpt.value = 'NEW'; newPageOpt.textContent = "새 페이지로 이동 (마지막)";
     select.appendChild(newPageOpt);
-
     document.getElementById('movePageModal').style.display='flex';
   }
 
   function executeMovePage() {
     const val = document.getElementById('moveTargetPage').value;
     const item = globalData.categories[moveSrcIndex];
-    
-    // 원래 자리를 null로 (빠지는 처리)
     globalData.categories[moveSrcIndex] = null;
-
     if(val === 'NEW') {
-        // 새 페이지 만들어서 넣기 (빈슬롯 채우기 로직 활용)
         const currentLen = globalData.categories.length;
         const newStart = Math.ceil(currentLen / itemsPerPage) * itemsPerPage;
-        // 부족한 만큼 null 채우기
         for(let i=currentLen; i<newStart; i++) globalData.categories.push(null);
-        // 새 페이지 첫번째 자리에 넣기
         globalData.categories.push(item);
-        // 나머지 4칸 채우기
         for(let i=0; i<itemsPerPage-1; i++) globalData.categories.push(null);
     } else {
         const page = parseInt(val);
         const startIdx = (page-1) * itemsPerPage;
         const endIdx = startIdx + itemsPerPage;
-        
-        // 해당 페이지에 빈 공간(null) 찾기
         let foundEmpty = -1;
         for(let i=startIdx; i<endIdx; i++) {
             if(globalData.categories[i] === null) { foundEmpty = i; break; }
         }
-        
-        if(foundEmpty !== -1) {
-            globalData.categories[foundEmpty] = item;
-        } else {
-            alert("해당 페이지에 빈 공간이 없습니다.");
-            // 실패했으니 원래 자리 복구
-            globalData.categories[moveSrcIndex] = item;
-            return;
-        }
+        if(foundEmpty !== -1) globalData.categories[foundEmpty] = item;
+        else { alert("해당 페이지에 빈 공간이 없습니다."); globalData.categories[moveSrcIndex] = item; return; }
     }
-    
-    // 정리 (배열 끝 불필요한 null 제거 - 선택사항이지만 깔끔하게)
     document.getElementById('movePageModal').style.display='none';
     renderCards();
   }
 
   function deleteCard(idx) {
     if(confirm("정말 삭제하시겠습니까? (하위 메뉴도 모두 삭제됩니다)")) {
-      globalData.categories[idx] = null; // 아예 삭제하지 않고 null로 비워둠 (자리 유지)
+      globalData.categories[idx] = null; 
       syncToLocalStorage(globalData);
       renderCards();
     }
