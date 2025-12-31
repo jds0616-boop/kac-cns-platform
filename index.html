@@ -53,11 +53,16 @@
   .settings-btn { display: flex; padding: 8px; width: 34px; height: 34px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.3s; color: #cbd5e1; }
   .settings-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
 
-  .content-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; width: 100%; overflow-y: auto; padding: 40px 20px; position: relative; }
-  .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 20px; flex-shrink: 0; z-index: 2000; position: relative; }
+  /* [수정] 상단 여백을 120px로 늘려 전체적으로 2cm 정도 내림 */
+  .content-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; width: 100%; overflow-y: auto; padding: 120px 20px 80px 20px; position: relative; }
   
+  .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 30px; flex-shrink: 0; z-index: 2000; position: relative; }
+  
+  /* [수정] 검색창과 결과창의 정렬을 위한 컨테이너 */
+  .search-container { position: relative; width: 600px; max-width: 90%; }
+
   .search-bar { 
-    width: 600px; max-width: 90%; padding: 18px 30px; border-radius: 50px; border: 2px solid var(--search-border);
+    width: 100%; padding: 18px 30px; border-radius: 50px; border: 2px solid var(--search-border);
     background: var(--bg-card); color: var(--text-main); font-size: 16px; font-weight: 600; 
     box-shadow: var(--search-shadow); transition: 0.3s; 
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'%3E%3Cpath d='M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z'/%3E%3C/svg%3E"); 
@@ -65,8 +70,15 @@
   }
   .search-bar:focus { outline: none; border-color: #2563eb; box-shadow: 0 12px 40px rgba(37, 99, 235, 0.18); transform: translateY(-2px); }
 
-  .search-results { position: absolute; top: calc(100% + 15px); left: 50%; transform: translateX(-50%); width: 600px; max-width: 90%; background: var(--bg-card); border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); border: 1px solid var(--border-card); overflow: hidden; display: none; max-height: 400px; overflow-y: auto; z-index: 2001; }
+  /* [수정] 검색 결과창 정렬 보정 */
+  .search-results { 
+    position: absolute; top: calc(100% + 15px); left: 0; right: 0; width: 100%;
+    background: var(--bg-card); border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); 
+    border: 1px solid var(--border-card); overflow: hidden; display: none; 
+    max-height: 400px; overflow-y: auto; z-index: 2001; 
+  }
   .search-results.active { display: block; animation: slideDown 0.2s ease-out; }
+  
   #searchOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1500; display: none; backdrop-filter: blur(2px); animation: fadeIn 0.3s; }
   #searchOverlay.active { display: block; }
 
@@ -76,6 +88,7 @@
     justify-content: center; padding: 20px; transform-style: preserve-3d; min-height: 400px;
   }
   
+  /* 카드 크기는 이전 요청사항(높이 줄임) 유지 */
   .card { 
     background: var(--bg-card); width: 280px; height: 280px; padding: 30px 20px; 
     border-radius: 25px; box-shadow: var(--shadow); border: var(--border-card); 
@@ -100,7 +113,7 @@
   .card h2 { font-size: var(--label-size-idx, 24px); font-weight: 800; text-align: center; pointer-events: none; }
 
   /* 페이지네이션 */
-  .pagination { display: flex; gap: 10px; margin-top: 20px; align-items: center; justify-content: center; padding-bottom: 50px; }
+  .pagination { display: flex; gap: 10px; margin-top: 20px; align-items: center; justify-content: center; padding-bottom: 20px; }
   .page-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--btn-border); cursor: pointer; transition: 0.3s; }
   .page-dot.active { background: var(--navy); transform: scale(1.3); }
 
@@ -130,9 +143,21 @@
   .result-item:hover { background: rgba(37, 99, 235, 0.05); }
   .res-title { font-weight: 700; font-size: 15px; }
   .res-path { font-size: 11px; opacity: 0.7; }
-  .res-tag { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; color: #fff; min-width: 45px; text-align: center; }
+  .res-tag { font-size: 12px; font-weight: 900; padding: 4px 10px; border-radius: 6px; color: #fff; min-width: 50px; text-align: center; }
 
-  .creator-info { position: fixed; bottom: 5px; width: 100%; text-align: center; font-size: 11px; color: var(--text-sub); opacity: 0.5; pointer-events: none; }
+  /* [수정] 푸터 스타일 개선 */
+  .creator-info { 
+    position: fixed; bottom: 0; left: 0; width: 100%; 
+    text-align: center; padding: 15px;
+    background: var(--bg-main); /* 배경색을 주어 겹침 방지 */
+    font-size: 12px; color: var(--text-sub); opacity: 0.8; 
+    pointer-events: none; z-index: 100;
+    line-height: 1.6;
+  }
+  .creator-info p { margin: 0; }
+  .creator-info .copyright { font-weight: 700; margin-top: 4px; color: #64748b; }
+  body.dark-mode .creator-info { color: #cbd5e1; background: var(--bg-main); }
+
   @keyframes spin { 100% { transform: rotate(360deg); } }
   @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
@@ -160,7 +185,7 @@
 
 <div class="content-wrapper">
   <div class="search-wrapper-outer">
-    <div style="position:relative; width:600px; max-width:90%;">
+    <div class="search-container">
       <input type="text" id="mainSearch" class="search-bar" placeholder="시설명 또는 교육 주제를 검색하세요..." autocomplete="off">
       <div id="searchResults" class="search-results"></div>
     </div>
@@ -223,7 +248,12 @@
   </div>
 </div>
 
-<div class="creator-info">Developed by <b>DooSeok, JANG</b> (jds0616@airport.co.kr)</div>
+<!-- [수정] 푸터 내용 변경 -->
+<div class="creator-info">
+  <p>본 웹사이트는 한국공항공사 항공기술훈련원의 항행안전시설 분야 교육 관련 플랫폼입니다.</p>
+  <p>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)</p>
+  <p class="copyright">© 2026 Korea Airports Corporation. All rights reserved.</p>
+</div>
 
 <script>
   let globalData = { categories: [], config: {} };
@@ -431,8 +461,15 @@
       cat.menus.forEach(menu => {
         menu.subjects.forEach(sub => {
           searchIndex.push({
-            name: sub.name, type: cat.id, typeName: cat.name,
-            menuName: menu.label, menuId: menu.id, subId: sub.id, color: cat.color, active: sub.active
+            name: sub.name, 
+            type: cat.id, 
+            code: cat.code, // [수정] 코드(B, C, N...) 저장
+            typeName: cat.name,
+            menuName: menu.label, 
+            menuId: menu.id, 
+            subId: sub.id, 
+            color: cat.color, 
+            active: sub.active
           });
         });
       });
@@ -451,7 +488,8 @@
     searchRes.innerHTML = matches.map(i => `
       <div class="result-item" onclick="location.href='viewer_list.html?type=${i.type}&menu=${encodeURIComponent(i.menuName)}&id=${i.menuId}&autoOpen=${i.subId}'">
         <div><div class="res-title">${i.name}</div><div class="res-path">${i.typeName} > ${i.menuName}</div></div>
-        <div class="res-tag" style="background:${i.color}">${i.type}</div>
+        <!-- [수정] type 대신 code 표시 -->
+        <div class="res-tag" style="background:${i.color}">${i.code}</div>
       </div>
     `).join('') || '<div style="padding:15px;text-align:center;">결과 없음</div>';
     
@@ -513,8 +551,10 @@
     } else {
       const pw = prompt("비밀번호 입력");
       if(!pw) return;
+      
       const inputHash = await sha256(pw.toUpperCase());
       const storedHash = localStorage.getItem('kac_access_pw_hash');
+
       if(inputHash === storedHash) {
         localStorage.setItem('kac_admin_mode','1');
         location.reload();
