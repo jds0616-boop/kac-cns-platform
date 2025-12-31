@@ -206,6 +206,7 @@
   #pdfOverlay { 
     position: fixed; inset: 0; background: #000; display: none; z-index: 7000; overflow: hidden; 
     transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    touch-action: pan-y; /* 모바일 터치 액션 허용 */
   }
   
   .v-header { position: absolute; top: 0; left: 0; right: 0; height: 80px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 8000; color: #fff; background: transparent; }
@@ -1135,6 +1136,32 @@
         if(e.key === "Escape") closeViewer();
     } 
   };
+
+  // [추가] 모바일 터치 스와이프 기능
+  let touchStartY = 0;
+  let touchEndY = 0;
+  const minSwipeDistance = 50; // 최소 스와이프 거리
+
+  overlay.addEventListener('touchstart', e => {
+      touchStartY = e.changedTouches[0].screenY;
+  }, {passive: true});
+
+  overlay.addEventListener('touchend', e => {
+      touchEndY = e.changedTouches[0].screenY;
+      handleSwipe();
+  }, {passive: true});
+
+  function handleSwipe() {
+      const distance = touchStartY - touchEndY;
+      // 아래에서 위로 쓸어올림 -> 다음 페이지
+      if (distance > minSwipeDistance) {
+          nextPage();
+      }
+      // 위에서 아래로 쓸어내림 -> 이전 페이지
+      else if (distance < -minSwipeDistance) {
+          prevPage();
+      }
+  }
   
   init();
 </script>
