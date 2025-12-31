@@ -81,7 +81,6 @@
     max-width: 1250px; 
     margin: 0 auto; 
     align-items: flex-start;
-    /* [수정] Grid 강제 해제하고 Flexbox 사용 */
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -147,36 +146,14 @@
   .bulk-row { display: grid; grid-template-columns: 40px 80px 80px 140px 1fr; gap: 8px; padding: 8px; border-bottom: 1px solid #f1f5f9; align-items: center; }
   .bulk-input { padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center; font-size: 12px; background: #f8fafc; outline: none; }
 
-  /* [추가] 모바일 반응형 처리 */
   @media (max-width: 768px) {
     header { padding: 0 15px; }
     .header-left, .header-right { display: none !important; }
     .header-center { width: 100%; max-width: 100%; }
-    
-    #trainGrid {
-      gap: 12px !important;
-      display: flex !important;
-      flex-wrap: wrap !important;
-      justify-content: center !important;
-    }
-
-    .menu-card {
-      /* 화면 너비의 절반보다 조금 작게 설정하여 한 줄에 2개 배치 */
-      width: calc(50% - 10px) !important;
-      min-height: 200px !important;
-      padding: 20px 10px !important;
-    }
-
-    /* 모바일에서 아이콘과 글자 크기 살짝 축소 */
-    .icon-circle {
-      min-width: 65px !important; 
-      min-height: 65px !important;
-      margin-bottom: 15px !important;
-      font-size: 24px !important;
-    }
+    #trainGrid { gap: 12px !important; display: flex !important; flex-wrap: wrap !important; justify-content: center !important; }
+    .menu-card { width: calc(50% - 10px) !important; min-height: 200px !important; padding: 20px 10px !important; }
+    .icon-circle { min-width: 65px !important; min-height: 65px !important; margin-bottom: 15px !important; font-size: 24px !important; }
     .menu-label { font-size: 15px !important; }
-    
-    /* 관리자 버튼 줄바꿈 */
     .admin-ctrl { flex-direction: column; width: 100%; gap: 4px; }
     .admin-ctrl button { width: 100%; }
   }
@@ -299,7 +276,6 @@
   let menus = [], searchIndex = [], currentEditIdx = -1, currentPage = 1, dragSrcIndex = null;
   const itemsPerPage = 8;
   
-  // [보안 수정] 전역 보안 객체 추가 (기본값: CATC1234)
   let globalSecurity = {
       admin_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c"
   };
@@ -308,18 +284,36 @@
     setTheme(localStorage.getItem('kac_theme') || 'light');
     if(isPreview) document.body.classList.add('preview-active');
     
-    // 1. data.json 로드 및 보안 정보 동기화
-    try {
-        const res = await fetch('data.json?v=' + new Date().getTime());
-        if(res.ok) {
-            const data = await res.json();
-            // [보안 수정] data.json의 보안 설정 로드
-            if(data.security && data.security.admin_pw) {
-                globalSecurity = data.security;
+    // [수정] 로컬 데이터가 존재하는지 확인
+    const hasLocalData = localStorage.getItem('kac_index_order');
+
+    if (hasLocalData) {
+        console.log("로컬 편집 데이터를 사용합니다.");
+        // 보안 설정 업데이트를 위해 data.json을 읽긴 하지만, 
+        // 내용을 덮어쓰는 syncToLocalStorage는 실행하지 않음
+        try {
+            const res = await fetch('data.json?v=' + new Date().getTime());
+            if(res.ok) {
+                const data = await res.json();
+                if(data.security && data.security.admin_pw) {
+                    globalSecurity = data.security;
+                }
             }
-            syncToLocalStorage(data);
-        }
-    } catch(e) { console.error("data.json 로딩 실패, 로컬 데이터 사용"); }
+        } catch(e) { console.log("보안 설정 로드 실패 (기본값 사용)"); }
+
+    } else {
+        // 로컬 데이터가 없으면 초기화 진행 (data.json Fetch 및 Sync)
+        try {
+            const res = await fetch('data.json?v=' + new Date().getTime());
+            if(res.ok) {
+                const data = await res.json();
+                if(data.security && data.security.admin_pw) {
+                    globalSecurity = data.security;
+                }
+                syncToLocalStorage(data);
+            }
+        } catch(e) { console.error("data.json 로딩 실패, 로컬 데이터 사용"); }
+    }
 
     document.getElementById('loadingSpinner').style.opacity = '0';
     setTimeout(() => document.getElementById('loadingSpinner').style.display='none', 500);
@@ -334,7 +328,6 @@
   // [추가] 페이지가 다시 보일 때 동기화 (Back-Forward Cache 대응)
   window.addEventListener('pageshow', () => {
       const savedStatus = localStorage.getItem('kac_admin_mode') === '1';
-      // 현재 변수(isAdmin)와 저장된 상태(savedStatus)가 다르면 새로고침
       if (isAdmin !== savedStatus) {
           location.reload();
       }
@@ -411,11 +404,10 @@
     if(currentPage > totalPages) currentPage = totalPages;
     const start = (currentPage - 1) * itemsPerPage, pageItems = list.slice(start, start + itemsPerPage);
 
-    // [수정] Grid 강제 설정을 Flexbox로 변경 (반응형 대응)
     grid.style.display = 'flex';
     grid.style.flexWrap = 'wrap';
     grid.style.justifyContent = 'center';
-    grid.style.gridTemplateColumns = ''; // 기존 Grid 속성 제거
+    grid.style.gridTemplateColumns = ''; 
 
     pageItems.forEach((item, idx) => {
       const globalIdx = start + idx, card = document.createElement('div');
@@ -488,27 +480,32 @@
   // SHA-256 Auth
   async function sha256(message) { const msgBuffer = new TextEncoder().encode(message); const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
   
-  // [보안 수정] toggleAdmin이 globalSecurity를 참조하도록 변경
   async function toggleAdmin() { 
     if(isAdmin) { 
         if(confirm("로그아웃?")) { localStorage.setItem('kac_admin_mode','0'); location.reload(); } 
     } else { 
         const pw = prompt("비밀번호"); if(!pw) return;
         const inputHash = await sha256(pw.toUpperCase());
-        // localStorage 대신 로드한 JSON의 값을 사용
+        // localStorage가 아닌 data.json에서 로드된 변수 사용
         const storedHash = globalSecurity.admin_pw;
         if(inputHash === storedHash) { localStorage.setItem('kac_admin_mode','1'); location.reload(); } else alert('비밀번호 불일치');
     } 
   }
   
   function setTheme(m) { document.body.classList.toggle('dark-mode', m==='dark'); localStorage.setItem('kac_theme', m); const bD = document.getElementById('btnDay'), bN = document.getElementById('btnNight'); if(bD) bD.classList.toggle('active', m==='light'); if(bN) bN.classList.toggle('active', m==='dark'); }
-  function saveUISettings() { localStorage.setItem('kac_fac_icon_size', document.getElementById('setFacIconSize').value); localStorage.setItem('kac_fac_label_size', document.getElementById('setFacLabelSize').value); loadStyles(); alert('적용됨'); }
+  function saveUISettings() { 
+      const iSize = document.getElementById('setFacIconSize').value;
+      const lSize = document.getElementById('setFacLabelSize').value;
+      localStorage.setItem('kac_fac_icon_size', iSize); 
+      localStorage.setItem('kac_fac_label_size', lSize); 
+      loadStyles(); 
+      alert('적용됨'); 
+  }
   function loadStyles() { document.documentElement.style.setProperty('--icon-size-fac', (localStorage.getItem('kac_fac_icon_size')||'28')+'px'); document.documentElement.style.setProperty('--label-size-fac', (localStorage.getItem('kac_fac_label_size')||'18')+'px'); }
 
   function exportJsonData() {
     try {
         const newData = { meta: { version: "2.0", lastUpdated: new Date().toISOString().split('T')[0] }, config: {}, categories: [] };
-        // [보안 수정] security 객체 포함 (내보낼 때도 현재 로드된 비번 유지)
         newData.security = globalSecurity; 
         
         newData.config.iconSize = localStorage.getItem('kac_idx_icon_size') || 60;
