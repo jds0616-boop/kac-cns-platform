@@ -150,7 +150,7 @@
   .subject-card.dragging { opacity: 0.5; border: 2px dashed #94a3b8; background: rgba(255,255,255,0.05); }
   .subject-card.drag-over { border: 2px solid var(--theme-color); transform: scale(1.02); box-shadow: 0 0 15px rgba(var(--theme-rgb), 0.2); z-index: 10; }
 
-  /* [수정] Last Viewed 위치 조정 (관리자 모드 시 왼쪽으로 이동) */
+  /* 기본: 게스트 모드일 때 Last Viewed (오른쪽 배치) */
   .last-viewed-icon {
     position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
     display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -163,11 +163,11 @@
     pointer-events: none; /* 클릭 통과 (버튼 클릭 방해 금지) */
   }
   
-/* 관리자 모드일 때는 버튼들과 겹치지 않게 왼쪽으로 밀기 */
-body.admin-mode .last-viewed-icon {
-  right: 350px !important;  /* 280px -> 350px로 변경하고 !important 추가 */
-  opacity: 0.5; /* 겹치는 느낌 없애기 위해 약간 흐리게 */
-}
+  /* [수정] 관리자 모드일 때는 버튼들과 겹치지 않게 왼쪽으로 밀기 */
+  body.admin-mode .last-viewed-icon {
+    right: 320px !important; /* 버튼 그룹(약 260px)보다 더 왼쪽으로 배치 */
+    opacity: 0.6; 
+  }
 
   .subject-card.last-viewed { border: 2px solid #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
   .subject-card.last-viewed .last-viewed-icon { opacity: 1; }
@@ -486,6 +486,10 @@ body.admin-mode .last-viewed-icon {
 
   async function init() {
     setTheme(localStorage.getItem('kac_theme') || 'light');
+    
+    // [수정] 관리자 모드 클래스 추가 로직 (CSS 적용을 위해 필수)
+    if(isAdmin) document.body.classList.add('admin-mode');
+    
     if(isPreview) document.body.classList.add('preview-active');
 
     let loaded = loadSubjectsFromLocal();
@@ -524,6 +528,27 @@ body.admin-mode .last-viewed-icon {
     buildSearchIndex();
     checkAutoOpen();
   }
+
+  // [추가] 페이지가 다시 보일 때 동기화 (Back-Forward Cache 대응)
+  window.addEventListener('pageshow', () => {
+      const savedStatus = localStorage.getItem('kac_admin_mode') === '1';
+      // 현재 변수(isAdmin)와 저장된 상태(savedStatus)가 다르면 새로고침
+      if (isAdmin !== savedStatus) {
+          location.reload();
+      }
+      
+      const savedPreview = localStorage.getItem('kac_preview_active') === '1';
+      if(isPreview !== savedPreview) {
+          location.reload();
+      }
+  });
+
+  // [추가] 다른 탭에서 변경 시 실시간 동기화
+  window.addEventListener('storage', (e) => {
+      if (e.key === 'kac_admin_mode' || e.key === 'kac_preview_active') {
+          location.reload();
+      }
+  });
 
   function loadSubjectsFromLocal() {
       const data = localStorage.getItem(`kac_subs_${type}_${menuId}`);
