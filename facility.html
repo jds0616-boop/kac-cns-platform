@@ -75,7 +75,17 @@
   .settings-btn { display: flex; padding: 8px; width: 34px; height: 34px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.3s; color: #cbd5e1; }
 
   main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
-  #trainGrid { gap: 30px; width: 100%; max-width: 1250px; margin: 0 auto; align-items: flex-start; }
+  #trainGrid { 
+    gap: 30px; 
+    width: 100%; 
+    max-width: 1250px; 
+    margin: 0 auto; 
+    align-items: flex-start;
+    /* [수정] Grid 강제 해제하고 Flexbox 사용 */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
   
   .menu-card { 
     background: var(--bg-card); width: 280px; min-height: 280px; height: auto; padding: 35px 25px; 
@@ -136,6 +146,40 @@
   .bulk-header-row { position: sticky; top: 0; display: grid; grid-template-columns: 40px 80px 80px 140px 1fr; background: #f1f5f9; padding: 12px; font-size: 11px; font-weight: 800; text-align: center; border-radius: 10px; color: var(--theme-color); margin-bottom: 10px; z-index: 10; }
   .bulk-row { display: grid; grid-template-columns: 40px 80px 80px 140px 1fr; gap: 8px; padding: 8px; border-bottom: 1px solid #f1f5f9; align-items: center; }
   .bulk-input { padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center; font-size: 12px; background: #f8fafc; outline: none; }
+
+  /* [추가] 모바일 반응형 처리 */
+  @media (max-width: 768px) {
+    header { padding: 0 15px; }
+    .header-left, .header-right { display: none !important; }
+    .header-center { width: 100%; max-width: 100%; }
+    
+    #trainGrid {
+      gap: 12px !important;
+      display: flex !important;
+      flex-wrap: wrap !important;
+      justify-content: center !important;
+    }
+
+    .menu-card {
+      /* 화면 너비의 절반보다 조금 작게 설정하여 한 줄에 2개 배치 */
+      width: calc(50% - 10px) !important;
+      min-height: 200px !important;
+      padding: 20px 10px !important;
+    }
+
+    /* 모바일에서 아이콘과 글자 크기 살짝 축소 */
+    .icon-circle {
+      min-width: 65px !important; 
+      min-height: 65px !important;
+      margin-bottom: 15px !important;
+      font-size: 24px !important;
+    }
+    .menu-label { font-size: 15px !important; }
+    
+    /* 관리자 버튼 줄바꿈 */
+    .admin-ctrl { flex-direction: column; width: 100%; gap: 4px; }
+    .admin-ctrl button { width: 100%; }
+  }
 </style>
 </head>
 <body>
@@ -367,8 +411,11 @@
     if(currentPage > totalPages) currentPage = totalPages;
     const start = (currentPage - 1) * itemsPerPage, pageItems = list.slice(start, start + itemsPerPage);
 
-    if (pageItems.length <= 4) { grid.style.display = 'flex'; grid.style.flexWrap = 'wrap'; grid.style.justifyContent = 'center'; }
-    else { grid.style.display = 'grid'; grid.style.gridTemplateColumns = 'repeat(4, 280px)'; grid.style.justifyContent = 'center'; }
+    // [수정] Grid 강제 설정을 Flexbox로 변경 (반응형 대응)
+    grid.style.display = 'flex';
+    grid.style.flexWrap = 'wrap';
+    grid.style.justifyContent = 'center';
+    grid.style.gridTemplateColumns = ''; // 기존 Grid 속성 제거
 
     pageItems.forEach((item, idx) => {
       const globalIdx = start + idx, card = document.createElement('div');
