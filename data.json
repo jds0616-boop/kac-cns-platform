@@ -1,0 +1,758 @@
+{
+  "meta": {
+    "version": "2.0",
+    "lastUpdated": "2025-12-31"
+  },
+  "config": {
+    "iconSize": "110",
+    "labelSize": "28",
+    "facIconSize": "30",
+    "facLabelSize": "25"
+  },
+  "categories": [
+    {
+      "id": "M_1767153081051",
+      "name": "RF 무선기초",
+      "code": "B",
+      "color": "#0547b3",
+      "menus": [
+        {
+          "id": "id_1767153106259",
+          "label": "직류 회로",
+          "line1": "DC",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1767153322891eajzk",
+              "name": "기초 정리",
+              "active": true,
+              "pdfName": "/BASIC/무선기초_CH1",
+              "link": "",
+              "audioName": ""
+            },
+            {
+              "id": "1767153322891f7qa0",
+              "name": "직류 회로",
+              "active": true,
+              "pdfName": "/BASIC/무선기초_CH2",
+              "link": "",
+              "audioName": ""
+            },
+            {
+              "id": "1767153487875",
+              "name": "직류회로 (통합본)",
+              "active": true,
+              "pdfName": "/BASIC/무선기초_CH3",
+              "link": "",
+              "audioName": ""
+            }
+          ]
+        },
+        {
+          "id": "id_1767153116578",
+          "label": "교류 회로",
+          "line1": "AC",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1767153632746fbhbi",
+              "name": "교류회로와 전압",
+              "active": true,
+              "pdfName": "/BASIC/무선기초_CH4",
+              "link": "",
+              "audioName": ""
+            },
+            {
+              "id": "1767153632746yv6ro",
+              "name": "캐패시터",
+              "active": true,
+              "pdfName": "/BASIC/무선기초_CH5",
+              "link": "",
+              "audioName": ""
+            },
+            {
+              "id": "1767153632746bd1oh",
+              "name": "인덕터",
+              "active": true,
+              "pdfName": "/BASIC/무선기초_CH6",
+              "link": "",
+              "audioName": ""
+            },
+            {
+              "id": "17671536327463s9oj",
+              "name": "RL 회로",
+              "active": true,
+              "pdfName": "/BASIC/무선기초_CH7",
+              "link": "",
+              "audioName": ""
+            },
+            {
+              "id": "1767153632746hsxui",
+              "name": "RLC회로와 공진",
+              "active": true,
+              "pdfName": "/BASIC/무선기초_CH8",
+              "link": "",
+              "audioName": ""
+            },
+            {
+              "id": "1767153632746kp546",
+              "name": "RF 무선시스템의 구성",
+              "active": true,
+              "pdfName": "/BASIC/무선기초_CH9",
+              "link": "",
+              "audioName": ""
+            }
+          ]
+        },
+        {
+          "id": "id_1767153141755",
+          "label": "안테나",
+          "line1": "ANTENNA",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1767153781225",
+              "name": "안테나 이론",
+              "active": true,
+              "pdfName": "/BASIC/무선기초_CH10",
+              "link": "",
+              "audioName": ""
+            }
+          ]
+        },
+        {
+          "id": "id_1767153882657",
+          "label": "변복조 이론",
+          "line1": "Modulation",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1767153892298",
+              "name": "변/복조 이론",
+              "active": true,
+              "pdfName": "/BASIC/무선기초_CH11",
+              "link": "",
+              "audioName": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "COMM",
+      "name": "항공정보통신시설",
+      "code": "C",
+      "color": "#da10c9",
+      "menus": [
+        {
+          "id": "id_1766923156620",
+          "label": "전파 및 항공주파수",
+          "line1": "Frequency",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1766846265369",
+              "name": "항공정보통신시설 개요 및 분류",
+              "pdfName": "/COMM/통신이론_CH1",
+              "audioName": "",
+              "active": false
+            },
+            {
+              "id": "1766846325095",
+              "name": "항공주파수 기술기준",
+              "pdfName": "/COMM/통신이론_CH2",
+              "audioName": ""
+            },
+            {
+              "id": "1766846274557",
+              "name": "전파의 이해",
+              "pdfName": "/COMM/통신이론_CH3",
+              "audioName": ""
+            }
+          ]
+        },
+        {
+          "id": "id_1766847788411_1",
+          "label": "음성통신제어시설",
+          "line1": "VCCS",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1766846349471",
+              "name": "항공직통전화망 이해 (* PSTN )",
+              "active": true,
+              "pdfName": "/COMM/통신이론_CH4",
+              "audioName": "",
+              "link": ""
+            },
+            {
+              "id": "1766846394790",
+              "name": "음성통신제어시설 통신패널 이해 (모델명 : NETVCCS)",
+              "pdfName": "/COMM/통신이론_CH5",
+              "audioName": "",
+              "active": true,
+              "link": ""
+            },
+            {
+              "id": "1766846374046",
+              "name": "음성통신제어시설 하드웨어 시스템 (모델명 : NETVCCS)",
+              "pdfName": "/COMM/통신이론_CH6",
+              "audioName": "",
+              "active": true,
+              "link": ""
+            },
+            {
+              "id": "1766846471124",
+              "name": "녹음시설(RECORDER)",
+              "pdfName": "/COMM/통신이론_CH7",
+              "audioName": ""
+            }
+          ]
+        },
+        {
+          "id": "id_1766847788411_4",
+          "label": "단거리 이동통신시설",
+          "line1": "U/VHF",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1766846285665",
+              "name": "무선송수신기 이론",
+              "pdfName": "/COMM/통신이론_CH8",
+              "audioName": ""
+            },
+            {
+              "id": "1766846452804",
+              "name": "Radio 인터페이스 이해",
+              "pdfName": "/COMM/통신이론_CH9",
+              "audioName": ""
+            },
+            {
+              "id": "1766848023961",
+              "name": "안테나 점검 및 유지관리 실무",
+              "pdfName": "/COMM/통신이론_CH10",
+              "audioName": ""
+            },
+            {
+              "id": "1766846298704",
+              "name": "전파혼신 및 전파환경조사",
+              "pdfName": "/COMM/통신이론_CH11",
+              "audioName": ""
+            }
+          ]
+        },
+        {
+          "id": "id_1766847788411_2",
+          "label": "공항정보방송시설",
+          "line1": "ATIS",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1766846234201",
+              "name": "공항정보방송시설(ATIS)",
+              "active": true,
+              "pdfName": "/COMM/통신이론_CH12",
+              "audioName": ""
+            }
+          ]
+        },
+        {
+          "id": "id_1766847788411_0",
+          "label": "단파이동통신시설",
+          "line1": "HF",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1766846414949",
+              "name": "단파이동통신시설(HF Radio)",
+              "active": true,
+              "pdfName": "/COMM/통신이론_CH13",
+              "audioName": ""
+            }
+          ]
+        },
+        {
+          "id": "id_1766847788411_3",
+          "label": "항공통신용 데이터링크",
+          "line1": "VDL",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1767154985939",
+              "name": "VDL 실무 (사내강사 : 임석용)",
+              "active": true,
+              "pdfName": "/COMM/통신이론_CH23",
+              "link": "",
+              "audioName": ""
+            },
+            {
+              "id": "1766848136942",
+              "name": "항공통신용 데이터링크 (PART #1)",
+              "active": true,
+              "pdfName": "/COMM/통신이론_CH14",
+              "audioName": ""
+            },
+            {
+              "id": "1766848142038",
+              "name": "항공통신용 데이터링크 (PART #2)",
+              "pdfName": "/COMM/통신이론_CH15",
+              "audioName": ""
+            },
+            {
+              "id": "1766848146326",
+              "name": "항공통신용 데이터링크 (PART #3)",
+              "pdfName": "/COMM/통신이론_CH16",
+              "audioName": ""
+            },
+            {
+              "id": "1766848150926",
+              "name": "항공통신용 데이터링크 (PART #4)",
+              "pdfName": "/COMM/통신이론_CH17",
+              "audioName": ""
+            },
+            {
+              "id": "1766878484596",
+              "name": "항공통신용 데이터링크 (PART #5)  - 개발중 -",
+              "active": false,
+              "pdfName": "/COMM/통신이론_CH18",
+              "audioName": ""
+            },
+            {
+              "id": "1766878517348",
+              "name": "항공통신용 데이터링크 (PART #6)  - 개발중 -",
+              "active": false,
+              "pdfName": "/COMM/통신이론_CH19",
+              "audioName": ""
+            }
+          ]
+        },
+        {
+          "id": "id_1766923124045",
+          "label": "항공고정통신시설",
+          "line1": "AFTN/AMHS",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "F_1766818637741",
+              "name": "항공고정통신시설 이해 (사내강사:김원중)",
+              "active": true,
+              "pdfName": "/COMM/통신이론_CH21",
+              "audioName": "",
+              "link": ""
+            },
+            {
+              "id": "1767154569079",
+              "name": "항공고정통신시설 이해 (사내강사:장지훈)",
+              "active": true,
+              "pdfName": "/COMM/통신이론_CH22",
+              "link": "",
+              "audioName": ""
+            }
+          ]
+        },
+        {
+          "id": "id_1767155056029",
+          "label": "항공기국 통신시스템",
+          "line1": "AVIONICS",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1767155091878",
+              "name": "항공기 통신시스템 이해 (외부강사 : 이연달)",
+              "active": true,
+              "pdfName": "/COMM/통신이론_CH24",
+              "link": "",
+              "audioName": ""
+            }
+          ]
+        },
+        {
+          "id": "id_1767155221980",
+          "label": "전용회선 통신망 이해",
+          "line1": "회선",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1767155241029",
+              "name": "전용회선 통신망의 이해 (사내강사 : 함동호)",
+              "active": true,
+              "pdfName": "/COMM/통신이론_CH25",
+              "link": "",
+              "audioName": ""
+            }
+          ]
+        },
+        {
+          "id": "id_1767155517179",
+          "label": "공항이동통신시설",
+          "line1": "AEROMACS",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1767155543701",
+              "name": "첨단 공항무선통신(AEROMACS) 기술현황 (외부강사 : 신대교)",
+              "active": true,
+              "pdfName": "/COMM/통신이론_CH26",
+              "link": "",
+              "audioName": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "NAV",
+      "name": "항법시설",
+      "code": "N",
+      "color": "#06bc33",
+      "menus": [
+        {
+          "id": "id_1766848178131_0",
+          "label": "계기착륙시설",
+          "line1": "ILS",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1767015283560kq9rw",
+              "name": "계기착륙시설(ILS)의 개요",
+              "active": true,
+              "pdfName": "/NAV/ILS이론교재_CH1",
+              "audioName": ""
+            },
+            {
+              "id": "17670152835605xs52",
+              "name": "기본개념 및 용어의 정의",
+              "active": true,
+              "pdfName": "/NAV/ILS이론교재_CH2",
+              "audioName": ""
+            },
+            {
+              "id": "17670152835602t4i5",
+              "name": "BASIC ANTENNA PAIRS",
+              "active": true,
+              "pdfName": "/NAV/ILS이론교재_CH3",
+              "audioName": ""
+            },
+            {
+              "id": "17670152835604ou1t",
+              "name": "SPECIFIC ANTENNA PAIRS",
+              "active": true,
+              "pdfName": "/NAV/ILS이론교재_CH4",
+              "audioName": ""
+            },
+            {
+              "id": "17670152835606v8zt",
+              "name": "MULTIPLE ANTENNA PAIRS AND THE IMAGE ANTENNA",
+              "active": true,
+              "pdfName": "/NAV/ILS이론교재_CH5",
+              "audioName": ""
+            },
+            {
+              "id": "17670152835602x2se",
+              "name": "MODULATION/DEMODULATION PRINCIPLES",
+              "active": true,
+              "pdfName": "/NAV/ILS이론교재_CH6",
+              "audioName": ""
+            },
+            {
+              "id": "1767015283560m61so",
+              "name": "POWER IN AMPLITUDE-MODULATED (AM) WAVES",
+              "active": true,
+              "pdfName": "/NAV/ILS이론교재_CH7",
+              "audioName": ""
+            },
+            {
+              "id": "176701528356049v1t",
+              "name": "ILS WAVEFORMS",
+              "active": true,
+              "pdfName": "/NAV/ILS이론교재_CH8",
+              "audioName": ""
+            },
+            {
+              "id": "1767015283560qhuyq",
+              "name": "SPACE MODULATION",
+              "active": true,
+              "pdfName": "/NAV/ILS이론교재_CH9",
+              "audioName": ""
+            },
+            {
+              "id": "1767015283560ghkv0",
+              "name": "DIFFERENCE OF MODULATION",
+              "active": true,
+              "pdfName": "/NAV/ILS이론교재_CH10",
+              "audioName": ""
+            },
+            {
+              "id": "1767015283560aatq5",
+              "name": "GLIDEPATH ANTENNA ARRAY",
+              "active": true,
+              "pdfName": "/NAV/ILS이론교재_CH11",
+              "audioName": ""
+            },
+            {
+              "id": "1767015283560skh5q",
+              "name": "GLIDEPATH DDM AND PATH WIDTH",
+              "active": true,
+              "pdfName": "/NAV/ILS이론교재_CH12",
+              "audioName": ""
+            },
+            {
+              "id": "1767015283560i4sx8",
+              "name": "CAPTURE EFFECT GLIDEPATH",
+              "active": true,
+              "pdfName": "/NAV/ILS이론교재_CH13",
+              "audioName": ""
+            },
+            {
+              "id": "1767015283560d8hmw",
+              "name": "PROXIMITY EFFECT",
+              "active": true,
+              "pdfName": "/NAV/ILS이론교재_CH14",
+              "audioName": ""
+            },
+            {
+              "id": "1767015283560ykuza",
+              "name": "GLIDEPATH MONITORING",
+              "active": true,
+              "pdfName": "/NAV/ILS이론교재_CH15",
+              "audioName": ""
+            },
+            {
+              "id": "1767015283560jv9vy",
+              "name": "GLIDEPATH HEIGHT RATIOS",
+              "active": true,
+              "pdfName": "/NAV/ILS이론교재_CH16",
+              "audioName": ""
+            },
+            {
+              "id": "1767015283560yvo7j",
+              "name": "LOCALIZER RADIATION PATTERNS",
+              "active": true,
+              "pdfName": "/NAV/ILS이론교재_CH17",
+              "audioName": ""
+            },
+            {
+              "id": "17670152835602fm0x",
+              "name": "LOCALIZER MONITORING",
+              "active": true,
+              "pdfName": "/NAV/ILS이론교재_CH18",
+              "audioName": ""
+            },
+            {
+              "id": "17670152835604r8r2",
+              "name": "FLIGHT INSPECTION",
+              "active": true,
+              "pdfName": "/NAV/ILS이론교재_CH19",
+              "audioName": ""
+            }
+          ]
+        },
+        {
+          "id": "id_1767067644172",
+          "label": "ILS 시물레이션",
+          "line1": "ILS",
+          "line2": "",
+          "link": "http://sonwooram.github.io/ILS-SIM/",
+          "subjects": [
+            {
+              "id": "1767067668436",
+              "name": "ILS 전파 시물레이션",
+              "active": true,
+              "pdfName": "/NAV/maker.html",
+              "audioName": ""
+            }
+          ]
+        },
+        {
+          "id": "id_1766848178131_1",
+          "label": "전방향표지시설",
+          "line1": "VOR",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1767059085255",
+              "name": "전방향표지시설(통합본)",
+              "active": true,
+              "pdfName": "/NAV/VOR이론교재",
+              "audioName": ""
+            }
+          ]
+        },
+        {
+          "id": "id_1767058994019",
+          "label": "거리측정시설",
+          "line1": "DME",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1767059122125",
+              "name": "거리축정시설(통합본)",
+              "active": true,
+              "pdfName": "/NAV/DME이론교재",
+              "audioName": ""
+            }
+          ]
+        },
+        {
+          "id": "id_1767059020827",
+          "label": "전술항행표지시설",
+          "line1": "TACAN",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1767059148364",
+              "name": "전술항행표지지설(통합본)",
+              "active": true,
+              "pdfName": "/NAV/TACAN이론교재",
+              "audioName": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SURV",
+      "name": "항행감시시설",
+      "code": "S",
+      "color": "#29d1b5",
+      "menus": [
+        {
+          "id": "id_1767053774674",
+          "label": "레이더시설",
+          "line1": "RADAR",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1767053888747hc192",
+              "name": "레이더 시설의 개요",
+              "active": true,
+              "pdfName": "/SURV/레이더이론_CH1",
+              "audioName": ""
+            },
+            {
+              "id": "1767053888747z3k68",
+              "name": "레이더 송신기",
+              "active": true,
+              "pdfName": "/SURV/레이더이론_CH2",
+              "audioName": ""
+            },
+            {
+              "id": "1767053888747ff1wb",
+              "name": "레이더 안테나 시스템",
+              "active": true,
+              "pdfName": "/SURV/레이더이론_CH3",
+              "audioName": ""
+            },
+            {
+              "id": "176705388874713rff",
+              "name": "레이더 수신기 및 프로세서",
+              "active": true,
+              "pdfName": "/SURV/레이더이론_CH4",
+              "audioName": ""
+            }
+          ]
+        },
+        {
+          "id": "id_1767053790707",
+          "label": "다변측정감시시설",
+          "line1": "MLAT",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1767053916370hw4gs",
+              "name": "MLAT 이론 및 구조",
+              "active": true,
+              "pdfName": "/SURV/레이더이론_CH5",
+              "audioName": ""
+            }
+          ]
+        },
+        {
+          "id": "id_1767053802530",
+          "label": "자동종속감시시설",
+          "line1": "ADS-B",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1767053938530dwu5z",
+              "name": "ADS-B 이론 및 구조",
+              "active": true,
+              "pdfName": "/SURV/레이더이론_CH6",
+              "audioName": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M_1767154255680",
+      "name": "관제 및 SWIM",
+      "code": "A",
+      "color": "#3b82f6",
+      "menus": [
+        {
+          "id": "id_1767154329551",
+          "label": "절차와 항행안전시설",
+          "line1": "비행절차",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1767154348353",
+              "name": "(통합본) 절차와 항행안전시설",
+              "active": true,
+              "pdfName": "/ATC/관련자료_CH1",
+              "link": "",
+              "audioName": ""
+            }
+          ]
+        },
+        {
+          "id": "id_1767155682827",
+          "label": "항공정보 종합관리망",
+          "line1": "SWIM",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1767155731108",
+              "name": "글로벌 항공정보 종합관리망(SWIM) (외부강사 : 박동기)",
+              "active": true,
+              "pdfName": "/ATC/관련자료_CH2",
+              "link": "",
+              "audioName": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M_1767154448046",
+      "name": "전력시설",
+      "code": "U",
+      "color": "#e60000",
+      "menus": []
+    }
+  ]
+}
