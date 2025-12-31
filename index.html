@@ -38,7 +38,7 @@
   body { background: var(--bg-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: var(--text-main); transition: 0.3s; }
 
   /* 관리자/미리보기 제어 */
-  body.preview-active .card-ctrl, body.preview-active .add-card-btn { display: none !important; }
+  body.preview-active .card-ctrl, body.preview-active .add-slot { display: none !important; }
   
   header { height: var(--header-h); background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.15); z-index: 1000; flex-shrink: 0; }
   .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; cursor: pointer; }
@@ -53,9 +53,8 @@
   .settings-btn { display: flex; padding: 8px; width: 34px; height: 34px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.3s; color: #cbd5e1; }
   .settings-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
 
-  /* 검색창 영역 */
   .content-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; width: 100%; overflow-y: auto; padding: 40px 20px; position: relative; }
-  .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 40px; flex-shrink: 0; z-index: 2000; position: relative; }
+  .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 20px; flex-shrink: 0; z-index: 2000; position: relative; }
   
   .search-bar { 
     width: 600px; max-width: 90%; padding: 18px 30px; border-radius: 50px; border: 2px solid var(--search-border);
@@ -74,11 +73,11 @@
   /* 메인 카드 영역 */
   #cardContainer { 
     display: flex; flex-wrap: wrap; gap: 30px; width: 100%; max-width: 1700px; 
-    justify-content: center; padding: 20px; transform-style: preserve-3d; 
+    justify-content: center; padding: 20px; transform-style: preserve-3d; min-height: 400px;
   }
   
   .card { 
-    background: var(--bg-card); width: 280px; height: 250px; padding: 40px 20px; 
+    background: var(--bg-card); width: 280px; height: 280px; padding: 30px 20px; 
     border-radius: 25px; box-shadow: var(--shadow); border: var(--border-card); 
     cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
     display: flex; flex-direction: column; align-items: center; justify-content: center; 
@@ -87,25 +86,33 @@
   }
   .card:hover { transform: translateY(-10px); border-color: var(--card-color); box-shadow: 0 15px 30px -5px var(--card-color); }
   
+  /* 드래그 앤 드롭 스타일 */
+  .card.dragging { opacity: 0.4; border: 2px dashed #94a3b8; }
+  .card.drag-over { transform: scale(1.05); box-shadow: 0 0 20px rgba(37, 99, 235, 0.3); border-color: #2563eb; z-index: 10; }
+
   .card-ctrl { position: absolute; top: 15px; width: 100%; display: none; gap: 5px; justify-content: center; z-index: 10; }
   body.admin-mode .card .card-ctrl { display: flex; }
 
-  /* 빈 슬롯 (관리자용) */
   .card.add-slot { background: transparent; border: 2px dashed #cbd5e1; opacity: 0; pointer-events: none; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px; color: #cbd5e1; }
   body.admin-mode .card.add-slot { opacity: 0.6; pointer-events: auto; cursor: pointer; }
   body.admin-mode .card.add-slot:hover { border-color: #2563eb; color: #2563eb; opacity: 1; transform: scale(1.02); }
 
-  .icon-box { width: 100px; height: 100px; border-radius: 30px; margin-bottom: 25px; font-weight: 900; display: flex; align-items: center; justify-content: center; background: var(--btn-bg); border: 1px solid var(--btn-border); font-size: var(--icon-size-idx, 60px); color: var(--card-color); pointer-events: none; }
+  .icon-box { width: 100px; height: 100px; border-radius: 30px; margin-bottom: 20px; font-weight: 900; display: flex; align-items: center; justify-content: center; background: var(--btn-bg); border: 1px solid var(--btn-border); font-size: var(--icon-size-idx, 60px); color: var(--card-color); pointer-events: none; }
   .card h2 { font-size: var(--label-size-idx, 24px); font-weight: 800; text-align: center; pointer-events: none; }
 
-  /* 로딩 인디케이터 */
+  /* 페이지네이션 */
+  .pagination { display: flex; gap: 10px; margin-top: 20px; align-items: center; justify-content: center; padding-bottom: 50px; }
+  .page-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--btn-border); cursor: pointer; transition: 0.3s; }
+  .page-dot.active { background: var(--navy); transform: scale(1.3); }
+
+  /* 로딩/모달 등 */
   #loadingSpinner { position: fixed; inset: 0; background: var(--bg-main); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
   .spinner { width: 50px; height: 50px; border: 5px solid #cbd5e1; border-top-color: #2563eb; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
 
-  /* 버튼 및 유틸 */
-  .btn-sm { padding: 6px 12px; font-size: 11px; border-radius: 8px; border: 1px solid var(--btn-border); background: var(--btn-bg); font-weight: 700; cursor: pointer; color: var(--btn-text); }
+  .btn-sm { padding: 5px 10px; font-size: 11px; border-radius: 6px; border: 1px solid var(--btn-border); background: var(--btn-bg); font-weight: 700; cursor: pointer; color: var(--btn-text); }
   .btn-del { color: #ef4444; border-color: #fee2e2; }
-  
+  .btn-move { color: #3b82f6; border-color: #dbeafe; }
+
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none; align-items: center; justify-content: center; }
   .modal-card { background: var(--bg-card); padding: 35px; border-radius: 25px; width: 450px; color: var(--text-main); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
   .setting-group { margin-bottom: 20px; }
@@ -117,6 +124,8 @@
   .btn-secondary { background: var(--btn-border); color: var(--text-sub); }
   .btn-danger { background: #ef4444; color: #fff; }
   .btn-success { background: #10b981; color: #fff; }
+  
+  .btn-preview-active { background: #10b981 !important; color: #fff !important; box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4) !important; }
 
   .result-item { padding: 15px 25px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--btn-border); transition: 0.2s; }
   .result-item:hover { background: rgba(37, 99, 235, 0.05); }
@@ -158,6 +167,7 @@
     </div>
   </div>
   <main id="cardContainer"></main>
+  <div id="pagination" class="pagination"></div>
 </div>
 
 <!-- 설정 모달 -->
@@ -171,8 +181,19 @@
     <div id="adminSettings" style="display:none;">
       <div class="setting-group">
         <label class="setting-label">🛠️ 시스템 관리</label>
-        <button class="btn-modal btn-danger" onclick="toggleAdmin()">로그아웃</button>
+        <div style="display:flex; gap:10px;">
+          <button class="btn-modal btn-danger" onclick="toggleAdmin()">로그아웃</button>
+          <button id="modalPreviewBtn" class="btn-modal btn-secondary" onclick="togglePreview()">미리보기 모드 시작</button>
+        </div>
         <button class="btn-modal btn-success" onclick="exportJsonData()">변경사항 저장 (data.json 다운로드)</button>
+      </div>
+      <div class="setting-group" style="background: rgba(0,0,0,0.02); padding: 15px; border-radius: 15px; border: 1px solid var(--btn-border);">
+        <label class="setting-label">🎨 카드 UI 크기 설정 (px)</label>
+        <div style="display:flex; gap:15px; align-items: center; margin-bottom: 10px;">
+          <div style="flex:1"><span style="font-size:11px; color:var(--text-sub); display:block; margin-bottom:5px;">아이콘</span><input type="number" id="setIconSize" class="setting-input" placeholder="60"></div>
+          <div style="flex:1"><span style="font-size:11px; color:var(--text-sub); display:block; margin-bottom:5px;">라벨</span><input type="number" id="setLabelSize" class="setting-input" placeholder="24"></div>
+        </div>
+        <button class="btn-modal btn-primary" onclick="saveUISettings()" style="margin-top:0;">설정 적용</button>
       </div>
     </div>
     <button class="btn-modal btn-secondary" onclick="document.getElementById('settingsModal').style.display='none'">닫기</button>
@@ -193,34 +214,52 @@
   </div>
 </div>
 
+<!-- 이동 모달 -->
+<div id="movePageModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-title">📂 페이지 이동</div>
+    <select id="moveTargetPage" class="setting-input" style="margin-bottom:20px;"></select>
+    <div class="btn-row"><button class="btn-modal btn-primary" onclick="executeMovePage()">이동</button><button class="btn-modal btn-secondary" onclick="document.getElementById('movePageModal').style.display='none'">취소</button></div>
+  </div>
+</div>
+
 <div class="creator-info">Developed by <b>DooSeok, JANG</b> (jds0616@airport.co.kr)</div>
 
 <script>
   let globalData = { categories: [], config: {} };
   let isAdmin = localStorage.getItem('kac_admin_mode') === '1';
+  let isPreview = localStorage.getItem('kac_preview_active') === '1';
   let searchIndex = [];
   let editingCardId = null;
+  let moveSrcIndex = -1;
+
+  // 페이지네이션
+  const itemsPerPage = 5;
+  let currentPage = 1;
+
+  // 드래그앤드롭
+  let dragSrcIndex = null;
 
   async function init() {
     setTheme(localStorage.getItem('kac_theme') || 'light');
-    
+    if(isPreview) document.body.classList.add('preview-active');
+
     try {
-      // 1. data.json 자동 로딩
       const res = await fetch('data.json?v=' + new Date().getTime());
       if(!res.ok) throw new Error("data.json not found");
       
       const data = await res.json();
       globalData = data;
       
-      // 2. 다른 페이지(facility.html 등)를 위해 LocalStorage 동기화 (Hydration)
       syncToLocalStorage(data);
-      
-      // 3. UI 적용
       applyConfig(data.config);
+      
+      // 페이지 초기화: 카테고리 개수에 맞춰 빈 슬롯(null) 채우기
+      ensurePageSlots();
+      
       renderCards();
       buildSearchIndex();
       
-      // 로딩 화면 제거
       setTimeout(() => {
         document.getElementById('loadingSpinner').style.opacity = '0';
         setTimeout(() => document.getElementById('loadingSpinner').style.display='none', 500);
@@ -234,42 +273,38 @@
     if(isAdmin) document.body.classList.add('admin-mode');
   }
 
-  // [핵심] JSON 데이터를 LocalStorage 구조로 변환하여 저장 (기존 페이지 호환성 유지)
+  // 페이지네이션을 위해 데이터를 5의 배수로 맞춤 (null로 채움)
+  function ensurePageSlots() {
+    // 실제 데이터만 남김 (null 제거)
+    const cleanList = globalData.categories.filter(c => c !== null);
+    globalData.categories = cleanList;
+
+    // 5의 배수가 되도록 null 추가
+    if (globalData.categories.length % itemsPerPage !== 0) {
+        const needed = itemsPerPage - (globalData.categories.length % itemsPerPage);
+        for(let i=0; i<needed; i++) globalData.categories.push(null);
+    }
+    // 데이터가 아예 없거나 페이지가 꽉 찼을때 관리자용으로 여유 페이지가 필요하면? 
+    // 기본적으로 데이터 개수만큼만 페이지 생성
+    if(globalData.categories.length === 0) {
+        for(let i=0; i<itemsPerPage; i++) globalData.categories.push(null);
+    }
+  }
+
   function syncToLocalStorage(data) {
     const order = [];
     data.categories.forEach(cat => {
-      order.push(cat.id);
-      
-      // 스타일 정보
-      localStorage.setItem(`kac_style_${cat.id}`, JSON.stringify({
-        name: cat.name, code: cat.code, color: cat.color
-      }));
-      
-      // 메뉴 정보
-      const menus = cat.menus.map(m => ({
-        dataId: m.id,
-        label: m.label,
-        line1: m.line1,
-        line2: m.line2,
-        link: m.link
-      }));
-      localStorage.setItem(`kac_menu_${cat.id}`, JSON.stringify(menus));
-      
-      // 각 메뉴의 과목 정보
-      cat.menus.forEach(m => {
-        localStorage.setItem(`kac_subs_${cat.id}_${m.id}`, JSON.stringify(m.subjects));
-      });
+      if(cat) {
+        order.push(cat.id);
+        localStorage.setItem(`kac_style_${cat.id}`, JSON.stringify({ name: cat.name, code: cat.code, color: cat.color }));
+        const menus = cat.menus.map(m => ({ dataId: m.id, label: m.label, line1: m.line1, line2: m.line2, link: m.link }));
+        localStorage.setItem(`kac_menu_${cat.id}`, JSON.stringify(menus));
+        cat.menus.forEach(m => { localStorage.setItem(`kac_subs_${cat.id}_${m.id}`, JSON.stringify(m.subjects)); });
+      } else {
+        order.push(null);
+      }
     });
-    
     localStorage.setItem('kac_index_order', JSON.stringify(order));
-    
-    // Config
-    if(data.config) {
-      if(data.config.iconSize) localStorage.setItem('kac_idx_icon_size', data.config.iconSize);
-      if(data.config.labelSize) localStorage.setItem('kac_idx_label_size', data.config.labelSize);
-      if(data.config.facIconSize) localStorage.setItem('kac_fac_icon_size', data.config.facIconSize);
-      if(data.config.facLabelSize) localStorage.setItem('kac_fac_label_size', data.config.facLabelSize);
-    }
   }
 
   function applyConfig(cfg) {
@@ -280,54 +315,124 @@
 
   function renderCards() {
     const container = document.getElementById('cardContainer');
-    container.innerHTML = '';
-    
-    globalData.categories.forEach((cat, idx) => {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.style.setProperty('--card-color', cat.color);
-      card.onclick = () => location.href = `facility.html?type=${cat.id}`;
-      
-      // 관리자 컨트롤
-      const ctrl = isAdmin ? `
-        <div class="card-ctrl" onclick="event.stopPropagation()">
-          <button class="btn-sm" onclick="openEdit('${cat.id}')">수정</button>
-          <button class="btn-sm btn-del" onclick="deleteCard('${idx}')">삭제</button>
-        </div>` : '';
+    const pagination = document.getElementById('pagination');
+    container.innerHTML = ''; 
+    pagination.innerHTML = '';
 
-      card.innerHTML = `
-        ${ctrl}
-        <div class="icon-box">${cat.code}</div>
-        <h2>${cat.name}</h2>
-      `;
-      container.appendChild(card);
+    const totalPages = Math.ceil(globalData.categories.length / itemsPerPage) || 1;
+    if(currentPage > totalPages) currentPage = totalPages;
+    const startIdx = (currentPage - 1) * itemsPerPage;
+    const pageItems = globalData.categories.slice(startIdx, startIdx + itemsPerPage);
+
+    pageItems.forEach((cat, i) => {
+      const globalIdx = startIdx + i;
+      
+      if(cat) { // 데이터 있는 카드
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.setProperty('--card-color', cat.color);
+        card.onclick = () => location.href = `facility.html?type=${cat.id}`;
+        
+        if(isAdmin && !isPreview) {
+          card.setAttribute('draggable', 'true');
+          card.ondragstart = (e) => handleDragStart(e, globalIdx);
+          card.ondragover = (e) => handleDragOver(e);
+          card.ondrop = (e) => handleDrop(e, globalIdx);
+          card.ondragend = (e) => handleDragEnd(e);
+          
+          card.innerHTML = `
+            <div class="card-ctrl" onclick="event.stopPropagation()">
+              <button class="btn-sm" onclick="openEdit('${cat.id}')">수정</button>
+              <button class="btn-sm btn-move" onclick="openMovePageModal(${globalIdx})">이동</button>
+              <button class="btn-sm btn-del" onclick="deleteCard('${globalIdx}')">삭제</button>
+            </div>
+            <div class="icon-box">${cat.code}</div>
+            <h2>${cat.name}</h2>
+          `;
+        } else {
+            // 일반 모드
+            card.innerHTML = `<div class="icon-box">${cat.code}</div><h2>${cat.name}</h2>`;
+        }
+        container.appendChild(card);
+      } else { // 빈 슬롯
+        const empty = document.createElement('div');
+        empty.className = 'card add-slot';
+        if(isAdmin && !isPreview) {
+           empty.innerHTML = '<div style="font-size:40px;">+</div><div>카테고리 추가</div>';
+           empty.onclick = () => openEdit('NEW', globalIdx);
+           // 빈 슬롯도 드롭 대상
+           empty.ondragover = (e) => handleDragOver(e);
+           empty.ondrop = (e) => handleDrop(e, globalIdx);
+        }
+        container.appendChild(empty);
+      }
     });
 
-    // 관리자용 추가 버튼
-    if(isAdmin) {
-      const addBtn = document.createElement('div');
-      addBtn.className = 'card add-slot';
-      addBtn.innerHTML = '<div style="font-size:40px;">+</div><div>카테고리 추가</div>';
-      addBtn.onclick = () => openEdit('NEW');
-      container.appendChild(addBtn);
+    // 페이지네이션 렌더링
+    for(let i=1; i<=totalPages; i++) {
+        const dot = document.createElement('div');
+        dot.className = `page-dot ${i === currentPage ? 'active' : ''}`;
+        dot.onclick = () => { currentPage = i; renderCards(); };
+        pagination.appendChild(dot);
     }
+    
+    // 관리자일 경우 페이지 추가 버튼
+    if(isAdmin && !isPreview) {
+        const addPageBtn = document.createElement('div');
+        addPageBtn.className = 'page-dot';
+        addPageBtn.style.background = 'transparent';
+        addPageBtn.style.border = '1px solid #cbd5e1';
+        addPageBtn.innerText = '+';
+        addPageBtn.style.textAlign = 'center';
+        addPageBtn.style.lineHeight = '10px';
+        addPageBtn.onclick = () => {
+            for(let k=0; k<itemsPerPage; k++) globalData.categories.push(null);
+            currentPage = Math.ceil(globalData.categories.length / itemsPerPage);
+            renderCards();
+        };
+        pagination.appendChild(addPageBtn);
+    }
+  }
+
+  // --- 드래그 앤 드롭 로직 ---
+  function handleDragStart(e, idx) {
+    dragSrcIndex = idx;
+    e.target.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  }
+  function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    return false;
+  }
+  function handleDrop(e, targetIdx) {
+    e.stopPropagation();
+    if(dragSrcIndex !== null && dragSrcIndex !== targetIdx) {
+        const srcItem = globalData.categories[dragSrcIndex];
+        const targetItem = globalData.categories[targetIdx];
+        
+        // 배열 위치 교환
+        globalData.categories[targetIdx] = srcItem;
+        globalData.categories[dragSrcIndex] = targetItem;
+        
+        renderCards();
+    }
+    return false;
+  }
+  function handleDragEnd(e) {
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('dragging'));
   }
 
   // --- 검색 로직 ---
   function buildSearchIndex() {
     searchIndex = [];
     globalData.categories.forEach(cat => {
+      if(!cat) return;
       cat.menus.forEach(menu => {
         menu.subjects.forEach(sub => {
           searchIndex.push({
-            name: sub.name,
-            type: cat.id,
-            typeName: cat.name,
-            menuName: menu.label,
-            menuId: menu.id,
-            subId: sub.id,
-            color: cat.color,
-            active: sub.active
+            name: sub.name, type: cat.id, typeName: cat.name,
+            menuName: menu.label, menuId: menu.id, subId: sub.id, color: cat.color, active: sub.active
           });
         });
       });
@@ -362,10 +467,37 @@
     const aSet = document.getElementById('adminSettings');
     gSet.style.display = isAdmin ? 'none' : 'block';
     aSet.style.display = isAdmin ? 'block' : 'none';
+    
+    // UI 값 채우기
+    if(isAdmin) {
+        document.getElementById('setIconSize').value = globalData.config.iconSize || 60;
+        document.getElementById('setLabelSize').value = globalData.config.labelSize || 24;
+        const pBtn = document.getElementById('modalPreviewBtn');
+        pBtn.textContent = isPreview ? "미리보기 종료" : "미리보기 시작";
+        pBtn.classList.toggle('btn-preview-active', isPreview);
+    }
     document.getElementById('settingsModal').style.display='flex';
   }
 
-  // SHA-256 암호화 (로그인과 동일 로직)
+  function saveUISettings() {
+    const is = document.getElementById('setIconSize').value;
+    const ls = document.getElementById('setLabelSize').value;
+    globalData.config.iconSize = parseInt(is);
+    globalData.config.labelSize = parseInt(ls);
+    
+    applyConfig(globalData.config);
+    document.getElementById('settingsModal').style.display='none';
+  }
+
+  function togglePreview() {
+    isPreview = !isPreview;
+    localStorage.setItem('kac_preview_active', isPreview ? '1' : '0');
+    document.body.classList.toggle('preview-active', isPreview);
+    document.getElementById('settingsModal').style.display='none';
+    renderCards();
+  }
+
+  // SHA-256
   async function sha256(message) {
       const msgBuffer = new TextEncoder().encode(message);
       const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -381,10 +513,8 @@
     } else {
       const pw = prompt("비밀번호 입력");
       if(!pw) return;
-      
       const inputHash = await sha256(pw.toUpperCase());
       const storedHash = localStorage.getItem('kac_access_pw_hash');
-
       if(inputHash === storedHash) {
         localStorage.setItem('kac_admin_mode','1');
         location.reload();
@@ -394,14 +524,17 @@
     }
   }
 
-  function openEdit(id) {
+  let tempSlotIdx = -1;
+  function openEdit(id, slotIdx = -1) {
     editingCardId = id;
+    tempSlotIdx = slotIdx;
+    
     if(id === 'NEW') {
       document.getElementById('editName').value = '';
       document.getElementById('editCode').value = '';
       document.getElementById('editColor').value = '#2563eb';
     } else {
-      const t = globalData.categories.find(c => c.id === id);
+      const t = globalData.categories.find(c => c && c.id === id);
       document.getElementById('editName').value = t.name;
       document.getElementById('editCode').value = t.code;
       document.getElementById('editColor').value = t.color;
@@ -415,24 +548,90 @@
     const color = document.getElementById('editColor').value;
     
     if(editingCardId === 'NEW') {
-      globalData.categories.push({
-        id: 'CAT_' + Date.now(),
-        name, code, color, menus: []
-      });
+      const newCat = { id: 'CAT_' + Date.now(), name, code, color, menus: [] };
+      if(tempSlotIdx !== -1) {
+          globalData.categories[tempSlotIdx] = newCat;
+      } else {
+          // 빈 슬롯 찾기
+          const emptyIdx = globalData.categories.indexOf(null);
+          if(emptyIdx !== -1) globalData.categories[emptyIdx] = newCat;
+          else globalData.categories.push(newCat);
+      }
     } else {
-      const t = globalData.categories.find(c => c.id === editingCardId);
+      const t = globalData.categories.find(c => c && c.id === editingCardId);
       if(t) { t.name = name; t.code = code; t.color = color; }
     }
     
-    // 메모리상 데이터 갱신 -> 로컬스토리지 동기화 -> 렌더링
     syncToLocalStorage(globalData);
     renderCards();
     document.getElementById('cardEditModal').style.display='none';
   }
 
+  // --- 페이지 이동 로직 ---
+  function openMovePageModal(idx) {
+    moveSrcIndex = idx;
+    const select = document.getElementById('moveTargetPage'); 
+    select.innerHTML = '';
+    const totalPages = Math.ceil(globalData.categories.length / itemsPerPage);
+    
+    for(let i=1; i<=totalPages; i++) {
+        const opt = document.createElement('option');
+        opt.value = i; opt.textContent = `${i} 페이지로 이동`;
+        select.appendChild(opt);
+    }
+    const newPageOpt = document.createElement('option');
+    newPageOpt.value = 'NEW'; newPageOpt.textContent = "새 페이지로 이동 (마지막)";
+    select.appendChild(newPageOpt);
+
+    document.getElementById('movePageModal').style.display='flex';
+  }
+
+  function executeMovePage() {
+    const val = document.getElementById('moveTargetPage').value;
+    const item = globalData.categories[moveSrcIndex];
+    
+    // 원래 자리를 null로 (빠지는 처리)
+    globalData.categories[moveSrcIndex] = null;
+
+    if(val === 'NEW') {
+        // 새 페이지 만들어서 넣기 (빈슬롯 채우기 로직 활용)
+        const currentLen = globalData.categories.length;
+        const newStart = Math.ceil(currentLen / itemsPerPage) * itemsPerPage;
+        // 부족한 만큼 null 채우기
+        for(let i=currentLen; i<newStart; i++) globalData.categories.push(null);
+        // 새 페이지 첫번째 자리에 넣기
+        globalData.categories.push(item);
+        // 나머지 4칸 채우기
+        for(let i=0; i<itemsPerPage-1; i++) globalData.categories.push(null);
+    } else {
+        const page = parseInt(val);
+        const startIdx = (page-1) * itemsPerPage;
+        const endIdx = startIdx + itemsPerPage;
+        
+        // 해당 페이지에 빈 공간(null) 찾기
+        let foundEmpty = -1;
+        for(let i=startIdx; i<endIdx; i++) {
+            if(globalData.categories[i] === null) { foundEmpty = i; break; }
+        }
+        
+        if(foundEmpty !== -1) {
+            globalData.categories[foundEmpty] = item;
+        } else {
+            alert("해당 페이지에 빈 공간이 없습니다.");
+            // 실패했으니 원래 자리 복구
+            globalData.categories[moveSrcIndex] = item;
+            return;
+        }
+    }
+    
+    // 정리 (배열 끝 불필요한 null 제거 - 선택사항이지만 깔끔하게)
+    document.getElementById('movePageModal').style.display='none';
+    renderCards();
+  }
+
   function deleteCard(idx) {
     if(confirm("정말 삭제하시겠습니까? (하위 메뉴도 모두 삭제됩니다)")) {
-      globalData.categories.splice(idx, 1);
+      globalData.categories[idx] = null; // 아예 삭제하지 않고 null로 비워둠 (자리 유지)
       syncToLocalStorage(globalData);
       renderCards();
     }
