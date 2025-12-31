@@ -3,6 +3,8 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8" />
+<!-- [수정] 모바일 화면 딱 맞춤 설정 (확대/축소 방지) -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>과목 리스트 - KAC CNS Training Platform</title>
 <!-- 로그인 체크 -->
 <script>
@@ -144,7 +146,7 @@
     border-left: 10px solid var(--theme-color); 
     cursor: pointer; color: var(--text-main);
     position: relative;
-    overflow: visible; /* 관리자 모드 아이콘이 밖으로 나가기 위해 필수 */
+    overflow: visible; 
   }
   .subject-card:hover { transform: translateX(10px); border-color: var(--theme-color); box-shadow: 0 5px 20px rgba(var(--theme-rgb), 0.2); }
   .subject-card.inactive { border-left-color: #94a3b8 !important; opacity: 0.7; background: #f8fafc; }
@@ -152,28 +154,25 @@
   .subject-card.dragging { opacity: 0.5; border: 2px dashed #94a3b8; background: rgba(255,255,255,0.05); }
   .subject-card.drag-over { border: 2px solid var(--theme-color); transform: scale(1.02); box-shadow: 0 0 15px rgba(var(--theme-rgb), 0.2); z-index: 10; }
 
-  /* [기본 위치] 게스트/미리보기 모드: 카드 내부 오른쪽 */
   .last-viewed-icon {
     position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
-    display: none; /* 기본 숨김 */
+    display: none; 
     align-items: center; justify-content: center; gap: 8px;
-    color: #10b981; /* Green */
+    color: #10b981; 
     font-size: 13px; font-weight: 800; white-space: nowrap;
     background: rgba(16, 185, 129, 0.1); padding: 8px 16px; border-radius: 50px; 
     border: 1px solid rgba(16, 185, 129, 0.3);
     z-index: 0; pointer-events: none;
   }
 
-  /* [관리자 모드 위치] 카드 바깥쪽 오른쪽으로 이동 */
   body.admin-mode .last-viewed-icon {
-    right: -140px !important; /* 카드 밖으로 밀어냄 */
-    background: #10b981; /* 배경색 진하게 */
+    right: -140px !important; 
+    background: #10b981; 
     color: #fff;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     z-index: 100;
   }
   
-  /* 활성화된 카드에만 표시 */
   .subject-card.last-viewed { border: 2px solid #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
   .subject-card.last-viewed .last-viewed-icon { display: flex; }
   .last-viewed-icon svg { width: 24px; height: 24px; fill: currentColor; }
@@ -206,7 +205,8 @@
   #pdfOverlay { 
     position: fixed; inset: 0; background: #000; display: none; z-index: 7000; overflow: hidden; 
     transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    touch-action: pan-y; /* 모바일 터치 액션 허용 */
+    /* [수정] 터치 동작 제어 (확대/축소 방지, 스크롤 막기) */
+    touch-action: none;
   }
   
   .v-header { position: absolute; top: 0; left: 0; right: 0; height: 80px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 8000; color: #fff; background: transparent; }
@@ -244,10 +244,23 @@
   .side-nav:hover svg { opacity: 0.7; }
   .nav-L { left: 0; } .nav-R { right: 0; }
   
-  .viewer-body { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; cursor: default; overflow: auto; scroll-behavior: smooth; }
+  /* [수정] 뷰어 바디: 스크롤 숨김 (화면에 딱 맞게) */
+  .viewer-body { 
+    width: 100%; height: 100%; 
+    display: flex; justify-content: center; align-items: center; 
+    cursor: default; 
+    overflow: hidden; /* 스크롤바 제거 */
+  }
   
-  canvas { box-shadow: 0 0 50px rgba(0,0,0,0.8); pointer-events: none; }
-  #pageContainer { position: relative; display: flex; justify-content: center; align-items: center; }
+  /* [수정] 캔버스: 화면에 꽉 차게, 비율 유지 */
+  canvas { 
+    box-shadow: 0 0 50px rgba(0,0,0,0.8); 
+    pointer-events: none; 
+    max-width: 100%; 
+    max-height: 100%; 
+    object-fit: contain; 
+  }
+  #pageContainer { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; }
 
   .bottom-nav { 
     position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); 
@@ -490,13 +503,10 @@
 
   async function init() {
     setTheme(localStorage.getItem('kac_theme') || 'light');
-    
-    // [수정] 관리자 모드 클래스 추가 로직 (CSS 적용을 위해 필수)
     if(isAdmin) document.body.classList.add('admin-mode');
-    
     if(isPreview) document.body.classList.add('preview-active');
     
-    // [수정] 1. data.json을 무조건 읽어서 보안 정보(globalSecurity) 업데이트
+    // [수정] 1. data.json을 무조건 읽어서 보안 정보 업데이트
     let serverData = null;
     try {
         const res = await fetch('data.json?v=' + Date.now());
@@ -513,7 +523,6 @@
 
     if (hasLocalData) {
         console.log("로컬 편집 데이터를 사용합니다.");
-        // 서버 데이터로 덮어쓰지 않음
     } else if (serverData) {
         // 로컬 데이터가 없으면 서버 데이터로 동기화
         console.log("서버 데이터로 동기화");
@@ -530,7 +539,6 @@
 
     if (!loaded) subjects = [];
 
-    // 스타일 적용
     const sData = localStorage.getItem(`kac_style_${type}`);
     const style = sData ? JSON.parse(sData) : { name: type, color: '#2563eb' };
     applyStyles(style);
@@ -540,25 +548,16 @@
     checkAutoOpen();
   }
 
-  // [추가] 페이지가 다시 보일 때 동기화 (Back-Forward Cache 대응)
+  // 동기화 이벤트
   window.addEventListener('pageshow', () => {
       const savedStatus = localStorage.getItem('kac_admin_mode') === '1';
-      // 현재 변수(isAdmin)와 저장된 상태(savedStatus)가 다르면 새로고침
-      if (isAdmin !== savedStatus) {
-          location.reload();
-      }
-      
+      if (isAdmin !== savedStatus) location.reload();
       const savedPreview = localStorage.getItem('kac_preview_active') === '1';
-      if(isPreview !== savedPreview) {
-          location.reload();
-      }
+      if(isPreview !== savedPreview) location.reload();
   });
 
-  // [추가] 다른 탭에서 변경 시 실시간 동기화
   window.addEventListener('storage', (e) => {
-      if (e.key === 'kac_admin_mode' || e.key === 'kac_preview_active') {
-          location.reload();
-      }
+      if (e.key === 'kac_admin_mode' || e.key === 'kac_preview_active') location.reload();
   });
 
   function loadSubjectsFromLocal() {
@@ -573,7 +572,6 @@
   function applyStyles(style) {
       const typeName = style.name || type;
       const themeColor = style.color || '#2563eb';
-      
       document.documentElement.style.setProperty('--theme-color', themeColor);
       document.documentElement.style.setProperty('--theme-rgb', hexToRgb(themeColor));
 
@@ -620,7 +618,6 @@
     document.getElementById('btnNight').classList.toggle('active', mode==='dark');
   }
 
-  // SHA-256 Auth
   async function sha256(message) {
       const msgBuffer = new TextEncoder().encode(message);
       const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -651,8 +648,6 @@
 
   async function render() {
     const list = document.getElementById('subjectList'); list.innerHTML = '';
-    
-    // [수정] 세션 스토리지에서 마지막으로 본 ID 가져오기 (방금 본 항목만 표시)
     const lastViewedId = sessionStorage.getItem('kac_last_viewed_id');
 
     for (let i = 0; i < subjects.length; i++) {
@@ -663,11 +658,8 @@
       const hasLink = !!sub.link;
       
       const card = document.createElement('div'); 
-      
-      // [수정] ID가 일치할 때만 last-viewed 클래스 추가
       const isLast = lastViewedId === sub.id;
       card.className = `subject-card ${isActive ? '' : 'inactive'} ${isLast ? 'last-viewed' : ''}`;
-      
       card.id = `card-${i}`; 
 
       if(isAdmin && !isPreview) {
@@ -688,10 +680,7 @@
             }
         } 
         
-        // [수정] 클릭 시 ID 저장 로직 추가
         sessionStorage.setItem('kac_last_viewed_id', sub.id);
-        
-        // UI 즉시 업데이트 (모든 카드 끄고 현재 카드만 켬)
         document.querySelectorAll('.subject-card').forEach(c => c.classList.remove('last-viewed'));
         card.classList.add('last-viewed');
 
@@ -730,11 +719,9 @@
       list.appendChild(addBtn);
     }
     
-    // AutoOpen 처리 및 헤더 겹침 체크
     checkAutoOpen();
     checkHeaderOverlap();
     
-    // 만약 lastViewed가 있다면 스크롤 이동
     if(lastViewedId) {
         const activeCard = document.querySelector('.subject-card.last-viewed');
         if(activeCard) {
@@ -1098,7 +1085,14 @@
     const newCanvas = document.createElement('canvas'); 
     const ctx = newCanvas.getContext('2d');
     const page = await pdfDoc.getPage(pageNum);
-    const baseScale = window.innerHeight / page.getViewport({scale:1}).height * 0.98;
+    
+    // [수정] 모바일 화면 맞춤형 스케일 계산 (너비/높이 중 작은 비율 선택)
+    const unscaledViewport = page.getViewport({ scale: 1 });
+    const scaleX = window.innerWidth / unscaledViewport.width;
+    const scaleY = window.innerHeight / unscaledViewport.height;
+    // 0.95를 곱해 약간의 여백을 두어 잘림 방지
+    const baseScale = Math.min(scaleX, scaleY) * 0.95; 
+    
     const viewport = page.getViewport({ scale: baseScale }); 
     newCanvas.width = viewport.width; newCanvas.height = viewport.height;
     
