@@ -65,9 +65,9 @@
   .result-item:hover { background: rgba(var(--theme-rgb), 0.05); }
   .res-title { font-weight: 700; color: var(--text-main); font-size: 14px; }
   .res-path { font-size: 11px; color: var(--text-sub); opacity: 0.6; margin-top: 4px; }
-  .res-tag { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; color: #fff; background: var(--theme-color); }
+  /* [수정] 태그 스타일 변경 */
+  .res-tag { font-size: 12px; font-weight: 900; padding: 4px 10px; border-radius: 6px; color: #fff; min-width: 50px; text-align: center; }
 
-  /* 주야간 버튼 */
   .theme-toggle { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); margin-right: 10px; }
   .theme-btn { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; opacity: 0.5; }
   .theme-btn.active { background: #fff; opacity: 1; color: var(--navy); }
@@ -75,28 +75,15 @@
 
   .settings-btn { display: flex; padding: 8px; width: 34px; height: 34px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.3s; color: #cbd5e1; }
 
-  /* 메인 콘텐츠 */
   main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
   #trainGrid { gap: 30px; width: 100%; max-width: 1250px; margin: 0 auto; align-items: flex-start; }
   
   .menu-card { 
-    background: var(--bg-card); 
-    width: 280px;      
-    min-height: 280px; 
-    height: auto;      
-    padding: 35px 25px; 
-    border-radius: 20px; 
-    box-shadow: var(--shadow); 
-    border: 2px solid transparent; 
-    cursor: pointer; 
-    transition: 0.3s; 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    justify-content: flex-start; 
-    position: relative; 
-    border-top: 6px solid var(--theme-color); 
-    color: var(--text-main); 
+    background: var(--bg-card); width: 280px; min-height: 280px; height: auto; padding: 35px 25px; 
+    border-radius: 20px; box-shadow: var(--shadow); border: 2px solid transparent; 
+    cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; 
+    align-items: center; justify-content: flex-start; position: relative; 
+    border-top: 6px solid var(--theme-color); color: var(--text-main); 
   }
   .menu-card:hover { border-color: var(--theme-color); transform: translateY(-10px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
   .menu-card.dragging { opacity: 0.4; border: 2px dashed var(--theme-color); }
@@ -120,7 +107,6 @@
   .page-dot.active { background: var(--navy); color: #fff; transform: scale(1.1); }
   .page-dot.drag-target { background: var(--theme-color) !important; color: #fff !important; transform: scale(1.2); }
 
-  /* 로딩 인디케이터 */
   #loadingSpinner { position: fixed; inset: 0; background: var(--bg-main); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
   .spinner { width: 50px; height: 50px; border: 5px solid #cbd5e1; border-top-color: #2563eb; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
 
@@ -481,11 +467,6 @@
   // --- 검색 로직 ---
   function buildSearchIndex() { 
     searchIndex = []; 
-    // 현재 페이지만 검색? -> 아니오, 전체 데이터 검색 필요
-    // 하지만 facility 페이지에서는 현재 카테고리 내부 검색 혹은 전체 검색? 
-    // 헤더 검색창은 '전체' 검색을 지향하므로 전체 데이터를 훑어야 함.
-    // 하지만 localStorage에는 모든 데이터가 있음.
-    
     // index order 순회
     const order = JSON.parse(localStorage.getItem('kac_index_order') || '[]');
     order.forEach(tid => {
@@ -496,8 +477,14 @@
             const subs = JSON.parse(localStorage.getItem(`kac_subs_${tid}_${m.dataId}`) || '[]');
             subs.forEach(sub => {
                 searchIndex.push({ 
-                    name: sub.name, type: tid, typeName: s.name, 
-                    menuName: m.label, menuId: m.dataId, subId: sub.id, color: s.color 
+                    name: sub.name, 
+                    type: tid, 
+                    code: s.code || tid.substring(0,1), // [수정] 코드 추가
+                    typeName: s.name, 
+                    menuName: m.label, 
+                    menuId: m.dataId, 
+                    subId: sub.id, 
+                    color: s.color 
                 });
             });
         });
@@ -514,7 +501,8 @@
     sRes.innerHTML = matches.map(i => `
       <div class="result-item" onclick="location.href='viewer_list.html?type=${i.type}&menu=${encodeURIComponent(i.menuName)}&id=${i.menuId}&autoOpen=${i.subId}'">
         <div><div class="res-title">${i.name}</div><div class="res-path">${i.typeName} > ${i.menuName}</div></div>
-        <div class="res-tag" style="background:${i.color}">${i.type}</div>
+        <!-- [수정] code 출력 -->
+        <div class="res-tag" style="background:${i.color}">${i.code}</div>
       </div>
     `).join('') || '<div style="padding:15px; text-align:center;">결과 없음</div>';
     sRes.classList.add('active');
