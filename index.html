@@ -86,7 +86,6 @@
   }
   .card:hover { transform: translateY(-10px); border-color: var(--card-color); box-shadow: 0 15px 30px -5px var(--card-color); }
   
-  /* 드래그 앤 드롭 스타일 */
   .card.dragging { opacity: 0.4; border: 2px dashed #94a3b8; }
   .card.drag-over { transform: scale(1.05); box-shadow: 0 0 20px rgba(37, 99, 235, 0.3); border-color: #2563eb; z-index: 10; }
 
@@ -181,8 +180,9 @@
     <div id="adminSettings" style="display:none;">
       <div class="setting-group">
         <label class="setting-label">🛠️ 시스템 관리</label>
-        <div style="display:flex; gap:10px;">
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
           <button class="btn-modal btn-danger" onclick="toggleAdmin()">로그아웃</button>
+          <button class="btn-modal btn-secondary" onclick="changePassword()">비밀번호 변경</button>
           <button id="modalPreviewBtn" class="btn-modal btn-secondary" onclick="togglePreview()">미리보기 모드 시작</button>
         </div>
         <button class="btn-modal btn-success" onclick="exportJsonData()">변경사항 저장 (data.json 다운로드)</button>
@@ -522,6 +522,32 @@
         alert("비밀번호 불일치");
       }
     }
+  }
+
+  // 비밀번호 변경 함수
+  async function changePassword() {
+    const currentHash = localStorage.getItem('kac_access_pw_hash');
+    const inputCurrent = prompt("현재 비밀번호를 입력하세요.");
+    if(!inputCurrent) return;
+
+    const inputHash = await sha256(inputCurrent.toUpperCase());
+    if(inputHash !== currentHash) {
+        alert("현재 비밀번호가 틀렸습니다.");
+        return;
+    }
+
+    const newPw = prompt("새로운 비밀번호를 입력하세요.");
+    if(!newPw) return;
+
+    const confirmPw = prompt("새로운 비밀번호 확인 (한 번 더 입력)");
+    if(newPw !== confirmPw) {
+        alert("비밀번호가 일치하지 않습니다.");
+        return;
+    }
+
+    const newHash = await sha256(newPw.toUpperCase());
+    localStorage.setItem('kac_access_pw_hash', newHash);
+    alert("비밀번호가 성공적으로 변경되었습니다.");
   }
 
   let tempSlotIdx = -1;
