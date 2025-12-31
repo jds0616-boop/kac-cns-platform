@@ -284,35 +284,27 @@
     setTheme(localStorage.getItem('kac_theme') || 'light');
     if(isPreview) document.body.classList.add('preview-active');
     
-    // [수정] 로컬 데이터가 존재하는지 확인
+    // [중요] data.json에서 보안 정보 무조건 로드
+    let serverData = null;
+    try {
+        const res = await fetch('data.json?v=' + Date.now());
+        if(res.ok) serverData = await res.json();
+    } catch(e) { console.log("data.json 로드 실패"); }
+
+    if(serverData && serverData.security) {
+        globalSecurity = serverData.security;
+    }
+
+    // 로컬 데이터 확인
     const hasLocalData = localStorage.getItem('kac_index_order');
 
     if (hasLocalData) {
         console.log("로컬 편집 데이터를 사용합니다.");
-        // 보안 설정 업데이트를 위해 data.json을 읽긴 하지만, 
-        // 내용을 덮어쓰는 syncToLocalStorage는 실행하지 않음
-        try {
-            const res = await fetch('data.json?v=' + new Date().getTime());
-            if(res.ok) {
-                const data = await res.json();
-                if(data.security && data.security.admin_pw) {
-                    globalSecurity = data.security;
-                }
-            }
-        } catch(e) { console.log("보안 설정 로드 실패 (기본값 사용)"); }
-
-    } else {
-        // 로컬 데이터가 없으면 초기화 진행 (data.json Fetch 및 Sync)
-        try {
-            const res = await fetch('data.json?v=' + new Date().getTime());
-            if(res.ok) {
-                const data = await res.json();
-                if(data.security && data.security.admin_pw) {
-                    globalSecurity = data.security;
-                }
-                syncToLocalStorage(data);
-            }
-        } catch(e) { console.error("data.json 로딩 실패, 로컬 데이터 사용"); }
+        // 로컬 데이터가 있으므로 syncToLocalStorage(덮어쓰기)는 건너뜀
+    } else if (serverData) {
+        // 로컬 데이터가 없으면 서버 데이터로 동기화
+        console.log("서버 데이터로 동기화");
+        syncToLocalStorage(serverData);
     }
 
     document.getElementById('loadingSpinner').style.opacity = '0';
@@ -325,24 +317,15 @@
     buildSearchIndex();
   }
 
-  // [추가] 페이지가 다시 보일 때 동기화 (Back-Forward Cache 대응)
   window.addEventListener('pageshow', () => {
       const savedStatus = localStorage.getItem('kac_admin_mode') === '1';
-      if (isAdmin !== savedStatus) {
-          location.reload();
-      }
-      
+      if (isAdmin !== savedStatus) location.reload();
       const savedPreview = localStorage.getItem('kac_preview_active') === '1';
-      if(isPreview !== savedPreview) {
-          location.reload();
-      }
+      if(isPreview !== savedPreview) location.reload();
   });
 
-  // [추가] 다른 탭에서 변경 시 실시간 동기화
   window.addEventListener('storage', (e) => {
-      if (e.key === 'kac_admin_mode' || e.key === 'kac_preview_active') {
-          location.reload();
-      }
+      if (e.key === 'kac_admin_mode' || e.key === 'kac_preview_active') location.reload();
   });
 
   function syncToLocalStorage(data) {
@@ -486,26 +469,20 @@
     } else { 
         const pw = prompt("비밀번호"); if(!pw) return;
         const inputHash = await sha256(pw.toUpperCase());
-        // localStorage가 아닌 data.json에서 로드된 변수 사용
+        // [수정] globalSecurity 변수를 사용하여 비밀번호 비교
         const storedHash = globalSecurity.admin_pw;
         if(inputHash === storedHash) { localStorage.setItem('kac_admin_mode','1'); location.reload(); } else alert('비밀번호 불일치');
     } 
   }
   
   function setTheme(m) { document.body.classList.toggle('dark-mode', m==='dark'); localStorage.setItem('kac_theme', m); const bD = document.getElementById('btnDay'), bN = document.getElementById('btnNight'); if(bD) bD.classList.toggle('active', m==='light'); if(bN) bN.classList.toggle('active', m==='dark'); }
-  function saveUISettings() { 
-      const iSize = document.getElementById('setFacIconSize').value;
-      const lSize = document.getElementById('setFacLabelSize').value;
-      localStorage.setItem('kac_fac_icon_size', iSize); 
-      localStorage.setItem('kac_fac_label_size', lSize); 
-      loadStyles(); 
-      alert('적용됨'); 
-  }
+  function saveUISettings() { localStorage.setItem('kac_fac_icon_size', document.getElementById('setFacIconSize').value); localStorage.setItem('kac_fac_label_size', document.getElementById('setFacLabelSize').value); loadStyles(); alert('적용됨'); }
   function loadStyles() { document.documentElement.style.setProperty('--icon-size-fac', (localStorage.getItem('kac_fac_icon_size')||'28')+'px'); document.documentElement.style.setProperty('--label-size-fac', (localStorage.getItem('kac_fac_label_size')||'18')+'px'); }
 
   function exportJsonData() {
     try {
         const newData = { meta: { version: "2.0", lastUpdated: new Date().toISOString().split('T')[0] }, config: {}, categories: [] };
+        // [수정] globalSecurity 포함
         newData.security = globalSecurity; 
         
         newData.config.iconSize = localStorage.getItem('kac_idx_icon_size') || 60;
