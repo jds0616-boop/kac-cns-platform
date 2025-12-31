@@ -10,6 +10,7 @@
   }
 </script>
 <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>시설 관리 - KAC CNS Training Platform</title>
 <style>
   @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -146,14 +147,44 @@
   .bulk-row { display: grid; grid-template-columns: 40px 80px 80px 140px 1fr; gap: 8px; padding: 8px; border-bottom: 1px solid #f1f5f9; align-items: center; }
   .bulk-input { padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center; font-size: 12px; background: #f8fafc; outline: none; }
 
+  /* [모바일 반응형 최적화 - 세로쓰기 방지 및 아이콘 크기 조정] */
   @media (max-width: 768px) {
     header { padding: 0 15px; }
     .header-left, .header-right { display: none !important; }
     .header-center { width: 100%; max-width: 100%; }
-    #trainGrid { gap: 12px !important; display: flex !important; flex-wrap: wrap !important; justify-content: center !important; }
-    .menu-card { width: calc(50% - 10px) !important; min-height: 200px !important; padding: 20px 10px !important; }
-    .icon-circle { min-width: 65px !important; min-height: 65px !important; margin-bottom: 15px !important; font-size: 24px !important; }
-    .menu-label { font-size: 15px !important; }
+    
+    #trainGrid {
+      gap: 12px !important;
+      display: flex !important;
+      flex-wrap: wrap !important;
+      justify-content: center !important;
+    }
+
+    .menu-card {
+      /* 카드 크기 축소 및 패딩 최적화 */
+      width: calc(50% - 10px) !important;
+      min-height: 180px !important;
+      padding: 20px 10px !important;
+    }
+
+    .icon-circle {
+      /* 아이콘 크기 축소 */
+      min-width: 50px !important;
+      min-height: 50px !important;
+      width: 50px !important; 
+      height: 50px !important;
+      margin-bottom: 15px !important;
+      font-size: 20px !important;
+      padding: 0 !important;
+    }
+    
+    .menu-label { 
+      /* 글자 세로쓰기 방지 (keep-all 제거) */
+      font-size: 14px !important; 
+      word-break: break-word !important; 
+      line-height: 1.3;
+    }
+    
     .admin-ctrl { flex-direction: column; width: 100%; gap: 4px; }
     .admin-ctrl button { width: 100%; }
   }
@@ -284,26 +315,29 @@
     setTheme(localStorage.getItem('kac_theme') || 'light');
     if(isPreview) document.body.classList.add('preview-active');
     
-    // [중요] data.json에서 보안 정보 무조건 로드
+    // 1. 현재 관리자 모드인지 확인 (인덱스 파일과 동일하게 localStorage 사용)
+    const isAdminSession = localStorage.getItem('kac_admin_mode') === '1';
+
+    // 2. 서버 데이터 가져오기
     let serverData = null;
     try {
         const res = await fetch('data.json?v=' + Date.now());
         if(res.ok) serverData = await res.json();
-    } catch(e) { console.log("data.json 로드 실패"); }
+    } catch(e) { console.error("data.json load failed"); }
 
-    if(serverData && serverData.security) {
-        globalSecurity = serverData.security;
-    }
-
-    // 로컬 데이터 확인
+    // 3. 로컬 데이터 확인
     const hasLocalData = localStorage.getItem('kac_index_order');
 
-    if (hasLocalData) {
-        console.log("로컬 편집 데이터를 사용합니다.");
-        // 로컬 데이터가 있으므로 syncToLocalStorage(덮어쓰기)는 건너뜀
-    } else if (serverData) {
-        // 로컬 데이터가 없으면 서버 데이터로 동기화
-        console.log("서버 데이터로 동기화");
+    // [핵심 로직 변경]
+    // 관리자(수정 권한 있음)이고 + 수정 중인 데이터가 있으면 -> 로컬 데이터 유지
+    if (isAdminSession && hasLocalData) {
+        console.log("🛠️ Admin: Using Local Data");
+        if(serverData && serverData.security) globalSecurity = serverData.security;
+    } 
+    // 일반 사용자이거나 + 로컬 데이터가 없으면 -> 서버 데이터로 강제 덮어쓰기
+    else if (serverData) {
+        console.log("🔄 User: Syncing with Server");
+        if(serverData.security) globalSecurity = serverData.security;
         syncToLocalStorage(serverData);
     }
 
