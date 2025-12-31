@@ -533,10 +533,14 @@
 <div class="creator-info">Developed by <b>DooSeok, JANG</b> (jds0616@airport.co.kr)</div>
 
 <script>
+  // [보안 및 설정] 초기 변수 및 PDF Worker 설정
   pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
-  
+
   const params = new URLSearchParams(location.search);
-  const type = params.get('type'), menuName = params.get('menu'), menuId = params.get('id');
+  const type = params.get('type');
+  const menuName = params.get('menu');
+  const menuId = params.get('id');
+  
   let isAdmin = localStorage.getItem('kac_admin_mode') === '1';
   let isPreview = localStorage.getItem('kac_preview_active') === '1';
 
@@ -546,66 +550,83 @@
 
   let subjects = [];
 
+  // [중요] UI 요소 변수 선언 (함수 실행 전 미리 확보)
+  let pdfDoc = null, pageNum = 1, isRendering = false, isDragging = false;
+  const canvasContainer = document.getElementById('pageContainer');
+  const viewerBody = document.getElementById('viewerBody');
+  const overlay = document.getElementById('pdfOverlay');
+  const hitArea = document.getElementById('progressHitArea');
+  const audioPlayer = document.getElementById('mainAudio');
+  
+  // 검색 관련 요소
+  const searchInput = document.getElementById('searchInput');
+  const searchDropdown = document.getElementById('searchDropdown');
+  const sOverlay = document.getElementById('searchOverlay');
+
   async function init() {
-    setTheme(localStorage.getItem('kac_theme') || 'light');
-    if(isAdmin) document.body.classList.add('admin-mode');
-    if(isPreview) document.body.classList.add('preview-active');
-    
-    // 1. 현재 관리자 모드인지 확인
-    const isAdminSession = localStorage.getItem('kac_admin_mode') === '1';
-
-    // 2. 서버 데이터 가져오기
-    let serverData = null;
     try {
-        const res = await fetch('data.json?v=' + Date.now());
-        if(res.ok) serverData = await res.json();
-    } catch(e) { console.log("data.json 로드 실패"); }
-
-    if(serverData && serverData.security) {
-        globalSecurity = serverData.security;
-    }
-
-    // 3. 로컬 데이터 확인 및 분기
-    const hasLocalData = localStorage.getItem('kac_index_order');
-    let loaded = loadSubjectsFromLocal();
-
-    // [핵심] 관리자이고 로컬 데이터가 있으면 로컬 사용
-    if (isAdminSession && hasLocalData) {
-        console.log("🛠️ Admin: Using Local Data");
-    } 
-    // [핵심] 일반 사용자이거나 로컬 데이터가 없으면 서버 데이터 강제 동기화 & 즉시 로드
-    else if (serverData) {
-        console.log("🔄 User: Syncing with Server & Direct Load");
+        setTheme(localStorage.getItem('kac_theme') || 'light');
+        if(isAdmin) document.body.classList.add('admin-mode');
+        if(isPreview) document.body.classList.add('preview-active');
         
-        // LocalStorage에 쓰기 (백그라운드)
-        serverData.categories.forEach(cat => {
-            if(cat) {
-                cat.menus.forEach(m => {
-                    localStorage.setItem(`kac_subs_${cat.id}_${m.id}`, JSON.stringify(m.subjects));
-                });
-            }
-        });
+        // 1. 서버 데이터 가져오기
+        let serverData = null;
+        try {
+            const res = await fetch('data.json?v=' + Date.now());
+            if(res.ok) serverData = await res.json();
+        } catch(e) { console.log("data.json 로드 실패, 로컬 데이터만 사용합니다."); }
 
-        // [중요] 서버 데이터에서 현재 페이지에 해당하는 subjects 직접 찾아서 로드 (동기화 지연 방지)
-        const currentCat = serverData.categories.find(c => c && c.id === type);
-        if(currentCat) {
-            const currentMenu = currentCat.menus.find(m => m.id === menuId);
-            if(currentMenu) {
-                subjects = currentMenu.subjects;
-                loaded = true;
+        if(serverData && serverData.security) {
+            globalSecurity = serverData.security;
+        }
+
+        // 2. 로컬 데이터 확인 및 분기
+        const hasLocalData = localStorage.getItem('kac_index_order');
+        let loaded = loadSubjectsFromLocal();
+
+        // 관리자 모드이거나 로컬 데이터가 있으면 로컬 우선
+        if (isAdmin && hasLocalData) {
+            console.log("🛠️ Admin: Using Local Data");
+        } 
+        // 일반 사용자이거나 로컬 데이터가 없으면 서버 데이터로 강제 동기화
+        else if (serverData) {
+            console.log("🔄 User: Syncing with Server");
+            
+            // LocalStorage에 쓰기 (백그라운드)
+            serverData.categories.forEach(cat => {
+                if(cat) {
+                    cat.menus.forEach(m => {
+                        localStorage.setItem(`kac_subs_${cat.id}_${m.id}`, JSON.stringify(m.subjects));
+                    });
+                }
+            });
+
+            // 서버 데이터에서 현재 페이지에 해당하는 subjects 직접 찾아서 로드 (동기화 지연 방지)
+            const currentCat = serverData.categories.find(c => c && c.id === type);
+            if(currentCat) {
+                const currentMenu = currentCat.menus.find(m => m.id === menuId);
+                if(currentMenu) {
+                    subjects = currentMenu.subjects;
+                    loaded = true;
+                }
             }
         }
+
+        if (!loaded) subjects = [];
+
+        // 스타일 적용
+        const sData = localStorage.getItem(`kac_style_${type}`);
+        const style = sData ? JSON.parse(sData) : { name: type, color: '#2563eb' };
+        applyStyles(style);
+
+        render();
+        buildSearchIndex();
+        checkAutoOpen();
+
+    } catch (err) {
+        console.error("Initialization Error:", err);
+        alert("페이지 로딩 중 오류가 발생했습니다.\n" + err.message);
     }
-
-    if (!loaded) subjects = [];
-
-    const sData = localStorage.getItem(`kac_style_${type}`);
-    const style = sData ? JSON.parse(sData) : { name: type, color: '#2563eb' };
-    applyStyles(style);
-
-    render();
-    buildSearchIndex();
-    checkAutoOpen();
   }
 
   // 동기화 이벤트
@@ -621,31 +642,37 @@
   });
 
   function loadSubjectsFromLocal() {
+      if(!type || !menuId) return false;
       const data = localStorage.getItem(`kac_subs_${type}_${menuId}`);
       if (data) {
-          subjects = JSON.parse(data);
-          return true;
+          try {
+            subjects = JSON.parse(data);
+            return true;
+          } catch(e) { return false; }
       }
       return false;
   }
 
   function applyStyles(style) {
-      const typeName = style.name || type;
+      const typeName = style.name || type || 'Unknown';
       const themeColor = style.color || '#2563eb';
       
       document.documentElement.style.setProperty('--theme-color', themeColor);
       document.documentElement.style.setProperty('--theme-rgb', hexToRgb(themeColor));
 
       const bc = document.getElementById('breadcrumbContainer');
-      const midSpan = document.createElement('span');
-      midSpan.innerHTML = ` &nbsp;>&nbsp; ${typeName}`;
-      midSpan.className = 'crumb-link';
-      midSpan.onclick = () => location.href = `facility.html?type=${type}`;
-      const currSpan = document.createElement('span');
-      currSpan.innerHTML = ` &nbsp;>&nbsp; ${menuName}`;
-      currSpan.className = 'crumb-current';
-      bc.appendChild(midSpan);
-      bc.appendChild(currSpan);
+      if(bc) {
+          bc.innerHTML = '';
+          const midSpan = document.createElement('span');
+          midSpan.innerHTML = ` &nbsp;>&nbsp; ${typeName}`;
+          midSpan.className = 'crumb-link';
+          midSpan.onclick = () => location.href = `facility.html?type=${type}`;
+          const currSpan = document.createElement('span');
+          currSpan.innerHTML = ` &nbsp;>&nbsp; ${menuName || '상세'}`;
+          currSpan.className = 'crumb-current';
+          bc.appendChild(midSpan);
+          bc.appendChild(currSpan);
+      }
   }
 
   function hexToRgb(hex) {
@@ -679,7 +706,6 @@
     document.getElementById('btnNight').classList.toggle('active', mode==='dark');
   }
 
-  // SHA-256 Auth
   async function sha256(message) {
       const msgBuffer = new TextEncoder().encode(message);
       const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -711,10 +737,10 @@
   async function render() {
     const list = document.getElementById('subjectList'); list.innerHTML = '';
     
-    // [수정] 세션 스토리지에서 마지막으로 본 ID 가져오기 (방금 본 항목만 표시)
+    // 세션 스토리지에서 마지막으로 본 ID 가져오기
     const lastViewedId = sessionStorage.getItem('kac_last_viewed_id');
 
-    // [추가] 데이터가 없을 경우 안내 메시지
+    // 데이터가 없을 경우 안내 메시지
     if(subjects.length === 0) {
         list.innerHTML = `<div style="text-align:center; padding:50px; color:var(--text-sub); opacity:0.7;">
             <div style="font-size:40px; margin-bottom:10px;">📭</div>
@@ -766,7 +792,6 @@
       const statusTag = isActive ? '' : '<span class="status-pill dev">🚧 개발중</span>';
       const moveBtn = (isAdmin && !isPreview) ? `<button class="btn-action" onclick="event.stopPropagation(); openMoveModal(${i})" title="이동"><svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M20,6h-8l-2-2H4C2.89,4,2,4.89,2,6v12c0,1.1,0.89,2,2,2h16c1.1,0,2-0.9,2-2V8C22,6.9,21.1,6,20,6z M20,18H4V6h5.17l2,2H20V18z M12,14h2v2h-2v2l-3.5-3.5L12,11V14z"/></svg> 이동</button>` : '';
 
-      // [수정] 모바일 아이콘 처리: 텍스트 부분에 클래스 추가
       const pdfLabel = hasPdf 
         ? `<span class="status-pill on"><span class="pill-icon">📄</span> <span class="status-text">PDF ${sub.pdfName}</span></span>` 
         : `<span class="status-pill"><span class="pill-icon">📄</span> <span class="status-text">PDF 미등록</span></span>`;
@@ -777,7 +802,7 @@
 
       card.innerHTML = `
         <div class="last-viewed-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
             <span>Last Viewed</span>
         </div>
         <div>
@@ -800,6 +825,7 @@
       list.appendChild(addBtn);
     }
     
+    // AutoOpen 처리 및 헤더 겹침 체크
     checkAutoOpen();
     checkHeaderOverlap();
     
@@ -809,6 +835,313 @@
              setTimeout(() => activeCard.scrollIntoView({ behavior: 'smooth', block: 'center' }), 500);
         }
     }
+  }
+
+  function openSettings() {
+    const adminBtn = document.getElementById('modalAdminBtn');
+    const batchGroup = document.getElementById('batchAdminGroup');
+    const previewBtn = document.getElementById('modalPreviewBtn');
+
+    if(isAdmin) {
+        adminBtn.textContent = "관리자 로그아웃";
+        adminBtn.className = "btn-modal btn-danger";
+        previewBtn.style.display = 'block';
+        batchGroup.style.display = 'block';
+    } else {
+        adminBtn.textContent = "관리자 로그인";
+        adminBtn.className = "btn-modal btn-primary";
+        previewBtn.style.display = 'none';
+        batchGroup.style.display = 'none';
+    }
+
+    if(isPreview) {
+        previewBtn.textContent = "미리보기 종료";
+        previewBtn.style.background = "#10b981";
+        previewBtn.style.color = "#fff";
+    } else {
+        previewBtn.textContent = "미리보기 시작";
+        previewBtn.style.background = "";
+        previewBtn.style.color = "";
+    }
+    document.getElementById('settingsModal').style.display = 'flex';
+  }
+
+  function openBatchAddModal() {
+    if(!isAdmin) return alert("관리자 권한이 필요합니다.");
+    document.getElementById('batchModalTitle').textContent = "📋 일괄 자료 등록 (신규 추가)";
+    const tbody = document.getElementById('batchTbody'); tbody.innerHTML = '';
+    for(let i=0; i<30; i++) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${i+1}</td><td><input type="text" class="batch-input" placeholder="과목명" name="name"></td><td><input type="text" class="batch-input" placeholder="PDF 경로" name="pdf"></td><td><input type="text" class="batch-input" placeholder="링크 주소" name="link"></td><td><input type="text" class="batch-input" placeholder="오디오 경로" name="audio"></td>`;
+        tbody.appendChild(tr);
+    }
+    document.getElementById('batchSaveBtn').onclick = saveBatchAddData;
+    document.getElementById('settingsModal').style.display = 'none';
+    document.getElementById('batchModal').style.display = 'flex';
+  }
+
+  function openBatchEditModal() {
+    if(!isAdmin) return alert("관리자 권한이 필요합니다.");
+    document.getElementById('batchModalTitle').textContent = "📋 일괄 자료 수정 (기존 목록)";
+    const tbody = document.getElementById('batchTbody'); tbody.innerHTML = '';
+    subjects.forEach((sub, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${i+1}</td><td><input type="text" class="batch-input" value="${sub.name}" name="name" data-idx="${i}"></td><td><input type="text" class="batch-input" value="${sub.pdfName || ''}" name="pdf" data-idx="${i}"></td><td><input type="text" class="batch-input" value="${sub.link || ''}" name="link" data-idx="${i}"></td><td><input type="text" class="batch-input" value="${sub.audioName || ''}" name="audio" data-idx="${i}"></td>`;
+        tbody.appendChild(tr);
+    });
+    document.getElementById('batchSaveBtn').onclick = saveBatchEditData;
+    document.getElementById('settingsModal').style.display = 'none';
+    document.getElementById('batchModal').style.display = 'flex';
+  }
+
+  function saveBatchAddData() {
+    const rows = document.querySelectorAll('#batchTbody tr');
+    let addedCount = 0;
+    for(const row of rows) {
+        const name = row.querySelector('input[name="name"]').value.trim();
+        const pdf = row.querySelector('input[name="pdf"]').value.trim();
+        const link = row.querySelector('input[name="link"]').value.trim();
+        const audio = row.querySelector('input[name="audio"]').value.trim();
+        if(name) {
+            const newId = Date.now().toString() + Math.random().toString(36).substr(2, 5);
+            subjects.push({ id: newId, name: name, active: true, pdfName: pdf, link: link, audioName: audio });
+            addedCount++;
+        }
+    }
+    if(addedCount > 0) { saveSubjects(); alert(`${addedCount}개 과목이 등록되었습니다.`); document.getElementById('batchModal').style.display = 'none'; } 
+    else { alert("입력된 과목이 없습니다."); }
+  }
+
+  function saveBatchEditData() {
+    const rows = document.querySelectorAll('#batchTbody tr');
+    let updatedCount = 0;
+    for(const row of rows) {
+        const nameInput = row.querySelector('input[name="name"]');
+        const idx = parseInt(nameInput.getAttribute('data-idx'));
+        if(subjects[idx]) {
+            subjects[idx].name = nameInput.value.trim();
+            subjects[idx].pdfName = row.querySelector('input[name="pdf"]').value.trim();
+            subjects[idx].link = row.querySelector('input[name="link"]').value.trim();
+            subjects[idx].audioName = row.querySelector('input[name="audio"]').value.trim();
+            updatedCount++;
+        }
+    }
+    if(updatedCount > 0) { saveSubjects(); alert("수정되었습니다."); document.getElementById('batchModal').style.display = 'none'; }
+  }
+
+  // 검색 인덱스 생성
+  let allSubjectsIndex = [];
+  function buildSearchIndex() {
+    allSubjectsIndex = [];
+    try {
+        const order = JSON.parse(localStorage.getItem('kac_index_order') || '[]');
+        order.forEach(t => {
+            if(!t) return;
+            const ms = JSON.parse(localStorage.getItem(`kac_menu_${t}`) || '[]');
+            const s = JSON.parse(localStorage.getItem(`kac_style_${t}`) || '{}');
+            ms.forEach(m => {
+                const subData = localStorage.getItem(`kac_subs_${t}_${m.dataId}`);
+                if(subData) {
+                    JSON.parse(subData).forEach(sub => {
+                        allSubjectsIndex.push({ 
+                            name: sub.name, type: t, code: s.code || t.substring(0,1), 
+                            menuName: m.label, menuId: m.dataId, subId: sub.id, 
+                            active: sub.active !== false, link: sub.link, color: s.color 
+                        });
+                    });
+                }
+            });
+        });
+    } catch(e) { console.error("Search Index Build Error", e); }
+  }
+
+  // 검색 기능 이벤트 리스너
+  if(searchInput) {
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.trim().toLowerCase();
+        if(query.length === 0) { searchDropdown.classList.remove('active'); return; }
+        const matches = allSubjectsIndex.filter(item => item.name.toLowerCase().includes(query) || item.menuName.toLowerCase().includes(query));
+        renderSearchResults(matches, query);
+    });
+    
+    searchInput.addEventListener('focus', () => { 
+        document.body.classList.add('search-mode');
+        sOverlay.classList.add('active');
+        if(searchInput.value.trim().length > 0) searchDropdown.classList.add('active'); 
+    });
+  }
+  
+  if(sOverlay) {
+    sOverlay.addEventListener('click', () => {
+        document.body.classList.remove('search-mode');
+        sOverlay.classList.remove('active');
+        searchDropdown.classList.remove('active');
+    });
+  }
+
+  function renderSearchResults(list, query) {
+    searchDropdown.innerHTML = ''; searchDropdown.classList.add('active');
+    if(list.length === 0) { searchDropdown.innerHTML = `<div style="padding:15px; text-align:center; opacity:0.6;">검색 결과 없음</div>`; return; }
+    list.forEach(item => {
+      const div = document.createElement('div'); div.className = 'result-item';
+      const highlightName = item.name.replace(new RegExp(`(${query})`, 'gi'), `<span style="color:${item.color}; font-weight:900;">$1</span>`);
+      div.innerHTML = `<div class="result-info"><div class="res-title">${highlightName}</div><div class="res-path">${item.type} > ${item.menuName}</div></div><div class="res-tag" style="background:${item.color}">${item.code}</div>`;
+      div.onclick = () => { 
+        if(!item.active && !isAdmin) { alert("현재 과정 개발중으로 사용 불가합니다."); return; } 
+        if(item.link) { window.open(item.link, '_blank'); return; }
+        location.href = `viewer_list.html?type=${item.type}&menu=${encodeURIComponent(item.menuName)}&id=${item.menuId}&autoOpen=${item.subId}`; 
+      };
+      searchDropdown.appendChild(div);
+    });
+  }
+
+  function checkAutoOpen() {
+    const autoId = params.get('autoOpen');
+    if(autoId && subjects.length > 0) { 
+        const targetIdx = subjects.findIndex(s => s.id === autoId); 
+        if(targetIdx !== -1) setTimeout(() => openViewer(targetIdx), 300); 
+    }
+  }
+
+  let dragSrcIndex = null;
+  function handleDragStart(e, index) { dragSrcIndex = index; e.target.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
+  function handleDragOver(e) { if (e.preventDefault) e.preventDefault(); e.target.closest('.subject-card').classList.add('drag-over'); e.dataTransfer.dropEffect = 'move'; return false; }
+  function handleDrop(e, index) { if (e.stopPropagation) e.stopPropagation(); e.target.closest('.subject-card').classList.remove('drag-over'); if (dragSrcIndex !== null && dragSrcIndex !== index) { const movedItem = subjects.splice(dragSrcIndex, 1)[0]; subjects.splice(index, 0, movedItem); saveSubjects(); } return false; }
+  function handleDragEnd(e) { document.querySelectorAll('.subject-card').forEach(card => { card.classList.remove('dragging'); card.classList.remove('drag-over'); }); }
+
+  function saveSubjects() { localStorage.setItem(`kac_subs_${type}_${menuId}`, JSON.stringify(subjects)); render(); }
+  
+  async function deleteSubject(i) {
+    const input = prompt("삭제하려면 관리자 비밀번호를 입력하세요.");
+    if (!input) return;
+
+    const inputHash = await sha256(input.toUpperCase());
+    const targetHash = globalSecurity.admin_pw;
+
+    if(inputHash === targetHash) {
+        if(confirm("정말 삭제하시겠습니까?")) {
+            subjects.splice(i, 1);
+            saveSubjects();
+            alert("삭제되었습니다.");
+        }
+    } else {
+        alert("비밀번호가 일치하지 않습니다.");
+    }
+  }
+
+  function saveFiles() {
+    const idx = currentEditIdx;
+    const name = document.getElementById('editSubjectName').value;
+    const isActiveStr = document.getElementById('editActiveStatus').value; 
+    
+    if(!name) return alert("과목명은 필수입니다.");
+    
+    subjects[idx].name = name;
+    subjects[idx].active = (isActiveStr === 'true');
+    subjects[idx].pdfName = document.getElementById('inputPdfName').value.trim();
+    subjects[idx].link = document.getElementById('inputLinkUrl').value.trim();
+    subjects[idx].audioName = document.getElementById('inputAudioName').value.trim();
+    
+    saveSubjects();
+    document.getElementById('uploadModal').style.display = 'none';
+  }
+
+  function openUploadMenu(idx) { 
+    currentEditIdx = idx; 
+    const sub = subjects[idx];
+    document.getElementById('editSubjectName').value = sub.name; 
+    document.getElementById('editActiveStatus').value = (sub.active !== false).toString();
+    document.getElementById('inputPdfName').value = sub.pdfName || '';
+    document.getElementById('inputLinkUrl').value = sub.link || '';
+    document.getElementById('inputAudioName').value = sub.audioName || '';
+    document.getElementById('uploadModal').style.display = 'flex'; 
+  }
+
+  let movingSubjectIndex = -1;
+  function openMoveModal(idx) {
+    movingSubjectIndex = idx;
+    const select = document.getElementById('moveTargetSelect');
+    select.innerHTML = '<option value="">-- 이동할 메뉴 선택 --</option>';
+    const types = JSON.parse(localStorage.getItem('kac_index_order') || '[]');
+    
+    types.forEach(t => {
+      if(!t) return;
+      const menus = JSON.parse(localStorage.getItem(`kac_menu_${t}`) || '[]');
+      const style = JSON.parse(localStorage.getItem(`kac_style_${t}`) || '{}');
+      if(menus.length > 0) {
+        const group = document.createElement('optgroup');
+        group.label = style.name || t;
+        menus.forEach(m => {
+          if (t === type && m.dataId === menuId) return;
+          const option = document.createElement('option');
+          option.value = `${t}|${m.dataId}`;
+          option.textContent = m.label;
+          group.appendChild(option);
+        });
+        if (group.children.length > 0) select.appendChild(group);
+      }
+    });
+    document.getElementById('moveModal').style.display = 'flex';
+  }
+
+  function executeMove() {
+    const value = document.getElementById('moveTargetSelect').value;
+    if(!value) return alert("선택해주세요.");
+    const [targetType, targetMenuId] = value.split('|');
+    const subjectToMove = subjects[movingSubjectIndex];
+    const targetKey = `kac_subs_${targetType}_${targetMenuId}`;
+    const targetSubjects = JSON.parse(localStorage.getItem(targetKey) || '[]');
+    targetSubjects.push(subjectToMove);
+    localStorage.setItem(targetKey, JSON.stringify(targetSubjects));
+    subjects.splice(movingSubjectIndex, 1);
+    saveSubjects();
+    alert("이동되었습니다.");
+    document.getElementById('moveModal').style.display = 'none';
+  }
+
+  async function openViewer(idx) {
+    document.querySelectorAll('.subject-card').forEach(c => c.classList.remove('last-viewed'));
+    viewingIndex = idx; 
+
+    const sub = subjects[idx];
+    let pdfName = sub.pdfName;
+    
+    if(!pdfName) return alert("등록된 PDF 파일이 없습니다.");
+    if (!pdfName.toLowerCase().endsWith('.pdf')) pdfName += '.pdf';
+
+    const pdfUrl = `files/${pdfName}`;
+    const audioUrl = sub.audioName ? `files/${sub.audioName}` : null;
+
+    overlay.style.display = 'block';
+    
+    try {
+      if (overlay.requestFullscreen) await overlay.requestFullscreen();
+      else if (overlay.webkitRequestFullscreen) await overlay.webkitRequestFullscreen();
+    } catch(e) { console.log(e); }
+
+    document.getElementById('vTitle').textContent = sub.name;
+    
+    try {
+        const task = pdfjsLib.getDocument(pdfUrl);
+        pdfDoc = await task.promise;
+        viewerBody.innerHTML = ''; viewerBody.appendChild(canvasContainer); canvasContainer.innerHTML = '';
+        pageNum = 1; renderPage('none');
+    } catch(e) {
+        alert("PDF 로드 실패: " + pdfUrl + "\n파일 경로를 확인하세요.");
+        closeViewer();
+        return;
+    }
+    
+    const audioBtn = document.getElementById('audioBtn');
+    if(audioUrl) {
+        audioPlayer.src = audioUrl;
+        audioPlayer.load();
+        audioBtn.classList.remove('disabled');
+    } else {
+        audioPlayer.src = "";
+        audioBtn.classList.add('disabled');
+    }
+    updateIconState(); 
   }
 
   function toggleFullScreen(e) {
@@ -862,23 +1195,20 @@
     if(isRendering) return; isRendering = true;
     if(pdfDoc) { document.getElementById('pageFill').style.width = `${((pageNum-1)/(pdfDoc.numPages-1))*100}%`; document.getElementById('progressFlag').textContent = `${pageNum} / ${pdfDoc.numPages}`; }
     
-    // [수정] 페이지 전환 효과: 캔버스를 교체하기 전에 애니메이션 클래스 추가
     if(canvasContainer.firstChild) {
         canvasContainer.firstChild.classList.remove('slide-active');
     }
 
     const newCanvas = document.createElement('canvas'); 
-    // 초기에는 약간 아래에 투명하게 배치
     newCanvas.className = 'slide-enter';
     
     const ctx = newCanvas.getContext('2d');
     const page = await pdfDoc.getPage(pageNum);
     
-    // [수정] 반응형 스케일 계산 (가로/세로 모두 대응)
     const unscaledViewport = page.getViewport({ scale: 1 });
     const scaleX = window.innerWidth / unscaledViewport.width;
     const scaleY = window.innerHeight / unscaledViewport.height;
-    const baseScale = Math.min(scaleX, scaleY) * 0.98; // 여백 약간 줌
+    const baseScale = Math.min(scaleX, scaleY) * 0.98;
     
     const viewport = page.getViewport({ scale: baseScale }); 
     newCanvas.width = viewport.width; newCanvas.height = viewport.height;
@@ -888,7 +1218,6 @@
     canvasContainer.innerHTML = ''; 
     canvasContainer.appendChild(newCanvas);
     
-    // 렌더링 완료 후 애니메이션 시작 (약간의 딜레이 필요)
     requestAnimationFrame(() => {
         newCanvas.classList.add('slide-active');
     });
@@ -905,9 +1234,11 @@
     if(e.button === 2) prevPage(); 
   }
 
-  hitArea.addEventListener('mousedown', (e) => { e.preventDefault(); e.stopPropagation(); isDragging = true; hitArea.classList.add('dragging'); updateProgress(e); });
-  window.addEventListener('mousemove', (e) => { if(!isDragging || !pdfDoc) return; updateProgress(e); });
-  window.addEventListener('mouseup', () => { if(isDragging) { isDragging = false; hitArea.classList.remove('dragging'); renderPage('none'); } });
+  if(hitArea) {
+      hitArea.addEventListener('mousedown', (e) => { e.preventDefault(); e.stopPropagation(); isDragging = true; hitArea.classList.add('dragging'); updateProgress(e); });
+      window.addEventListener('mousemove', (e) => { if(!isDragging || !pdfDoc) return; updateProgress(e); });
+      window.addEventListener('mouseup', () => { if(isDragging) { isDragging = false; hitArea.classList.remove('dragging'); renderPage('none'); } });
+  }
 
   function updateProgress(e) {
     const rect = hitArea.getBoundingClientRect(); const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
@@ -928,7 +1259,6 @@
     } 
   };
 
-  // 모바일 터치 스와이프 기능
   let touchStartY = 0;
   let touchEndY = 0;
   const minSwipeDistance = 50; 
@@ -951,6 +1281,7 @@
       }
   }
   
+  // 모든 설정이 끝난 후 초기화 실행
   init();
 </script>
 </body>
