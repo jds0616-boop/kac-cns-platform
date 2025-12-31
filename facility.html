@@ -287,6 +287,27 @@
     buildSearchIndex();
   }
 
+  // [추가] 페이지가 다시 보일 때 동기화 (Back-Forward Cache 대응)
+  window.addEventListener('pageshow', () => {
+      const savedStatus = localStorage.getItem('kac_admin_mode') === '1';
+      // 현재 변수(isAdmin)와 저장된 상태(savedStatus)가 다르면 새로고침
+      if (isAdmin !== savedStatus) {
+          location.reload();
+      }
+      
+      const savedPreview = localStorage.getItem('kac_preview_active') === '1';
+      if(isPreview !== savedPreview) {
+          location.reload();
+      }
+  });
+
+  // [추가] 다른 탭에서 변경 시 실시간 동기화
+  window.addEventListener('storage', (e) => {
+      if (e.key === 'kac_admin_mode' || e.key === 'kac_preview_active') {
+          location.reload();
+      }
+  });
+
   function syncToLocalStorage(data) {
     const order = [];
     data.categories.forEach(cat => {
