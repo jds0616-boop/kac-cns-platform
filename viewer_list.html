@@ -39,19 +39,18 @@
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
   body { background: var(--bg-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: var(--text-main); transition: 0.3s; }
 
-  /* 검색 오버레이 계층 구조 명확화 */
+  /* 검색 오버레이 */
   #searchOverlay { 
     position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
     z-index: 1500; display: none; backdrop-filter: blur(4px); animation: fadeIn 0.3s; 
   }
   #searchOverlay.active { display: block; }
   
-  /* 검색 모드일 때 헤더와 검색창을 최상위로 */
+  /* 검색 모드 스타일 */
   body.search-mode header { z-index: 2000; position: relative; }
   body.search-mode .header-center { z-index: 2001; }
   body.search-mode .search-dropdown { z-index: 2002; }
   
-  /* 검색 모드일 때 배경 흐림 처리 */
   body.search-mode main, 
   body.search-mode .bottom-nav,
   body.search-mode .header-left,
@@ -71,7 +70,6 @@
   .header-center { position: absolute; left: 50%; transform: translateX(-50%); width: 600px; max-width: 100%; z-index: 20; transition: width 0.3s; }
   .header-right { display: flex; align-items: center; gap: 15px; min-width: 250px; justify-content: flex-end; z-index: 10; }
 
-  /* 헤더 겹침 방지 */
   body.header-overlap .header-left { opacity: 0; pointer-events: none; width: 0; overflow: hidden; min-width: 0; }
   body.header-overlap .header-center { width: 80%; }
 
@@ -152,7 +150,7 @@
   .subject-card.dragging { opacity: 0.5; border: 2px dashed #94a3b8; background: rgba(255,255,255,0.05); }
   .subject-card.drag-over { border: 2px solid var(--theme-color); transform: scale(1.02); box-shadow: 0 0 15px rgba(var(--theme-rgb), 0.2); z-index: 10; }
 
-  /* [수정] Last Viewed 아이콘 위치 조정 및 클릭 통과 처리 */
+  /* [수정] Last Viewed 위치 조정 (관리자 모드 시 왼쪽으로 이동) */
   .last-viewed-icon {
     position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
     display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -161,13 +159,13 @@
     font-size: 13px; font-weight: 800; white-space: nowrap;
     background: rgba(16, 185, 129, 0.1); padding: 8px 16px; border-radius: 50px; 
     border: 1px solid rgba(16, 185, 129, 0.3);
-    z-index: 0; /* 버튼보다 아래로 */
-    pointer-events: none; /* 클릭을 통과시켜 버튼 클릭 가능하게 함 */
+    z-index: 0; 
+    pointer-events: none; /* 클릭 통과 (버튼 클릭 방해 금지) */
   }
   
-  /* 관리자 모드일 때만 Last Viewed 아이콘을 왼쪽으로 밀어냄 */
+  /* 관리자 모드일 때는 버튼들과 겹치지 않게 왼쪽으로 밀기 */
   body.admin-mode .last-viewed-icon {
-    right: 240px; /* 버튼 3개 공간(약 220px) 확보 */
+    right: 280px; 
   }
 
   .subject-card.last-viewed { border: 2px solid #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
@@ -189,9 +187,8 @@
   .status-pill.dev { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
   body.dark-mode .status-pill.dev { background: rgba(255,255,255,0.1); color: #94a3b8; border-color: rgba(255,255,255,0.1); }
 
-  /* [수정] 버튼 그룹을 최상위로 */
+  /* [수정] 버튼 그룹을 최상위로 (Last Viewed보다 위) */
   .ctrl-btns { display: flex; gap: 10px; z-index: 50; position: relative; }
-  
   .btn-action { 
     padding: 8px 14px; border-radius: 8px; border: 1px solid var(--btn-border); background: var(--btn-bg); 
     font-size: 12px; font-weight: 700; color: var(--btn-text); cursor: pointer; transition: 0.2s; 
@@ -632,8 +629,17 @@
         card.ondragend = (e) => handleDragEnd(e);
       }
       
+      // [수정] 클릭 이벤트 로직 개선 (개발중 팝업)
       card.onclick = () => { 
-        if(!isActive && !isAdmin) { alert("현재 과정 개발중으로 사용 불가합니다."); return; } 
+        if(!isActive) { 
+            if(isAdmin) {
+                if(!confirm("현재 개발 중인 과정입니다.\n관리자 권한으로 열람하시겠습니까?")) return;
+            } else {
+                alert("현재 과정 개발중으로 사용 불가합니다."); 
+                return; 
+            }
+        } 
+        
         if(hasLink) {
             window.open(sub.link, '_blank');
             document.querySelectorAll('.subject-card').forEach(c => c.classList.remove('last-viewed'));
@@ -770,15 +776,19 @@
   let allSubjectsIndex = [];
   function buildSearchIndex() {
     allSubjectsIndex = [];
-    ['COMM', 'NAV', 'SURV', 'RF', 'ATC'].forEach(t => { // 타입 확장시 여기 추가
+    const order = JSON.parse(localStorage.getItem('kac_index_order') || '[]');
+    order.forEach(t => {
+      if(!t) return;
       const ms = JSON.parse(localStorage.getItem(`kac_menu_${t}`) || '[]');
+      const s = JSON.parse(localStorage.getItem(`kac_style_${t}`) || '{}');
       ms.forEach(m => {
         const subData = localStorage.getItem(`kac_subs_${t}_${m.dataId}`);
         if(subData) {
           JSON.parse(subData).forEach(sub => {
             allSubjectsIndex.push({ 
-                name: sub.name, type: t, menuName: m.label, menuId: m.dataId, subId: sub.id, 
-                active: sub.active !== false, link: sub.link
+                name: sub.name, type: t, code: s.code || t.substring(0,1), 
+                menuName: m.label, menuId: m.dataId, subId: sub.id, 
+                active: sub.active !== false, link: sub.link, color: s.color 
             });
           });
         }
@@ -811,13 +821,8 @@
     if(list.length === 0) { searchDropdown.innerHTML = `<div style="padding:15px; text-align:center; opacity:0.6;">검색 결과 없음</div>`; return; }
     list.forEach(item => {
       const div = document.createElement('div'); div.className = 'result-item';
-      // style from localstorage or default
-      const itemStyle = JSON.parse(localStorage.getItem(`kac_style_${item.type}`) || '{"color":"#2563eb"}');
-      const itemColor = itemStyle.color;
-
-      const highlightName = item.name.replace(new RegExp(`(${query})`, 'gi'), `<span style="color:${itemColor}; font-weight:900;">$1</span>`);
-      div.innerHTML = `<div class="result-info"><div class="res-title">${highlightName}</div><div class="res-path">${item.type} > ${item.menuName}</div></div><div class="res-tag" style="background:${itemColor}">${item.type}</div>`;
-      
+      const highlightName = item.name.replace(new RegExp(`(${query})`, 'gi'), `<span style="color:${item.color}; font-weight:900;">$1</span>`);
+      div.innerHTML = `<div class="result-info"><div class="res-title">${highlightName}</div><div class="res-path">${item.type} > ${item.menuName}</div></div><div class="res-tag" style="background:${item.color}">${item.code}</div>`;
       div.onclick = () => { 
         if(!item.active && !isAdmin) { alert("현재 과정 개발중으로 사용 불가합니다."); return; } 
         if(item.link) { window.open(item.link, '_blank'); return; }
@@ -839,7 +844,35 @@
   function handleDragEnd(e) { document.querySelectorAll('.subject-card').forEach(card => { card.classList.remove('dragging'); card.classList.remove('drag-over'); }); }
 
   function saveSubjects() { localStorage.setItem(`kac_subs_${type}_${menuId}`, JSON.stringify(subjects)); render(); }
-  function deleteSubject(i) { if(confirm("삭제하시겠습니까?")) { subjects.splice(i, 1); saveSubjects(); } }
+  
+  // [수정] 삭제 보안 로직 강화
+  async function deleteSubject(i) {
+    const input = prompt("삭제하려면 관리자 비밀번호를 입력하세요.");
+    if (!input) return;
+
+    // 입력값 해싱
+    const inputHash = await sha256(input.toUpperCase());
+    
+    // data.json에서 실제 비번 해시 가져오기 (없으면 기본값)
+    let targetHash = "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c"; 
+    try {
+        const res = await fetch('data.json?v=' + new Date().getTime());
+        if(res.ok) {
+            const data = await res.json();
+            if(data.security && data.security.admin_pw) targetHash = data.security.admin_pw;
+        }
+    } catch(e) { console.warn("비번 확인용 data.json 로드 실패"); }
+
+    if(inputHash === targetHash) {
+        if(confirm("정말 삭제하시겠습니까?")) {
+            subjects.splice(i, 1);
+            saveSubjects();
+            alert("삭제되었습니다.");
+        }
+    } else {
+        alert("비밀번호가 일치하지 않습니다.");
+    }
+  }
 
   function saveFiles() {
     const idx = currentEditIdx;
