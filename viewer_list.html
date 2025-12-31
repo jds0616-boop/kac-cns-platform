@@ -477,38 +477,43 @@ body.admin-mode .last-viewed-icon {
   let isAdmin = localStorage.getItem('kac_admin_mode') === '1';
   let isPreview = localStorage.getItem('kac_preview_active') === '1';
 
-  // [수정] 데이터 로딩 전략: localStorage 확인 후 없으면 data.json fetch 시도
+  // [보안 수정] 전역 보안 객체
+  let globalSecurity = {
+      admin_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c"
+  };
+
   let subjects = [];
 
   async function init() {
     setTheme(localStorage.getItem('kac_theme') || 'light');
     if(isPreview) document.body.classList.add('preview-active');
 
-    // 1. LocalStorage에서 먼저 시도
     let loaded = loadSubjectsFromLocal();
 
-    // 2. 없으면 data.json fetch (직접 접속 등의 경우)
-    if (!loaded) {
-        try {
-            const res = await fetch('data.json?v=' + new Date().getTime());
-            if(res.ok) {
-                const data = await res.json();
-                // 데이터 동기화 (간이)
-                data.categories.forEach(cat => {
-                    if(cat) {
-                        cat.menus.forEach(m => {
-                            localStorage.setItem(`kac_subs_${cat.id}_${m.id}`, JSON.stringify(m.subjects));
-                        });
-                    }
-                });
-                loaded = loadSubjectsFromLocal(); // 다시 로드
+    // 1. data.json fetch (데이터 및 보안 정보 로드)
+    try {
+        const res = await fetch('data.json?v=' + new Date().getTime());
+        if(res.ok) {
+            const data = await res.json();
+            
+            // [보안 수정] 보안 정보 동기화
+            if(data.security && data.security.admin_pw) {
+                globalSecurity = data.security;
             }
-        } catch(e) { console.error("데이터 로딩 실패"); }
-    }
 
-    if (!loaded) {
-        subjects = []; // 끝까지 없으면 빈 배열
-    }
+            // 데이터 동기화
+            data.categories.forEach(cat => {
+                if(cat) {
+                    cat.menus.forEach(m => {
+                        localStorage.setItem(`kac_subs_${cat.id}_${m.id}`, JSON.stringify(m.subjects));
+                    });
+                }
+            });
+            if (!loaded) loaded = loadSubjectsFromLocal(); 
+        }
+    } catch(e) { console.error("데이터 로딩 실패"); }
+
+    if (!loaded) subjects = [];
 
     // 스타일 적용
     const sData = localStorage.getItem(`kac_style_${type}`);
@@ -586,13 +591,14 @@ body.admin-mode .last-viewed-icon {
       return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
+  // [보안 수정] globalSecurity 사용
   async function toggleAdmin() {
     if(isAdmin) { 
         if(confirm("로그아웃?")) { localStorage.setItem('kac_admin_mode','0'); location.reload(); } 
     } else { 
         const pw = prompt("비밀번호"); if(!pw) return;
         const inputHash = await sha256(pw.toUpperCase());
-        const storedHash = localStorage.getItem('kac_access_pw_hash');
+        const storedHash = globalSecurity.admin_pw;
         if(inputHash === storedHash) { localStorage.setItem('kac_admin_mode','1'); location.reload(); } 
         else alert('비밀번호 불일치');
     } 
@@ -630,7 +636,6 @@ body.admin-mode .last-viewed-icon {
         card.ondragend = (e) => handleDragEnd(e);
       }
       
-      // [수정] 클릭 이벤트 로직 개선 (개발중 팝업)
       card.onclick = () => { 
         if(!isActive) { 
             if(isAdmin) {
@@ -773,7 +778,6 @@ body.admin-mode .last-viewed-icon {
     if(updatedCount > 0) { saveSubjects(); alert("수정되었습니다."); document.getElementById('batchModal').style.display = 'none'; }
   }
 
-  // --- 검색 로직 ---
   let allSubjectsIndex = [];
   function buildSearchIndex() {
     allSubjectsIndex = [];
@@ -846,23 +850,13 @@ body.admin-mode .last-viewed-icon {
 
   function saveSubjects() { localStorage.setItem(`kac_subs_${type}_${menuId}`, JSON.stringify(subjects)); render(); }
   
-  // [수정] 삭제 보안 로직 강화
+  // [보안 수정] globalSecurity를 참조하도록 변경
   async function deleteSubject(i) {
     const input = prompt("삭제하려면 관리자 비밀번호를 입력하세요.");
     if (!input) return;
 
-    // 입력값 해싱
     const inputHash = await sha256(input.toUpperCase());
-    
-    // data.json에서 실제 비번 해시 가져오기 (없으면 기본값)
-    let targetHash = "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c"; 
-    try {
-        const res = await fetch('data.json?v=' + new Date().getTime());
-        if(res.ok) {
-            const data = await res.json();
-            if(data.security && data.security.admin_pw) targetHash = data.security.admin_pw;
-        }
-    } catch(e) { console.warn("비번 확인용 data.json 로드 실패"); }
+    const targetHash = globalSecurity.admin_pw;
 
     if(inputHash === targetHash) {
         if(confirm("정말 삭제하시겠습니까?")) {
