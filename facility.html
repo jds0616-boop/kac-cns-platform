@@ -147,12 +147,20 @@
   .bulk-row { display: grid; grid-template-columns: 40px 80px 80px 140px 1fr; gap: 8px; padding: 8px; border-bottom: 1px solid #f1f5f9; align-items: center; }
   .bulk-input { padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center; font-size: 12px; background: #f8fafc; outline: none; }
 
-  /* [모바일 반응형 최적화 - 세로쓰기 방지 및 아이콘 크기 조정] */
+  /* [모바일 반응형 최적화 및 UI 디자인 개선] */
   @media (max-width: 768px) {
     header { padding: 0 15px; }
     .header-left, .header-right { display: none !important; }
     .header-center { width: 100%; max-width: 100%; }
     
+    /* 검색창 디자인 개선 */
+    .header-search {
+      font-size: 14px;
+      padding: 10px 20px 10px 45px;
+      background-size: 18px;
+      background-position: 15px center;
+    }
+
     #trainGrid {
       gap: 12px !important;
       display: flex !important;
@@ -187,6 +195,19 @@
     
     .admin-ctrl { flex-direction: column; width: 100%; gap: 4px; }
     .admin-ctrl button { width: 100%; }
+
+    /* 하단 네비게이션 개선 */
+    .bottom-nav {
+      width: 90%;
+      bottom: 20px;
+      padding: 12px 0;
+      justify-content: center;
+      gap: 30px;
+      border-radius: 20px;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(10px);
+    }
+    .nav-item { font-size: 14px; gap: 6px; }
   }
 </style>
 </head>
@@ -315,7 +336,7 @@
     setTheme(localStorage.getItem('kac_theme') || 'light');
     if(isPreview) document.body.classList.add('preview-active');
     
-    // 1. 현재 관리자 모드인지 확인 (인덱스 파일과 동일하게 localStorage 사용)
+    // 1. 현재 관리자 모드인지 확인
     const isAdminSession = localStorage.getItem('kac_admin_mode') === '1';
 
     // 2. 서버 데이터 가져오기
@@ -328,13 +349,12 @@
     // 3. 로컬 데이터 확인
     const hasLocalData = localStorage.getItem('kac_index_order');
 
-    // [핵심 로직 변경]
-    // 관리자(수정 권한 있음)이고 + 수정 중인 데이터가 있으면 -> 로컬 데이터 유지
+    // [핵심 로직] viewer_list.html과 동일하게 적용
     if (isAdminSession && hasLocalData) {
         console.log("🛠️ Admin: Using Local Data");
         if(serverData && serverData.security) globalSecurity = serverData.security;
     } 
-    // 일반 사용자이거나 + 로컬 데이터가 없으면 -> 서버 데이터로 강제 덮어쓰기
+    // 일반 사용자이거나 로컬 데이터가 없으면 서버 데이터 강제 동기화
     else if (serverData) {
         console.log("🔄 User: Syncing with Server");
         if(serverData.security) globalSecurity = serverData.security;
