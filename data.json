@@ -3,9 +3,15 @@
     "version": "2.0",
     "lastUpdated": "2025-12-31"
   },
+  "security": {
+    "entry_pw": "489a97f30f7aabd25773bf71342c8373537bc3a355be07161b7ab9280e09bb6f",
+    "admin_pw": "6bb303bfa434223a00981c7c3cba271b042a30f172565fae0e9349fb160010bd"
+  },
   "config": {
-    "iconSize": 110,
-    "labelSize": 28
+    "iconSize": "110",
+    "labelSize": "28",
+    "facIconSize": "30",
+    "facLabelSize": "25"
   },
   "categories": [
     {
@@ -158,8 +164,7 @@
               "name": "항공정보통신시설 개요 및 분류",
               "pdfName": "/COMM/통신이론_CH1",
               "audioName": "",
-              "active": true,
-              "link": ""
+              "active": false
             },
             {
               "id": "1766846325095",
@@ -171,12 +176,6 @@
               "id": "1766846274557",
               "name": "전파의 이해",
               "pdfName": "/COMM/통신이론_CH3",
-              "audioName": ""
-            },
-            {
-              "id": "1766846298704",
-              "name": "전파혼신 및 전파환경조사",
-              "pdfName": "/COMM/통신이론_CH11",
               "audioName": ""
             }
           ]
@@ -243,6 +242,12 @@
               "id": "1766848023961",
               "name": "안테나 점검 및 유지관리 실무",
               "pdfName": "/COMM/통신이론_CH10",
+              "audioName": ""
+            },
+            {
+              "id": "1766846298704",
+              "name": "전파혼신 및 전파환경조사",
+              "pdfName": "/COMM/통신이론_CH11",
               "audioName": ""
             }
           ]
@@ -602,11 +607,10 @@
           "subjects": [
             {
               "id": "1767059122125",
-              "name": "거리측정시설(통합본)",
+              "name": "거리축정시설(통합본)",
               "active": true,
               "pdfName": "/NAV/DME이론교재",
-              "audioName": "",
-              "link": ""
+              "audioName": ""
             }
           ]
         },
@@ -758,9 +762,5 @@
     null,
     null,
     null
-  ],
-  "security": {
-    "entry_pw": "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c",
-    "admin_pw": "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c"
-  }
+  ]
 }
