@@ -65,7 +65,6 @@
   .result-item:hover { background: rgba(var(--theme-rgb), 0.05); }
   .res-title { font-weight: 700; color: var(--text-main); font-size: 14px; }
   .res-path { font-size: 11px; color: var(--text-sub); opacity: 0.6; margin-top: 4px; }
-  /* [수정] 태그 스타일 변경 */
   .res-tag { font-size: 12px; font-weight: 900; padding: 4px 10px; border-radius: 6px; color: #fff; min-width: 50px; text-align: center; }
 
   .theme-toggle { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); margin-right: 10px; }
@@ -255,16 +254,25 @@
   let isPreview = localStorage.getItem('kac_preview_active') === '1';
   let menus = [], searchIndex = [], currentEditIdx = -1, currentPage = 1, dragSrcIndex = null;
   const itemsPerPage = 8;
+  
+  // [보안 수정] 전역 보안 객체 추가 (기본값: CATC1234)
+  let globalSecurity = {
+      admin_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c"
+  };
 
   async function init() {
     setTheme(localStorage.getItem('kac_theme') || 'light');
     if(isPreview) document.body.classList.add('preview-active');
     
-    // 1. data.json 로드 및 동기화 (새로고침 시에도 최신 유지)
+    // 1. data.json 로드 및 보안 정보 동기화
     try {
         const res = await fetch('data.json?v=' + new Date().getTime());
         if(res.ok) {
             const data = await res.json();
+            // [보안 수정] data.json의 보안 설정 로드
+            if(data.security && data.security.admin_pw) {
+                globalSecurity = data.security;
+            }
             syncToLocalStorage(data);
         }
     } catch(e) { console.error("data.json 로딩 실패, 로컬 데이터 사용"); }
@@ -301,7 +309,6 @@
       try {
           const saved = localStorage.getItem(`kac_menu_${type}`);
           menus = saved ? JSON.parse(saved) : [];
-          // 호환성: line1 없으면 code로 대체
           menus = menus.map(m => { if (!m.line1 && m.code) m.line1 = m.code; return m; });
       } catch(e) { menus = []; }
       
@@ -322,7 +329,6 @@
     if(!grid || !paginCont) return;
     grid.innerHTML = ''; paginCont.innerHTML = '';
     
-    // Animation
     if(direction !== 'none') { 
         grid.style.opacity = '0';
         grid.style.transform = direction === 'next' ? 'translateX(20px)' : 'translateX(-20px)';
@@ -340,7 +346,6 @@
     if(currentPage > totalPages) currentPage = totalPages;
     const start = (currentPage - 1) * itemsPerPage, pageItems = list.slice(start, start + itemsPerPage);
 
-    // Flex layout for few items, Grid for many
     if (pageItems.length <= 4) { grid.style.display = 'flex'; grid.style.flexWrap = 'wrap'; grid.style.justifyContent = 'center'; }
     else { grid.style.display = 'grid'; grid.style.gridTemplateColumns = 'repeat(4, 280px)'; grid.style.justifyContent = 'center'; }
 
@@ -414,12 +419,16 @@
   
   // SHA-256 Auth
   async function sha256(message) { const msgBuffer = new TextEncoder().encode(message); const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
+  
+  // [보안 수정] toggleAdmin이 globalSecurity를 참조하도록 변경
   async function toggleAdmin() { 
-    if(isAdmin) { if(confirm("로그아웃?")) { localStorage.setItem('kac_admin_mode','0'); location.reload(); } } 
-    else { 
+    if(isAdmin) { 
+        if(confirm("로그아웃?")) { localStorage.setItem('kac_admin_mode','0'); location.reload(); } 
+    } else { 
         const pw = prompt("비밀번호"); if(!pw) return;
         const inputHash = await sha256(pw.toUpperCase());
-        const storedHash = localStorage.getItem('kac_access_pw_hash');
+        // localStorage 대신 로드한 JSON의 값을 사용
+        const storedHash = globalSecurity.admin_pw;
         if(inputHash === storedHash) { localStorage.setItem('kac_admin_mode','1'); location.reload(); } else alert('비밀번호 불일치');
     } 
   }
@@ -428,24 +437,20 @@
   function saveUISettings() { localStorage.setItem('kac_fac_icon_size', document.getElementById('setFacIconSize').value); localStorage.setItem('kac_fac_label_size', document.getElementById('setFacLabelSize').value); loadStyles(); alert('적용됨'); }
   function loadStyles() { document.documentElement.style.setProperty('--icon-size-fac', (localStorage.getItem('kac_fac_icon_size')||'28')+'px'); document.documentElement.style.setProperty('--label-size-fac', (localStorage.getItem('kac_fac_label_size')||'18')+'px'); }
 
-  // [중요] 데이터 내보내기 (Full Export)
   function exportJsonData() {
     try {
         const newData = { meta: { version: "2.0", lastUpdated: new Date().toISOString().split('T')[0] }, config: {}, categories: [] };
+        // [보안 수정] security 객체 포함 (내보낼 때도 현재 로드된 비번 유지)
+        newData.security = globalSecurity; 
         
-        // Config 수집
         newData.config.iconSize = localStorage.getItem('kac_idx_icon_size') || 60;
         newData.config.labelSize = localStorage.getItem('kac_idx_label_size') || 24;
         newData.config.facIconSize = localStorage.getItem('kac_fac_icon_size') || 28;
         newData.config.facLabelSize = localStorage.getItem('kac_fac_label_size') || 18;
 
-        // Categories 수집
         const order = JSON.parse(localStorage.getItem('kac_index_order') || '[]');
         order.forEach(id => {
-            if(!id) {
-                // newData.categories.push(null); // null 저장 필요 시 (보통은 데이터만 저장)
-                return;
-            }
+            if(!id) return;
             const s = JSON.parse(localStorage.getItem(`kac_style_${id}`) || '{}');
             const ms = JSON.parse(localStorage.getItem(`kac_menu_${id}`) || '[]');
             const menuList = ms.map(m => {
@@ -464,10 +469,8 @@
     } catch(e) { alert("내보내기 실패: " + e.message); }
   }
 
-  // --- 검색 로직 ---
   function buildSearchIndex() { 
     searchIndex = []; 
-    // index order 순회
     const order = JSON.parse(localStorage.getItem('kac_index_order') || '[]');
     order.forEach(tid => {
         if(!tid) return;
@@ -477,14 +480,9 @@
             const subs = JSON.parse(localStorage.getItem(`kac_subs_${tid}_${m.dataId}`) || '[]');
             subs.forEach(sub => {
                 searchIndex.push({ 
-                    name: sub.name, 
-                    type: tid, 
-                    code: s.code || tid.substring(0,1), // [수정] 코드 추가
-                    typeName: s.name, 
-                    menuName: m.label, 
-                    menuId: m.dataId, 
-                    subId: sub.id, 
-                    color: s.color 
+                    name: sub.name, type: tid, code: s.code || tid.substring(0,1), 
+                    typeName: s.name, menuName: m.label, menuId: m.dataId, 
+                    subId: sub.id, color: s.color 
                 });
             });
         });
@@ -501,7 +499,6 @@
     sRes.innerHTML = matches.map(i => `
       <div class="result-item" onclick="location.href='viewer_list.html?type=${i.type}&menu=${encodeURIComponent(i.menuName)}&id=${i.menuId}&autoOpen=${i.subId}'">
         <div><div class="res-title">${i.name}</div><div class="res-path">${i.typeName} > ${i.menuName}</div></div>
-        <!-- [수정] code 출력 -->
         <div class="res-tag" style="background:${i.color}">${i.code}</div>
       </div>
     `).join('') || '<div style="padding:15px; text-align:center;">결과 없음</div>';
