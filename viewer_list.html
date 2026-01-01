@@ -3,7 +3,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8" />
-<!-- 모바일 화면 꽉 차게 설정 -->
+<!-- 모바일 화면 꽉 차게 설정 (확대/축소 제한 없음) -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>과목 리스트 - KAC CNS Training Platform</title>
 <!-- 로그인 체크 -->
@@ -251,19 +251,19 @@
     overflow: hidden; 
   }
   
-  /* 캔버스 */
+  /* [중요 수정] 캔버스 CSS 강제 설정 */
   canvas { 
     box-shadow: 0 0 50px rgba(0,0,0,0.8); 
     pointer-events: none; 
-    max-width: none; 
-    max-height: none; 
+    max-width: 100%; /* 화면 너비 절대 넘지 않음 */
+    height: auto;    /* 비율 유지 */
     object-fit: contain; 
     transition: opacity 0.3s ease-out;
   }
   .slide-enter { opacity: 0; }
   .slide-active { opacity: 1; }
 
-  #pageContainer { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; }
+  #pageContainer { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; min-height: 100%; }
 
   .bottom-nav { 
     position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); 
@@ -359,12 +359,13 @@
       background-position: 15px center;
     }
 
-    /* 6. 뷰어 바디: 스크롤 허용 및 하단 여백 제거 (버튼이 플로팅이므로) */
+    /* 6. 뷰어 바디: 스크롤 허용 및 가로 스크롤 방지 */
     .viewer-body { 
         padding-bottom: 0; 
         padding-top: 0; 
-        align-items: flex-start; 
-        overflow: auto; 
+        align-items: flex-start; /* 세로 스크롤 위함 */
+        overflow-y: auto; 
+        overflow-x: hidden; /* 중요: 좌우 스크롤 차단 */
         -webkit-overflow-scrolling: touch;
     }
     
@@ -561,7 +562,7 @@
     <div id="pageContainer"></div>
   </div>
 
-  <!-- [수정] 모바일 하단 플로팅 닫기 버튼 (기본 숨김, 터치 시 등장) -->
+  <!-- [수정] 모바일 플로팅 닫기 버튼 -->
   <div class="mobile-close-btn" onclick="closeViewer()" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
     ✕ 닫기
   </div>
@@ -1264,18 +1265,21 @@
     const ctx = newCanvas.getContext('2d');
     const page = await pdfDoc.getPage(pageNum);
     
+    // [중요] 뷰포트 스케일 계산 로직 (모바일 vs 데스크탑 분기)
     const isMobile = window.innerWidth <= 768;
     let viewport;
     
     if (isMobile) {
+        // 모바일: 너비 기준 맞춤 + 고해상도 (1.5배) + 스크롤 허용
         const unscaledViewport = page.getViewport({ scale: 1 });
         const scale = (window.innerWidth / unscaledViewport.width) * 1.5; 
         viewport = page.getViewport({ scale: scale });
     } else {
+        // PC: 화면 높이에 딱 맞춤 (스크롤 없음)
         const unscaledViewport = page.getViewport({ scale: 1 });
         const scaleX = window.innerWidth / unscaledViewport.width;
         const scaleY = window.innerHeight / unscaledViewport.height;
-        const baseScale = Math.min(scaleX, scaleY) * 0.98;
+        const baseScale = Math.min(scaleX, scaleY) * 0.98; // 여백 약간
         viewport = page.getViewport({ scale: baseScale }); 
     }
     
