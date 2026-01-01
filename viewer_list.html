@@ -41,14 +41,18 @@
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
   body { background: var(--bg-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: var(--text-main); transition: 0.3s; }
 
-  /* 검색 오버레이 */
+  /* [수정] 검색 클릭 시 데스크탑 깜빡임 방지 최적화 */
   #searchOverlay { 
     position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
-    z-index: 1500; display: none; backdrop-filter: blur(4px); animation: fadeIn 0.3s; 
+    z-index: 1500; display: none; backdrop-filter: blur(4px); 
+    -webkit-backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s; 
+    will-change: opacity, backdrop-filter; /* 렌더링 성능 최적화 */
+    transform: translateZ(0);
   }
   #searchOverlay.active { display: block; }
   
-  /* 검색 모드 스타일 */
+  /* [수정] 검색 모드 전환 시 깜빡임 방지 */
   body.search-mode header { z-index: 2000; position: relative; }
   body.search-mode .header-center { z-index: 2001; }
   body.search-mode .search-dropdown { z-index: 2002; }
@@ -57,7 +61,8 @@
   body.search-mode .bottom-nav,
   body.search-mode .header-left,
   body.search-mode .header-right { 
-      opacity: 0.3; pointer-events: none; filter: blur(2px); transition: 0.3s; 
+      opacity: 0.3; pointer-events: none; filter: blur(2px); transition: 0.25s ease;
+      will-change: opacity, filter;
   }
 
   /* 헤더 스타일 */
@@ -66,6 +71,7 @@
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 40px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
     z-index: 1000; flex-shrink: 0; gap: 20px; position: relative; transition: 0.3s;
+    transform: translateZ(0); /* 깜빡임 방지 하드웨어 가속 */
   }
   
   .header-left { display: flex; align-items: center; min-width: 250px; z-index: 10; white-space: nowrap; transition: opacity 0.2s; }
@@ -154,6 +160,7 @@
   .subject-card.dragging { opacity: 0.5; border: 2px dashed #94a3b8; background: rgba(255,255,255,0.05); }
   .subject-card.drag-over { border: 2px solid var(--theme-color); transform: scale(1.02); box-shadow: 0 0 15px rgba(var(--theme-rgb), 0.2); z-index: 10; }
 
+  /* [수정] 데스크탑에서의 배지 위치 */
   .last-viewed-icon {
     position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
     display: none; 
@@ -177,7 +184,8 @@
   .subject-card.last-viewed .last-viewed-icon { display: flex; }
   .last-viewed-icon svg { width: 24px; height: 24px; fill: currentColor; }
 
-  .subj-title { font-size: 20px; font-weight: 800; color: var(--title-color); transition: 0.3s; }
+  /* [수정] 제목 가독성 개선 */
+  .subj-title { font-size: 20px; font-weight: 800; color: var(--title-color); transition: 0.3s; line-height: 1.4; }
   body.dark-mode .subj-title { text-shadow: 0 0 15px rgba(255,255,255,0.15); }
 
   .add-card { border: 2px dashed #cbd5e1; background: transparent; justify-content: center; color: #94a3b8; font-weight: 800; }
@@ -298,24 +306,37 @@
   .mobile-close-btn { display: none; } /* 기본 숨김 */
 
   @media (max-width: 768px) {
-    /* 1. 상단 제목 등 PC 전용 UI 숨김 */
+    /* [수정] 1. 상단 제목 등 PC 전용 UI 숨김 */
     .v-title-box, .v-icon-btn, .close-v { display: none !important; }
     
-    /* 2. 카드: Last Viewed 뱃지 겹침 방지 */
+    /* [수정] 2. 카드 레이아웃: 긴 제목 가독성 개선 및 배지 위치 조정 */
     .subject-card {
-        padding: 20px 15px;
+        padding: 20px 15px !important;
+        flex-direction: column !important; /* 세로 배치로 제목 가로폭 확보 */
+        align-items: flex-start !important;
+        gap: 12px;
     }
     .subj-title {
-        padding-right: 95px; /* 뱃지 공간 확보 */
-        word-break: break-all;
+        font-size: 17px !important;
+        line-height: 1.5 !important; /* 행간 확보 */
+        padding-right: 0 !important;
+        width: 100%;
+        word-break: keep-all;
+        overflow-wrap: break-word;
     }
     .last-viewed-icon { 
+        position: absolute;
         right: 15px; 
-        transform: translateY(-50%) scale(0.85); 
-        transform-origin: right center;
+        top: 15px;
+        transform: none !important;
+        font-size: 10px !important;
+        padding: 4px 10px !important;
+        background: rgba(16, 185, 129, 0.9) !important;
+        color: white !important;
+        border-radius: 5px !important;
     }
 
-    /* 3. 닫기 버튼: 플로팅 캡슐 형태 */
+    /* [수정] 3. 닫기 버튼: 플로팅 캡슐 형태 */
     .mobile-close-btn {
       display: flex;
       position: fixed;
@@ -389,7 +410,13 @@
         -webkit-overflow-scrolling: touch;
     }
     
-    /* 7. 기타 카드 스타일 */
+    /* [수정] 7. 관리자 버튼 영역 모바일 최적화 */
+    .ctrl-btns {
+        width: 100%;
+        justify-content: flex-end;
+        padding-top: 10px;
+        border-top: 1px solid var(--btn-border);
+    }
     .status-text { display: none !important; }
     .status-pill { padding: 6px 8px; font-size: 14px; }
     .pill-icon { margin-right: 0 !important; }
