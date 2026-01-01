@@ -123,17 +123,46 @@
   .nav-item { color: #fff; cursor: pointer; font-size: 18px; font-weight: 700; transition: 0.3s; opacity: 0.8; display: flex; align-items: center; gap: 10px; }
   .nav-item:hover { opacity: 1; transform: translateY(-3px); }
 
+  /* [수정] 야간 모드일 때 하단 버튼 시인성 개선 */
+  body.dark-mode .bottom-nav {
+    background: rgba(30, 41, 59, 0.95); /* 조금 더 밝은 남색 */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* 테두리 밝게 */
+  }
+  body.dark-mode .nav-item {
+    color: #e2e8f0; /* 밝은 회색 텍스트 */
+    opacity: 1;
+  }
+
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none; align-items: center; justify-content: center; }
   .modal-card { background: var(--bg-card); padding: 40px; border-radius: 30px; width: 500px; color: var(--text-main); box-shadow: 0 20px 50px rgba(0,0,0,0.5); max-height: 95vh; overflow-y: auto; }
   
+  /* 야간 모드 모달 카드 배경 */
+  body.dark-mode .modal-card {
+      background-color: #1e293b;
+      border: 1px solid rgba(255,255,255,0.1);
+  }
+
   #settingsModal { z-index: 10000; }
   #bulkEditModal, #itemEditModal, #moveMenuModal { z-index: 11000; }
   
   .modal-title { font-size: 22px; font-weight: 800; margin-bottom: 25px; border-bottom: 1px solid var(--btn-border); padding-bottom: 12px; display: flex; align-items: center; gap: 10px; }
   .setting-group { margin-bottom: 25px; }
   .setting-label { font-size: 12px; font-weight: 800; color: var(--text-sub); margin-bottom: 10px; display: block; }
+  
   .setting-input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--btn-border); background: #f8fafc; color: var(--text-main); font-size: 14px; text-align: center; outline: none; transition: 0.3s; }
   .setting-input:focus { border-color: var(--theme-color); background: #fff; box-shadow: 0 0 0 4px rgba(var(--theme-rgb), 0.1); }
+
+  /* [수정] 야간 모드 팝업창(모달) 입력필드 시인성 개선 */
+  body.dark-mode .setting-input,
+  body.dark-mode select.setting-input {
+      background-color: #334155 !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255,255,255,0.3);
+  }
+  body.dark-mode select.setting-input option {
+      background-color: #1e293b;
+      color: #ffffff;
+  }
 
   .btn-modal { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 15px; margin-top: 12px; }
   .btn-primary { background: #0f172a; color: #fff; }
@@ -147,20 +176,12 @@
   .bulk-row { display: grid; grid-template-columns: 40px 80px 80px 140px 1fr; gap: 8px; padding: 8px; border-bottom: 1px solid #f1f5f9; align-items: center; }
   .bulk-input { padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center; font-size: 12px; background: #f8fafc; outline: none; }
 
-  /* [모바일 반응형 최적화 및 UI 디자인 개선] */
+  /* [모바일 반응형 최적화 - 세로쓰기 방지 및 아이콘 크기 조정] */
   @media (max-width: 768px) {
     header { padding: 0 15px; }
     .header-left, .header-right { display: none !important; }
     .header-center { width: 100%; max-width: 100%; }
     
-    /* 검색창 디자인 개선 */
-    .header-search {
-      font-size: 14px;
-      padding: 10px 20px 10px 45px;
-      background-size: 18px;
-      background-position: 15px center;
-    }
-
     #trainGrid {
       gap: 12px !important;
       display: flex !important;
@@ -196,7 +217,7 @@
     .admin-ctrl { flex-direction: column; width: 100%; gap: 4px; }
     .admin-ctrl button { width: 100%; }
 
-    /* 하단 네비게이션 개선 */
+    /* [수정] 모바일 하단 네비게이션 개선 */
     .bottom-nav {
       width: 90%;
       bottom: 20px;
@@ -207,7 +228,20 @@
       background: rgba(15, 23, 42, 0.95);
       backdrop-filter: blur(10px);
     }
+    /* 모바일 야간모드 */
+    body.dark-mode .bottom-nav {
+      background: rgba(30, 41, 59, 0.95);
+    }
+    
     .nav-item { font-size: 14px; gap: 6px; }
+    
+    /* 검색창 디자인 개선 */
+    .header-search {
+      font-size: 14px;
+      padding: 10px 20px 10px 45px;
+      background-size: 18px;
+      background-position: 15px center;
+    }
   }
 </style>
 </head>
@@ -336,7 +370,7 @@
     setTheme(localStorage.getItem('kac_theme') || 'light');
     if(isPreview) document.body.classList.add('preview-active');
     
-    // 1. 현재 관리자 모드인지 확인
+    // 1. 현재 관리자 모드인지 확인 (인덱스 파일과 동일하게 localStorage 사용)
     const isAdminSession = localStorage.getItem('kac_admin_mode') === '1';
 
     // 2. 서버 데이터 가져오기
@@ -349,12 +383,13 @@
     // 3. 로컬 데이터 확인
     const hasLocalData = localStorage.getItem('kac_index_order');
 
-    // [핵심 로직] viewer_list.html과 동일하게 적용
+    // [핵심 로직 변경]
+    // 관리자(수정 권한 있음)이고 + 수정 중인 데이터가 있으면 -> 로컬 데이터 유지
     if (isAdminSession && hasLocalData) {
         console.log("🛠️ Admin: Using Local Data");
         if(serverData && serverData.security) globalSecurity = serverData.security;
     } 
-    // 일반 사용자이거나 로컬 데이터가 없으면 서버 데이터 강제 동기화
+    // 일반 사용자이거나 + 로컬 데이터가 없으면 -> 서버 데이터로 강제 덮어쓰기
     else if (serverData) {
         console.log("🔄 User: Syncing with Server");
         if(serverData.security) globalSecurity = serverData.security;
