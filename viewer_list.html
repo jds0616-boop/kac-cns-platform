@@ -137,7 +137,7 @@
 
   main { flex: 1; overflow-y: auto; padding: 40px; padding-bottom: 150px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
 
-  /* [수정] 카드 설정: overflow를 visible로 변경 */
+  /* 카드 설정 */
   .subject-card { 
     background: var(--bg-card); width: 100%; max-width: 900px; padding: 25px 35px; border-radius: 18px; 
     box-shadow: var(--shadow); 
@@ -279,13 +279,13 @@
   .nav-icon { width: 24px; height: 24px; fill: currentColor; }
 
   /* [모바일 전용 스타일 수정] */
-  .mobile-close-btn { display: none; }
+  .mobile-close-btn { display: none; } /* 기본 숨김 */
 
   @media (max-width: 768px) {
     /* 1. 상단 제목 등 PC 전용 UI 숨김 */
     .v-title-box, .v-icon-btn, .close-v { display: none !important; }
     
-    /* 2. 카드: Last Viewed 뱃지 겹침 방지 (글자 영역에 여백 추가) */
+    /* 2. 카드: Last Viewed 뱃지 겹침 방지 */
     .subject-card {
         padding: 20px 15px;
     }
@@ -299,23 +299,43 @@
         transform-origin: right center;
     }
 
-    /* 3. 닫기 버튼: 하단 고정 바 */
+    /* 3. 닫기 버튼: 플로팅 캡슐 형태 (숨김 상태 기본) */
     .mobile-close-btn {
       display: flex;
-      position: absolute;
-      bottom: 0; left: 0; width: 100%;
-      height: 60px;
-      background: #ef4444; 
+      position: fixed;
+      bottom: 40px; 
+      left: 50%; 
+      transform: translateX(-50%);
+      width: auto;
+      height: auto;
+      padding: 12px 30px;
+      border-radius: 50px;
+      background: rgba(0, 0, 0, 0.7); 
       color: #fff;
-      font-size: 16px; font-weight: 800;
-      align-items: center; justify-content: center;
+      font-size: 15px; 
+      font-weight: 700;
+      align-items: center; 
+      justify-content: center;
       gap: 8px;
-      z-index: 9500;
-      box-shadow: 0 -4px 15px rgba(0,0,0,0.3);
+      z-index: 9999;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
       cursor: pointer;
-      border-top: 1px solid rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.2);
+      backdrop-filter: blur(5px);
+      
+      /* 애니메이션용 */
+      opacity: 0;
+      pointer-events: none; /* 숨겨졌을 때 클릭 방지 */
+      transition: opacity 0.3s ease;
     }
-    .mobile-close-btn:active { background: #dc2626; }
+    
+    /* 활성화 클래스 */
+    .mobile-close-btn.visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .mobile-close-btn:active { background: #ef4444; }
 
     /* 4. 리스트 하단 네비게이션 */
     .bottom-nav {
@@ -339,11 +359,11 @@
       background-position: 15px center;
     }
 
-    /* 6. 뷰어 바디: 스크롤 허용 및 여백 */
+    /* 6. 뷰어 바디: 스크롤 허용 및 하단 여백 제거 (버튼이 플로팅이므로) */
     .viewer-body { 
-        padding-bottom: 60px; /* 하단 닫기버튼 공간 */
+        padding-bottom: 0; 
         padding-top: 0; 
-        align-items: flex-start; /* 세로 스크롤 위함 */
+        align-items: flex-start; 
         overflow: auto; 
         -webkit-overflow-scrolling: touch;
     }
@@ -541,7 +561,7 @@
     <div id="pageContainer"></div>
   </div>
 
-  <!-- [추가] 모바일 하단 닫기 바 -->
+  <!-- [수정] 모바일 하단 플로팅 닫기 버튼 (기본 숨김, 터치 시 등장) -->
   <div class="mobile-close-btn" onclick="closeViewer()" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
     ✕ 닫기
   </div>
@@ -841,7 +861,7 @@
 
       card.innerHTML = `
         <div class="last-viewed-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
             <span>Last Viewed</span>
         </div>
         <div>
@@ -1244,21 +1264,18 @@
     const ctx = newCanvas.getContext('2d');
     const page = await pdfDoc.getPage(pageNum);
     
-    // [중요 수정] 뷰포트 스케일 계산 로직 (모바일 vs 데스크탑 분기)
     const isMobile = window.innerWidth <= 768;
     let viewport;
     
     if (isMobile) {
-        // 모바일: 너비 기준 맞춤 + 고해상도 (1.5배) + 스크롤 허용
         const unscaledViewport = page.getViewport({ scale: 1 });
         const scale = (window.innerWidth / unscaledViewport.width) * 1.5; 
         viewport = page.getViewport({ scale: scale });
     } else {
-        // PC: 화면 높이에 딱 맞춤 (스크롤 없음)
         const unscaledViewport = page.getViewport({ scale: 1 });
         const scaleX = window.innerWidth / unscaledViewport.width;
         const scaleY = window.innerHeight / unscaledViewport.height;
-        const baseScale = Math.min(scaleX, scaleY) * 0.98; // 여백 약간
+        const baseScale = Math.min(scaleX, scaleY) * 0.98;
         viewport = page.getViewport({ scale: baseScale }); 
     }
     
@@ -1310,18 +1327,39 @@
     } 
   };
 
+  // [수정] 모바일 화면 터치 시 닫기 버튼 3초간 노출 로직
   let touchStartY = 0;
   let touchEndY = 0;
+  let closeBtnTimeout = null;
   const minSwipeDistance = 50; 
+  const mobileCloseBtn = document.querySelector('.mobile-close-btn');
+
+  function showMobileCloseBtn() {
+      if (!mobileCloseBtn || window.innerWidth > 768) return;
+      
+      mobileCloseBtn.classList.add('visible');
+      
+      if(closeBtnTimeout) clearTimeout(closeBtnTimeout);
+      
+      closeBtnTimeout = setTimeout(() => {
+          mobileCloseBtn.classList.remove('visible');
+      }, 2500); // 2.5초 후 사라짐
+  }
 
   overlay.addEventListener('touchstart', e => {
       touchStartY = e.changedTouches[0].screenY;
+      showMobileCloseBtn(); // 터치 시작 시 버튼 보이기
   }, {passive: true});
 
   overlay.addEventListener('touchend', e => {
       touchEndY = e.changedTouches[0].screenY;
       handleSwipe();
   }, {passive: true});
+  
+  // 클릭시에도 버튼 보이기 (PDF 넘기기 클릭 등)
+  overlay.addEventListener('click', () => {
+      showMobileCloseBtn();
+  });
 
   function handleSwipe() {
       const distance = touchStartY - touchEndY;
@@ -1332,6 +1370,7 @@
       }
   }
   
+  // 모든 설정이 끝난 후 초기화 실행
   init();
 </script>
 </body>
