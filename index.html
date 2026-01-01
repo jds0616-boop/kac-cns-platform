@@ -40,7 +40,7 @@
   /* 관리자/미리보기 제어 */
   body.preview-active .card-ctrl, body.preview-active .add-slot { display: none !important; }
   
-  header { height: var(--header-h); background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.15); z-index: 2000; flex-shrink: 0; }
+  header { height: var(--header-h); background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.15); z-index: 1000; flex-shrink: 0; }
   .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; cursor: pointer; }
   .header-right { display: flex; align-items: center; gap: 15px; }
   
@@ -53,8 +53,8 @@
   .settings-btn { display: flex; padding: 8px; width: 34px; height: 34px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.3s; color: #cbd5e1; }
   .settings-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
 
-  .content-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; width: 100%; overflow-y: auto; padding: 100px 20px 80px 20px; position: relative; }
-  .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 30px; flex-shrink: 0; z-index: 1800; position: relative; }
+  .content-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; width: 100%; overflow-y: auto; padding: 120px 20px 80px 20px; position: relative; }
+  .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 30px; flex-shrink: 0; z-index: 2000; position: relative; }
   .search-container { position: relative; width: 600px; max-width: 90%; }
   
   .search-bar { 
@@ -68,16 +68,13 @@
 
   .search-results { position: absolute; top: calc(100% + 15px); left: 0; right: 0; width: 100%; background: var(--bg-card); border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); border: 1px solid var(--border-card); overflow: hidden; display: none; max-height: 400px; overflow-y: auto; z-index: 2001; }
   .search-results.active { display: block; animation: slideDown 0.2s ease-out; }
-  
-  /* [중요] 검색 시 흐릿한 효과 오버레이 */
-  #searchOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1500; display: none; backdrop-filter: blur(4px); animation: fadeIn 0.3s; }
+  #searchOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1500; display: none; backdrop-filter: blur(2px); animation: fadeIn 0.3s; }
   #searchOverlay.active { display: block; }
-  body.search-mode main { filter: blur(2px); opacity: 0.5; pointer-events: none; transition: 0.3s; }
 
   /* 메인 카드 영역 */
   #cardContainer { display: flex; flex-wrap: wrap; gap: 30px; width: 100%; max-width: 1700px; justify-content: center; padding: 20px; transform-style: preserve-3d; min-height: 400px; }
   
-  .card { background: var(--bg-card); width: 280px; height: 280px; padding: 30px 20px; border-radius: 25px; box-shadow: var(--shadow); border: var(--border-card); cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; border-left: 10px solid var(--card-color, #64748b); color: var(--text-main); }
+  .card { background: var(--bg-card); width: 280px; height: 280px; padding: 30px 20px; border-radius: 25px; box-shadow: var(--shadow); border: var(--border-card); cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; border-left: 10px solid transparent; color: var(--text-main); --card-color: #64748b; border-left-color: var(--card-color); }
   .card:hover { transform: translateY(-10px); border-color: var(--card-color); box-shadow: 0 15px 30px -5px var(--card-color); }
   .card.dragging { opacity: 0.4; border: 2px dashed #94a3b8; }
   .card.drag-over { transform: scale(1.05); box-shadow: 0 0 20px rgba(37, 99, 235, 0.3); border-color: #2563eb; z-index: 10; }
@@ -189,6 +186,7 @@
 
         <p style="font-size:11px; color:red; margin-top:5px;">* 중요: 비밀번호 변경 또는 데이터 수정 후 반드시 [변경사항 저장] 또는 [GitHub 업로드]를 해야 적용됩니다.</p>
         
+        <!-- 초기화 버튼 -->
         <button class="btn-modal btn-danger" style="margin-top:15px; background:#ef4444; opacity:0.8;" onclick="resetToDataJson()">⚠️ 서버 원본으로 초기화 (수정취소)</button>
       </div>
       <div class="setting-group" style="background: rgba(0,0,0,0.02); padding: 15px; border-radius: 15px; border: 1px solid var(--btn-border);">
@@ -204,17 +202,26 @@
   </div>
 </div>
 
-<!-- GitHub 업로드 모달 (우회 적용됨) -->
+<!-- GitHub 업로드 설정 모달 -->
 <div id="githubModal" class="modal-overlay">
   <div class="modal-card">
-    <div class="modal-title">🐙 GitHub Cloud Sync</div>
-    <div style="background: rgba(37, 99, 235, 0.05); padding: 20px; border-radius: 15px; border: 1px solid #dbeafe; margin-bottom: 20px; text-align: center;">
-      <p style="font-weight: 800; color: #1e40af; margin-bottom: 5px;">✅ 연동 준비 완료</p>
-      <p style="font-size: 13px; color: #64748b;">jds0616-boop / kac-cns-platform</p>
-    </div>
-    <p style="font-size:12px; color:#64748b; margin-bottom:20px; text-align: center;">
-      [업로드 실행] 버튼을 누르면 현재 브라우저의 모든 변경 사항이<br>GitHub 서버에 즉시 반영됩니다.
+    <div class="modal-title">🐙 GitHub 연동 설정</div>
+    <p style="font-size:12px; color:#64748b; margin-bottom:15px;">
+      깃허브 저장소 정보를 입력하세요. 정보는 브라우저에만 저장됩니다.
     </p>
+    <div class="setting-group">
+      <label class="setting-label">GitHub 아이디 (Owner)</label>
+      <input type="text" id="ghOwner" class="setting-input" placeholder="예: MyGitID">
+    </div>
+    <div class="setting-group">
+      <label class="setting-label">저장소 이름 (Repo)</label>
+      <input type="text" id="ghRepo" class="setting-input" placeholder="예: kac-training-platform">
+    </div>
+    <div class="setting-group">
+      <label class="setting-label">Personal Access Token</label>
+      <input type="password" id="ghToken" class="setting-input" placeholder="ghp_..." autocomplete="new-password">
+      <p style="font-size:11px; color:red; margin-top:5px;">* 토큰은 절대 타인에게 공유하지 마세요.</p>
+    </div>
     <div class="btn-row">
       <button id="btnGhUpload" class="btn-modal btn-primary" onclick="uploadToGithub()">업로드 실행</button>
       <button class="btn-modal btn-secondary" onclick="document.getElementById('githubModal').style.display='none'">취소</button>
@@ -274,65 +281,88 @@
 </div>
 
 <script>
-  // 🐙 GitHub 보안 스캔 우회 - 토큰 조각화
-  const _T1 = "ghp_";
-  const _T2 = "LK6sgXTezLr2NSE7";
-  const _T3 = "N2uJXf4FceRvbX46";
-  const _T4 = "22t9";
-
-  const GH_CONFIG = {
-    owner: "jds0616-boop",
-    repo: "kac-cns-platform",
-    get k() { return _T1 + _T2 + _T3 + _T4; }
-  };
-
   let globalData = { categories: [], config: {}, security: {} };
   let isAdmin = localStorage.getItem('kac_admin_mode') === '1';
   let isPreview = localStorage.getItem('kac_preview_active') === '1';
   let searchIndex = [];
   let editingCardId = null;
   let moveSrcIndex = -1;
+
+  // 페이지네이션
   const itemsPerPage = 5;
   let currentPage = 1;
+
+  // 드래그앤드롭
   let dragSrcIndex = null;
 
   async function init() {
     setTheme(localStorage.getItem('kac_theme') || 'light');
     if(isPreview) document.body.classList.add('preview-active');
-    const isAdminSession = localStorage.getItem('kac_admin_mode') === '1';
+
+    // 1. 현재 관리자 모드인지 확인 (세션 기준: 브라우저 끄면 풀리게 하려면 sessionStorage 권장, 
+    // 기존 코드와의 호환성을 위해 localStorage 유지 중이라면 localStorage 사용)
+    // * 문제 해결을 위해 관리자 여부 판단 변수를 명확히 합니다.
+    const isAdminSession = localStorage.getItem('kac_admin_mode') === '1'; // 혹은 sessionStorage
+
+    // 2. 서버 데이터 가져오기 (무조건)
     let serverData = null;
     try {
         const res = await fetch('data.json?v=' + Date.now());
         if(res.ok) serverData = await res.json();
     } catch(e) { console.log("data.json 로드 실패"); }
+
+    // 3. 로컬 데이터 확인
     const hasLocalData = localStorage.getItem('kac_index_order');
+
+    // [핵심 로직 변경]
+    // 관리자(수정 권한 있음)이고 + 수정 중인 데이터가 있으면 -> 로컬 데이터 사용
     if (isAdminSession && hasLocalData) {
+        console.log("🛠️ 관리자 모드: 로컬 편집 데이터를 복원합니다.");
         reconstructGlobalDataFromLocal();
-        if(serverData && serverData.security) globalData.security = serverData.security;
-    } else if (serverData) {
+        
+        // 보안 설정은 서버 최신본으로 갱신 (비밀번호 동기화)
+        if(serverData && serverData.security) {
+            globalData.security = serverData.security;
+        }
+    } 
+    // 일반 사용자이거나 + 로컬 데이터가 없으면 -> 서버 데이터로 강제 덮어쓰기
+    else if (serverData) {
+        console.log("🔄 일반 사용자: 서버 데이터로 강제 업데이트합니다.");
         globalData = serverData;
-        syncToLocalStorage(globalData);
+        syncToLocalStorage(globalData); // 로컬에 남은 찌꺼기 데이터를 최신 서버 데이터로 덮어씀
         applyConfig(globalData.config);
     }
+
     ensurePageSlots();
     renderCards();
     buildSearchIndex();
+    
     setTimeout(() => {
       document.getElementById('loadingSpinner').style.opacity = '0';
       setTimeout(() => document.getElementById('loadingSpinner').style.display='none', 500);
     }, 500);
+
     if(isAdmin) document.body.classList.add('admin-mode');
   }
   
+  // 로컬스토리지 내용을 globalData로 역조립하는 함수 (비밀번호 보존)
   function reconstructGlobalDataFromLocal() {
     const currentSecurity = globalData.security || {
         entry_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c",
         admin_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c"
     };
-    globalData = { meta: { version: "2.0", lastUpdated: new Date().toISOString() }, config: {}, categories: [], security: currentSecurity };
+
+    globalData = { 
+        meta: { version: "2.0", lastUpdated: new Date().toISOString() }, 
+        config: {}, 
+        categories: [], 
+        security: currentSecurity 
+    };
+    
     globalData.config.iconSize = parseInt(localStorage.getItem('kac_idx_icon_size') || 60);
     globalData.config.labelSize = parseInt(localStorage.getItem('kac_idx_label_size') || 24);
     applyConfig(globalData.config);
+
     const orderRaw = localStorage.getItem('kac_index_order');
     if(orderRaw) {
         const order = JSON.parse(orderRaw);
@@ -340,21 +370,35 @@
             if(!id) return null;
             const s = JSON.parse(localStorage.getItem(`kac_style_${id}`) || '{}');
             const ms = JSON.parse(localStorage.getItem(`kac_menu_${id}`) || '[]');
+            
             const menuList = ms.map(m => {
                 const subs = JSON.parse(localStorage.getItem(`kac_subs_${id}_${m.dataId}`) || '[]');
                 return { id: m.dataId, label: m.label, line1: m.line1, line2: m.line2, link: m.link, subjects: subs };
             });
+
             return { id: id, name: s.name, code: s.code, color: s.color, menus: menuList };
         });
     }
   }
 
+  // 로컬 데이터 초기화 및 서버 원본 복구
   function resetToDataJson() {
-    if(confirm("현재까지 수정한 모든 내용이 사라지고 서버의 원본 상태로 되돌아갑니다. 계속하시겠습니까?")) {
+    if(confirm("현재까지 수정한 모든 내용이 사라지고 서버의 원본 파일(data.json) 상태로 되돌아갑니다.\n계속하시겠습니까?")) {
         localStorage.clear();
         location.reload();
     }
   }
+
+  window.addEventListener('pageshow', () => {
+      const savedStatus = localStorage.getItem('kac_admin_mode') === '1';
+      if (isAdmin !== savedStatus) location.reload();
+      const savedPreview = localStorage.getItem('kac_preview_active') === '1';
+      if(isPreview !== savedPreview) location.reload();
+  });
+
+  window.addEventListener('storage', (e) => {
+      if (e.key === 'kac_admin_mode' || e.key === 'kac_preview_active') location.reload();
+  });
 
   function ensurePageSlots() {
     const cleanList = globalData.categories.filter(c => c !== null);
@@ -363,7 +407,9 @@
         const needed = itemsPerPage - (globalData.categories.length % itemsPerPage);
         for(let i=0; i<needed; i++) globalData.categories.push(null);
     }
-    if(globalData.categories.length === 0) { for(let i=0; i<itemsPerPage; i++) globalData.categories.push(null); }
+    if(globalData.categories.length === 0) {
+        for(let i=0; i<itemsPerPage; i++) globalData.categories.push(null);
+    }
   }
 
   function syncToLocalStorage(data) {
@@ -375,7 +421,9 @@
         const menus = cat.menus.map(m => ({ dataId: m.id, label: m.label, line1: m.line1, line2: m.line2, link: m.link }));
         localStorage.setItem(`kac_menu_${cat.id}`, JSON.stringify(menus));
         cat.menus.forEach(m => { localStorage.setItem(`kac_subs_${cat.id}_${m.id}`, JSON.stringify(m.subjects)); });
-      } else { order.push(null); }
+      } else {
+        order.push(null);
+      }
     });
     localStorage.setItem('kac_index_order', JSON.stringify(order));
     if(data.config) {
@@ -393,7 +441,9 @@
   function renderCards() {
     const container = document.getElementById('cardContainer');
     const pagination = document.getElementById('pagination');
-    container.innerHTML = ''; pagination.innerHTML = '';
+    container.innerHTML = ''; 
+    pagination.innerHTML = '';
+
     const totalPages = Math.ceil(globalData.categories.length / itemsPerPage) || 1;
     if(currentPage > totalPages) currentPage = totalPages;
     const startIdx = (currentPage - 1) * itemsPerPage;
@@ -401,36 +451,74 @@
 
     pageItems.forEach((cat, i) => {
       const globalIdx = startIdx + i;
+      
       if(cat) { 
         const card = document.createElement('div');
         card.className = 'card';
         card.style.setProperty('--card-color', cat.color);
         card.onclick = () => location.href = `facility.html?type=${cat.id}`;
+        
         if(isAdmin && !isPreview) {
           card.setAttribute('draggable', 'true');
-          card.ondragstart = (e) => { dragSrcIndex = globalIdx; e.target.classList.add('dragging'); };
-          card.ondragover = (e) => e.preventDefault();
+          card.ondragstart = (e) => handleDragStart(e, globalIdx);
+          card.ondragover = (e) => handleDragOver(e);
           card.ondrop = (e) => handleDrop(e, globalIdx);
-          card.ondragend = () => document.querySelectorAll('.card').forEach(c => c.classList.remove('dragging'));
-          card.innerHTML = `<div class="card-ctrl" onclick="event.stopPropagation()"><button class="btn-sm" onclick="openEdit('${cat.id}')">수정</button><button class="btn-sm btn-move" onclick="openMovePageModal(${globalIdx})">이동</button><button class="btn-sm btn-del" onclick="deleteCard('${globalIdx}')">삭제</button></div><div class="icon-box">${cat.code}</div><h2>${cat.name}</h2>`;
-        } else { card.innerHTML = `<div class="icon-box">${cat.code}</div><h2>${cat.name}</h2>`; }
+          card.ondragend = (e) => handleDragEnd(e);
+          
+          card.innerHTML = `
+            <div class="card-ctrl" onclick="event.stopPropagation()">
+              <button class="btn-sm" onclick="openEdit('${cat.id}')">수정</button>
+              <button class="btn-sm btn-move" onclick="openMovePageModal(${globalIdx})">이동</button>
+              <button class="btn-sm btn-del" onclick="deleteCard('${globalIdx}')">삭제</button>
+            </div>
+            <div class="icon-box">${cat.code}</div>
+            <h2>${cat.name}</h2>
+          `;
+        } else {
+            card.innerHTML = `<div class="icon-box">${cat.code}</div><h2>${cat.name}</h2>`;
+        }
         container.appendChild(card);
       } else { 
         const empty = document.createElement('div');
         empty.className = 'card add-slot';
-        if(isAdmin && !isPreview) { empty.innerHTML = '<div style="font-size:40px;">+</div><div>추가</div>'; empty.onclick = () => openEdit('NEW', globalIdx); }
+        if(isAdmin && !isPreview) {
+           empty.innerHTML = '<div style="font-size:40px;">+</div><div>카테고리 추가</div>';
+           empty.onclick = () => openEdit('NEW', globalIdx);
+           empty.ondragover = (e) => handleDragOver(e);
+           empty.ondrop = (e) => handleDrop(e, globalIdx);
+        }
         container.appendChild(empty);
       }
     });
+
     for(let i=1; i<=totalPages; i++) {
         const dot = document.createElement('div');
         dot.className = `page-dot ${i === currentPage ? 'active' : ''}`;
         dot.onclick = () => { currentPage = i; renderCards(); };
         pagination.appendChild(dot);
     }
+    
+    if(isAdmin && !isPreview) {
+        const addPageBtn = document.createElement('div');
+        addPageBtn.className = 'page-dot';
+        addPageBtn.style.background = 'transparent';
+        addPageBtn.style.border = '1px solid #cbd5e1';
+        addPageBtn.innerText = '+';
+        addPageBtn.style.textAlign = 'center';
+        addPageBtn.style.lineHeight = '10px';
+        addPageBtn.onclick = () => {
+            for(let k=0; k<itemsPerPage; k++) globalData.categories.push(null);
+            currentPage = Math.ceil(globalData.categories.length / itemsPerPage);
+            renderCards();
+        };
+        pagination.appendChild(addPageBtn);
+    }
   }
 
-  function handleDrop(e, targetIdx) { if(dragSrcIndex !== null && dragSrcIndex !== targetIdx) { const srcItem = globalData.categories[dragSrcIndex]; globalData.categories[dragSrcIndex] = globalData.categories[targetIdx]; globalData.categories[targetIdx] = srcItem; renderCards(); } }
+  function handleDragStart(e, idx) { dragSrcIndex = idx; e.target.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
+  function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; return false; }
+  function handleDrop(e, targetIdx) { e.stopPropagation(); if(dragSrcIndex !== null && dragSrcIndex !== targetIdx) { const srcItem = globalData.categories[dragSrcIndex]; const targetItem = globalData.categories[targetIdx]; globalData.categories[targetIdx] = srcItem; globalData.categories[dragSrcIndex] = targetItem; renderCards(); } return false; }
+  function handleDragEnd(e) { document.querySelectorAll('.card').forEach(c => c.classList.remove('dragging')); }
 
   function buildSearchIndex() {
     searchIndex = [];
@@ -438,7 +526,10 @@
       if(!cat) return;
       cat.menus.forEach(menu => {
         menu.subjects.forEach(sub => {
-          searchIndex.push({ name: sub.name, type: cat.id, code: cat.code, typeName: cat.name, menuName: menu.label, menuId: menu.id, subId: sub.id, color: cat.color, active: sub.active });
+          searchIndex.push({
+            name: sub.name, type: cat.id, code: cat.code, typeName: cat.name,
+            menuName: menu.label, menuId: menu.id, subId: sub.id, color: cat.color, active: sub.active
+          });
         });
       });
     });
@@ -447,43 +538,297 @@
   const searchInput = document.getElementById('mainSearch');
   const searchRes = document.getElementById('searchResults');
   const sOverlay = document.getElementById('searchOverlay');
+
   searchInput.addEventListener('input', (e) => {
     const q = e.target.value.toLowerCase().trim();
     if(!q) { searchRes.classList.remove('active'); return; }
+    
     const matches = searchIndex.filter(i => i.name.toLowerCase().includes(q) || i.menuName.toLowerCase().includes(q));
-    searchRes.innerHTML = matches.map(i => `<div class="result-item" onclick="location.href='viewer_list.html?type=${i.type}&menu=${encodeURIComponent(i.menuName)}&id=${i.menuId}&autoOpen=${i.subId}'"><div><div class="res-title">${i.name}</div><div class="res-path">${i.typeName} > ${i.menuName}</div></div><div class="res-tag" style="background:${i.color}">${i.code}</div></div>`).join('') || '<div style="padding:15px;text-align:center;">결과 없음</div>';
+    searchRes.innerHTML = matches.map(i => `
+      <div class="result-item" onclick="location.href='viewer_list.html?type=${i.type}&menu=${encodeURIComponent(i.menuName)}&id=${i.menuId}&autoOpen=${i.subId}'">
+        <div><div class="res-title">${i.name}</div><div class="res-path">${i.typeName} > ${i.menuName}</div></div>
+        <div class="res-tag" style="background:${i.color}">${i.code}</div>
+      </div>
+    `).join('') || '<div style="padding:15px;text-align:center;">결과 없음</div>';
+    
     searchRes.classList.add('active');
   });
-  searchInput.onfocus = () => { sOverlay.classList.add('active'); document.body.classList.add('search-mode'); if(searchInput.value) searchRes.classList.add('active'); };
-  sOverlay.onclick = () => { sOverlay.classList.remove('active'); searchRes.classList.remove('active'); document.body.classList.remove('search-mode'); };
 
-  function openSettings() { document.getElementById('guestSettings').style.display = isAdmin ? 'none' : 'block'; document.getElementById('adminSettings').style.display = isAdmin ? 'block' : 'none'; document.getElementById('settingsModal').style.display='flex'; }
-  function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-  function openGithubModal() { closeModal('settingsModal'); document.getElementById('githubModal').style.display = 'flex'; }
+  searchInput.onfocus = () => { sOverlay.classList.add('active'); if(searchInput.value) searchRes.classList.add('active'); };
+  sOverlay.onclick = () => { sOverlay.classList.remove('active'); searchRes.classList.remove('active'); };
+
+  function openSettings() {
+    const gSet = document.getElementById('guestSettings');
+    const aSet = document.getElementById('adminSettings');
+    gSet.style.display = isAdmin ? 'none' : 'block';
+    aSet.style.display = isAdmin ? 'block' : 'none';
+    
+    if(isAdmin) {
+        document.getElementById('setIconSize').value = globalData.config.iconSize || 60;
+        document.getElementById('setLabelSize').value = globalData.config.labelSize || 24;
+        const pBtn = document.getElementById('modalPreviewBtn');
+        pBtn.textContent = isPreview ? "미리보기 종료" : "미리보기 시작";
+        pBtn.classList.toggle('btn-preview-active', isPreview);
+    }
+    document.getElementById('settingsModal').style.display='flex';
+  }
+
+  function saveUISettings() {
+    const is = document.getElementById('setIconSize').value;
+    const ls = document.getElementById('setLabelSize').value;
+    globalData.config.iconSize = parseInt(is);
+    globalData.config.labelSize = parseInt(ls);
+    applyConfig(globalData.config);
+    // 설정 변경사항 로컬 저장
+    localStorage.setItem('kac_idx_icon_size', globalData.config.iconSize);
+    localStorage.setItem('kac_idx_label_size', globalData.config.labelSize);
+    document.getElementById('settingsModal').style.display='none';
+  }
+
+  function togglePreview() {
+    isPreview = !isPreview;
+    localStorage.setItem('kac_preview_active', isPreview ? '1' : '0');
+    document.body.classList.toggle('preview-active', isPreview);
+    document.getElementById('settingsModal').style.display='none';
+    renderCards();
+  }
+
+  async function sha256(message) {
+      const msgBuffer = new TextEncoder().encode(message);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  async function toggleAdmin() {
+    if(isAdmin) {
+      if(confirm("관리자 모드를 종료하시겠습니까?")) {
+        localStorage.setItem('kac_admin_mode','0');
+        location.reload();
+      }
+    } else {
+      const pw = prompt("관리자 비밀번호 입력");
+      if(!pw) return;
+      const inputHash = await sha256(pw.toUpperCase());
+      const storedHash = globalData.security.admin_pw;
+
+      if(inputHash === storedHash) {
+        localStorage.setItem('kac_admin_mode','1');
+        location.reload();
+      } else {
+        alert("비밀번호 불일치");
+      }
+    }
+  }
+
+  // --- GitHub 업로드 기능 ---
+  function openGithubModal() {
+    document.getElementById('ghOwner').value = localStorage.getItem('kac_gh_owner') || '';
+    document.getElementById('ghRepo').value = localStorage.getItem('kac_gh_repo') || '';
+    document.getElementById('ghToken').value = localStorage.getItem('kac_gh_token') || '';
+    document.getElementById('settingsModal').style.display = 'none';
+    document.getElementById('githubModal').style.display = 'flex';
+  }
 
   async function uploadToGithub() {
-    const owner = GH_CONFIG.owner; const repo = GH_CONFIG.repo; const token = GH_CONFIG.k; const path = "data.json"; const btn = document.getElementById('btnGhUpload');
-    btn.textContent = "서버 통신 중..."; btn.disabled = true;
+    const owner = document.getElementById('ghOwner').value.trim();
+    const repo = document.getElementById('ghRepo').value.trim();
+    const token = document.getElementById('ghToken').value.trim();
+    const path = "data.json"; 
+    const branch = "main"; 
+
+    if(!owner || !repo || !token) return alert("모든 정보를 입력해주세요.");
+
+    localStorage.setItem('kac_gh_owner', owner);
+    localStorage.setItem('kac_gh_repo', repo);
+    localStorage.setItem('kac_gh_token', token);
+
+    const btn = document.getElementById('btnGhUpload');
+    const originalText = btn.textContent;
+    btn.textContent = "업로드 중...";
+    btn.disabled = true;
+
     try {
         reconstructGlobalDataFromLocal();
         globalData.meta.lastUpdated = new Date().toISOString().split('T')[0];
         const jsonString = JSON.stringify(globalData, null, 2);
-        const contentBase64 = btoa(encodeURIComponent(jsonString).replace(/%([0-9A-F]{2})/g, (match, p1) => String.fromCharCode('0x' + p1)));
-        const getUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-        const getRes = await fetch(getUrl, { headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json" } });
-        let sha = ""; if (getRes.ok) { const gd = await getRes.json(); sha = gd.sha; }
-        const putRes = await fetch(getUrl, { method: "PUT", headers: { "Authorization": `token ${token}`, "Content-Type": "application/json" }, body: JSON.stringify({ message: "Cloud Sync", content: contentBase64, sha: sha || undefined }) });
-        if (putRes.ok) { alert("✅ GitHub 업로드 성공!"); closeModal('githubModal'); } else throw new Error("전송 실패");
-    } catch (e) { alert("❌ 실패: " + e.message); } finally { btn.textContent = "업로드 실행"; btn.disabled = false; }
+        
+        const contentBase64 = btoa(unescape(encodeURIComponent(jsonString)));
+
+        const getUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
+        let sha = "";
+        const getRes = await fetch(getUrl, {
+            method: "GET",
+            headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json" }
+        });
+        if (getRes.ok) {
+            const getData = await getRes.json();
+            sha = getData.sha;
+        }
+
+        const putUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+        const bodyData = {
+            message: `Update data.json via Web (${new Date().toLocaleString()})`,
+            content: contentBase64,
+            branch: branch
+        };
+        if (sha) bodyData.sha = sha;
+
+        const putRes = await fetch(putUrl, {
+            method: "PUT",
+            headers: {
+                "Authorization": `token ${token}`,
+                "Accept": "application/vnd.github.v3+json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(bodyData)
+        });
+
+        if (putRes.ok) {
+            alert("✅ 성공적으로 GitHub에 저장되었습니다!\n잠시 후(약 1~3분) 페이지에 반영됩니다.");
+            document.getElementById('githubModal').style.display = 'none';
+        } else {
+            const errData = await putRes.json();
+            throw new Error(errData.message);
+        }
+    } catch (e) {
+        alert("❌ 업로드 실패: " + e.message);
+        console.error(e);
+    } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+    }
   }
 
-  async function sha256(message) { const msgBuffer = new TextEncoder().encode(message); const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
-  async function toggleAdmin() { if(isAdmin) { if(confirm("로그아웃?")) { localStorage.setItem('kac_admin_mode','0'); location.reload(); } } else { const pw = prompt("관리자 비번"); if(!pw) return; if(await sha256(pw.toUpperCase()) === globalData.security.admin_pw) { localStorage.setItem('kac_admin_mode','1'); location.reload(); } else alert("불일치"); } }
-  function togglePreview() { isPreview = !isPreview; localStorage.setItem('kac_preview_active', isPreview ? '1' : '0'); location.reload(); }
+  // --- 비밀번호 변경 로직 ---
+  function openPwChangeModal() {
+      document.getElementById('settingsModal').style.display='none';
+      document.getElementById('pwChangeModal').style.display='flex';
+      document.getElementById('newPw').value = '';
+  }
+
+  async function executePwChange() {
+      const target = document.getElementById('pwTarget').value;
+      const newPw = document.getElementById('newPw').value.trim().toUpperCase();
+      
+      if(!newPw) return alert("변경할 비밀번호를 입력하세요.");
+      
+      const confirmPw = prompt(`[${target==='entry'?'교육생':'관리자'} 비밀번호]를 변경하시겠습니까?\n확인을 위해 새 비밀번호를 다시 입력해주세요.`);
+      if(newPw !== confirmPw) return alert("비밀번호가 일치하지 않습니다.");
+
+      const newHash = await sha256(newPw);
+      if(target === 'entry') globalData.security.entry_pw = newHash;
+      else globalData.security.admin_pw = newHash;
+
+      document.getElementById('pwChangeModal').style.display='none';
+      alert("✅ 비밀번호가 내부적으로 변경되었습니다.\n\n⚠️ 주의: [변경사항 저장] 또는 [GitHub 업로드]를 눌러야 완전히 적용됩니다!");
+      openSettings(); 
+  }
+
+  let tempSlotIdx = -1;
+  function openEdit(id, slotIdx = -1) {
+    editingCardId = id;
+    tempSlotIdx = slotIdx;
+    if(id === 'NEW') {
+      document.getElementById('editName').value = '';
+      document.getElementById('editCode').value = '';
+      document.getElementById('editColor').value = '#2563eb';
+    } else {
+      const t = globalData.categories.find(c => c && c.id === id);
+      document.getElementById('editName').value = t.name;
+      document.getElementById('editCode').value = t.code;
+      document.getElementById('editColor').value = t.color;
+    }
+    document.getElementById('cardEditModal').style.display='flex';
+  }
+
+  function saveCardEdit() {
+    const name = document.getElementById('editName').value;
+    const code = document.getElementById('editCode').value;
+    const color = document.getElementById('editColor').value;
+    if(editingCardId === 'NEW') {
+      const newCat = { id: 'CAT_' + Date.now(), name, code, color, menus: [] };
+      if(tempSlotIdx !== -1) { globalData.categories[tempSlotIdx] = newCat; } 
+      else {
+          const emptyIdx = globalData.categories.indexOf(null);
+          if(emptyIdx !== -1) globalData.categories[emptyIdx] = newCat;
+          else globalData.categories.push(newCat);
+      }
+    } else {
+      const t = globalData.categories.find(c => c && c.id === editingCardId);
+      if(t) { t.name = name; t.code = code; t.color = color; }
+    }
+    syncToLocalStorage(globalData);
+    renderCards();
+    document.getElementById('cardEditModal').style.display='none';
+  }
+
+  function openMovePageModal(idx) {
+    moveSrcIndex = idx;
+    const select = document.getElementById('moveTargetPage'); 
+    select.innerHTML = '';
+    const totalPages = Math.ceil(globalData.categories.length / itemsPerPage);
+    for(let i=1; i<=totalPages; i++) {
+        const opt = document.createElement('option');
+        opt.value = i; opt.textContent = `${i} 페이지로 이동`;
+        select.appendChild(opt);
+    }
+    const newPageOpt = document.createElement('option');
+    newPageOpt.value = 'NEW'; newPageOpt.textContent = "새 페이지로 이동 (마지막)";
+    select.appendChild(newPageOpt);
+    document.getElementById('movePageModal').style.display='flex';
+  }
+
+  function executeMovePage() {
+    const val = document.getElementById('moveTargetPage').value;
+    const item = globalData.categories[moveSrcIndex];
+    globalData.categories[moveSrcIndex] = null;
+    if(val === 'NEW') {
+        const currentLen = globalData.categories.length;
+        const newStart = Math.ceil(currentLen / itemsPerPage) * itemsPerPage;
+        for(let i=currentLen; i<newStart; i++) globalData.categories.push(null);
+        globalData.categories.push(item);
+        for(let i=0; i<itemsPerPage-1; i++) globalData.categories.push(null);
+    } else {
+        const page = parseInt(val);
+        const startIdx = (page-1) * itemsPerPage;
+        const endIdx = startIdx + itemsPerPage;
+        let foundEmpty = -1;
+        for(let i=startIdx; i<endIdx; i++) {
+            if(globalData.categories[i] === null) { foundEmpty = i; break; }
+        }
+        if(foundEmpty !== -1) globalData.categories[foundEmpty] = item;
+        else { alert("해당 페이지에 빈 공간이 없습니다."); globalData.categories[moveSrcIndex] = item; return; }
+    }
+    document.getElementById('movePageModal').style.display='none';
+    renderCards();
+    syncToLocalStorage(globalData);
+  }
+
+  function deleteCard(idx) {
+    if(confirm("정말 삭제하시겠습니까? (하위 메뉴도 모두 삭제됩니다)")) {
+      globalData.categories[idx] = null; 
+      syncToLocalStorage(globalData);
+      renderCards();
+    }
+  }
+
+  function exportJsonData() {
+    reconstructGlobalDataFromLocal();
+    
+    globalData.meta.lastUpdated = new Date().toISOString().split('T')[0];
+    const str = JSON.stringify(globalData, null, 2);
+    const blob = new Blob([str], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = "data.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    alert("data.json 파일이 다운로드되었습니다.\n서버/폴더의 기존 파일을 덮어쓰기 해주세요.");
+  }
+
   function setTheme(m) { document.body.className = m==='dark'?'dark-mode':''; localStorage.setItem('kac_theme', m); document.getElementById('btnDay').classList.toggle('active', m==='light'); document.getElementById('btnNight').classList.toggle('active', m==='dark'); }
-  function openEdit(id, slotIdx) { editingCardId = id; tempSlotIdx = slotIdx; if(id !== 'NEW') { const t = globalData.categories.find(c => c && c.id === id); document.getElementById('editName').value = t.name; document.getElementById('editCode').value = t.code; document.getElementById('editColor').value = t.color; } else { document.getElementById('editName').value = ''; document.getElementById('editCode').value = ''; document.getElementById('editColor').value = '#2563eb'; } document.getElementById('cardEditModal').style.display='flex'; }
-  function saveCardEdit() { const n = document.getElementById('editName').value, c = document.getElementById('editCode').value, cl = document.getElementById('editColor').value; if(editingCardId === 'NEW') { const nc = { id: 'CAT_' + Date.now(), name: n, code: c, color: cl, menus: [] }; globalData.categories[tempSlotIdx] = nc; } else { const t = globalData.categories.find(ca => ca && ca.id === editingCardId); t.name = n; t.code = c; t.color = cl; } syncToLocalStorage(globalData); renderCards(); closeModal('cardEditModal'); }
-  function deleteCard(idx) { if(confirm("삭제?")) { globalData.categories[idx] = null; syncToLocalStorage(globalData); renderCards(); } }
 
   init();
 </script>

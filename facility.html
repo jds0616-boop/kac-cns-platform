@@ -40,7 +40,6 @@
   #searchOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1500; display: none; backdrop-filter: blur(4px); animation: fadeIn 0.3s; }
   #searchOverlay.active { display: block; }
   body.search-mode .header-left, body.search-mode .header-right { opacity: 0.1; pointer-events: none; }
-  body.search-mode main { filter: blur(2px); opacity: 0.5; pointer-events: none; transition: 0.3s; }
 
   header { height: var(--header-h); background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 2000; flex-shrink: 0; position: relative; }
   .header-left { display: flex; align-items: center; flex: 1; min-width: 400px; }
@@ -77,7 +76,16 @@
   .settings-btn { display: flex; padding: 8px; width: 34px; height: 34px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.3s; color: #cbd5e1; }
 
   main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
-  #trainGrid { gap: 30px; width: 100%; max-width: 1250px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; }
+  #trainGrid { 
+    gap: 30px; 
+    width: 100%; 
+    max-width: 1250px; 
+    margin: 0 auto; 
+    align-items: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
   
   .menu-card { 
     background: var(--bg-card); width: 280px; min-height: 280px; height: auto; padding: 35px 25px; 
@@ -91,7 +99,7 @@
   .menu-card.drag-over { border: 2px solid var(--theme-color); transform: scale(1.05); }
 
   .icon-circle { 
-    min-width: 90px; width: fit-content; height: auto; min-height: 90px; padding: 15px 25px; 
+    min-width: 90px; width: auto; height: auto; min-height: 90px; padding: 15px 30px; 
     border-radius: 28px; background: var(--icon-bg); border: 2px solid var(--icon-border); 
     display: flex; flex-direction: column; align-items: center; justify-content: center; 
     font-size: var(--icon-size-fac, 28px); font-weight: 900; margin-bottom: 25px; 
@@ -103,85 +111,138 @@
   .btn-sm { padding: 5px 12px; font-size: 11px; border-radius: 8px; border: 1px solid var(--btn-border); background: var(--btn-bg); font-weight: 700; cursor: pointer; color: var(--btn-text); transition: 0.2s; }
   .btn-del { color: #ef4444; border-color: #fee2e2; }
 
-  /* [모바일 반응형 최적화 - 지적사항 반영] */
-  @media (max-width: 768px) {
-    header { padding: 0 15px; height: 60px; }
-    .header-left, .header-right { display: none !important; }
-    .header-center { width: 100%; max-width: 100%; }
-    
-    main { padding: 10px; }
-    #trainGrid { gap: 10px !important; }
-
-    .menu-card {
-      /* 카드 높이 축소 */
-      width: calc(50% - 8px) !important;
-      min-height: 110px !important; 
-      padding: 12px 8px !important;
-      border-top-width: 4px !important;
-      border-radius: 15px !important;
-    }
-
-    .icon-circle {
-      /* 글자 안넘치게 width 유동적 처리 */
-      min-width: 45px !important;
-      width: fit-content !important;
-      height: 40px !important;
-      min-height: 40px !important;
-      margin-bottom: 8px !important;
-      font-size: 14px !important; 
-      padding: 0 12px !important;
-      border-radius: 10px !important;
-    }
-    
-    .menu-label { 
-      font-size: 12px !important; 
-      font-weight: 700 !important;
-      line-height: 1.2;
-    }
-    
-    .admin-ctrl { margin-top: 5px; gap: 3px; }
-    .btn-sm { padding: 3px 6px; font-size: 9px; }
-
-    /* 하단 네비게이션 정렬 수정 */
-    .bottom-nav {
-      width: 90%;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 12px 0;
-      justify-content: center; /* 가운데 정렬 */
-      gap: 30px;
-      border-radius: 50px;
-      background: rgba(15, 23, 42, 0.95);
-      backdrop-filter: blur(10px);
-    }
-    .nav-item { font-size: 14px; gap: 6px; flex: none; }
-  }
-
   .pagination { display: flex; gap: 10px; margin-top: 30px; justify-content: center; align-items: center; padding-bottom: 100px; }
   .page-dot { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--bg-card); color: var(--text-sub); border: 1px solid var(--btn-border); cursor: pointer; font-weight: 700; transition: 0.3s; }
   .page-dot.active { background: var(--navy); color: #fff; transform: scale(1.1); }
+  .page-dot.drag-target { background: var(--theme-color) !important; color: #fff !important; transform: scale(1.2); }
 
   #loadingSpinner { position: fixed; inset: 0; background: var(--bg-main); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
   .spinner { width: 50px; height: 50px; border: 5px solid #cbd5e1; border-top-color: #2563eb; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
 
   .bottom-nav { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); background: var(--navy); padding: 15px 45px; border-radius: 100px; display: flex; gap: 40px; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000; border: 1px solid rgba(255,255,255,0.1); }
   .nav-item { color: #fff; cursor: pointer; font-size: 18px; font-weight: 700; transition: 0.3s; opacity: 0.8; display: flex; align-items: center; gap: 10px; }
+  .nav-item:hover { opacity: 1; transform: translateY(-3px); }
+
+  /* [수정] 야간 모드일 때 하단 버튼 시인성 개선 */
+  body.dark-mode .bottom-nav {
+    background: rgba(30, 41, 59, 0.95); /* 조금 더 밝은 남색 */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* 테두리 밝게 */
+  }
+  body.dark-mode .nav-item {
+    color: #e2e8f0; /* 밝은 회색 텍스트 */
+    opacity: 1;
+  }
 
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none; align-items: center; justify-content: center; }
   .modal-card { background: var(--bg-card); padding: 40px; border-radius: 30px; width: 500px; color: var(--text-main); box-shadow: 0 20px 50px rgba(0,0,0,0.5); max-height: 95vh; overflow-y: auto; }
-  body.dark-mode .modal-card { background-color: #1e293b; border: 1px solid rgba(255,255,255,0.1); }
+  
+  /* 야간 모드 모달 카드 배경 */
+  body.dark-mode .modal-card {
+      background-color: #1e293b;
+      border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  #settingsModal { z-index: 10000; }
+  #bulkEditModal, #itemEditModal, #moveMenuModal { z-index: 11000; }
+  
+  .modal-title { font-size: 22px; font-weight: 800; margin-bottom: 25px; border-bottom: 1px solid var(--btn-border); padding-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  .setting-group { margin-bottom: 25px; }
+  .setting-label { font-size: 12px; font-weight: 800; color: var(--text-sub); margin-bottom: 10px; display: block; }
   
   .setting-input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--btn-border); background: #f8fafc; color: var(--text-main); font-size: 14px; text-align: center; outline: none; transition: 0.3s; }
-  body.dark-mode .setting-input { background-color: #334155 !important; color: #ffffff !important; border-color: rgba(255,255,255,0.3); }
+  .setting-input:focus { border-color: var(--theme-color); background: #fff; box-shadow: 0 0 0 4px rgba(var(--theme-rgb), 0.1); }
+
+  /* [수정] 야간 모드 팝업창(모달) 입력필드 시인성 개선 */
+  body.dark-mode .setting-input,
+  body.dark-mode select.setting-input {
+      background-color: #334155 !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255,255,255,0.3);
+  }
+  body.dark-mode select.setting-input option {
+      background-color: #1e293b;
+      color: #ffffff;
+  }
 
   .btn-modal { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 15px; margin-top: 12px; }
   .btn-primary { background: #0f172a; color: #fff; }
   .btn-danger { background: #ef4444; color: #fff; }
   .btn-secondary { background: #e2e8f0; color: #64748b; }
+  .btn-success { background: #10b981; color: #fff; }
+  .btn-preview-active { background: #10b981 !important; color: #fff !important; }
 
-  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .bulk-list-container { display: flex; flex-direction: column; gap: 5px; border: 1px solid var(--btn-border); border-radius: 20px; overflow-y: auto; max-height: 50vh; background: #fff; padding: 10px; }
+  .bulk-header-row { position: sticky; top: 0; display: grid; grid-template-columns: 40px 80px 80px 140px 1fr; background: #f1f5f9; padding: 12px; font-size: 11px; font-weight: 800; text-align: center; border-radius: 10px; color: var(--theme-color); margin-bottom: 10px; z-index: 10; }
+  .bulk-row { display: grid; grid-template-columns: 40px 80px 80px 140px 1fr; gap: 8px; padding: 8px; border-bottom: 1px solid #f1f5f9; align-items: center; }
+  .bulk-input { padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center; font-size: 12px; background: #f8fafc; outline: none; }
+
+  /* [모바일 반응형 최적화 - 세로쓰기 방지 및 아이콘 크기 조정] */
+  @media (max-width: 768px) {
+    header { padding: 0 15px; }
+    .header-left, .header-right { display: none !important; }
+    .header-center { width: 100%; max-width: 100%; }
+    
+    #trainGrid {
+      gap: 12px !important;
+      display: flex !important;
+      flex-wrap: wrap !important;
+      justify-content: center !important;
+    }
+
+    .menu-card {
+      /* 카드 크기 축소 및 패딩 최적화 */
+      width: calc(50% - 10px) !important;
+      min-height: 180px !important;
+      padding: 20px 10px !important;
+    }
+
+    .icon-circle {
+      /* 아이콘 크기 축소 */
+      min-width: 50px !important;
+      min-height: 50px !important;
+      width: 50px !important; 
+      height: 50px !important;
+      margin-bottom: 15px !important;
+      font-size: 20px !important;
+      padding: 0 !important;
+    }
+    
+    .menu-label { 
+      /* 글자 세로쓰기 방지 (keep-all 제거) */
+      font-size: 14px !important; 
+      word-break: break-word !important; 
+      line-height: 1.3;
+    }
+    
+    .admin-ctrl { flex-direction: column; width: 100%; gap: 4px; }
+    .admin-ctrl button { width: 100%; }
+
+    /* [수정] 모바일 하단 네비게이션 개선 */
+    .bottom-nav {
+      width: 90%;
+      bottom: 20px;
+      padding: 12px 0;
+      justify-content: center;
+      gap: 30px;
+      border-radius: 20px;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(10px);
+    }
+    /* 모바일 야간모드 */
+    body.dark-mode .bottom-nav {
+      background: rgba(30, 41, 59, 0.95);
+    }
+    
+    .nav-item { font-size: 14px; gap: 6px; }
+    
+    /* 검색창 디자인 개선 */
+    .header-search {
+      font-size: 14px;
+      padding: 10px 20px 10px 45px;
+      background-size: 18px;
+      background-position: 15px center;
+    }
+  }
 </style>
 </head>
 <body>
@@ -199,7 +260,7 @@
     <span class="breadcrumb" id="bc"></span>
   </div>
   <div class="header-center">
-    <input type="text" id="searchInput" class="header-search" placeholder="시설명 또는 교육 주제를 검색하세요..." autocomplete="off">
+    <input type="text" id="searchInput" class="header-search" placeholder="예시) VOR, ILS, 단거리 이동통신..." autocomplete="off">
     <div id="searchDropdown" class="search-dropdown"></div>
   </div>
   <div class="header-right">
@@ -226,9 +287,8 @@
   <div class="nav-item" onclick="location.href='index.html'"><svg style="width:22px;height:22px;fill:currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>홈으로</div>
 </div>
 
-<!-- 모달 영역 -->
 <div id="itemEditModal" class="modal-overlay">
-  <div class="modal-card">
+  <div class="modal-card" style="width:450px;">
     <div class="modal-title">📦 메뉴 상세 수정</div>
     <div class="setting-group"><label class="setting-label">아이콘(1행)</label><input type="text" id="editItemLine1" class="setting-input"></div>
     <div class="setting-group"><label class="setting-label">아이콘(2행)</label><input type="text" id="editItemLine2" class="setting-input"></div>
@@ -241,13 +301,54 @@
   </div>
 </div>
 
+<div id="moveMenuModal" class="modal-overlay">
+  <div class="modal-card" style="width:400px;">
+    <div class="modal-title">📂 메뉴 이동</div>
+    <div class="setting-group"><label class="setting-label">목적지 시설 선택</label><select id="moveTargetCategory" class="setting-input" style="text-align-last:center;"></select></div>
+    <div class="btn-row">
+      <button class="btn-modal btn-primary" onclick="executeMoveMenu()">이동</button>
+      <button class="btn-modal btn-secondary" onclick="closeModal('moveMenuModal')">취소</button>
+    </div>
+  </div>
+</div>
+
+<div id="bulkEditModal" class="modal-overlay">
+  <div class="modal-card" style="width:900px;">
+    <div class="modal-title">📋 일괄 자료 수정</div>
+    <div class="bulk-list-container">
+      <div class="bulk-header-row"><div>No.</div><div>아이콘(1)</div><div>아이콘(2)</div><div>메뉴 명칭</div><div>외부 연동 링크</div></div>
+      <div id="bulkRowContainer"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-modal btn-primary" onclick="saveBulkData()">전체 저장</button>
+      <button class="btn-modal btn-secondary" onclick="closeModal('bulkEditModal')">닫기</button>
+    </div>
+  </div>
+</div>
+
 <div id="settingsModal" class="modal-overlay">
-  <div class="modal-card">
+  <div class="modal-card" style="width:400px;">
     <div class="modal-title">⚙️ 설정 및 관리</div>
-    <div id="adminSettings">
-      <button class="btn-modal btn-danger" onclick="toggleAdmin()">로그아웃</button>
-      <button id="modalPreviewBtn" class="btn-modal btn-secondary" onclick="togglePreview()">미리보기 시작</button>
-      <button class="btn-modal btn-primary" onclick="exportJsonData()">변경사항 저장 (data.json)</button>
+    <div id="guestSettings" style="display:none;">
+      <p style="margin-bottom:20px; font-size:14px; color:var(--text-sub);">관리자 권한이 필요합니다.</p>
+      <button class="btn-modal btn-primary" onclick="toggleAdmin()">관리자 로그인</button>
+    </div>
+    <div id="adminSettings" style="display:none;">
+      <div class="setting-group">
+        <label class="setting-label">🛠️ 시스템 관리</label>
+        <button class="btn-modal btn-danger" onclick="toggleAdmin()">로그아웃</button>
+        <button id="modalPreviewBtn" class="btn-modal btn-secondary" onclick="togglePreview()">미리보기 시작</button>
+        <button class="btn-modal btn-success" onclick="exportJsonData()">변경사항 저장 (data.json 다운로드)</button>
+      </div>
+      <div class="setting-group"><button class="btn-modal btn-primary" onclick="openBulkEdit()">일괄 수정 팝업 열기</button></div>
+      <div class="setting-group" style="background: rgba(0,0,0,0.02); padding: 15px; border-radius: 15px; border: 1px solid var(--btn-border);">
+        <label class="setting-label">🎨 UI 설정 (px)</label>
+        <div style="display:flex; gap:10px;">
+          <input type="number" id="setFacIconSize" class="setting-input" placeholder="아이콘">
+          <input type="number" id="setFacLabelSize" class="setting-input" placeholder="라벨">
+        </div>
+        <button class="btn-modal btn-primary" onclick="saveUISettings()">UI 적용</button>
+      </div>
     </div>
     <button class="btn-modal btn-secondary" onclick="closeModal('settingsModal')">닫기</button>
   </div>
@@ -258,26 +359,39 @@
   const type = params.get('type');
   let isAdmin = localStorage.getItem('kac_admin_mode') === '1';
   let isPreview = localStorage.getItem('kac_preview_active') === '1';
-  let menus = [], currentEditIdx = -1, currentPage = 1, dragSrcIndex = null;
+  let menus = [], searchIndex = [], currentEditIdx = -1, currentPage = 1, dragSrcIndex = null;
   const itemsPerPage = 8;
   
-  let globalSecurity = { admin_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c" };
+  let globalSecurity = {
+      admin_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c"
+  };
 
   async function init() {
     setTheme(localStorage.getItem('kac_theme') || 'light');
+    if(isPreview) document.body.classList.add('preview-active');
     
+    // 1. 현재 관리자 모드인지 확인 (인덱스 파일과 동일하게 localStorage 사용)
+    const isAdminSession = localStorage.getItem('kac_admin_mode') === '1';
+
+    // 2. 서버 데이터 가져오기
     let serverData = null;
     try {
         const res = await fetch('data.json?v=' + Date.now());
         if(res.ok) serverData = await res.json();
-    } catch(e) {}
+    } catch(e) { console.error("data.json load failed"); }
 
-    const isAdminSession = localStorage.getItem('kac_admin_mode') === '1';
+    // 3. 로컬 데이터 확인
     const hasLocalData = localStorage.getItem('kac_index_order');
 
+    // [핵심 로직 변경]
+    // 관리자(수정 권한 있음)이고 + 수정 중인 데이터가 있으면 -> 로컬 데이터 유지
     if (isAdminSession && hasLocalData) {
+        console.log("🛠️ Admin: Using Local Data");
         if(serverData && serverData.security) globalSecurity = serverData.security;
-    } else if (serverData) {
+    } 
+    // 일반 사용자이거나 + 로컬 데이터가 없으면 -> 서버 데이터로 강제 덮어쓰기
+    else if (serverData) {
+        console.log("🔄 User: Syncing with Server");
         if(serverData.security) globalSecurity = serverData.security;
         syncToLocalStorage(serverData);
     }
@@ -285,10 +399,23 @@
     document.getElementById('loadingSpinner').style.opacity = '0';
     setTimeout(() => document.getElementById('loadingSpinner').style.display='none', 500);
 
+    // 2. 초기화
     loadMenuData();
+    loadStyles();
     render(); 
     buildSearchIndex();
   }
+
+  window.addEventListener('pageshow', () => {
+      const savedStatus = localStorage.getItem('kac_admin_mode') === '1';
+      if (isAdmin !== savedStatus) location.reload();
+      const savedPreview = localStorage.getItem('kac_preview_active') === '1';
+      if(isPreview !== savedPreview) location.reload();
+  });
+
+  window.addEventListener('storage', (e) => {
+      if (e.key === 'kac_admin_mode' || e.key === 'kac_preview_active') location.reload();
+  });
 
   function syncToLocalStorage(data) {
     const order = [];
@@ -296,21 +423,30 @@
       if(cat) {
         order.push(cat.id);
         localStorage.setItem(`kac_style_${cat.id}`, JSON.stringify({ name: cat.name, code: cat.code, color: cat.color }));
-        const mData = cat.menus.map(m => ({ dataId: m.id, label: m.label, line1: m.line1, line2: m.line2, link: m.link }));
-        localStorage.setItem(`kac_menu_${cat.id}`, JSON.stringify(mData));
-        cat.menus.forEach(m => localStorage.setItem(`kac_subs_${cat.id}_${m.id}`, JSON.stringify(m.subjects)));
+        const menus = cat.menus.map(m => ({ dataId: m.id, label: m.label, line1: m.line1, line2: m.line2, link: m.link }));
+        localStorage.setItem(`kac_menu_${cat.id}`, JSON.stringify(menus));
+        cat.menus.forEach(m => { localStorage.setItem(`kac_subs_${cat.id}_${m.id}`, JSON.stringify(m.subjects)); });
       } else { order.push(null); }
     });
     localStorage.setItem('kac_index_order', JSON.stringify(order));
+    if(data.config) {
+        if(data.config.facIconSize) localStorage.setItem('kac_fac_icon_size', data.config.facIconSize);
+        if(data.config.facLabelSize) localStorage.setItem('kac_fac_label_size', data.config.facLabelSize);
+    }
   }
 
   function loadMenuData() {
-    const saved = localStorage.getItem(`kac_menu_${type}`);
-    menus = saved ? JSON.parse(saved) : [];
-    const sData = localStorage.getItem(`kac_style_${type}`), style = sData ? JSON.parse(sData) : { name: type, color: '#2563eb' };
-    document.getElementById('bc').textContent = ` > ${style.name || type}`;
-    document.documentElement.style.setProperty('--theme-color', style.color || '#2563eb');
-    document.documentElement.style.setProperty('--theme-rgb', hexToRgb(style.color || '#2563eb'));
+      try {
+          const saved = localStorage.getItem(`kac_menu_${type}`);
+          menus = saved ? JSON.parse(saved) : [];
+          menus = menus.map(m => { if (!m.line1 && m.code) m.line1 = m.code; return m; });
+      } catch(e) { menus = []; }
+      
+      const sData = localStorage.getItem(`kac_style_${type}`), style = sData ? JSON.parse(sData) : { name: type, color: '#2563eb' };
+      document.getElementById('bc').textContent = ` > ${style.name || type}`;
+      document.documentElement.style.setProperty('--theme-color', style.color || '#2563eb');
+      const rgb = hexToRgb(style.color || '#2563eb');
+      document.documentElement.style.setProperty('--theme-rgb', rgb);
   }
   
   function hexToRgb(hex) {
@@ -318,25 +454,52 @@
     return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '37, 99, 235';
   }
 
-  function render() {
+  function render(direction = 'none') {
     const grid = document.getElementById('trainGrid'), paginCont = document.getElementById('pagination');
+    if(!grid || !paginCont) return;
     grid.innerHTML = ''; paginCont.innerHTML = '';
     
+    if(direction !== 'none') { 
+        grid.style.opacity = '0';
+        grid.style.transform = direction === 'next' ? 'translateX(20px)' : 'translateX(-20px)';
+        setTimeout(() => {
+            grid.style.transition = '0.3s';
+            grid.style.opacity = '1';
+            grid.style.transform = 'translateX(0)';
+        }, 50);
+    }
+
     let list = [...menus]; 
     if(isAdmin && !isPreview) list.push({ isAddButton: true });
 
     const totalPages = Math.ceil(list.length / itemsPerPage) || 1;
+    if(currentPage > totalPages) currentPage = totalPages;
     const start = (currentPage - 1) * itemsPerPage, pageItems = list.slice(start, start + itemsPerPage);
+
+    grid.style.display = 'flex';
+    grid.style.flexWrap = 'wrap';
+    grid.style.justifyContent = 'center';
+    grid.style.gridTemplateColumns = ''; 
 
     pageItems.forEach((item, idx) => {
       const globalIdx = start + idx, card = document.createElement('div');
       card.className = item.isAddButton ? 'menu-card add-btn-wrap' : 'menu-card';
       
+      if(isAdmin && !isPreview && !item.isAddButton) {
+        card.setAttribute('draggable', 'true');
+        card.ondragstart = (e) => { dragSrcIndex = globalIdx; e.target.classList.add('dragging'); };
+        card.ondragover = (e) => { e.preventDefault(); card.classList.add('drag-over'); };
+        card.ondragleave = () => card.classList.remove('drag-over');
+        card.ondrop = (e) => { e.preventDefault(); card.classList.remove('drag-over'); if(dragSrcIndex !== globalIdx) { const moved = menus.splice(dragSrcIndex, 1)[0]; menus.splice(globalIdx, 0, moved); saveData(); } };
+        card.ondragend = () => card.classList.remove('dragging');
+      }
+
       if(item.isAddButton) {
-        card.innerHTML = `<div class="icon-circle" style="background:none; border:2px dashed #cbd5e1; color:#cbd5e1">+</div><div style="color:#94a3b8; font-weight:800;">메뉴 추가</div>`;
+        card.style.border = '2px dashed #cbd5e1';
+        card.innerHTML = `<div class="icon-circle" style="background:none; border:2px solid #cbd5e1; color:#cbd5e1">+</div><div style="color:#94a3b8; font-weight:800;">메뉴 추가</div>`;
         card.onclick = () => openIndividualEdit('NEW');
       } else {
-        const ctrl = (isAdmin && !isPreview) ? `<div class="admin-ctrl" onclick="event.stopPropagation()"><button class="btn-sm" onclick="openIndividualEdit(${globalIdx})">수정</button><button class="btn-sm btn-del" onclick="deleteItem(${globalIdx})">삭제</button></div>` : '';
+        const ctrl = (isAdmin && !isPreview) ? `<div class="admin-ctrl" onclick="event.stopPropagation()"><button class="btn-sm" onclick="openIndividualEdit(${globalIdx})">수정</button><button class="btn-sm btn-move" style="color:#2563eb; border-color:#dbeafe;" onclick="openMoveMenuModal(${globalIdx})">이동</button><button class="btn-sm" style="color:#ef4444" onclick="deleteItem(${globalIdx})">삭제</button></div>` : '';
         const l1 = item.line1 || '', l2 = item.line2 ? `<div>${item.line2}</div>` : '';
         card.innerHTML = `<div class="icon-circle"><div>${l1}</div>${l2}</div><div class="menu-label">${item.label || '제목없음'}</div>${ctrl}`;
         card.onclick = () => item.link ? window.open(item.link, '_blank') : location.href = `viewer_list.html?type=${type}&menu=${encodeURIComponent(item.label)}&id=${item.dataId}`;
@@ -349,53 +512,129 @@
         const dot = document.createElement('div');
         dot.className = `page-dot ${i === currentPage ? 'active' : ''}`;
         dot.textContent = i;
-        dot.onclick = () => { currentPage = i; render(); };
+        dot.onclick = () => { if(i === currentPage) return; const dir = i > currentPage ? 'next' : 'prev'; currentPage = i; render(dir); };
+        if(isAdmin && !isPreview) {
+          dot.ondragover = (e) => { e.preventDefault(); dot.classList.add('drag-target'); };
+          dot.ondragleave = () => dot.classList.remove('drag-target');
+          dot.ondrop = (e) => { e.preventDefault(); dot.classList.remove('drag-target'); const moved = menus.splice(dragSrcIndex, 1)[0]; menus.splice((i-1)*itemsPerPage, 0, moved); currentPage = i; saveData(); };
+        }
         paginCont.appendChild(dot);
       }
     }
   }
 
-  // [수정] 모달 열 때 기존 데이터 채우기
-  function openIndividualEdit(idx) { 
-    currentEditIdx = idx; 
-    if(idx === 'NEW') {
-        ['editItemLine1','editItemLine2','editItemLabel','editItemLink'].forEach(id => document.getElementById(id).value = ''); 
-    } else { 
-        const m = menus[idx]; 
-        document.getElementById('editItemLine1').value = m.line1 || ''; 
-        document.getElementById('editItemLine2').value = m.line2 || ''; 
-        document.getElementById('editItemLabel').value = m.label || ''; 
-        document.getElementById('editItemLink').value = m.link || ''; 
-    } 
-    document.getElementById('itemEditModal').style.display = 'flex'; 
+  function openIndividualEdit(idx) { currentEditIdx = idx; if(idx === 'NEW') ['editItemLine1','editItemLine2','editItemLabel','editItemLink'].forEach(id => document.getElementById(id).value = ''); else { const m = menus[idx]; document.getElementById('editItemLine1').value = m.line1 || ''; document.getElementById('editItemLine2').value = m.line2 || ''; document.getElementById('editItemLabel').value = m.label || ''; document.getElementById('editItemLink').value = m.link || ''; } document.getElementById('itemEditModal').style.display = 'flex'; }
+  function saveIndividualEdit() { const data = { line1: document.getElementById('editItemLine1').value, line2: document.getElementById('editItemLine2').value, label: document.getElementById('editItemLabel').value, link: document.getElementById('editItemLink').value, dataId: (currentEditIdx === 'NEW' ? 'id_' + Date.now() : menus[currentEditIdx].dataId) }; if(currentEditIdx === 'NEW') menus.push(data); else menus[currentEditIdx] = data; saveData(); closeModal('itemEditModal'); }
+  function openMoveMenuModal(idx) { currentEditIdx = idx; const select = document.getElementById('moveTargetCategory'); select.innerHTML = ''; const mOrder = JSON.parse(localStorage.getItem('kac_index_order') || '[]'); mOrder.forEach(t => { if(!t || t === type) return; const sD = localStorage.getItem(`kac_style_${t}`), s = sD ? JSON.parse(sD) : { name: t }; select.innerHTML += `<option value="${t}">${s.name || t}</option>`; }); document.getElementById('moveMenuModal').style.display = 'flex'; }
+  function executeMoveMenu() { const targetType = document.getElementById('moveTargetCategory').value; if(!targetType) return; const item = menus.splice(currentEditIdx, 1)[0], targetMenus = JSON.parse(localStorage.getItem(`kac_menu_${targetType}`) || '[]'); const oK = `kac_subs_${type}_${item.dataId}`, nK = `kac_subs_${targetType}_${item.dataId}`, sD = localStorage.getItem(oK); if(sD) { localStorage.setItem(nK, sD); localStorage.removeItem(oK); } targetMenus.push(item); localStorage.setItem(`kac_menu_${targetType}`, JSON.stringify(targetMenus)); saveData(); alert('이동됨'); closeModal('moveMenuModal'); }
+  function openBulkEdit() { const cont = document.getElementById('bulkRowContainer'); cont.innerHTML = ''; for(let i=0; i<30; i++) { const m = menus[i] || {}; cont.innerHTML += `<div class="bulk-row"><div>${i+1}</div><input type="text" class="bulk-input b-line1" value="${m.line1 || ''}"><input type="text" class="bulk-input b-line2" value="${m.line2 || ''}"><input type="text" class="bulk-input b-label" value="${m.label || ''}"><input type="text" class="bulk-input b-link" value="${m.link || ''}"></div>`; } document.getElementById('bulkEditModal').style.display = 'flex'; }
+  function saveBulkData() { const rows = document.querySelectorAll('.bulk-row'); let nMs = []; rows.forEach((row, i) => { const l1 = row.querySelector('.b-line1').value, lab = row.querySelector('.b-label').value; if(l1 || lab) nMs.push({ line1: l1, line2: row.querySelector('.b-line2').value, label: lab, link: row.querySelector('.b-link').value, dataId: (menus[i] ? menus[i].dataId : 'id_'+Date.now()+'_'+i) }); }); menus = nMs; saveData(); alert('저장됨'); closeModal('bulkEditModal'); }
+  function deleteItem(idx) { if(confirm('정말 삭제하시겠습니까?')) { menus.splice(idx,1); saveData(); alert('삭제됨'); } }
+
+  function openSettings() { 
+    const gSet = document.getElementById('guestSettings'), aSet = document.getElementById('adminSettings'); 
+    gSet.style.display = isAdmin ? 'none' : 'block';
+    aSet.style.display = isAdmin ? 'block' : 'none';
+    if(isAdmin) {
+      document.getElementById('setFacIconSize').value = localStorage.getItem('kac_fac_icon_size') || 28; 
+      document.getElementById('setFacLabelSize').value = localStorage.getItem('kac_fac_label_size') || 18; 
+      const pBtn = document.getElementById('modalPreviewBtn'); 
+      pBtn.textContent = isPreview ? "미리보기 종료" : "미리보기 시작"; 
+      pBtn.classList.toggle('btn-preview-active', isPreview); 
+    }
+    document.getElementById('settingsModal').style.display = 'flex'; 
   }
 
-  function saveIndividualEdit() { 
-    const data = { 
-        line1: document.getElementById('editItemLine1').value, 
-        line2: document.getElementById('editItemLine2').value, 
-        label: document.getElementById('editItemLabel').value, 
-        link: document.getElementById('editItemLink').value, 
-        dataId: (currentEditIdx === 'NEW' ? 'id_' + Date.now() : menus[currentEditIdx].dataId) 
-    }; 
-    if(currentEditIdx === 'NEW') menus.push(data); 
-    else menus[currentEditIdx] = data; 
-    saveData(); 
-    closeModal('itemEditModal'); 
-  }
-
+  function togglePreview() { isPreview = !isPreview; localStorage.setItem('kac_preview_active', isPreview ? '1' : '0'); document.body.classList.toggle('preview-active', isPreview); render(); closeModal('settingsModal'); }
   function saveData() { localStorage.setItem(`kac_menu_${type}`, JSON.stringify(menus)); render(); buildSearchIndex(); }
   function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+  
+  // SHA-256 Auth
+  async function sha256(message) { const msgBuffer = new TextEncoder().encode(message); const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
+  
+  async function toggleAdmin() { 
+    if(isAdmin) { 
+        if(confirm("로그아웃?")) { localStorage.setItem('kac_admin_mode','0'); location.reload(); } 
+    } else { 
+        const pw = prompt("비밀번호"); if(!pw) return;
+        const inputHash = await sha256(pw.toUpperCase());
+        // [수정] globalSecurity 변수를 사용하여 비밀번호 비교
+        const storedHash = globalSecurity.admin_pw;
+        if(inputHash === storedHash) { localStorage.setItem('kac_admin_mode','1'); location.reload(); } else alert('비밀번호 불일치');
+    } 
+  }
+  
   function setTheme(m) { document.body.classList.toggle('dark-mode', m==='dark'); localStorage.setItem('kac_theme', m); const bD = document.getElementById('btnDay'), bN = document.getElementById('btnNight'); if(bD) bD.classList.toggle('active', m==='light'); if(bN) bN.classList.toggle('active', m==='dark'); }
-  function openSettings() { document.getElementById('adminSettings').style.display = isAdmin ? 'block' : 'none'; document.getElementById('settingsModal').style.display = 'flex'; }
-  function togglePreview() { isPreview = !isPreview; localStorage.setItem('kac_preview_active', isPreview ? '1' : '0'); location.reload(); }
-  async function toggleAdmin() { if(isAdmin) { localStorage.setItem('kac_admin_mode','0'); location.reload(); } }
-  function deleteItem(idx) { if(confirm('삭제하시겠습니까?')) { menus.splice(idx,1); saveData(); } }
+  function saveUISettings() { localStorage.setItem('kac_fac_icon_size', document.getElementById('setFacIconSize').value); localStorage.setItem('kac_fac_label_size', document.getElementById('setFacLabelSize').value); loadStyles(); alert('적용됨'); }
+  function loadStyles() { document.documentElement.style.setProperty('--icon-size-fac', (localStorage.getItem('kac_fac_icon_size')||'28')+'px'); document.documentElement.style.setProperty('--label-size-fac', (localStorage.getItem('kac_fac_label_size')||'18')+'px'); }
+
+  function exportJsonData() {
+    try {
+        const newData = { meta: { version: "2.0", lastUpdated: new Date().toISOString().split('T')[0] }, config: {}, categories: [] };
+        // [수정] globalSecurity 포함
+        newData.security = globalSecurity; 
+        
+        newData.config.iconSize = localStorage.getItem('kac_idx_icon_size') || 60;
+        newData.config.labelSize = localStorage.getItem('kac_idx_label_size') || 24;
+        newData.config.facIconSize = localStorage.getItem('kac_fac_icon_size') || 28;
+        newData.config.facLabelSize = localStorage.getItem('kac_fac_label_size') || 18;
+
+        const order = JSON.parse(localStorage.getItem('kac_index_order') || '[]');
+        order.forEach(id => {
+            if(!id) return;
+            const s = JSON.parse(localStorage.getItem(`kac_style_${id}`) || '{}');
+            const ms = JSON.parse(localStorage.getItem(`kac_menu_${id}`) || '[]');
+            const menuList = ms.map(m => {
+                const subs = JSON.parse(localStorage.getItem(`kac_subs_${id}_${m.dataId}`) || '[]');
+                return { id: m.dataId, label: m.label, line1: m.line1, line2: m.line2, link: m.link, subjects: subs };
+            });
+            newData.categories.push({ id: id, name: s.name, code: s.code, color: s.color, menus: menuList });
+        });
+
+        const str = JSON.stringify(newData, null, 2);
+        const blob = new Blob([str], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = "data.json";
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        alert("data.json 파일이 다운로드되었습니다.\n깃허브에 업로드해주세요.");
+    } catch(e) { alert("내보내기 실패: " + e.message); }
+  }
 
   function buildSearchIndex() { 
+    searchIndex = []; 
     const order = JSON.parse(localStorage.getItem('kac_index_order') || '[]');
-    order.forEach(tid => { if(!tid) return; const ms = JSON.parse(localStorage.getItem(`kac_menu_${tid}`) || '[]'); ms.forEach(m => { /* 검색 인덱싱 로직 */ }); });
+    order.forEach(tid => {
+        if(!tid) return;
+        const s = JSON.parse(localStorage.getItem(`kac_style_${tid}`) || '{}');
+        const ms = JSON.parse(localStorage.getItem(`kac_menu_${tid}`) || '[]');
+        ms.forEach(m => {
+            const subs = JSON.parse(localStorage.getItem(`kac_subs_${tid}_${m.dataId}`) || '[]');
+            subs.forEach(sub => {
+                searchIndex.push({ 
+                    name: sub.name, type: tid, code: s.code || tid.substring(0,1), 
+                    typeName: s.name, menuName: m.label, menuId: m.dataId, 
+                    subId: sub.id, color: s.color 
+                });
+            });
+        });
+    });
   }
+  
+  const sInput = document.getElementById('searchInput'), sOverlay = document.getElementById('searchOverlay'), sRes = document.getElementById('searchDropdown');
+  sInput.onfocus = () => { document.body.classList.add('search-mode'); sOverlay.classList.add('active'); if(sInput.value.trim()) sRes.classList.add('active'); };
+  sOverlay.onclick = () => { document.body.classList.remove('search-mode'); sOverlay.classList.remove('active'); sRes.classList.remove('active'); };
+  sInput.oninput = (e) => {
+    const q = e.target.value.toLowerCase().trim();
+    if(!q) { sRes.classList.remove('active'); return; }
+    const matches = searchIndex.filter(i => i.name.toLowerCase().includes(q));
+    sRes.innerHTML = matches.map(i => `
+      <div class="result-item" onclick="location.href='viewer_list.html?type=${i.type}&menu=${encodeURIComponent(i.menuName)}&id=${i.menuId}&autoOpen=${i.subId}'">
+        <div><div class="res-title">${i.name}</div><div class="res-path">${i.typeName} > ${i.menuName}</div></div>
+        <div class="res-tag" style="background:${i.color}">${i.code}</div>
+      </div>
+    `).join('') || '<div style="padding:15px; text-align:center;">결과 없음</div>';
+    sRes.classList.add('active');
+  };
 
   init();
 </script>
