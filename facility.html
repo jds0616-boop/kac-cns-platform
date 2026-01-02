@@ -69,9 +69,12 @@
   }
   
   .header-left { display: flex; align-items: center; gap: 15px; z-index: 10; min-width: 0; flex-shrink: 0; }
-  .hamburger-btn { cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; flex-shrink: 0; }
-  .hamburger-btn:hover { background: rgba(255,255,255,0.1); }
-  .hamburger-btn svg { width: 24px; height: 24px; fill: #fff; }
+  
+  /* [수정] 햄버거 버튼 대신 홈 아이콘 스타일 */
+  .home-btn { cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; flex-shrink: 0; }
+  .home-btn:hover { background: rgba(255,255,255,0.1); }
+  .home-btn svg { width: 24px; height: 24px; fill: #fff; }
+
   .logo-text { font-size: 20px; font-weight: 800; cursor: pointer; white-space: nowrap; }
   
   .breadcrumb { 
@@ -111,15 +114,14 @@
   .res-tag { font-size: 11px; padding: 3px 8px; border-radius: 6px; background: var(--theme-color); color: #fff; font-weight: 800; }
 
   .header-right { display: flex; align-items: center; gap: 15px; z-index: 10; flex-shrink: 0; }
-  .theme-toggle { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); margin-right: 10px; }
-  .theme-btn { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; opacity: 0.5; }
-  .theme-btn.active { background: #fff; opacity: 1; color: var(--navy); }
-  .theme-btn svg { width: 16px; height: 16px; fill: currentColor; }
+  
+  /* [수정] 주/야간 토글 삭제됨 */
+  
   .settings-btn { display: flex; padding: 8px; width: 34px; height: 34px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.3s; color: #cbd5e1; }
   .settings-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
   .kac-logo-img { height: 30px; width: auto; display: block; object-fit: contain; }
 
-  /* 사이드바 */
+  /* 사이드바 스타일 (기능은 남겨두지만 호출 버튼은 삭제됨) */
   .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 3000; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(2px); }
   .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
   .sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background: var(--bg-card); z-index: 3001; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; border-right: 1px solid var(--btn-border); }
@@ -183,7 +185,7 @@
       position: relative;
       z-index: 2;
       display: flex; flex-direction: column;
-      overflow: hidden; /* 내부 버튼 radius 처리용 */
+      overflow: hidden; 
       transition: transform 0.2s;
   }
   .root-card-integrated:hover { transform: scale(1.03); }
@@ -196,28 +198,12 @@
       background: var(--bg-card);
   }
   
-  /* 카드 하단 홈 버튼 영역 (일체형) */
-  .card-home-btn {
-      padding: 15px 0;
-      background: var(--bg-card); /* 기본 배경 */
-      border-top: 1px solid rgba(var(--theme-rgb), 0.2);
-      color: var(--theme-color);
-      font-weight: 800; font-size: 14px;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      transition: 0.2s;
-  }
-  /* [수정 1] 카드 전체 호버 시 하단 버튼 색상 채우기 */
-  .root-card-integrated:hover .card-home-btn {
-      background: var(--theme-color);
-      color: #fff;
-  }
+  /* [수정] 하단 홈 버튼 삭제됨 (HTML에서 제거) */
 
   .root-icon {
       width: 80px; height: 80px; border-radius: 25px;
       background: var(--icon-bg); border: 2px solid var(--icon-border);
       display: flex; align-items: center; justify-content: center;
-      /* [수정 2] 글자 크기 대폭 확대 (32px -> 56px) */
       font-size: 56px; 
       font-weight: 900; color: var(--theme-color);
   }
@@ -273,29 +259,16 @@
       box-shadow: 0 8px 25px rgba(var(--theme-rgb), 0.15);
       z-index: 20; 
   }
-  /* [추가] 드래그 앤 드롭 시각 효과 */
+  /* 드래그 앤 드롭 시각 효과 */
   .menu-bar.dragging { opacity: 0.4; border: 2px dashed var(--theme-color); background: #f8fafc; }
   .menu-bar.drag-over { border-top: 3px solid var(--theme-color); transform: translateY(-2px); }
   
-  /* Last Viewed 뱃지 */
+  /* Last Viewed 뱃지 스타일 */
+  /* [수정] 아이콘과 텍스트 숨김 처리, 테두리 효과만 남김 */
   .last-viewed-icon {
-    position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
-    display: none; 
-    align-items: center; justify-content: center; gap: 6px;
-    color: #10b981; 
-    font-size: 12px; font-weight: 800; white-space: nowrap;
-    background: rgba(16, 185, 129, 0.1); padding: 6px 12px; border-radius: 50px; 
-    border: 1px solid rgba(16, 185, 129, 0.3);
-    pointer-events: none;
+    display: none !important;
   }
   .menu-bar.last-viewed { border: 2px solid #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
-  .menu-bar.last-viewed .last-viewed-icon { display: flex; }
-  
-  body.admin-mode .menu-bar.last-viewed .last-viewed-icon {
-      right: -130px; 
-      background: #10b981; color: #fff;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  }
 
   /* 미리보기 팝업 (너비 확장 유지) */
   .preview-popup {
@@ -390,24 +363,30 @@
     .header-center { display: none; } 
     .preview-popup { display: none !important; }
 
+    /* [수정] 메뉴 비침 현상 해결을 위한 Sticky 영역 보완 */
     .root-section { 
-        width: 100%; height: auto; padding: 20px 20px 0 20px; 
-        justify-content: center; position: sticky; top: 0; 
-        background: var(--bg-main); z-index: 20; 
+        width: 100%; height: auto; 
+        padding: 10px 20px; /* 상하 여백 조정 */
+        justify-content: center; 
+        position: sticky; 
+        top: var(--header-h); /* 헤더 바로 아래에 붙음 */
+        background: var(--bg-main); /* 불투명 배경색 추가하여 뒤에 비침 방지 */
+        z-index: 50; /* 리스트보다 높은 z-index */
         margin-top: 0; flex-direction: row; gap: 10px; flex-wrap: wrap;
+        border-bottom: 1px solid transparent; /* 경계선 제거 */
     }
+    
     /* 모바일에서는 일체형 카드 레이아웃 조정 */
     .root-card-integrated { 
         position: static; width: 100%; 
         flex-direction: row; border-width: 2px; margin: 0;
         align-items: center;
+        /* 홈버튼 제거로 인해 패딩 등 조정 */
+        padding-right: 15px;
     }
     .card-content {
         flex: 1; padding: 15px; flex-direction: row; gap: 15px;
-    }
-    .card-home-btn {
-        width: auto; padding: 0 20px; border-top: none; border-left: 1px solid rgba(var(--theme-rgb), 0.2);
-        height: 100%;
+        background: none; /* 부모 배경 사용 */
     }
     
     .root-icon { margin-bottom: 0; font-size: 24px; width: 50px; height: 50px; border-radius: 15px; }
@@ -420,15 +399,13 @@
         margin-left: 45px; margin-right: 20px;
         gap: 15px;
         width: auto;
+        position: relative;
+        z-index: 1; /* Sticky 영역보다 낮음 */
     }
 
     .menu-bar { padding: 15px; gap: 12px; min-height: 60px; }
     .menu-bar::before { left: -27px; width: 27px; } 
     .menu-bar::after { left: -30px; width: 6px; height: 6px; }
-    
-    .menu-bar.last-viewed .last-viewed-icon {
-        right: 10px; top: 50%; transform: translateY(-50%) scale(0.8);
-    }
     
     .menu-pill-icon { font-size: 11px; padding: 4px 10px; min-width: auto; }
     .menu-title { font-size: 15px; padding-right: 20px; }
@@ -470,8 +447,9 @@
 
 <header>
   <div class="header-left">
-    <div class="hamburger-btn" onclick="toggleSidebar()">
-      <svg viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
+    <!-- [수정] 햄버거 메뉴 대신 홈 아이콘 배치 -->
+    <div class="home-btn" onclick="location.href='index.html'" title="홈으로">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
     </div>
     <div class="logo-text" onclick="location.href='index.html'">KAC CNS Training Platform</div>
     <!-- Breadcrumb -->
@@ -484,14 +462,7 @@
   </div>
 
   <div class="header-right">
-    <div class="theme-toggle">
-        <div class="theme-btn" id="btnDay" onclick="setTheme('light')" title="주간">
-            <svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg>
-        </div>
-        <div class="theme-btn" id="btnNight" onclick="setTheme('dark')" title="야간">
-            <svg viewBox="0 0 24 24"><path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C6.94,10.39 9.79,16.87 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z"/></svg>
-        </div>
-    </div>
+    <!-- [수정] 주/야간 테마 버튼 삭제됨 -->
     <div class="settings-btn" onclick="openSettings()">⚙️</div>
     <img src="logo.png" alt="KAC Logo" class="kac-logo-img">
   </div>
@@ -508,10 +479,8 @@
                 <div id="rootIcon" class="root-icon">?</div>
                 <div id="rootTitle" class="root-title">Loading...</div>
             </div>
-            <div class="card-home-btn" onclick="location.href='index.html'">
-                <svg style="width:16px;height:16px;fill:currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-                홈으로 이동
-            </div>
+            <!-- [수정] 카드 하단 '홈으로 이동' 버튼 삭제됨 -->
+            
             <!-- 삼각형 포인터 -->
             <div class="triangle-pointer"></div>
         </div>
@@ -827,7 +796,7 @@
 
           bar.innerHTML = `
               <div class="last-viewed-icon">
-                <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
                 Last Viewed
               </div>
               <div class="menu-pill-icon">${iconInner}</div>
@@ -1064,8 +1033,7 @@
   function setTheme(m) { 
       document.body.classList.toggle('dark-mode', m==='dark'); 
       localStorage.setItem('kac_theme', m);
-      document.getElementById('btnDay').classList.toggle('active', m==='light'); 
-      document.getElementById('btnNight').classList.toggle('active', m==='dark'); 
+      // 토글 버튼이 삭제되었으므로 클래스 제어 코드 제거
   }
   
   function toggleSidebar() {
