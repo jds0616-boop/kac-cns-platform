@@ -120,13 +120,17 @@
   .sb-sub-item { padding: 8px 15px; font-size: 13px; color: var(--text-sub); cursor: pointer; border-left: 2px solid var(--btn-border); transition: 0.2s; }
   .sb-sub-item:hover { border-left-color: #2563eb; color: #2563eb; background: rgba(37,99,235,0.05); }
 
-  /* 컨텐츠 영역 */
+  /* 컨텐츠 영역 (PC 레이아웃) */
   .content-wrapper { 
       flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; 
-      width: 100%; overflow-y: auto; padding: 120px 0 0 0; position: relative; 
+      width: 100%; overflow-y: auto; 
+      /* [수정] 헤더(75px) + 여백(60px) = 135px */
+      padding-top: 135px; 
+      padding-bottom: 0; position: relative; 
   }
   
-  .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 30px; flex-shrink: 0; z-index: 2000; position: relative; padding: 0 20px; }
+  /* [수정] 검색창 하단 여백 60px (위아래 밸런스 1:1) */
+  .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 60px; flex-shrink: 0; z-index: 2000; position: relative; padding: 0 20px; }
   .search-container { position: relative; width: 600px; max-width: 100%; }
   
   .search-bar { 
@@ -165,63 +169,6 @@
   .icon-box { width: 100px; height: 100px; border-radius: 30px; margin-bottom: 20px; font-weight: 900; display: flex; align-items: center; justify-content: center; background: var(--btn-bg); border: 1px solid var(--btn-border); font-size: var(--icon-size-idx, 60px); color: var(--card-color); pointer-events: none; }
   .card h2 { font-size: var(--label-size-idx, 24px); font-weight: 800; text-align: center; pointer-events: none; }
 
-  /* 모바일 전용 UI 최적화 */
-  @media (max-width: 768px) {
-    /* 전체 스크롤 허용 */
-    body { 
-        display: block; 
-        height: auto; 
-        overflow-y: auto; 
-        overflow-x: hidden; 
-    }
-    
-    header { 
-        position: sticky; 
-        top: 0; 
-        padding: 0 10px;
-    }
-
-    .content-wrapper { 
-        height: auto; 
-        overflow: visible; 
-        padding-top: 30px; 
-        padding-bottom: 120px; /* 하단 여백 */
-        display: block;
-    }
-
-    .header-left { gap: 5px; flex: 1; }
-    .logo-text { font-size: 13px; max-width: none; white-space: nowrap; }
-    .kac-logo-img { display: none; }
-    .header-center-title { display: none; }
-    
-    .header-right { gap: 8px; }
-    .theme-toggle { margin-right: 5px; }
-    .settings-btn { width: 30px; height: 30px; font-size: 16px; padding: 0; }
-
-    #cardContainerWrapper { padding: 0 15px; }
-    #cardContainer { 
-        gap: 15px; padding: 10px 0; 
-        min-height: auto; 
-        flex-direction: column; 
-        flex-wrap: nowrap;
-    }
-    
-    .card { 
-      width: 100%; height: auto; min-height: 90px; 
-      flex-direction: row; justify-content: flex-start; 
-      padding: 15px 25px; gap: 20px; border-radius: 20px;
-    }
-    .card:hover { transform: translateY(-3px); }
-    .icon-box { width: 50px; height: 50px; border-radius: 15px; margin-bottom: 0; font-size: 24px; flex-shrink: 0; }
-    .card h2 { font-size: 18px; text-align: left; word-break: keep-all; flex: 1; }
-    .card-ctrl { top: 50%; right: 10px; transform: translateY(-50%); width: auto; flex-direction: row; }
-    .btn-sm { padding: 6px 10px; }
-
-    .main-footer { padding: 25px 15px; margin-top: 30px; }
-    .main-footer p { font-size: 11px; white-space: normal; }
-    .main-footer .copyright { font-size: 11px; }
-  }
-
   .pagination { display: flex; gap: 10px; margin-top: 20px; align-items: center; justify-content: center; padding-bottom: 40px; flex-shrink: 0; }
   .page-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--btn-border); cursor: pointer; transition: 0.3s; }
   .page-dot.active { background: var(--navy); transform: scale(1.3); }
@@ -239,9 +186,14 @@
     line-height: 1.6;
     border-top: 1px solid rgba(255,255,255,0.1);
     box-sizing: border-box;
+    display: flex; flex-direction: column; align-items: center;
   }
   .main-footer p { margin: 0; word-break: keep-all; }
   .main-footer .copyright { font-weight: 700; margin-top: 8px; color: rgba(255,255,255,0.9); }
+  
+  .footer-edit-btn { margin-top: 10px; font-size: 11px; cursor: pointer; opacity: 0.5; color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 4px; display: none; }
+  .footer-edit-btn:hover { opacity: 1; background: rgba(255,255,255,0.1); }
+  body.admin-mode .footer-edit-btn { display: inline-block; }
 
   #loadingSpinner { position: fixed; inset: 0; background: var(--bg-main); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
   .spinner { width: 50px; height: 50px; border: 5px solid #cbd5e1; border-top-color: #2563eb; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
@@ -250,7 +202,7 @@
   .btn-del { color: #ef4444; border-color: #fee2e2; }
   .btn-move { color: #3b82f6; border-color: #dbeafe; }
 
-  /* 통합 관리자 모달 스타일 (트리 UI 개선) */
+  /* 통합 관리자 모달 스타일 */
   .tree-container { display: flex; height: 500px; border: 1px solid var(--btn-border); border-radius: 10px; overflow: hidden; margin-top: 15px; }
   .tree-sidebar { width: 35%; background: var(--bg-main); border-right: 1px solid var(--btn-border); overflow-y: auto; padding: 10px; }
   .tree-content { width: 65%; padding: 20px; overflow-y: auto; background: var(--bg-card); }
@@ -263,7 +215,7 @@
       transition: transform 0.2s;
   }
   .t-toggle-btn:hover { color: #2563eb; }
-  .t-toggle-btn.empty { cursor: default; opacity: 0; } /* 하위 없음 */
+  .t-toggle-btn.empty { cursor: default; opacity: 0; } 
   
   .t-label { 
       padding: 6px 10px; cursor: pointer; border-radius: 6px; font-size: 13px; 
@@ -298,6 +250,80 @@
   .res-title { font-weight: 700; font-size: 15px; }
   .res-path { font-size: 11px; opacity: 0.7; }
   .res-tag { font-size: 12px; font-weight: 900; padding: 4px 10px; border-radius: 6px; color: #fff; min-width: 50px; text-align: center; }
+  
+  /* ========================================= */
+  /* [모바일 전용 최적화 스타일] */
+  /* ========================================= */
+  @media (max-width: 768px) {
+    /* 1. 전체 구조 변경: Flex 해제하고 네이티브 스크롤 사용 */
+    body { 
+        display: block; 
+        height: auto; 
+        overflow-y: auto; /* 세로 스크롤 허용 */
+        overflow-x: hidden; /* 가로 스크롤 방지 */
+    }
+    
+    /* 2. 헤더 상단 고정 (Sticky) */
+    header { 
+        position: sticky; 
+        top: 0; 
+        padding: 0 10px;
+    }
+
+    /* 3. 콘텐츠 영역 (PC의 135px 대신 105px 적용) */
+    .content-wrapper { 
+        height: auto; 
+        overflow: visible; 
+        /* [수정] 헤더(75px) + 여백(30px) */
+        padding-top: 105px; 
+        padding-bottom: 120px; /* 하단 여백 */
+        display: block;
+    }
+    
+    /* [수정] 검색창 하단 여백 30px (PC 60px의 절반) */
+    .search-wrapper-outer { margin-bottom: 30px; }
+
+    /* 4. 상단바 텍스트 최적화 (잘림 방지) */
+    .header-left { gap: 5px; flex: 1; }
+    .logo-text { 
+        font-size: 13px; /* 폰트 축소 */
+        white-space: nowrap; 
+        max-width: none; /* 너비 제한 해제 */
+        text-overflow: clip;
+    }
+    .kac-logo-img { display: none; } /* 공간 확보를 위해 이미지 로고 숨김 */
+    
+    .header-center-title { display: none; } /* 공간 부족 시 중앙 제목 숨김 (깔끔하게) */
+    
+    .header-right { gap: 8px; }
+    .theme-toggle { margin-right: 5px; }
+    .settings-btn { width: 30px; height: 30px; font-size: 16px; padding: 0; }
+
+    /* 5. 카드 리스트 스타일 */
+    #cardContainerWrapper { padding: 0 15px; }
+    #cardContainer { 
+        gap: 15px; padding: 10px 0; 
+        min-height: auto; 
+        flex-direction: column; /* 세로 나열 */
+        flex-wrap: nowrap;
+    }
+    
+    .card { 
+      width: 100%; height: auto; min-height: 90px; 
+      flex-direction: row; justify-content: flex-start; 
+      padding: 15px 25px; gap: 20px; border-radius: 20px;
+    }
+    .card:hover { transform: translateY(-3px); }
+    .icon-box { width: 50px; height: 50px; border-radius: 15px; margin-bottom: 0; font-size: 24px; flex-shrink: 0; }
+    .card h2 { font-size: 18px; text-align: left; word-break: keep-all; flex: 1; }
+    .card-ctrl { top: 50%; right: 10px; transform: translateY(-50%); width: auto; flex-direction: row; }
+    .btn-sm { padding: 6px 10px; }
+
+    /* 6. 하단바 폰트 반응형 */
+    .main-footer { padding: 25px 15px; margin-top: 30px; }
+    .main-footer p { font-size: 11px; white-space: normal; }
+    .main-footer .copyright { font-size: 11px; }
+  }
 
   @keyframes spin { 100% { transform: rotate(360deg); } }
   @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
@@ -333,7 +359,7 @@
     <div class="logo-text" onclick="location.reload()">KAC CNS Training Platform</div>
   </div>
   
-  <!-- 헤더 중앙: 페이지 제목 (모바일에서는 자동 숨김) -->
+  <!-- 헤더 중앙: 페이지 제목 -->
   <div class="header-center-title">
       <span id="pageHeadline"></span>
       <span class="title-edit-icon" onclick="editPageTitle()">✏️</span>
@@ -341,7 +367,7 @@
 
   <div class="header-right">
     <div class="theme-toggle">
-      <div class="theme-btn" id="btnDay" onclick="setTheme('light')"><svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg></div>
+      <div class="theme-btn" id="btnDay" onclick="setTheme('light')"><svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg></div>
       <div class="theme-btn" id="btnNight" onclick="setTheme('dark')"><svg viewBox="0 0 24 24"><path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C6.94,10.39 9.79,16.87 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z"/></svg></div>
     </div>
     <div class="settings-btn" onclick="openSettings()">⚙️</div>
@@ -367,6 +393,7 @@
     <p>본 웹사이트는 한국공항공사 항공기술훈련원의 항행안전시설 분야 교육 관련 플랫폼입니다.</p>
     <p>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)</p>
     <p class="copyright">© 2026 Korea Airports Corporation. All rights reserved.</p>
+    <span class="footer-edit-btn" onclick="editFooterText()">텍스트 수정</span>
   </footer>
 </div>
 
@@ -387,7 +414,7 @@
           <button id="modalPreviewBtn" class="btn-modal btn-secondary" onclick="togglePreview()">미리보기 모드 시작</button>
         </div>
         
-        <!-- 종합 관리 버튼 추가 -->
+        <!-- 종합 관리 버튼 -->
         <button class="btn-modal btn-primary" style="margin-top:10px; background:#4f46e5;" onclick="openIntegratedAdmin()">
             🗂️ 전체 데이터 종합 관리 (Tree Editor)
         </button>
@@ -559,6 +586,9 @@
 
     // 페이지 타이틀 초기화
     if(!globalData.config.pageTitles) globalData.config.pageTitles = {};
+    
+    // 푸터 텍스트 로드
+    loadFooterText();
 
     ensurePageSlots();
     renderCards(false); 
@@ -570,7 +600,26 @@
       setTimeout(() => document.getElementById('loadingSpinner').style.display='none', 500);
     }, 500);
 
-    if(isAdmin) document.body.classList.add('admin-mode');
+    if(isAdmin) {
+        document.body.classList.add('admin-mode');
+        document.getElementById('headlineEditBtn').style.display = 'block';
+    }
+  }
+  
+  function loadFooterText() {
+      const savedText = localStorage.getItem('kac_footer_text');
+      const defaultText = "본 웹사이트는 한국공항공사 항공기술훈련원의 항행안전시설 분야 교육 관련 플랫폼입니다.<br>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)";
+      document.querySelector('.main-footer p').innerHTML = savedText || defaultText;
+  }
+
+  function editFooterText() {
+      const current = document.querySelector('.main-footer p').innerHTML;
+      const newVal = prompt("하단 문구를 입력하세요 (HTML 태그 사용 가능):", current.replace(/<br>/g, "\n"));
+      if(newVal !== null) {
+          const formatted = newVal.replace(/\n/g, "<br>");
+          localStorage.setItem('kac_footer_text', formatted);
+          loadFooterText();
+      }
   }
   
   function reconstructGlobalDataFromLocal() {
