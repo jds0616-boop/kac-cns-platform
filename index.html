@@ -36,6 +36,10 @@
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
+  
+  /* [수정 3] 좌우 스크롤 흔들림 방지 */
+  body, html { overflow-x: hidden; width: 100%; }
+  
   body { background: var(--bg-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: var(--text-main); transition: background 0.3s, color 0.3s; }
 
   /* 관리자/미리보기 제어 */
@@ -44,25 +48,26 @@
   /* 헤더 스타일 */
   header { height: var(--header-h); background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.15); z-index: 1000; flex-shrink: 0; position: relative; }
   
-  .header-left { display: flex; align-items: center; gap: 15px; z-index: 10; }
-  .hamburger-btn { cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; }
+  .header-left { display: flex; align-items: center; gap: 15px; z-index: 10; min-width: 0; }
+  .hamburger-btn { cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; flex-shrink: 0; }
   .hamburger-btn:hover { background: rgba(255,255,255,0.1); }
   .hamburger-btn svg { width: 24px; height: 24px; fill: #fff; }
 
-  .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; cursor: pointer; white-space: nowrap;}
+  .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   
   /* 헤더 중앙 페이지 제목 영역 */
   .header-center-title {
       position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
       font-size: 24px; font-weight: 800; color: #fff; letter-spacing: -0.5px;
       display: flex; align-items: center; gap: 8px; z-index: 5;
-      white-space: nowrap;
+      white-space: nowrap; pointer-events: none; /* 클릭 통과 */
   }
+  .header-center-title span { pointer-events: auto; } /* 텍스트와 아이콘은 클릭 가능 */
   .title-edit-icon { cursor: pointer; opacity: 0.3; transition: 0.2s; font-size: 16px; display: none; }
   .title-edit-icon:hover { opacity: 1; color: #60a5fa; }
   body.admin-mode .title-edit-icon { display: block; }
 
-  .header-right { display: flex; align-items: center; gap: 15px; z-index: 10; }
+  .header-right { display: flex; align-items: center; gap: 15px; z-index: 10; flex-shrink: 0; }
   
   .theme-toggle { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); margin-right: 10px; }
   .theme-btn { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; opacity: 0.5; }
@@ -98,10 +103,15 @@
   .sb-sub-item:hover { border-left-color: #2563eb; color: #2563eb; background: rgba(37,99,235,0.05); }
 
   /* 컨텐츠 영역 */
-  /* [수정 1] padding-top을 120px로 늘려 데스크탑에서 위치 복구 */
-  .content-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; width: 100%; overflow-y: auto; padding: 120px 0 0 0; position: relative; }
+  /* [수정 4] 모바일 터치 스크롤 최적화 */
+  .content-wrapper { 
+      flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; 
+      width: 100%; overflow-y: auto; padding: 120px 0 0 0; position: relative; 
+      -webkit-overflow-scrolling: touch;
+  }
   
-  .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 30px; flex-shrink: 0; z-index: 900; position: relative; padding: 0 20px; }
+  /* [수정 1] PC 검색창 z-index 2000으로 상향 (오버레이 위로) */
+  .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 30px; flex-shrink: 0; z-index: 2000; position: relative; padding: 0 20px; }
   .search-container { position: relative; width: 600px; max-width: 100%; }
   
   .search-bar { 
@@ -140,12 +150,23 @@
   .icon-box { width: 100px; height: 100px; border-radius: 30px; margin-bottom: 20px; font-weight: 900; display: flex; align-items: center; justify-content: center; background: var(--btn-bg); border: 1px solid var(--btn-border); font-size: var(--icon-size-idx, 60px); color: var(--card-color); pointer-events: none; }
   .card h2 { font-size: var(--label-size-idx, 24px); font-weight: 800; text-align: center; pointer-events: none; }
 
-  /* 모바일 전용 카드 스타일 (리스트형) */
+  /* [수정 2 & 4] 모바일 전용 UI 최적화 */
   @media (max-width: 768px) {
-    .header-center-title { font-size: 18px; max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
-    /* 모바일에서 위쪽 여백 줄임 */
-    .content-wrapper { padding-top: 40px; }
+    /* 상단바 다이어트 */
+    header { padding: 0 10px; }
+    .header-left { gap: 5px; }
+    .logo-text { font-size: 14px; max-width: 120px; }
+    .header-center-title { font-size: 15px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
+    .kac-logo-img { display: none; } /* KAC 이미지 숨김 */
+    .header-right { gap: 8px; }
+    .theme-toggle { margin-right: 5px; }
+    .settings-btn { width: 30px; height: 30px; font-size: 16px; padding: 0; }
+    
+    /* 콘텐츠 여백 조정 */
+    .content-wrapper { padding-top: 40px; padding-bottom: 120px; } /* 하단 여백 확보 */
     #cardContainer { gap: 15px; padding: 10px; min-height: auto; }
+    
+    /* 리스트형 카드 */
     .card { 
       width: 100%; height: auto; min-height: 90px; 
       flex-direction: row; justify-content: flex-start; 
@@ -162,14 +183,14 @@
   .page-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--btn-border); cursor: pointer; transition: 0.3s; }
   .page-dot.active { background: var(--navy); transform: scale(1.3); }
 
-  /* [수정 3 & 4] 하단바 (Footer) 디자인 및 텍스트 자동 축소 */
+  /* 하단바 (Footer) */
   .main-footer {
     width: 100%;
     background: var(--navy);
     padding: 30px 20px;
     text-align: center;
     color: rgba(255,255,255,0.7);
-    margin-top: auto; /* 콘텐츠가 적어도 하단에 붙게 함 (flex) */
+    margin-top: auto; 
     flex-shrink: 0;
     font-size: 13px;
     line-height: 1.6;
@@ -178,16 +199,10 @@
   .main-footer p { margin: 0; word-break: keep-all; }
   .main-footer .copyright { font-weight: 700; margin-top: 8px; color: rgba(255,255,255,0.9); }
 
-  /* 모바일에서 텍스트 자동 축소 (반응형 폰트) */
   @media (max-width: 768px) {
     .main-footer { padding: 20px 10px; }
-    .main-footer p {
-       font-size: 3.2vw; /* 화면 너비에 비례해서 글자 크기 축소 */
-       white-space: nowrap; /* 줄바꿈 방지 */
-    }
-    .main-footer .copyright {
-       font-size: 3vw;
-    }
+    .main-footer p { font-size: 3.2vw; white-space: nowrap; }
+    .main-footer .copyright { font-size: 3vw; }
   }
 
   #loadingSpinner { position: fixed; inset: 0; background: var(--bg-main); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
@@ -296,7 +311,7 @@
   </div>
   <div id="pagination" class="pagination"></div>
 
-  <!-- [수정 2 & 3] 하단바 (Footer)를 콘텐츠 영역 내부 맨 아래로 이동 + 디자인 적용 -->
+  <!-- 하단바 (Footer) -->
   <footer class="main-footer">
     <p>본 웹사이트는 한국공항공사 항공기술훈련원의 항행안전시설 분야 교육 관련 플랫폼입니다.</p>
     <p>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)</p>
