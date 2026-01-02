@@ -61,7 +61,7 @@
   #searchOverlay.active { display: block; }
   body.search-mode .header-left, body.search-mode .header-right { opacity: 0.1; pointer-events: none; }
 
-  /* 헤더 스타일 */
+  /* 헤더 스타일 (PC 고정) */
   header { 
     height: var(--header-h); background: var(--navy); 
     display: flex; align-items: center; justify-content: space-between; 
@@ -87,7 +87,7 @@
       white-space: nowrap; pointer-events: none;
   }
   
-  /* [추가] 헤더 중앙 아이콘 뱃지 */
+  /* 헤더 중앙 아이콘 뱃지 */
   .title-badge {
       display: inline-flex; align-items: center; justify-content: center;
       width: 32px; height: 32px; border-radius: 8px;
@@ -117,20 +117,28 @@
   
   .sb-item { padding: 12px 15px; cursor: pointer; border-radius: 10px; color: var(--text-main); font-weight: 600; transition: 0.2s; display: flex; align-items: center; justify-content: space-between; font-size: 14px; }
   .sb-item:hover { background: var(--btn-bg); color: #2563eb; }
-  /* [추가] 사이드바 현재 위치 하이라이트 */
+  /* 사이드바 현재 위치 하이라이트 */
   .sb-item.active { background: #eff6ff; border-left: 4px solid #2563eb; color: #2563eb; }
   body.dark-mode .sb-item.active { background: rgba(37,99,235,0.1); }
 
   /* 컨텐츠 영역 */
   .content-wrapper { 
       flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; 
-      width: 100%; overflow-y: auto; 
-      padding-top: 100px; /* 기존 여백 유지 */
-      padding-bottom: 80px; 
+      width: 100%; 
+      /* [수정] 스크롤바 숨기기 */
+      overflow-y: scroll;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none;  /* IE/Edge */
+      
+      /* [수정] 상단 여백 넉넉히 (헤더 겹침 방지) */
+      padding-top: 110px; 
+      padding-bottom: 60px; /* 푸터 높이만큼 공간 확보 */
       position: relative; 
   }
+  /* Webkit 스크롤바 숨김 */
+  .content-wrapper::-webkit-scrollbar { display: none; }
   
-  .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 30px; flex-shrink: 0; z-index: 2000; position: relative; padding: 0 20px; }
+  .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 20px; flex-shrink: 0; z-index: 2000; position: relative; padding: 0 20px; }
   .search-container { position: relative; width: 600px; max-width: 100%; }
   
   .header-search { 
@@ -150,7 +158,7 @@
   .res-path { font-size: 11px; color: var(--text-sub); opacity: 0.6; margin-top: 4px; }
   .res-tag { font-size: 12px; font-weight: 900; padding: 4px 10px; border-radius: 6px; color: #fff; min-width: 50px; text-align: center; }
 
-  /* 메인 그리드 및 내비게이션 */
+  /* 메인 그리드 */
   #gridWrapper { width: 100%; max-width: 1400px; padding: 0 20px; flex: 1; display: flex; align-items: flex-start; justify-content: center; position: relative; }
   
   #trainGrid { 
@@ -159,30 +167,30 @@
     transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s;
   }
   
-  /* 카드 스타일 */
+  /* [수정] PC 카드 높이 축소 (200px) */
   .menu-card { 
     background: var(--bg-card); width: 280px; 
-    min-height: 230px; /* [수정] 카드 높이 축소 (280 -> 230) */
-    height: auto; padding: 30px 25px; 
-    border-radius: 25px; box-shadow: var(--shadow); border: 2px solid transparent; 
+    min-height: 200px; 
+    height: auto; padding: 25px 20px; 
+    border-radius: 20px; box-shadow: var(--shadow); border: 2px solid transparent; 
     cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; 
     align-items: center; justify-content: flex-start; position: relative; 
     border-top: 6px solid var(--theme-color); color: var(--text-main); 
   }
-  .menu-card:hover { border-color: var(--theme-color); transform: translateY(-10px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+  .menu-card:hover { border-color: var(--theme-color); transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
   .menu-card.dragging { opacity: 0.4; border: 2px dashed var(--theme-color); }
   .menu-card.drag-over { border: 2px solid var(--theme-color); transform: scale(1.05); }
 
   .icon-circle { 
-    min-width: 90px; width: auto; height: auto; min-height: 90px; padding: 15px 30px; 
-    border-radius: 28px; background: var(--icon-bg); border: 2px solid var(--icon-border); 
+    min-width: 80px; width: auto; height: auto; min-height: 80px; padding: 12px 25px; 
+    border-radius: 25px; background: var(--icon-bg); border: 2px solid var(--icon-border); 
     display: flex; flex-direction: column; align-items: center; justify-content: center; 
-    font-size: var(--icon-size-fac, 28px); font-weight: 900; margin-bottom: 25px; 
+    font-size: var(--icon-size-fac, 26px); font-weight: 900; margin-bottom: 20px; 
     color: var(--theme-color); text-align: center; line-height: 1.1; word-break: keep-all; flex-shrink: 0;
   }
-  .menu-label { font-weight: 800; font-size: var(--label-size-fac, 19px); text-align: center; width: 100%; word-wrap: break-word; }
+  .menu-label { font-weight: 800; font-size: var(--label-size-fac, 18px); text-align: center; width: 100%; word-wrap: break-word; }
 
-  .admin-ctrl { display: flex; gap: 6px; margin-top: 20px; width: 100%; justify-content: center; flex-wrap: wrap; }
+  .admin-ctrl { display: flex; gap: 6px; margin-top: 15px; width: 100%; justify-content: center; flex-wrap: wrap; }
   .btn-sm { padding: 5px 12px; font-size: 11px; border-radius: 8px; border: 1px solid var(--btn-border); background: var(--btn-bg); font-weight: 700; cursor: pointer; color: var(--btn-text); transition: 0.2s; }
   .btn-del { color: #ef4444; border-color: #fee2e2; }
 
@@ -202,7 +210,7 @@
   .arrow-nav.hidden { opacity: 0; pointer-events: none; }
   .arrow-nav svg { width: 24px; height: 24px; fill: currentColor; }
 
-  .pagination { display: flex; gap: 10px; margin-top: 30px; justify-content: center; align-items: center; padding-bottom: 40px; flex-shrink: 0; }
+  .pagination { display: flex; gap: 10px; margin-top: 20px; justify-content: center; align-items: center; padding-bottom: 20px; flex-shrink: 0; }
   .page-dot { width: 12px; height: 12px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--btn-border); color: transparent; cursor: pointer; transition: 0.3s; font-size: 0; }
   .page-dot.active { background: var(--theme-color); transform: scale(1.3); }
   
@@ -210,29 +218,28 @@
   #loadingSpinner { position: fixed; inset: 0; background: var(--bg-main); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
   .spinner { width: 50px; height: 50px; border: 5px solid #cbd5e1; border-top-color: #2563eb; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
 
-  /* [수정] PC 하단 버튼 우측 하단 배치 */
+  /* [수정] PC 하단 버튼 (정적 배치: 카드 목록 아래, 푸터 위) */
   .bottom-nav { 
-    position: fixed; bottom: 30px; right: 30px; left: auto; transform: none; /* PC: 우측 하단 */
-    background: rgba(255, 255, 255, 0.9); 
-    padding: 12px 30px; border-radius: 100px; 
-    display: flex; gap: 30px; align-items: center; 
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 1000; 
-    border: 1px solid rgba(0,0,0,0.1); 
-    backdrop-filter: blur(5px);
+    display: flex; justify-content: center; gap: 30px; 
+    margin: 10px auto; padding: 10px;
   }
-  .nav-item { color: #0f172a; cursor: pointer; font-size: 16px; font-weight: 700; transition: 0.3s; opacity: 0.9; display: flex; align-items: center; gap: 8px; }
-  .nav-item:hover { opacity: 1; transform: translateY(-2px); }
-  
-  body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(255, 255, 255, 0.3); }
-  body.dark-mode .nav-item { color: #e2e8f0; }
+  .nav-item { 
+    color: var(--text-main); cursor: pointer; font-size: 16px; font-weight: 700; 
+    transition: 0.3s; opacity: 0.8; display: flex; align-items: center; gap: 8px; 
+    padding: 8px 20px; border-radius: 50px;
+    background: rgba(255,255,255,0.5); border: 1px solid var(--btn-border);
+  }
+  .nav-item:hover { opacity: 1; transform: translateY(-2px); background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+  body.dark-mode .nav-item { background: rgba(30,41,59,0.5); color: #e2e8f0; }
+  body.dark-mode .nav-item:hover { background: #1e293b; }
 
-  /* [수정] 하단바 Sticky Footer */
+  /* [수정] 하단바 (PC: 절대 고정) */
   .main-footer {
-    width: 100%; background: var(--navy); padding: 30px 20px;
+    width: 100%; background: var(--navy); padding: 25px 20px;
     text-align: center; color: rgba(255,255,255,0.7);
-    margin-top: auto; /* Sticky */
-    flex-shrink: 0; font-size: 13px; line-height: 1.6;
+    font-size: 13px; line-height: 1.6;
     border-top: 1px solid rgba(255,255,255,0.1); box-sizing: border-box;
+    position: absolute; bottom: 0; left: 0;
   }
   .main-footer p { margin: 0; word-break: keep-all; }
   .main-footer .copyright { font-weight: 700; margin-top: 8px; color: rgba(255,255,255,0.9); }
@@ -248,8 +255,14 @@
     /* 헤더 중앙 제목 모바일에서 숨김 */
     .header-center-title { display: none; }
 
-    .content-wrapper { height: auto; overflow: visible; padding-top: 90px; padding-bottom: 120px; display: block; }
-    
+    /* 모바일에서는 Flow 방식 (absolute footer 해제) */
+    .content-wrapper { 
+        height: auto; overflow: visible; 
+        padding-top: 90px; padding-bottom: 0; display: block; 
+        overflow-y: visible; /* 스크롤 허용 */
+    }
+    .main-footer { position: static; margin-top: 30px; padding-bottom: 30px; }
+
     .header-left { gap: 5px; flex: 1; }
     .logo-text { font-size: 13px; max-width: none; white-space: nowrap; }
     .kac-logo-img { display: none; }
@@ -291,34 +304,27 @@
     /* 모바일에서 화살표 숨김 */
     .arrow-nav { display: none; }
     
-    /* [수정] 모바일 하단 버튼 디자인 (Fit-content, 가독성 강화) */
+    /* [수정] 모바일 하단 버튼 가독성 개선 (Fit content) */
     .bottom-nav { 
-        position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
-        right: auto;
-        width: auto; max-width: 90%; 
-        padding: 12px 30px; 
-        justify-content: center; gap: 30px; border-radius: 30px;
-        
-        /* 주간 모드: 흰색 배경, 진한 테두리 */
-        background: rgba(255,255,255,0.95);
-        border: 1px solid #94a3b8;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        position: static; margin: 20px auto; 
+        width: auto; padding: 10px;
+        background: transparent; border: none; box-shadow: none;
+        gap: 15px;
     }
-    .nav-item { font-size: 14px; gap: 6px; color: #334155; }
+    .nav-item { 
+        font-size: 14px; gap: 6px; 
+        background: #fff; border: 1px solid #cbd5e1; 
+        padding: 10px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        color: #334155; opacity: 1;
+    }
+    /* 야간 모드 모바일 버튼 */
+    body.dark-mode .nav-item { background: #1e293b; border-color: #475569; color: #e2e8f0; }
 
-    .main-footer { padding: 25px 15px; margin-top: 30px; }
     .main-footer p { font-size: 11px; white-space: normal; }
     .main-footer .copyright { font-size: 11px; }
   }
-  
-  /* 모바일 야간 모드 버튼 */
-  body.dark-mode .bottom-nav {
-      background: rgba(15, 23, 42, 0.95);
-      border: 1px solid #475569;
-  }
-  body.dark-mode .bottom-nav .nav-item { color: #e2e8f0; }
 
-  /* 모달 스타일 (초기 로딩 시 display: none으로 숨김 처리) */
+  /* 모달 스타일 */
   .modal-card { background: var(--bg-card); padding: 40px; border-radius: 30px; width: 500px; color: var(--text-main); box-shadow: 0 20px 50px rgba(0,0,0,0.5); max-height: 95vh; overflow-y: auto; }
   .modal-title { font-size: 22px; font-weight: 800; margin-bottom: 25px; border-bottom: 1px solid var(--btn-border); padding-bottom: 12px; display: flex; align-items: center; gap: 10px; }
   .setting-group { margin-bottom: 25px; }
@@ -327,7 +333,6 @@
   .btn-modal { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 15px; margin-top: 12px; }
   .btn-primary { background: #0f172a; color: #fff; }
   .btn-secondary { background: #e2e8f0; color: #64748b; }
-  .btn-preview-active { background: #10b981 !important; color: #fff !important; }
   
   @keyframes spin { 100% { transform: rotate(360deg); } }
   @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
@@ -392,7 +397,6 @@
   </div>
 
   <div id="gridWrapper">
-    <!-- 좌우 화살표 내비게이션 -->
     <div id="prevArrow" class="arrow-nav left" onclick="goPrevPage()">
         <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
     </div>
@@ -405,16 +409,17 @@
   
   <div id="pagination" class="pagination"></div>
 
+  <!-- [수정] PC: 흐름 배치, 모바일: 하단 정렬 -->
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="history.back()"><svg style="width:22px;height:22px;fill:currentColor" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>뒤로가기</div>
+    <div class="nav-item" onclick="location.href='index.html'"><svg style="width:22px;height:22px;fill:currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>홈으로</div>
+  </div>
+
   <footer class="main-footer">
     <p>본 웹사이트는 한국공항공사 항공기술훈련원의 항행안전시설 분야 교육 관련 플랫폼입니다.</p>
     <p>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)</p>
     <p class="copyright">© 2026 Korea Airports Corporation. All rights reserved.</p>
   </footer>
-</div>
-
-<div class="bottom-nav">
-  <div class="nav-item" onclick="history.back()"><svg style="width:22px;height:22px;fill:currentColor" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>뒤로가기</div>
-  <div class="nav-item" onclick="location.href='index.html'"><svg style="width:22px;height:22px;fill:currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>홈으로</div>
 </div>
 
 <!-- 모달들 (초기 숨김 적용) -->
