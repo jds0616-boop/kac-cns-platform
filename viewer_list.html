@@ -225,15 +225,15 @@
       display: flex; align-items: center; justify-content: center;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       transition: 0.2s;
-      z-index: 10; /* 버튼이 선보다 위에 오도록 */
+      z-index: 10;
   }
   
   .fac-title { font-size: 22px; font-weight: 800; word-break: keep-all; }
 
-  /* [수정] 세로 연결선 (침범 방지를 위해 시작점 조정) */
+  /* 세로 연결선 */
   .tree-spine {
       position: absolute; 
-      top: 100px; /* 상단 카드를 뚫지 않도록 아래로 내림 */
+      top: 100px;
       bottom: 40px; 
       left: calc(50% - 450px + var(--spine-left)); 
       width: 3px; 
@@ -423,10 +423,10 @@
     /* 1. 트리 레이아웃 (좌측 라인) */
     .tree-container { align-items: flex-start; }
 
-    /* [수정] 세로선 (Spine) 위치 조정 */
+    /* [수정] 세로선 (Spine) 위치 재조정 (침범 방지) */
     .tree-spine { 
         display: block !important; 
-        left: 24px; top: 80px; /* 명함 카드를 뚫지 않도록 시작점 내림 */
+        left: 24px; top: 85px; /* 태그 버튼을 뚫지 않도록 더 아래로 */
         bottom: 30px;
         width: 3px;
         background: rgba(var(--theme-rgb), 0.3);
@@ -434,7 +434,7 @@
 
     /* 2. 상단 카드 */
     .fac-top-card { 
-        width: 100%; border-radius: 15px; margin-bottom: 25px; padding: 15px; 
+        width: 100%; border-radius: 15px; margin-bottom: 25px; padding: 12px 15px; /* 패딩 축소 */
         flex-direction: column; align-items: flex-start; gap: 10px;
         position: relative; z-index: 5; margin-left: 0;
     }
@@ -448,7 +448,7 @@
 
     /* 3. 개별 카드 래퍼 */
     .card-wrapper { 
-        display: block; margin-bottom: 12px; 
+        display: block; margin-bottom: 10px; /* 간격 축소 */
         padding-left: 55px; width: 100%;
     }
 
@@ -469,30 +469,29 @@
         border: 2px solid var(--bg-main); z-index: 2;
     }
 
-    /* [수정] 모바일 카드 두께 축소 (패딩과 갭 줄임) */
+    /* [수정] 모바일 카드 두께 대폭 축소 (패딩 10px) */
     .subject-card { 
-        padding: 10px 15px; /* 패딩 축소 */
+        padding: 10px 12px; /* 패딩 대폭 축소 */
         border-radius: 10px;
         min-height: auto; 
-        display: flex; flex-direction: column; align-items: flex-start; gap: 4px; /* 간격 축소 */
+        display: flex; flex-direction: column; align-items: flex-start; gap: 3px; /* 내부 간격 축소 */
     }
 
     .subj-title { 
-        font-size: 14px; /* 폰트 살짝 축소 */
+        font-size: 14px; /* 폰트 축소 */
         padding-right: 0; 
         word-break: keep-all;
-        line-height: 1.35;
+        line-height: 1.3;
         margin-bottom: 0;
     }
 
-    /* 모바일 Last Viewed (트리 라인에 체크 아이콘으로 표시) */
+    /* 모바일 Last Viewed */
     .subject-card.last-viewed {
         border-color: #10b981;
     }
     .subject-card.last-viewed .last-viewed-icon {
         display: flex; position: absolute;
-        left: -35px; /* 카드의 왼쪽 바깥으로 이동 (트리 라인 위) */
-        top: 50%; transform: translateY(-50%);
+        left: -35px; top: 50%; transform: translateY(-50%);
         width: 20px; height: 20px;
         border-radius: 50%;
         background: #10b981;
@@ -502,23 +501,20 @@
         z-index: 10;
         right: auto;
     }
-    .last-viewed-icon span { display: none; } /* 텍스트 숨김 */
+    .last-viewed-icon span { display: none; }
     .last-viewed-icon svg { width: 12px; height: 12px; fill: #fff; }
 
-    /* 5. 상태 버튼 */
+    /* 5. 상태 버튼 슬림화 */
     .status-group { flex-wrap: wrap; gap: 4px; margin-top: 2px; }
     
     .status-pill {
-        padding: 2px 6px; font-size: 10px; height: auto; /* 패딩 축소 */
+        padding: 2px 6px; font-size: 10px; height: auto;
         display: inline-block;
         border-radius: 4px;
-        line-height: 1.4;
+        line-height: 1.3;
     }
     
-    /* 아이콘 숨김 */
     .pill-icon { display: none !important; }
-    
-    /* 텍스트 표시 */
     .status-text { display: inline-block !important; white-space: normal; }
     
     .status-pill:has(.status-text:contains('PDF')) .status-text::before { content: 'PDF '; font-weight: 800; opacity: 0.7; }
@@ -532,7 +528,6 @@
     }
     .mobile-close-btn.visible { opacity: 1; pointer-events: auto; }
 
-    /* 모바일 하단 메뉴 */
     .bottom-nav { 
         width: 90%; 
         bottom: 10px;
@@ -901,6 +896,7 @@
           if(!tid) return;
           const style = JSON.parse(localStorage.getItem(`kac_style_${tid}`) || '{}');
           
+          // [수정] 사이드바 자동 펼침 로직
           const isActive = tid === type; 
           const itemClass = isActive ? 'sb-item active' : 'sb-item';
 
@@ -908,14 +904,13 @@
           
           const item = document.createElement('div');
           
-          // [수정] 사이드바 자동 펼침 로직 추가
-          // 현재 페이지의 type과 일치하는 카테고리라면 'open' 클래스 추가 및 화살표 '▼' 설정
-          const isCategoryActive = (tid === type);
-          const listClass = isCategoryActive ? 'sb-sub-list open' : 'sb-sub-list';
-          const arrowSymbol = (menus.length > 0) ? (isCategoryActive ? '▼' : '▶') : '';
+          // 현재 활성화된 카테고리면 화살표는 아래(▼), 아니면 오른쪽(▶)
+          const arrow = menus.length > 0 ? `<span class="sb-toggle">${isActive ? '▼' : '▶'}</span>` : '';
           
+          // 현재 활성화된 카테고리면 리스트를 open 상태로 시작
           let subHtml = '';
           if(menus.length > 0) {
+              const listClass = isActive ? 'sb-sub-list open' : 'sb-sub-list';
               subHtml = `<div class="${listClass}" id="sb-sub-${tid}">`;
               menus.forEach(m => {
                   const isSubActive = (tid === type && m.dataId === menuId);
@@ -931,7 +926,7 @@
                     <span style="width:10px;height:10px;border-radius:50%;background:${style.color || '#2563eb'}"></span>
                     ${style.name || tid}
                 </span>
-                <span class="sb-toggle">${arrowSymbol}</span>
+                ${arrow}
             </div>
             ${subHtml}
           `;
@@ -942,12 +937,13 @@
   function toggleSubMenu(id, el) {
       const list = document.getElementById(`sb-sub-${id}`);
       if(list) {
+          const toggleIcon = el.querySelector('.sb-toggle');
           if(list.classList.contains('open')) {
               list.classList.remove('open');
-              el.querySelector('.sb-toggle').innerText = '▶';
+              if(toggleIcon) toggleIcon.innerText = '▶';
           } else {
               list.classList.add('open');
-              el.querySelector('.sb-toggle').innerText = '▼';
+              if(toggleIcon) toggleIcon.innerText = '▼';
           }
       } else {
           location.href = `facility.html?type=${id}`;
@@ -1167,7 +1163,7 @@
 
       card.innerHTML = `
         <div class="last-viewed-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
             <span>Last Viewed</span>
         </div>
         <div>
