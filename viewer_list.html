@@ -26,8 +26,10 @@
     --title-color: #1e293b;
     --header-h: 75px;
 
-    /* [추가] 트리 레이아웃 위치 변수 */
+    /* 트리 레이아웃 위치 변수 */
     --tree-pos-x: 0px; 
+    /* 세로선 위치 (상단 카드의 태그 중앙 정렬을 위함) */
+    --spine-left: 65px; 
   }
   body.dark-mode {
     --navy: #020617; --bg-main: #0f172a; --bg-card: #1e293b; 
@@ -42,7 +44,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
   body { background: var(--bg-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: var(--text-main); transition: 0.3s; }
 
-  /* [추가] 사이드바 스타일 (facility.html에서 가져옴) */
+  /* 사이드바 스타일 */
   .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 6000; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(2px); }
   .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
   .sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background: var(--bg-card); z-index: 6001; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; border-right: 1px solid var(--btn-border); }
@@ -82,11 +84,10 @@
     z-index: 1000; flex-shrink: 0; gap: 20px; position: relative; transition: 0.3s;
   }
   
-  .header-left { display: flex; align-items: center; min-width: 250px; z-index: 10; white-space: nowrap; transition: opacity 0.2s; gap: 15px; } /* gap 추가 */
+  .header-left { display: flex; align-items: center; min-width: 250px; z-index: 10; white-space: nowrap; transition: opacity 0.2s; gap: 15px; } 
   .header-center { position: absolute; left: 50%; transform: translateX(-50%); width: 600px; max-width: 100%; z-index: 20; transition: width 0.3s; }
   .header-right { display: flex; align-items: center; gap: 15px; min-width: 250px; justify-content: flex-end; z-index: 10; }
 
-  /* [추가] 햄버거 버튼 스타일 */
   .hamburger-btn { cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; flex-shrink: 0; }
   .hamburger-btn:hover { background: rgba(255,255,255,0.1); }
   .hamburger-btn svg { width: 24px; height: 24px; fill: #fff; }
@@ -156,51 +157,89 @@
 
   main { flex: 1; overflow-y: auto; padding: 40px; padding-bottom: 150px; display: flex; flex-direction: column; align-items: center; gap: 0px; }
 
-  /* [수정/추가] 트리 레이아웃 관련 스타일 */
+  /* ========================================================= */
+  /* [수정] 트리 구조 + Facility 카드 스타일 적용 */
+  /* ========================================================= */
+  
   .tree-container {
       display: flex; flex-direction: column; align-items: center; width: 100%; position: relative;
-      transform: translateX(var(--tree-pos-x, 0px)); /* 가로 위치 조정 변수 */
+      transform: translateX(var(--tree-pos-x, 0px));
       transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 
-  /* 상단 명칭 카드 (Category Title Card) */
-  .cat-title-card {
-      background: var(--navy); color: #fff;
-      padding: 15px 40px; border-radius: 50px;
-      font-size: 18px; font-weight: 800;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      z-index: 5; margin-bottom: 30px;
-      display: flex; align-items: center; gap: 10px;
-      border: 2px solid rgba(255,255,255,0.1);
-  }
-
-  /* 세로 연결선 (Vertical Line) */
-  .tree-spine {
-      position: absolute; top: 50px; bottom: 30px; left: 50%;
-      width: 4px; background: #cbd5e1;
-      transform: translateX(-50%); z-index: 0;
-      border-radius: 2px;
-  }
-  body.dark-mode .tree-spine { background: rgba(255,255,255,0.1); }
-
-  /* 카드 래퍼 (Card Wrapper) - 선과 연결하기 위함 */
-  .card-wrapper {
-      position: relative; width: 100%; max-width: 900px;
-      display: flex; justify-content: center;
-      margin-bottom: 25px; z-index: 1;
+  /* 상단 시설 명칭 카드 (Facility Card Style) */
+  .fac-top-card {
+      background: var(--bg-card);
+      width: 100%; max-width: 900px;
+      padding: 20px 30px; border-radius: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid transparent;
+      border-left: 8px solid var(--theme-color);
+      display: flex; align-items: center; justify-content: space-between;
+      color: var(--text-main);
+      z-index: 5; margin-bottom: 25px;
+      position: relative;
   }
   
-  /* 연결 점 (Connector Dot) */
-  .card-wrapper::before {
-      content: ''; position: absolute; top: 50%; left: 50%;
-      width: 12px; height: 12px; background: var(--theme-color);
-      border-radius: 50%; transform: translate(-50%, -50%);
-      z-index: -1; box-shadow: 0 0 0 4px var(--bg-main);
+  .fac-left-group { display: flex; align-items: center; gap: 20px; flex: 1; }
+  
+  /* 아이콘(태그) 원형/타원형 스타일 - facility.html의 icon-circle 유사하지만 가로형 */
+  .fac-tag-pill {
+      background: #fdf2f8; /* 기본 핑크 배경 (데이터에 따라 변경 가능하지만 여기선 고정 또는 테마색 연하게) */
+      color: var(--theme-color);
+      border: 2px solid #fbcfe8; /* 연한 테두리 */
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-weight: 900;
+      font-size: 16px;
+      min-width: 80px;
+      text-align: center;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  }
+  /* 다크모드 대응 */
+  body.dark-mode .fac-tag-pill {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(255,255,255,0.2);
   }
 
-  /* 카드 설정 (기존 유지 + 트리용 수정) */
+  .fac-title { font-size: 22px; font-weight: 800; word-break: keep-all; }
+
+  /* 세로 연결선 (Vertical Spine) - 왼쪽 태그 밑에서 시작 */
+  .tree-spine {
+      position: absolute; 
+      top: 60px; /* 상단 카드 내부 태그 위치 고려 */
+      bottom: 40px; 
+      left: calc(50% - 450px + var(--spine-left)); /* 중앙정렬된 카드(900px)의 왼쪽 끝에서 spine-left 만큼 이동 */
+      width: 3px; 
+      background: #cbd5e1; /* 연한 회색 */
+      z-index: 0;
+      border-radius: 2px;
+  }
+  body.dark-mode .tree-spine { background: rgba(255,255,255,0.15); }
+
+  /* 하위 카드 래퍼 - 'E'자 연결선 구현 */
+  .card-wrapper {
+      position: relative; width: 100%; max-width: 900px;
+      display: flex; justify-content: flex-end; /* 카드를 오른쪽으로 밀기 위함 */
+      margin-bottom: 20px; z-index: 1;
+      padding-left: calc(var(--spine-left) + 40px); /* 스파인 + 여백 만큼 공간 확보 */
+  }
+  
+  /* 가로 연결선 (Horizontal Branch) */
+  .card-wrapper::before {
+      content: ''; position: absolute; 
+      top: 50%; left: var(--spine-left); /* 스파인 위치에서 시작 */
+      width: 40px; height: 3px; /* 가로 길이 */
+      background: #cbd5e1;
+      transform: translateY(-50%);
+      z-index: -1;
+  }
+  body.dark-mode .card-wrapper::before { background: rgba(255,255,255,0.15); }
+
+  /* 카드 스타일 (기존 유지) */
   .subject-card { 
-    background: var(--bg-card); width: 100%; /* max-width 제거, wrapper가 제어 */ 
+    background: var(--bg-card); width: 100%; 
     padding: 25px 35px; border-radius: 18px; 
     box-shadow: var(--shadow); 
     border: 1px solid transparent;
@@ -210,12 +249,13 @@
     position: relative;
     overflow: visible; 
   }
-  .subject-card:hover { transform: translateX(10px); border-color: var(--theme-color); box-shadow: 0 5px 20px rgba(var(--theme-rgb), 0.2); }
+  .subject-card:hover { transform: translateX(5px); border-color: var(--theme-color); box-shadow: 0 5px 20px rgba(var(--theme-rgb), 0.2); }
   .subject-card.inactive { border-left-color: #94a3b8 !important; opacity: 0.7; background: #f8fafc; }
   body.dark-mode .subject-card.inactive { background: #1e293b; opacity: 0.6; }
   .subject-card.dragging { opacity: 0.5; border: 2px dashed #94a3b8; background: rgba(255,255,255,0.05); }
   .subject-card.drag-over { border: 2px solid var(--theme-color); transform: scale(1.02); box-shadow: 0 0 15px rgba(var(--theme-rgb), 0.2); z-index: 10; }
 
+  /* Last Viewed 뱃지 */
   .last-viewed-icon {
     position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
     display: none; 
@@ -383,10 +423,11 @@
     .status-pill { padding: 6px 8px; font-size: 14px; }
     .pill-icon { margin-right: 0 !important; }
     
-    /* 모바일에서는 트리 레이아웃 해제 (화면 좁음) */
+    /* 모바일에서는 트리 레이아웃 해제 (단순 리스트) */
     .tree-spine { display: none; }
-    .cat-title-card { width: 100%; border-radius: 20px; margin-bottom: 20px; padding: 15px; font-size: 16px; justify-content: center; }
-    .card-wrapper { display: block; margin-bottom: 15px; }
+    .fac-top-card { width: 100%; border-radius: 20px; margin-bottom: 20px; padding: 15px; font-size: 16px; flex-direction:column; align-items:flex-start; gap:10px; }
+    .fac-left-group { width:100%; justify-content: space-between; }
+    .card-wrapper { display: block; margin-bottom: 15px; padding-left: 0; }
     .card-wrapper::before { display: none; }
   }
 
@@ -437,7 +478,6 @@
 
 <header>
   <div class="header-left" id="headerLeft">
-    <!-- [추가] 햄버거 버튼 -->
     <div class="hamburger-btn" onclick="toggleSidebar()">
       <svg viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
     </div>
@@ -452,7 +492,7 @@
 
   <div class="header-right">
     <div class="theme-toggle">
-      <div class="theme-btn" id="btnDay" onclick="setTheme('light')" title="주간 모드"><svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 7,12A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg></div>
+      <div class="theme-btn" id="btnDay" onclick="setTheme('light')" title="주간 모드"><svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg></div>
       <div class="theme-btn" id="btnNight" onclick="setTheme('dark')" title="야간 모드"><svg viewBox="0 0 24 24"><path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C6.94,10.39 9.79,16.87 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z"/></svg></div>
     </div>
     
@@ -518,7 +558,7 @@
       </div>
     </div>
     
-    <!-- [추가] 트리 레이아웃 위치 조정 메뉴 -->
+    <!-- [유지] 트리 레이아웃 위치 조정 -->
     <div class="setting-group">
       <label class="setting-label">↔️ 트리 레이아웃 가로 위치 조정 (px)</label>
       <div style="display:flex; gap:10px; align-items:center;">
@@ -652,6 +692,7 @@
   };
 
   let subjects = [];
+  let currentMenuData = null; // [추가] 현재 메뉴의 상세 정보(아이콘 등)
 
   let pdfDoc = null, pageNum = 1, isRendering = false, isDragging = false;
   const canvasContainer = document.getElementById('pageContainer');
@@ -705,19 +746,22 @@
         }
 
         if (!loaded) subjects = [];
+        
+        // [추가] 현재 메뉴 데이터(Tag 표시용) 로드
+        const menuList = JSON.parse(localStorage.getItem(`kac_menu_${type}`) || '[]');
+        currentMenuData = menuList.find(m => m.dataId === menuId) || { label: menuName, line1: 'Tag' };
 
         const sData = localStorage.getItem(`kac_style_${type}`);
         const style = sData ? JSON.parse(sData) : { name: type, color: '#2563eb' };
         applyStyles(style);
 
-        // [추가] 저장된 트리 위치 불러오기
         const savedPos = localStorage.getItem('kac_tree_pos') || 0;
         document.documentElement.style.setProperty('--tree-pos-x', savedPos + 'px');
 
         render();
         buildSearchIndex();
         checkAutoOpen();
-        renderSidebar(); // 사이드바 로드
+        renderSidebar();
 
     } catch (err) {
         console.error("Initialization Error:", err);
@@ -725,7 +769,6 @@
     }
   }
 
-  // 사이드바 로직
   function toggleSidebar() {
       const sb = document.getElementById('sidebar');
       const ov = document.getElementById('sidebarOverlay');
@@ -737,23 +780,13 @@
       const content = document.getElementById('sidebarContent');
       content.innerHTML = '';
       const order = JSON.parse(localStorage.getItem('kac_index_order') || '[]');
-      
       order.forEach(tid => {
           if(!tid) return;
           const style = JSON.parse(localStorage.getItem(`kac_style_${tid}`) || '{}');
-          
           const isActive = tid === type; 
           const itemClass = isActive ? 'sb-item active' : 'sb-item';
-
           const item = document.createElement('div');
-          item.innerHTML = `
-            <div class="${itemClass}" onclick="location.href='facility.html?type=${tid}'">
-                <span style="display:flex;align-items:center;gap:10px;">
-                    <span style="width:10px;height:10px;border-radius:50%;background:${style.color || '#2563eb'}"></span>
-                    ${style.name || tid}
-                </span>
-            </div>
-          `;
+          item.innerHTML = `<div class="${itemClass}" onclick="location.href='facility.html?type=${tid}'"><span style="display:flex;align-items:center;gap:10px;"><span style="width:10px;height:10px;border-radius:50%;background:${style.color || '#2563eb'}"></span>${style.name || tid}</span></div>`;
           content.appendChild(item);
       });
   }
@@ -773,10 +806,7 @@
       if(!type || !menuId) return false;
       const data = localStorage.getItem(`kac_subs_${type}_${menuId}`);
       if (data) {
-          try {
-            subjects = JSON.parse(data);
-            return true;
-          } catch(e) { return false; }
+          try { subjects = JSON.parse(data); return true; } catch(e) { return false; }
       }
       return false;
   }
@@ -784,10 +814,8 @@
   function applyStyles(style) {
       const typeName = style.name || type || 'Unknown';
       const themeColor = style.color || '#2563eb';
-      
       document.documentElement.style.setProperty('--theme-color', themeColor);
       document.documentElement.style.setProperty('--theme-rgb', hexToRgb(themeColor));
-
       const bc = document.getElementById('breadcrumbContainer');
       if(bc) {
           bc.innerHTML = '';
@@ -859,7 +887,6 @@
     location.reload();
   }
 
-  // [추가] 트리 위치 업데이트 함수
   function updateTreePos(val) {
       document.documentElement.style.setProperty('--tree-pos-x', val + 'px');
       document.getElementById('treePosVal').textContent = val;
@@ -873,18 +900,45 @@
     const list = document.getElementById('subjectList'); list.innerHTML = '';
     const lastViewedId = sessionStorage.getItem('kac_last_viewed_id');
 
-    // [수정] 트리 컨테이너 생성
     const treeContainer = document.createElement('div');
     treeContainer.className = 'tree-container';
     
-    // [수정] 상단 명칭 카드 추가
-    const catCard = document.createElement('div');
-    catCard.className = 'cat-title-card';
-    // 시설 이름 가져오기 (메뉴명이 있다면 표시, 없으면 '시설 정보')
-    catCard.textContent = menuName || "교육 과정 목록";
-    treeContainer.appendChild(catCard);
+    // [수정] 상단 시설 명칭 카드 생성 (Facility Card Style 적용)
+    const facCard = document.createElement('div');
+    facCard.className = 'fac-top-card';
 
-    // [수정] 중앙 세로선 추가
+    // 태그 + 제목 그룹
+    const leftGroup = document.createElement('div');
+    leftGroup.className = 'fac-left-group';
+
+    // 태그(Pill) 생성
+    const tag = document.createElement('div');
+    tag.className = 'fac-tag-pill';
+    tag.textContent = currentMenuData ? (currentMenuData.line1 || 'Tag') : 'Tag';
+    
+    // 제목 생성
+    const title = document.createElement('div');
+    title.className = 'fac-title';
+    title.textContent = currentMenuData ? currentMenuData.label : (menuName || "교육 과정 목록");
+
+    leftGroup.appendChild(tag);
+    leftGroup.appendChild(title);
+    facCard.appendChild(leftGroup);
+
+    // [옵션] 우측 버튼 (Facility 페이지처럼 시각적으로만 배치)
+    if(isAdmin && !isPreview) {
+        const rightGroup = document.createElement('div');
+        rightGroup.className = 'ctrl-btns';
+        rightGroup.innerHTML = `
+            <button class="btn-action" style="cursor:not-allowed; opacity:0.6;">수정</button>
+            <button class="btn-action btn-del" style="cursor:not-allowed; opacity:0.6;">삭제</button>
+        `;
+        facCard.appendChild(rightGroup);
+    }
+
+    treeContainer.appendChild(facCard);
+
+    // [수정] 세로선(Spine) 추가
     const spine = document.createElement('div');
     spine.className = 'tree-spine';
     treeContainer.appendChild(spine);
@@ -906,7 +960,6 @@
       const hasAudio = !!sub.audioName;
       const hasLink = !!sub.link;
       
-      // [수정] 카드를 wrapper로 감싸서 트리 선과 연결
       const wrapper = document.createElement('div');
       wrapper.className = 'card-wrapper';
 
@@ -925,22 +978,13 @@
       
       card.onclick = () => { 
         if(!isActive) { 
-            if(isAdmin) {
-                if(!confirm("현재 개발 중인 과정입니다.\n관리자 권한으로 열람하시겠습니까?")) return;
-            } else {
-                alert("현재 과정 개발중으로 사용 불가합니다."); 
-                return; 
-            }
+            if(isAdmin) { if(!confirm("현재 개발 중인 과정입니다.\n관리자 권한으로 열람하시겠습니까?")) return; } 
+            else { alert("현재 과정 개발중으로 사용 불가합니다."); return; }
         } 
-        
         sessionStorage.setItem('kac_last_viewed_id', sub.id);
         document.querySelectorAll('.subject-card').forEach(c => c.classList.remove('last-viewed'));
         card.classList.add('last-viewed');
-
-        if(hasLink) {
-            window.open(sub.link, '_blank');
-            return;
-        }
+        if(hasLink) { window.open(sub.link, '_blank'); return; }
         openViewer(i); 
       };
 
@@ -957,7 +1001,7 @@
 
       card.innerHTML = `
         <div class="last-viewed-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
             <span>Last Viewed</span>
         </div>
         <div>
@@ -1025,7 +1069,6 @@
         previewBtn.style.color = "";
     }
 
-    // [추가] 설정값 로드
     const currentPos = localStorage.getItem('kac_tree_pos') || 0;
     document.getElementById('treePosRange').value = currentPos;
     document.getElementById('treePosVal').textContent = currentPos;
