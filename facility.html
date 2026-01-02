@@ -8,7 +8,6 @@
 <!-- 로그인 체크 -->
 <script>
   if(sessionStorage.getItem('kac_access_token') !== 'granted') {
-    alert("로그인이 필요합니다.");
     location.replace('login.html');
   }
 </script>
@@ -18,19 +17,23 @@
   :root { 
     --theme-color: #2563eb; 
     --theme-rgb: 37, 99, 235;
+
     --navy: #0f172a; --bg-main: #f0f4f8; --bg-card: #ffffff; 
     --text-main: #000000; --text-sub: #334155; 
-    --border-card: 2px solid transparent; 
-    --shadow: 0 5px 15px rgba(0,0,0,0.05);
+    --border-card: transparent; --shadow: 0 5px 15px rgba(0,0,0,0.05);
     --btn-bg: #f8fafc; --btn-border: #e2e8f0; --btn-text: #64748b;
+    --pill-bg: #f1f5f9; --pill-text: #94a3b8; --pill-border: #e2e8f0;
+    --title-color: #1e293b;
     --header-h: 75px;
   }
   body.dark-mode {
     --navy: #020617; --bg-main: #0f172a; --bg-card: #1e293b; 
     --text-main: #f1f5f9; --text-sub: #cbd5e1; 
-    --border-card: 2px solid rgba(255,255,255,0.1); 
+    --border-card: 1px solid rgba(255,255,255,0.1); 
     --shadow: 0 5px 20px rgba(0,0,0,0.5);
     --btn-bg: rgba(255,255,255,0.05); --btn-border: rgba(255,255,255,0.2); --btn-text: #e2e8f0;
+    --pill-bg: rgba(255,255,255,0.05); --pill-text: #cbd5e1; --pill-border: rgba(255,255,255,0.2);
+    --title-color: #ffffff;
   }
   
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
@@ -53,167 +56,89 @@
   .header-left { display: flex; align-items: center; gap: 15px; }
   .logo-text { font-size: 20px; font-weight: 800; cursor: pointer; white-space: nowrap; }
   .header-right { display: flex; align-items: center; gap: 15px; }
-
-  /* 마인드맵 컨테이너 */
-  .mindmap-container {
-      display: flex;
-      width: 100%; height: 100%;
-      padding-top: var(--header-h); /* 헤더 공간 */
-      position: relative;
-      overflow: hidden;
-  }
-
-  /* [좌측] 루트 노드 (고정) */
-  .root-section {
-      width: 350px; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: flex-end;
-      padding-right: 40px; position: relative;
-      z-index: 10;
-  }
-  .root-card {
-      background: var(--bg-card);
-      border: 3px solid var(--theme-color);
-      border-radius: 20px;
-      padding: 30px;
-      width: 260px;
-      box-shadow: var(--shadow);
-      text-align: center;
-      position: relative;
-      z-index: 2;
-  }
-  .root-icon {
-      font-size: 40px; font-weight: 900; color: var(--theme-color);
-      margin-bottom: 10px; display: block;
-  }
-  .root-title {
-      font-size: 22px; font-weight: 800; word-break: keep-all; line-height: 1.3;
-  }
-
-  /* 연결선 (Curved Line) */
-  .connector-line {
-      position: absolute; right: 0; top: 50%;
-      width: 40px; height: 4px; background: var(--theme-color);
-      border-radius: 4px;
-      z-index: 1;
-  }
-  /* 중앙 세로선 (버스) */
-  .branch-bus {
-      position: absolute; left: 350px; top: 0; bottom: 0;
-      width: 4px; background: rgba(var(--theme-rgb), 0.2);
-      z-index: 1;
-  }
-
-  /* [우측] 리스트 섹션 (스크롤) */
-  .list-section {
-      flex: 1;
-      overflow-y: auto;
-      padding: 40px 40px 100px 40px; /* 하단 여백 충분히 */
-      display: flex; flex-direction: column; gap: 20px;
-      position: relative;
-      scrollbar-width: none;
-  }
-  .list-section::-webkit-scrollbar { display: none; }
-
-  /* [수정] 과목 카드 디자인 (Single Line) */
-  .subject-card {
-      background: var(--bg-card);
-      border-radius: 18px;
-      padding: 20px 25px;
-      box-shadow: var(--shadow);
-      display: flex; align-items: center; gap: 20px;
-      position: relative;
-      transition: transform 0.2s, box-shadow 0.2s;
-      border: 1px solid var(--border-card);
-      cursor: pointer;
-  }
-  .subject-card:hover {
-      transform: translateX(5px);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-      border-color: var(--theme-color);
-  }
-  /* 연결점 */
-  .subject-card::before {
-      content: ''; position: absolute; left: -44px; top: 50%;
-      width: 44px; height: 2px; background: rgba(var(--theme-rgb), 0.3);
-  }
-  .subject-card::after {
-      content: ''; position: absolute; left: -48px; top: 50%; transform: translateY(-50%);
-      width: 10px; height: 10px; border-radius: 50%; background: var(--theme-color);
-  }
-
-  /* [수정] 아이콘 박스 (Auto Width) */
-  .subj-icon-box {
-      background: rgba(var(--theme-rgb), 0.1);
-      color: var(--theme-color);
-      border: 1px solid rgba(var(--theme-rgb), 0.2);
-      padding: 8px 16px;
-      border-radius: 12px;
-      font-size: 14px; font-weight: 800;
-      white-space: nowrap;
-      min-width: 60px; text-align: center;
-  }
-
-  .subj-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
-  .subj-title { font-size: 18px; font-weight: 700; color: var(--text-main); }
-  .subj-meta { font-size: 12px; color: var(--text-sub); display: flex; gap: 8px; opacity: 0.8; }
   
-  /* 상태 뱃지 */
-  .badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; }
-  .badge.pdf { background: #dcfce7; color: #166534; }
-  .badge.link { background: #dbeafe; color: #1e40af; }
+  .kac-logo-img { height: 30px; width: auto; display: block; object-fit: contain; }
+  .breadcrumb { color: rgba(255,255,255,0.7); font-weight: 500; font-size: 16px; margin-left: 10px; white-space: nowrap; display: none; }
+  @media(min-width: 1024px) { .breadcrumb { display: inline-block; } }
+  
+  .theme-toggle { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); margin-right: 10px; }
+  .theme-btn { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; opacity: 0.5; }
+  .theme-btn.active { background: #fff; opacity: 1; color: var(--navy); }
+  .theme-btn svg { width: 16px; height: 16px; fill: currentColor; }
 
-  /* 관리자 버튼 */
-  .admin-btns { display: flex; gap: 5px; }
-  .btn-xs { padding: 4px 8px; font-size: 11px; border-radius: 6px; border: 1px solid #e2e8f0; background: #fff; cursor: pointer; color: #64748b; }
-  .btn-xs:hover { background: #f1f5f9; color: #0f172a; }
+  /* 메인 컨텐츠 영역 (스크롤 가능) */
+  .content-wrapper {
+      flex: 1; 
+      display: flex; flex-direction: column;
+      width: 100%; height: 100%;
+      padding-top: 100px; /* 헤더 여백 */
+      padding-bottom: 0;
+      overflow-y: scroll;
+      scrollbar-width: none; -ms-overflow-style: none;
+      align-items: center;
+  }
+  .content-wrapper::-webkit-scrollbar { display: none; }
+
+  /* 리스트 컨테이너 */
+  #subjectList {
+      width: 100%; max-width: 900px;
+      padding: 0 20px 40px 20px;
+      display: flex; flex-direction: column; gap: 20px;
+      flex: 1; /* 남은 공간 차지 (Footer 밀어내기용) */
+  }
+
+  /* 카드 디자인 (기존 스타일 유지 + 가로 배치) */
+  .subject-card { 
+    background: var(--bg-card); width: 100%; padding: 25px 35px; border-radius: 18px; 
+    box-shadow: var(--shadow); border: 1px solid transparent;
+    display: flex; justify-content: space-between; align-items: center; transition: 0.3s;
+    border-left: 10px solid var(--theme-color); 
+    cursor: pointer; color: var(--text-main); position: relative;
+  }
+  .subject-card:hover { transform: translateX(5px); border-color: var(--theme-color); box-shadow: 0 8px 25px rgba(var(--theme-rgb), 0.2); }
+  .subject-card.inactive { border-left-color: #94a3b8 !important; opacity: 0.7; background: #f8fafc; }
+  
+  .subj-title { font-size: 20px; font-weight: 800; color: var(--title-color); }
+  .status-group { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .status-pill { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 6px; background: var(--pill-bg); color: var(--pill-text); border: 1px solid var(--pill-border); }
+  .status-pill.on { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+  .status-pill.link { background: #dbeafe; color: #1e40af; border-color: #bfdbfe; }
+  
+  /* 관리자 버튼 그룹 */
+  .ctrl-btns { display: flex; gap: 10px; }
+  .btn-action { padding: 6px 12px; border-radius: 8px; border: 1px solid var(--btn-border); background: #fff; font-size: 12px; cursor: pointer; }
+  .btn-del { color: #ef4444; border-color: #fee2e2; }
 
   /* 추가 버튼 */
-  .add-subject-card {
-      border: 2px dashed #cbd5e1; background: transparent;
-      justify-content: center; color: #94a3b8; font-weight: 700;
-      padding: 15px; box-shadow: none;
+  .add-card { border: 2px dashed #cbd5e1; background: transparent; justify-content: center; color: #94a3b8; font-weight: 700; padding: 20px; box-shadow: none; }
+  .add-card:hover { border-color: var(--theme-color); color: var(--theme-color); background: rgba(var(--theme-rgb), 0.05); transform: none; }
+
+  /* 하단바 (Sticky Footer) */
+  .main-footer {
+    width: 100%; background: var(--navy); padding: 30px 20px;
+    text-align: center; color: rgba(255,255,255,0.7);
+    font-size: 13px; line-height: 1.6;
+    border-top: 1px solid rgba(255,255,255,0.1); box-sizing: border-box;
+    margin-top: auto; /* 내용 적을때 바닥 고정 */
+    flex-shrink: 0;
   }
-  .add-subject-card:hover { border-color: var(--theme-color); color: var(--theme-color); background: rgba(var(--theme-rgb), 0.05); }
-  .add-subject-card::before, .add-subject-card::after { display: none; } /* 연결선 없음 */
+  .main-footer p { margin: 0; word-break: keep-all; }
+  .main-footer .copyright { font-weight: 700; margin-top: 8px; color: rgba(255,255,255,0.9); }
 
-  /* 모바일 대응 */
-  @media (max-width: 768px) {
-      .mindmap-container { flex-direction: column; overflow-y: auto; }
-      
-      /* 상단 루트 카드 */
-      .root-section { 
-          width: 100%; height: auto; padding: 20px; 
-          justify-content: center; position: sticky; top: 0; 
-          background: var(--bg-main); z-index: 20; 
-          border-bottom: 1px solid rgba(0,0,0,0.05);
-      }
-      .root-card { 
-          width: 100%; padding: 15px; display: flex; align-items: center; gap: 15px; text-align: left; 
-          flex-direction: row; /* 가로 배치 */
-      }
-      .root-icon { margin-bottom: 0; font-size: 24px; width: 40px; }
-      .root-title { font-size: 16px; }
-      .connector-line { display: none; } /* 가로선 숨김 */
-
-      /* 리스트 섹션 */
-      .list-section { 
-          padding: 20px; overflow: visible; 
-          border-left: 2px solid rgba(var(--theme-rgb), 0.2);
-          margin-left: 30px; margin-right: 10px;
-          gap: 15px;
-      }
-      .branch-bus { display: none; } /* PC용 버스선 숨김 */
-
-      /* 카드 스타일 */
-      .subject-card { padding: 15px; gap: 12px; }
-      .subject-card::before { left: -22px; width: 22px; } /* 연결선 길이 조정 */
-      .subject-card::after { left: -25px; } /* 점 위치 조정 */
-      
-      .subj-icon-box { font-size: 12px; padding: 6px 10px; min-width: auto; }
-      .subj-title { font-size: 15px; }
-      
-      .admin-btns { flex-direction: column; gap: 2px; }
+  /* 하단 버튼 (뒤로가기/홈) */
+  .bottom-nav { 
+    display: flex; justify-content: center; gap: 20px; 
+    margin: 20px 0; padding: 10px; width: 100%;
   }
+  .nav-item { 
+    color: #fff; cursor: pointer; font-size: 16px; font-weight: 700; 
+    transition: 0.3s; opacity: 1; display: flex; align-items: center; gap: 8px; 
+    padding: 10px 30px; border-radius: 50px;
+    background: #0f172a; border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  }
+  .nav-item:hover { background: #1e293b; transform: translateY(-2px); }
+  body.dark-mode .nav-item { background: #1e293b; border-color: rgba(255,255,255,0.3); }
 
   /* PDF 뷰어 오버레이 */
   #pdfOverlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: none; }
@@ -221,12 +146,20 @@
   #viewerBody { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; overflow: auto; }
   canvas { max-width: 100%; height: auto; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
   
+  /* 모바일 대응 */
+  @media (max-width: 768px) {
+      .subject-card { flex-direction: column; align-items: flex-start; gap: 15px; }
+      .ctrl-btns { width: 100%; justify-content: flex-end; }
+      .bottom-nav { margin-bottom: 20px; }
+  }
+
   /* 모달 공통 */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 11000; display: none; align-items: center; justify-content: center; }
   .modal-card { background: var(--bg-card); padding: 30px; border-radius: 20px; width: 400px; }
   .setting-input { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #e2e8f0; }
   .btn-modal { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; margin-top: 5px; }
   .btn-primary { background: #0f172a; color: #fff; }
+
 </style>
 </head>
 <body>
@@ -234,30 +167,40 @@
 <header>
   <div class="header-left">
     <div class="logo-text" onclick="location.href='index.html'">KAC CNS Training Platform</div>
+    <span class="breadcrumb" id="bc"></span>
   </div>
   <div class="header-right">
-    <div class="settings-btn" onclick="location.href='index.html'">🏠</div>
+    <div class="theme-toggle">
+        <div class="theme-btn" id="btnDay" onclick="setTheme('light')">☀️</div>
+        <div class="theme-btn" id="btnNight" onclick="setTheme('dark')">🌙</div>
+    </div>
+    <img src="logo.png" alt="KAC Logo" class="kac-logo-img">
   </div>
 </header>
 
-<div class="mindmap-container">
+<div class="content-wrapper">
   
-  <!-- [좌측] 루트 노드 (고정) -->
-  <div class="root-section">
-    <div class="root-card">
-      <div id="rootIcon" class="root-icon">?</div>
-      <div id="rootTitle" class="root-title">Loading...</div>
-    </div>
-    <div class="connector-line"></div>
-  </div>
-
-  <!-- [중앙] 연결 버스 라인 -->
-  <div class="branch-bus"></div>
-
-  <!-- [우측] 과목 리스트 (스크롤) -->
-  <div id="subjectList" class="list-section">
+  <!-- 과목 리스트 (스크롤) -->
+  <div id="subjectList">
     <!-- JS로 카드 생성됨 -->
   </div>
+
+  <!-- 하단 버튼 -->
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="history.back()">
+      <svg style="width:20px;height:20px;fill:currentColor" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      뒤로가기
+    </div>
+    <div class="nav-item" onclick="location.href='index.html'">
+      <svg style="width:20px;height:20px;fill:currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      홈으로
+    </div>
+  </div>
+
+  <!-- 하단바 -->
+  <footer class="main-footer">
+    <div class="footer-content"></div>
+  </footer>
 
 </div>
 
@@ -280,57 +223,64 @@
 </div>
 
 <script>
-  // 초기 설정
   pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
   
   const params = new URLSearchParams(location.search);
-  const type = params.get('type'); // Category ID (ex: COMM)
-  const menuLabel = params.get('menu'); // Menu Name (ex: 전파이론)
-  const menuId = params.get('id'); // Menu ID
+  const type = params.get('type'); 
+  const menuLabel = params.get('menu');
+  const menuId = params.get('id');
   
   let isAdmin = localStorage.getItem('kac_admin_mode') === '1';
   let subjects = [];
   let currentEditIdx = -1;
 
   async function init() {
-      // 테마 설정
       const theme = localStorage.getItem('kac_theme') || 'light';
-      document.body.classList.toggle('dark-mode', theme === 'dark');
+      setTheme(theme);
 
       if(isAdmin) document.body.classList.add('admin-mode');
 
-      // 스타일 및 데이터 로드
       loadStyleData();
       loadSubjects();
+      loadFooterText();
       render();
+  }
+  
+  function setTheme(m) { 
+      document.body.classList.toggle('dark-mode', m==='dark'); 
+      localStorage.setItem('kac_theme', m);
+      document.getElementById('btnDay').classList.toggle('active', m==='light'); 
+      document.getElementById('btnNight').classList.toggle('active', m==='dark'); 
   }
 
   function loadStyleData() {
-      // 인덱스에서 설정한 카테고리 스타일(색상 등) 가져오기
       const sData = localStorage.getItem(`kac_style_${type}`);
       const style = sData ? JSON.parse(sData) : { name: type, color: '#2563eb' };
       
       document.documentElement.style.setProperty('--theme-color', style.color || '#2563eb');
-      
-      // 루트 카드 정보 설정
-      // 아이콘(코드) 찾기: 메뉴 데이터에서 line1 찾기
-      const menuDataStr = localStorage.getItem(`kac_menu_${type}`);
-      let iconCode = style.code || type.charAt(0);
-      if(menuDataStr) {
-          const menus = JSON.parse(menuDataStr);
-          const currentMenu = menus.find(m => m.dataId === menuId);
-          if(currentMenu && currentMenu.line1) iconCode = currentMenu.line1;
-      }
+      const rgb = hexToRgb(style.color || '#2563eb');
+      document.documentElement.style.setProperty('--theme-rgb', rgb);
 
-      document.getElementById('rootIcon').textContent = iconCode;
-      document.getElementById('rootTitle').textContent = menuLabel || "상세 목록";
+      // 브레드크럼 설정
+      const bc = document.getElementById('bc');
+      if(bc) bc.innerHTML = ` > ${style.name} > ${decodeURIComponent(menuLabel)}`;
+  }
+  
+  function hexToRgb(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '37, 99, 235';
   }
 
   function loadSubjects() {
-      // 로컬스토리지에서 과목 데이터 불러오기
       const key = `kac_subs_${type}_${menuId}`;
       const data = localStorage.getItem(key);
       subjects = data ? JSON.parse(data) : [];
+  }
+  
+  function loadFooterText() {
+      const savedText = localStorage.getItem('kac_full_footer');
+      const defaultText = "<p>본 웹사이트는 한국공항공사 항공기술훈련원의 항행안전시설 분야 교육 관련 플랫폼입니다.</p><p>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)</p><p class='copyright'>© 2026 Korea Airports Corporation. All rights reserved.</p>";
+      document.querySelector('.footer-content').innerHTML = savedText || defaultText;
   }
 
   function render() {
@@ -343,49 +293,40 @@
       }
 
       subjects.forEach((sub, idx) => {
-          if(!sub.active && !isAdmin) return; // 비활성은 관리자만
+          if(!sub.active && !isAdmin) return; 
 
           const card = document.createElement('div');
-          card.className = 'subject-card';
+          card.className = sub.active ? 'subject-card' : 'subject-card inactive';
           card.onclick = () => openContent(sub);
 
-          // 뱃지 처리
           let badges = '';
-          if(sub.pdfName) badges += `<span class="badge pdf">PDF</span>`;
-          if(sub.link) badges += `<span class="badge link">Link</span>`;
+          if(sub.pdfName) badges += `<span class="status-pill on">📄 PDF</span>`;
+          if(sub.link) badges += `<span class="status-pill link">🔗 Link</span>`;
 
-          // 아이콘 박스 텍스트 (PDF명이나 링크가 없으면 기본값)
-          let iconText = "DOC";
-          if(sub.pdfName) iconText = "PDF";
-          if(sub.link) iconText = "WEB";
-
-          // 관리자 버튼
           let adminHtml = '';
           if(isAdmin) {
               adminHtml = `
-                <div class="admin-btns admin-only" onclick="event.stopPropagation()">
-                   <button class="btn-xs" onclick="editSubject(${idx})">수정</button>
-                   <button class="btn-xs" style="color:#ef4444" onclick="deleteSubject(${idx})">삭제</button>
+                <div class="ctrl-btns admin-only" onclick="event.stopPropagation()">
+                   <button class="btn-action" onclick="editSubject(${idx})">수정</button>
+                   <button class="btn-action btn-del" onclick="deleteSubject(${idx})">삭제</button>
                 </div>
               `;
           }
 
           card.innerHTML = `
-              <div class="subj-icon-box">${iconText}</div>
-              <div class="subj-info">
+              <div>
                   <div class="subj-title">${sub.name}</div>
-                  <div class="subj-meta">${badges}</div>
+                  <div class="status-group">${badges}</div>
               </div>
               ${adminHtml}
           `;
           list.appendChild(card);
       });
 
-      // 관리자용 추가 버튼
       if(isAdmin) {
           const addBtn = document.createElement('div');
-          addBtn.className = 'subject-card add-subject-card admin-only';
-          addBtn.innerHTML = '+ 과정 추가하기';
+          addBtn.className = 'subject-card add-card admin-only';
+          addBtn.innerHTML = '+ 새로운 교육 과정(Subject) 추가';
           addBtn.onclick = () => editSubject('NEW');
           list.appendChild(addBtn);
       }
@@ -398,10 +339,9 @@
           return;
       }
       if(sub.pdfName) {
-          // PDF 파일명 처리
           let pdfFile = sub.pdfName;
           if(!pdfFile.toLowerCase().endsWith('.pdf')) pdfFile += '.pdf';
-          const url = `files/${pdfFile}`; // files 폴더 경로 가정
+          const url = `files/${pdfFile}`; 
 
           document.getElementById('pdfOverlay').style.display = 'flex';
           const viewer = document.getElementById('viewerBody');
@@ -410,7 +350,7 @@
           try {
               const loadingTask = pdfjsLib.getDocument(url);
               const pdf = await loadingTask.promise;
-              viewer.innerHTML = ''; // 초기화
+              viewer.innerHTML = ''; 
               
               for(let i=1; i<=pdf.numPages; i++) {
                   const page = await pdf.getPage(i);
@@ -475,13 +415,11 @@
       if(currentEditIdx === 'NEW') {
           subjects.push(newItem);
       } else {
-          // 기존 ID 등 유지하며 업데이트
           subjects[currentEditIdx].name = name;
           subjects[currentEditIdx].pdfName = pdf;
           subjects[currentEditIdx].link = link;
       }
 
-      // 저장
       localStorage.setItem(`kac_subs_${type}_${menuId}`, JSON.stringify(subjects));
       document.getElementById('editModal').style.display = 'none';
       render();
