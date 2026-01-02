@@ -42,15 +42,27 @@
   body.preview-active .card-ctrl, body.preview-active .add-slot { display: none !important; }
   
   /* 헤더 스타일 */
-  header { height: var(--header-h); background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.15); z-index: 1000; flex-shrink: 0; }
+  header { height: var(--header-h); background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.15); z-index: 1000; flex-shrink: 0; position: relative; }
   
-  .header-left { display: flex; align-items: center; gap: 15px; }
+  .header-left { display: flex; align-items: center; gap: 15px; z-index: 10; }
   .hamburger-btn { cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; }
   .hamburger-btn:hover { background: rgba(255,255,255,0.1); }
   .hamburger-btn svg { width: 24px; height: 24px; fill: #fff; }
 
   .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; cursor: pointer; white-space: nowrap;}
-  .header-right { display: flex; align-items: center; gap: 15px; }
+  
+  /* 헤더 중앙 페이지 제목 영역 */
+  .header-center-title {
+      position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+      font-size: 24px; font-weight: 800; color: #fff; letter-spacing: -0.5px;
+      display: flex; align-items: center; gap: 8px; z-index: 5;
+      white-space: nowrap;
+  }
+  .title-edit-icon { cursor: pointer; opacity: 0.3; transition: 0.2s; font-size: 16px; display: none; }
+  .title-edit-icon:hover { opacity: 1; color: #60a5fa; }
+  body.admin-mode .title-edit-icon { display: block; }
+
+  .header-right { display: flex; align-items: center; gap: 15px; z-index: 10; }
   
   .theme-toggle { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); margin-right: 10px; }
   .theme-btn { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; opacity: 0.5; }
@@ -86,8 +98,8 @@
   .sb-sub-item:hover { border-left-color: #2563eb; color: #2563eb; background: rgba(37,99,235,0.05); }
 
   /* 컨텐츠 영역 */
-  .content-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; width: 100%; overflow-y: auto; padding: 100px 20px 80px 20px; position: relative; }
-  .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 20px; flex-shrink: 0; z-index: 900; position: relative; }
+  .content-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; width: 100%; overflow-y: auto; padding: 60px 20px 80px 20px; position: relative; }
+  .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 30px; flex-shrink: 0; z-index: 900; position: relative; }
   .search-container { position: relative; width: 600px; max-width: 90%; }
   
   .search-bar { 
@@ -104,25 +116,12 @@
   #searchOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1500; display: none; backdrop-filter: blur(2px); animation: fadeIn 0.3s; }
   #searchOverlay.active { display: block; }
 
-  /* 페이지 헤드라인 (제목) */
-  .page-headline-container { 
-    width: 100%; max-width: 1200px; text-align: center; margin-bottom: 20px; 
-    min-height: 40px; display: flex; justify-content: center; align-items: center; gap: 10px;
-    animation: fadeIn 0.5s;
-  }
-  .page-headline { font-size: 28px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px; }
-  .headline-edit-btn { cursor: pointer; opacity: 0.3; transition: 0.2s; color: var(--text-sub); }
-  .headline-edit-btn:hover { opacity: 1; color: #2563eb; }
-
   /* 메인 카드 영역 & 애니메이션 */
   #cardContainerWrapper { width: 100%; max-width: 1700px; overflow: hidden; }
   #cardContainer { 
     display: flex; flex-wrap: wrap; gap: 30px; width: 100%; justify-content: center; padding: 20px; 
     transform-style: preserve-3d; min-height: 400px; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s;
   }
-  
-  .slide-out-left { transform: translateX(-50px); opacity: 0; }
-  .slide-out-right { transform: translateX(50px); opacity: 0; }
   
   .card { background: var(--bg-card); width: 280px; height: 280px; padding: 30px 20px; border-radius: 25px; box-shadow: var(--shadow); border: var(--border-card); cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; border-left: 10px solid transparent; color: var(--text-main); --card-color: #64748b; border-left-color: var(--card-color); }
   .card:hover { transform: translateY(-10px); border-color: var(--card-color); box-shadow: 0 15px 30px -5px var(--card-color); }
@@ -141,6 +140,7 @@
 
   /* 모바일 전용 카드 스타일 (리스트형) */
   @media (max-width: 768px) {
+    .header-center-title { font-size: 18px; max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
     #cardContainer { gap: 15px; padding: 10px; }
     .card { 
       width: 100%; height: auto; min-height: 90px; 
@@ -149,7 +149,7 @@
     }
     .card:hover { transform: translateY(-3px); }
     .icon-box { width: 50px; height: 50px; border-radius: 15px; margin-bottom: 0; font-size: 24px; flex-shrink: 0; }
-    .card h2 { font-size: 18px; text-align: left; word-break: keep-all; }
+    .card h2 { font-size: 18px; text-align: left; word-break: keep-all; flex: 1; }
     .card-ctrl { top: 50%; right: 10px; transform: translateY(-50%); width: auto; flex-direction: row; }
     .btn-sm { padding: 6px 10px; }
   }
@@ -180,7 +180,7 @@
   /* 공통 모달 */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none; align-items: center; justify-content: center; }
   .modal-card { background: var(--bg-card); padding: 35px; border-radius: 25px; width: 450px; color: var(--text-main); box-shadow: 0 20px 50px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
-  .modal-card.large { width: 900px; max-width: 95%; }
+  .modal-card.large { width: 1000px; max-width: 95%; height: 85vh; }
   .setting-group { margin-bottom: 20px; }
   .setting-label { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; display: block; }
   .setting-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--text-main); font-size: 14px; outline: none; }
@@ -239,6 +239,13 @@
     </div>
     <div class="logo-text" onclick="location.reload()">KAC CNS Training Platform</div>
   </div>
+  
+  <!-- 헤더 중앙: 페이지 제목 -->
+  <div class="header-center-title">
+      <span id="pageHeadline"></span>
+      <span class="title-edit-icon" onclick="editPageTitle()">✏️</span>
+  </div>
+
   <div class="header-right">
     <div class="theme-toggle">
       <div class="theme-btn" id="btnDay" onclick="setTheme('light')"><svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg></div>
@@ -257,14 +264,6 @@
     </div>
   </div>
   
-  <!-- 페이지별 제목 (헤드라인) -->
-  <div class="page-headline-container">
-    <div id="pageHeadline" class="page-headline"></div>
-    <div id="headlineEditBtn" class="headline-edit-btn" onclick="editPageTitle()" style="display:none;">
-      <svg style="width:20px;height:20px;" viewBox="0 0 24 24"><path fill="currentColor" d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" /></svg>
-    </div>
-  </div>
-
   <div id="cardContainerWrapper">
     <main id="cardContainer"></main>
   </div>
@@ -322,7 +321,8 @@
   <div class="modal-card modal-card large">
     <div class="modal-title">🗂️ 전체 데이터 종합 관리</div>
     <p style="font-size:13px; color:var(--text-sub);">
-      좌측 트리에서 항목을 선택하여 수정하세요. '저장' 버튼을 누르면 즉시 반영됩니다.
+      좌측 트리에서 항목을 선택하여 수정하세요. '저장' 버튼을 누르면 즉시 반영됩니다.<br>
+      하위 항목 추가/삭제도 가능합니다.
     </p>
     
     <div class="tree-container">
@@ -435,7 +435,7 @@
   let dragSrcIndex = null;
   
   // 종합 관리용 변수
-  let currentTreeSelection = null; // { type: 'cat'|'menu'|'subj', id: ..., parentId: ... }
+  let currentTreeSelection = null; // { type: 'cat'|'menu'|'subj', cIdx, mIdx, sIdx }
 
   async function init() {
     setTheme(localStorage.getItem('kac_theme') || 'light');
@@ -467,19 +467,16 @@
     if(!globalData.config.pageTitles) globalData.config.pageTitles = {};
 
     ensurePageSlots();
-    renderCards(false); // 애니메이션 없이 초기 렌더링
+    renderCards(false); 
     buildSearchIndex();
-    renderSidebar(); // 사이드바 생성
+    renderSidebar(); 
     
     setTimeout(() => {
       document.getElementById('loadingSpinner').style.opacity = '0';
       setTimeout(() => document.getElementById('loadingSpinner').style.display='none', 500);
     }, 500);
 
-    if(isAdmin) {
-        document.body.classList.add('admin-mode');
-        document.getElementById('headlineEditBtn').style.display = 'block';
-    }
+    if(isAdmin) document.body.classList.add('admin-mode');
   }
   
   function reconstructGlobalDataFromLocal() {
@@ -640,10 +637,14 @@
       el.textContent = t;
       
       if(isAdmin && t === "") {
-         el.textContent = "(제목 없음 - 수정하려면 클릭)";
+         el.textContent = "제목 없음 (클릭 수정)";
          el.style.opacity = "0.5";
+         el.style.cursor = "pointer";
+         el.onclick = editPageTitle;
       } else {
          el.style.opacity = "1";
+         el.style.cursor = "default";
+         el.onclick = null;
       }
   }
 
@@ -838,7 +839,7 @@
     renderCards(false);
   }
 
-  /* 종합 관리자 (Tree Editor) 로직 */
+  /* 종합 관리자 (Tree Editor) 로직 - 3단계까지 확장 */
   function openIntegratedAdmin() {
     document.getElementById('settingsModal').style.display='none';
     document.getElementById('integratedAdminModal').style.display='flex';
@@ -868,16 +869,27 @@
                   mDiv.innerHTML = `└ 📁 ${menu.label}`;
                   mDiv.onclick = (e) => { e.stopPropagation(); selectTreeNode('menu', cIdx, mIdx); };
                   root.appendChild(mDiv);
+
+                  // Subject Node (3단계)
+                  if(menu.subjects) {
+                      menu.subjects.forEach((subj, sIdx) => {
+                          const sDiv = document.createElement('div');
+                          sDiv.className = 't-node t-depth-2';
+                          sDiv.innerHTML = `└ 📄 ${subj.name}`;
+                          sDiv.onclick = (e) => { e.stopPropagation(); selectTreeNode('subj', cIdx, mIdx, sIdx); };
+                          root.appendChild(sDiv);
+                      });
+                  }
               });
           }
       });
   }
 
-  function selectTreeNode(type, cIdx, mIdx) {
+  function selectTreeNode(type, cIdx, mIdx, sIdx) {
       document.querySelectorAll('.t-node').forEach(n => n.classList.remove('selected'));
       event.currentTarget.classList.add('selected');
       
-      currentTreeSelection = { type, cIdx, mIdx };
+      currentTreeSelection = { type, cIdx, mIdx, sIdx };
       const content = document.getElementById('treeDetail');
       const cat = globalData.categories[cIdx];
 
@@ -887,22 +899,77 @@
             <div class="setting-group"><label class="setting-label">명칭</label><input type="text" id="tName" class="setting-input" value="${cat.name}"></div>
             <div class="setting-group"><label class="setting-label">코드 (영문 1자)</label><input type="text" id="tCode" class="setting-input" value="${cat.code}"></div>
             <div class="setting-group"><label class="setting-label">색상</label><input type="color" id="tColor" style="width:100%;height:40px;" value="${cat.color}"></div>
+            <button class="btn-modal btn-success" onclick="addChildMenu()">+ 하위 메뉴(Menu) 추가</button>
           `;
       } else if (type === 'menu') {
           const menu = cat.menus[mIdx];
           content.innerHTML = `
             <h3>📁 시설(메뉴) 수정</h3>
             <div class="setting-group"><label class="setting-label">시설 명칭</label><input type="text" id="tLabel" class="setting-input" value="${menu.label}"></div>
-            <div class="setting-group"><label class="setting-label">아이콘 1줄 (예: VOR)</label><input type="text" id="tLine1" class="setting-input" value="${menu.line1||''}"></div>
+            <div class="setting-group"><label class="setting-label">아이콘 1줄</label><input type="text" id="tLine1" class="setting-input" value="${menu.line1||''}"></div>
             <div class="setting-group"><label class="setting-label">아이콘 2줄</label><input type="text" id="tLine2" class="setting-input" value="${menu.line2||''}"></div>
-            <div class="setting-group"><label class="setting-label">외부 링크 (선택)</label><input type="text" id="tLink" class="setting-input" value="${menu.link||''}"></div>
+            <div class="setting-group"><label class="setting-label">외부 링크</label><input type="text" id="tLink" class="setting-input" value="${menu.link||''}"></div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-modal btn-success" onclick="addChildSubject()">+ 하위 과목(Subject) 추가</button>
+                <button class="btn-modal btn-danger" onclick="deleteTreeNode()">삭제</button>
+            </div>
+          `;
+      } else if (type === 'subj') {
+          const subj = cat.menus[mIdx].subjects[sIdx];
+          content.innerHTML = `
+            <h3>📄 과목(Subject) 수정</h3>
+            <div class="setting-group"><label class="setting-label">과목명</label><input type="text" id="sName" class="setting-input" value="${subj.name}"></div>
+            <div class="setting-group"><label class="setting-label">활성 상태</label>
+                <select id="sActive" class="setting-input">
+                    <option value="true" ${subj.active !== false ? 'selected':''}>활성</option>
+                    <option value="false" ${subj.active === false ? 'selected':''}>비활성 (개발중)</option>
+                </select>
+            </div>
+            <div class="setting-group"><label class="setting-label">PDF 경로</label><input type="text" id="sPdf" class="setting-input" value="${subj.pdfName||''}"></div>
+            <div class="setting-group"><label class="setting-label">링크 주소</label><input type="text" id="sLink" class="setting-input" value="${subj.link||''}"></div>
+            <div class="setting-group"><label class="setting-label">오디오 경로</label><input type="text" id="sAudio" class="setting-input" value="${subj.audioName||''}"></div>
+            <button class="btn-modal btn-danger" onclick="deleteTreeNode()">삭제</button>
           `;
       }
   }
+  
+  // 하위 추가/삭제 함수
+  function addChildMenu() {
+      if(!currentTreeSelection || currentTreeSelection.type !== 'cat') return;
+      const cat = globalData.categories[currentTreeSelection.cIdx];
+      const newMenu = { id: 'id_'+Date.now(), label: '새 메뉴', line1: '', line2: '', link: '', subjects: [] };
+      if(!cat.menus) cat.menus = [];
+      cat.menus.push(newMenu);
+      renderTree();
+      alert("메뉴가 추가되었습니다.");
+  }
+  
+  function addChildSubject() {
+      if(!currentTreeSelection || currentTreeSelection.type !== 'menu') return;
+      const menu = globalData.categories[currentTreeSelection.cIdx].menus[currentTreeSelection.mIdx];
+      const newSubj = { id: Date.now().toString(), name: '새 과목', active: true, pdfName: '', link: '', audioName: '' };
+      if(!menu.subjects) menu.subjects = [];
+      menu.subjects.push(newSubj);
+      renderTree();
+      alert("과목이 추가되었습니다.");
+  }
+  
+  function deleteTreeNode() {
+      if(!confirm("정말 삭제하시겠습니까?")) return;
+      const { type, cIdx, mIdx, sIdx } = currentTreeSelection;
+      if(type === 'menu') {
+          globalData.categories[cIdx].menus.splice(mIdx, 1);
+      } else if (type === 'subj') {
+          globalData.categories[cIdx].menus[mIdx].subjects.splice(sIdx, 1);
+      }
+      renderTree();
+      document.getElementById('treeDetail').innerHTML = '';
+      currentTreeSelection = null;
+  }
 
   function saveIntegratedData() {
-      if(!currentTreeSelection) return alert("수정할 항목이 선택되지 않았습니다.");
-      const { type, cIdx, mIdx } = currentTreeSelection;
+      if(!currentTreeSelection) return alert("수정할 항목이 없거나 저장되었습니다.");
+      const { type, cIdx, mIdx, sIdx } = currentTreeSelection;
       
       if(type === 'cat') {
           const cat = globalData.categories[cIdx];
@@ -915,6 +982,13 @@
           menu.line1 = document.getElementById('tLine1').value;
           menu.line2 = document.getElementById('tLine2').value;
           menu.link = document.getElementById('tLink').value;
+      } else if (type === 'subj') {
+          const subj = globalData.categories[cIdx].menus[mIdx].subjects[sIdx];
+          subj.name = document.getElementById('sName').value;
+          subj.active = document.getElementById('sActive').value === 'true';
+          subj.pdfName = document.getElementById('sPdf').value;
+          subj.link = document.getElementById('sLink').value;
+          subj.audioName = document.getElementById('sAudio').value;
       }
       
       syncToLocalStorage(globalData);
