@@ -152,12 +152,28 @@
       "color": "#da10c9",
       "menus": [
         {
-          "id": "id_1766923156620",
-          "label": "전파 및 항공주파수",
-          "line1": "Frequency",
+          "id": "id_1767393816140",
+          "label": "항공정보통신시설 개요 및 분류",
+          "line1": "정의 및 분류",
           "line2": "",
           "link": "",
           "subjects": [
+            {
+              "id": "1767393989160",
+              "name": "공항시설법",
+              "active": true,
+              "pdfName": "",
+              "link": "https://law.go.kr/LSW/lsLinkCommonInfo.do?lsJoLnkSeq=1030864877&chrClsCd=&ancYnChk=",
+              "audioName": ""
+            },
+            {
+              "id": "1767393928378",
+              "name": "공항시설법 시행규칙 제8조(항공정보통신시설)",
+              "active": true,
+              "pdfName": "",
+              "link": "https://law.go.kr/LSW/lsLinkCommonInfo.do?lspttninfSeq=139509&chrClsCd=010202",
+              "audioName": ""
+            },
             {
               "id": "1766846265369",
               "name": "항공정보통신시설 개요 및 분류",
@@ -165,7 +181,16 @@
               "audioName": "",
               "active": true,
               "link": ""
-            },
+            }
+          ]
+        },
+        {
+          "id": "id_1766923156620",
+          "label": "전파 및 항공주파수",
+          "line1": "Frequency",
+          "line2": "",
+          "link": "",
+          "subjects": [
             {
               "id": "1766846325095",
               "name": "항공주파수 기술기준",
@@ -219,9 +244,11 @@
             },
             {
               "id": "1766846471124",
-              "name": "녹음시설(RECORDER)",
+              "name": "자동기록장치(RECORDER / 모델명 : 콜세이버 플러스)",
               "pdfName": "/COMM/통신이론_CH7",
-              "audioName": ""
+              "audioName": "",
+              "active": true,
+              "link": ""
             }
           ]
         },
@@ -248,38 +275,6 @@
               "id": "1766848023961",
               "name": "안테나 점검 및 유지관리 실무",
               "pdfName": "/COMM/통신이론_CH10",
-              "audioName": ""
-            }
-          ]
-        },
-        {
-          "id": "id_1766847788411_2",
-          "label": "공항정보방송시설",
-          "line1": "ATIS",
-          "line2": "",
-          "link": "",
-          "subjects": [
-            {
-              "id": "1766846234201",
-              "name": "공항정보방송시설(ATIS)",
-              "active": true,
-              "pdfName": "/COMM/통신이론_CH12",
-              "audioName": ""
-            }
-          ]
-        },
-        {
-          "id": "id_1766847788411_0",
-          "label": "단파이동통신시설",
-          "line1": "HF",
-          "line2": "",
-          "link": "",
-          "subjects": [
-            {
-              "id": "1766846414949",
-              "name": "단파이동통신시설(HF Radio)",
-              "active": true,
-              "pdfName": "/COMM/통신이론_CH13",
               "audioName": ""
             }
           ]
@@ -341,6 +336,38 @@
           ]
         },
         {
+          "id": "id_1766847788411_0",
+          "label": "단파이동통신시설",
+          "line1": "HF",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1766846414949",
+              "name": "단파이동통신시설(HF Radio)",
+              "active": true,
+              "pdfName": "/COMM/통신이론_CH13",
+              "audioName": ""
+            }
+          ]
+        },
+        {
+          "id": "id_1766847788411_2",
+          "label": "공항정보방송시설",
+          "line1": "ATIS",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1766846234201",
+              "name": "공항정보방송시설(ATIS)",
+              "active": true,
+              "pdfName": "/COMM/통신이론_CH12",
+              "audioName": ""
+            }
+          ]
+        },
+        {
           "id": "id_1766923124045",
           "label": "항공고정통신시설",
           "line1": "AFTN/AMHS",
@@ -384,8 +411,8 @@
         },
         {
           "id": "id_1767155221980",
-          "label": "전용회선 통신망 이해",
-          "line1": "회선",
+          "label": "전용회선 통신망 이해 (인천ACC)",
+          "line1": "전용 회선",
           "line2": "",
           "link": "",
           "subjects": [
@@ -402,7 +429,7 @@
         {
           "id": "id_1767155517179",
           "label": "공항이동통신시설",
-          "line1": "AEROMACS",
+          "line1": "AeroMACS",
           "line2": "",
           "link": "",
           "subjects": [
@@ -567,20 +594,12 @@
           ]
         },
         {
-          "id": "id_1767067644172",
-          "label": "ILS 시물레이션",
+          "id": "id_1767390862251_5",
+          "label": "계기착륙시설 시물레이션",
           "line1": "ILS",
           "line2": "",
           "link": "http://sonwooram.github.io/ILS-SIM/",
-          "subjects": [
-            {
-              "id": "1767067668436",
-              "name": "ILS 전파 시물레이션",
-              "active": true,
-              "pdfName": "/NAV/maker.html",
-              "audioName": ""
-            }
-          ]
+          "subjects": []
         },
         {
           "id": "id_1766848178131_1",
