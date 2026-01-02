@@ -37,7 +37,6 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
   
-  /* [중요] PC 화면 스크롤 제거 및 높이 고정 */
   html, body { width: 100%; height: 100%; overflow: hidden; }
   
   body { 
@@ -120,8 +119,7 @@
   /* 컨텐츠 영역 (PC: 수직 중앙 정렬) */
   .content-wrapper { 
       width: 100%; height: 100%;
-      /* [수정] JS에서 이 값을 변경하여 위치 조정 가능 */
-      padding-top: 135px; 
+      padding-top: 135px; /* 초기값 */
       padding-bottom: 120px; 
       overflow: hidden; 
       position: relative; 
@@ -160,15 +158,18 @@
   
   .card { background: var(--bg-card); width: 280px; height: 280px; padding: 30px 20px; border-radius: 25px; box-shadow: var(--shadow); border: var(--border-card); cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; border-left: 10px solid transparent; color: var(--text-main); --card-color: #64748b; border-left-color: var(--card-color); z-index: 1; }
   .card:hover { transform: translateY(-10px); border-color: var(--card-color); box-shadow: 0 15px 30px -5px var(--card-color); z-index: 2; }
+  
+  /* [수정] 빈칸 슬롯 스타일 (안보이게) */
+  .card.empty-placeholder { opacity: 0; pointer-events: none; border: none; box-shadow: none; background: transparent; cursor: default; }
+  /* 관리자 모드에서는 보이게 */
+  body.admin-mode .card.empty-placeholder { opacity: 0.5; border: 2px dashed #cbd5e1; cursor: pointer; pointer-events: auto; }
+  body.admin-mode .card.empty-placeholder:hover { border-color: #2563eb; opacity: 1; }
+
   .card.dragging { opacity: 0.4; border: 2px dashed #94a3b8; }
   .card.drag-over { transform: scale(1.05); box-shadow: 0 0 20px rgba(37, 99, 235, 0.3); border-color: #2563eb; z-index: 10; }
 
   .card-ctrl { position: absolute; top: 15px; width: 100%; display: none; gap: 5px; justify-content: center; z-index: 10; }
   body.admin-mode .card .card-ctrl { display: flex; }
-
-  .card.add-slot { background: transparent; border: 2px dashed #cbd5e1; opacity: 0; pointer-events: none; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px; color: #cbd5e1; }
-  body.admin-mode .card.add-slot { opacity: 0.6; pointer-events: auto; cursor: pointer; }
-  body.admin-mode .card.add-slot:hover { border-color: #2563eb; color: #2563eb; opacity: 1; transform: scale(1.02); }
 
   .icon-box { width: 100px; height: 100px; border-radius: 30px; margin-bottom: 20px; font-weight: 900; display: flex; align-items: center; justify-content: center; background: var(--btn-bg); border: 1px solid var(--btn-border); font-size: var(--icon-size-idx, 60px); color: var(--card-color); pointer-events: none; }
   .card h2 { font-size: var(--label-size-idx, 24px); font-weight: 800; text-align: center; pointer-events: none; }
@@ -223,6 +224,10 @@
 
     #cardContainerWrapper { padding: 0 15px; }
     #cardContainer { gap: 15px; padding: 10px 0; min-height: auto; flex-direction: column; flex-wrap: nowrap; }
+    
+    /* 모바일에서는 빈칸(Empty Slot)을 아예 숨김 */
+    .card.empty-placeholder { display: none !important; }
+
     .card { 
       width: 100%; height: auto; min-height: 90px; 
       flex-direction: row; justify-content: flex-start; 
@@ -328,7 +333,7 @@
 
   <div class="header-right">
     <div class="theme-toggle">
-      <div class="theme-btn" id="btnDay" onclick="setTheme('light')"><svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg></div>
+      <div class="theme-btn" id="btnDay" onclick="setTheme('light')"><svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg></div>
       <div class="theme-btn" id="btnNight" onclick="setTheme('dark')"><svg viewBox="0 0 24 24"><path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C6.94,10.39 9.79,16.87 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z"/></svg></div>
     </div>
     <div class="settings-btn" onclick="openSettings()">⚙️</div>
