@@ -188,14 +188,17 @@
       color: var(--text-main);
       z-index: 5; margin-bottom: 25px;
       position: relative;
+      transition: 0.2s;
   }
+  .fac-top-card:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(var(--theme-rgb), 0.15); }
   
   .fac-left-group { display: flex; align-items: center; gap: 20px; flex: 1; }
   
+  /* [수정] 태그 필 스타일 (테마 컬러 적용) */
   .fac-tag-pill {
-      background: #fdf2f8; 
-      color: var(--theme-color);
-      border: 2px solid #fbcfe8; 
+      background: var(--theme-color);
+      color: #fff;
+      border: none;
       border-radius: 20px;
       padding: 8px 16px;
       font-weight: 900;
@@ -203,16 +206,10 @@
       min-width: 80px;
       text-align: center;
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       transition: 0.2s;
   }
-  .fac-tag-pill:hover { opacity: 0.8; transform: scale(1.05); }
   
-  body.dark-mode .fac-tag-pill {
-      background: rgba(255,255,255,0.05);
-      border-color: rgba(255,255,255,0.2);
-  }
-
   .fac-title { font-size: 22px; font-weight: 800; word-break: keep-all; }
 
   /* 세로 연결선 */
@@ -397,7 +394,7 @@
   .mobile-close-btn { display: none; }
 
   /* ========================================= */
-  /* [수정] 모바일 디자인 (Facility 스타일 적용) */
+  /* [수정] 모바일 디자인 (깔끔함 우선, 아이콘 제거) */
   /* ========================================= */
   @media (max-width: 768px) {
     .v-title-box, .v-icon-btn, .close-v { display: none !important; }
@@ -405,102 +402,111 @@
     /* 전체 컨테이너 패딩 조절 */
     main { padding: 20px 15px; padding-bottom: 100px; }
 
-    /* 1. 트리 레이아웃 (좌측 라인 복구) */
-    .tree-container {
-        align-items: flex-start; /* 중앙 정렬 해제 -> 좌측 정렬 */
-    }
+    /* 1. 트리 레이아웃 (좌측 라인) */
+    .tree-container { align-items: flex-start; }
 
-    /* 세로선 (Spine) 위치 재설정 */
+    /* 세로선 (Spine) */
     .tree-spine { 
-        display: block !important; /* 숨김 해제 */
-        left: 24px; /* 왼쪽으로 이동 */
-        top: 60px; bottom: 30px;
+        display: block !important; 
+        left: 24px; top: 60px; bottom: 30px;
         width: 3px;
         background: rgba(var(--theme-rgb), 0.3);
     }
 
-    /* 2. 상단 카드 스타일 */
+    /* 2. 상단 카드 */
     .fac-top-card { 
         width: 100%; border-radius: 15px; margin-bottom: 25px; padding: 15px; 
         flex-direction: column; align-items: flex-start; gap: 10px;
-        position: relative; z-index: 5;
-        margin-left: 0;
+        position: relative; z-index: 5; margin-left: 0;
     }
     .fac-left-group { width: 100%; flex-direction: column; align-items: flex-start; gap: 10px; }
     
-    /* 태그 버튼 (파란색 부분) */
     .fac-tag-pill {
-        font-size: 13px; padding: 6px 12px; min-width: auto;
+        font-size: 13px; padding: 5px 12px; min-width: auto;
         align-self: flex-start;
+        /* 모바일에서는 약간 작게 */
     }
-    
-    /* 제목 */
     .fac-title { font-size: 18px; line-height: 1.3; }
 
-    /* 3. 개별 카드 래퍼 (가로선 연결) */
+    /* 3. 개별 카드 래퍼 */
     .card-wrapper { 
-        display: block; 
-        margin-bottom: 15px; 
-        padding-left: 55px; /* 세로선 공간 확보 */
-        width: 100%;
+        display: block; margin-bottom: 12px; 
+        padding-left: 55px; width: 100%;
     }
 
-    /* 카드와 세로선을 연결하는 가로선 (::before) */
+    /* 가로선 */
     .card-wrapper::before { 
         display: block !important; 
-        left: 26px; width: 34px; /* 세로선에서 카드까지 연결 */
+        left: 26px; width: 34px; 
         top: 50%; height: 3px;
         background: rgba(var(--theme-rgb), 0.3);
     }
 
-    /* 세로선 위의 점 (::after로 구현) */
+    /* 연결 점 */
     .card-wrapper::after {
         content: ''; position: absolute;
         left: 22px; top: 50%; transform: translateY(-50%);
         width: 10px; height: 10px; border-radius: 50%;
         background: var(--theme-color);
-        border: 2px solid var(--bg-main); /* 배경색으로 테두리 줘서 끊긴 느낌 */
-        z-index: 2;
+        border: 2px solid var(--bg-main); z-index: 2;
     }
 
-    /* 4. 과목 카드 디자인 경량화 */
+    /* 4. 과목 카드 디자인 (슬림형) */
     .subject-card { 
-        padding: 15px; 
-        border-radius: 12px;
-        min-height: 80px;
-        display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+        padding: 12px 15px; /* 패딩 축소 */
+        border-radius: 10px;
+        min-height: auto; /* 높이 제한 해제 */
+        display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
     }
 
-    /* 제목 크기 축소 */
     .subj-title { 
-        font-size: 16px; 
+        font-size: 15px; 
         padding-right: 0; 
         word-break: keep-all;
+        line-height: 1.35;
+        margin-bottom: 0;
+    }
+
+    /* [수정] 모바일 Last Viewed (트리 라인에 체크 아이콘으로 표시) */
+    .subject-card.last-viewed {
+        border-color: #10b981;
+    }
+    .subject-card.last-viewed .last-viewed-icon {
+        display: flex; position: absolute;
+        left: -35px; /* 카드의 왼쪽 바깥으로 이동 (트리 라인 위) */
+        top: 50%; transform: translateY(-50%);
+        width: 20px; height: 20px;
+        border-radius: 50%;
+        background: #10b981;
+        padding: 0;
+        justify-content: center; align-items: center;
+        border: 2px solid var(--bg-main);
+        z-index: 10;
+        right: auto;
+    }
+    .last-viewed-icon span { display: none; } /* 텍스트 숨김 */
+    .last-viewed-icon svg { width: 12px; height: 12px; fill: #fff; }
+
+    /* 5. 상태 버튼 (텍스트만 1-2줄, 아이콘 삭제) */
+    .status-group { flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+    
+    .status-pill {
+        padding: 3px 8px; font-size: 10px; height: auto;
+        display: inline-block;
+        border-radius: 4px;
         line-height: 1.4;
     }
-
-    /* 상태바(Last Viewed) 아이콘 */
-    .last-viewed-icon { 
-        position: static; transform: none; 
-        margin-bottom: 5px; display: inline-flex; 
-        font-size: 10px; padding: 4px 8px;
-    }
     
-    /* 5. 하단 상태 아이콘 (PDF/Audio) 간소화 */
-    .status-group { flex-wrap: wrap; gap: 5px; }
+    /* 아이콘 숨김 */
+    .pill-icon { display: none !important; }
     
-    /* 긴 파일명은 모바일에서 숨김 (깔끔하게) */
-    .status-text { display: none !important; }
+    /* 텍스트 표시 */
+    .status-text { display: inline-block !important; white-space: normal; }
     
-    .status-pill { 
-        padding: 5px 8px; font-size: 11px; 
-        display: inline-flex; align-items: center; gap: 0;
-    }
+    /* PDF/Audio 접두사 처리를 위해 가상요소 활용 */
+    .status-pill:has(.status-text:contains('PDF')) .status-text::before { content: 'PDF '; font-weight: 800; opacity: 0.7; }
+    /* 이미 텍스트에 PDF가 포함된 경우 중복 방지 로직 필요하면 JS나 CSS 세부조정 */
     
-    /* 아이콘만 크게 유지 */
-    .pill-icon { margin-right: 0 !important; font-size: 14px; }
-
-    /* 뷰어 내부 모바일 */
     .mobile-close-btn {
       display: flex; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
       width: auto; padding: 10px 25px; border-radius: 50px;
@@ -510,7 +516,6 @@
     }
     .mobile-close-btn.visible { opacity: 1; pointer-events: auto; }
 
-    /* 하단 네비게이션 */
     .bottom-nav { 
         width: 90%; bottom: 15px; padding: 10px 0; 
         gap: 20px; border-radius: 15px; justify-content: center;
@@ -521,9 +526,7 @@
     .nav-item { font-size: 13px; gap: 5px; }
     .nav-icon { width: 18px; height: 18px; }
 
-    /* 뷰어 바디 여백 */
     .viewer-body { padding: 0; align-items: flex-start; overflow-y: auto; }
-    
     .header-search { font-size: 14px; padding: 10px 20px 10px 45px; background-size: 18px; background-position: 15px center; }
   }
 
@@ -1041,6 +1044,11 @@
     // 상단 시설 명칭 카드 생성 (Facility Card Style)
     const facCard = document.createElement('div');
     facCard.className = 'fac-top-card';
+    
+    // [수정] 카드 전체 클릭 이벤트
+    facCard.onclick = () => location.href = `facility.html?type=${type}`;
+    facCard.style.cursor = 'pointer';
+    facCard.title = "목록으로 이동";
 
     const leftGroup = document.createElement('div');
     leftGroup.className = 'fac-left-group';
@@ -1048,11 +1056,6 @@
     const tag = document.createElement('div');
     tag.className = 'fac-tag-pill';
     tag.textContent = currentMenuData ? (currentMenuData.line1 || 'Tag') : 'Tag';
-    
-    // [추가] 클릭 시 Facility 목록으로 이동
-    tag.onclick = () => location.href = `facility.html?type=${type}`;
-    tag.style.cursor = 'pointer';
-    tag.title = "목록으로 이동";
     
     const title = document.createElement('div');
     title.className = 'fac-title';
@@ -1069,6 +1072,8 @@
             <button class="btn-action" style="cursor:not-allowed; opacity:0.6;">수정</button>
             <button class="btn-action btn-del" style="cursor:not-allowed; opacity:0.6;">삭제</button>
         `;
+        // 관리자 버튼 클릭시에는 이동 이벤트 전파 방지
+        rightGroup.onclick = (e) => e.stopPropagation();
         facCard.appendChild(rightGroup);
     }
 
@@ -1137,7 +1142,7 @@
 
       card.innerHTML = `
         <div class="last-viewed-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
             <span>Last Viewed</span>
         </div>
         <div>
