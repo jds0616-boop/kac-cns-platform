@@ -1,22 +1,25 @@
+<!-- START OF FILE viewer_list.html -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<script>
-  // [보안] 로그인 세션 체크
-  if(sessionStorage.getItem('kac_access_token') !== 'granted') {
-    alert("로그인이 필요합니다.");
-    location.replace('login.html');
-  }
-</script>
 <meta charset="UTF-8" />
+<!-- 모바일 화면 꽉 차게 설정 -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>과목 리스트 - KAC CNS Training Platform</title>
+<!-- 로그인 체크 -->
+<script>
+  if(sessionStorage.getItem('kac_access_token') !== 'granted') {
+    location.replace('login.html'); 
+  }
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
   :root { 
-    --theme-color: #2563eb; --theme-rgb: 37, 99, 235;
+    --theme-color: #2563eb; 
+    --theme-rgb: 37, 99, 235;
+
     --navy: #0f172a; --bg-main: #f0f4f8; --bg-card: #ffffff; 
     --text-main: #000000; --text-sub: #334155; 
     --border-card: transparent; --shadow: 0 5px 15px rgba(0,0,0,0.05);
@@ -24,9 +27,6 @@
     --pill-bg: #f1f5f9; --pill-text: #94a3b8; --pill-border: #e2e8f0;
     --title-color: #1e293b;
     --header-h: 75px;
-    
-    /* 사용자 설정 변수 */
-    --layout-x-pos: 0px; 
   }
   body.dark-mode {
     --navy: #020617; --bg-main: #0f172a; --bg-card: #1e293b; 
@@ -41,205 +41,236 @@
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
   body { background: var(--bg-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: var(--text-main); transition: 0.3s; }
 
-  /* 검색 모드 효과 */
+  /* 검색 오버레이 */
   #searchOverlay { 
-      position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
-      z-index: 1500; display: none; backdrop-filter: blur(4px); animation: fadeIn 0.3s; 
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
+    z-index: 1500; display: none; backdrop-filter: blur(4px); animation: fadeIn 0.3s; 
   }
   #searchOverlay.active { display: block; }
-  body.search-mode .header-left, body.search-mode .header-right { opacity: 0.1; pointer-events: none; transition: 0.3s; }
-  body.search-mode .mindmap-container { filter: blur(2px); pointer-events: none; }
+  
+  /* 검색 모드 스타일 */
+  body.search-mode header { z-index: 2000; position: relative; }
+  body.search-mode .header-center { z-index: 2001; }
+  body.search-mode .search-dropdown { z-index: 2002; }
+  
+  body.search-mode main, 
+  body.search-mode .bottom-nav,
+  body.search-mode .header-left,
+  body.search-mode .header-right { 
+      opacity: 0.3; pointer-events: none; filter: blur(2px); transition: 0.3s; 
+  }
 
-  /* === 헤더 스타일 (Facility 원복) === */
+  /* 헤더 스타일 */
   header { 
     height: var(--header-h); background: var(--navy); 
-    display: flex; align-items: center; justify-content: space-between; 
-    padding: 0 20px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.15); 
-    z-index: 2000; flex-shrink: 0; 
-    position: fixed; top: 0; left: 0; width: 100%;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+    z-index: 1000; flex-shrink: 0; gap: 20px; position: relative; transition: 0.3s;
   }
   
-  .header-left { display: flex; align-items: center; gap: 15px; z-index: 10; min-width: 0; flex-shrink: 0; }
-  .hamburger-btn { cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; flex-shrink: 0; }
-  .hamburger-btn:hover { background: rgba(255,255,255,0.1); }
-  .hamburger-btn svg { width: 24px; height: 24px; fill: #fff; }
-  .logo-text { font-size: 20px; font-weight: 800; cursor: pointer; white-space: nowrap; }
-  
-  /* 브레드크럼 (회색조 원복) */
-  .breadcrumb { 
-      display: none; align-items: center; 
-      color: #94a3b8; font-weight: 500; font-size: 16px; 
-      margin-left: 10px; white-space: nowrap; 
-  }
-  @media(min-width: 1024px) { .breadcrumb { display: flex; } }
-  .breadcrumb span { display: flex; align-items: center; }
-  .crumb-link { cursor: pointer; transition: color 0.2s; }
-  .crumb-link:hover { color: #fff; }
+  .header-left { display: flex; align-items: center; min-width: 250px; z-index: 10; white-space: nowrap; transition: opacity 0.2s; }
+  .header-center { position: absolute; left: 50%; transform: translateX(-50%); width: 600px; max-width: 100%; z-index: 20; transition: width 0.3s; }
+  .header-right { display: flex; align-items: center; gap: 15px; min-width: 250px; justify-content: flex-end; z-index: 10; }
 
-  /* 중앙 검색창 */
-  .header-center { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 400px; max-width: 40vw; z-index: 2001; }
-  .header-search { 
-    width: 100%; padding: 12px 20px 12px 45px; border-radius: 50px; 
-    border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.15); 
-    color: #fff; font-size: 15px; outline: none; transition: 0.3s;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'%3E%3Cpath d='M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z'/%3E%3C/svg%3E"); 
-    background-repeat: no-repeat; background-position: 15px center; background-size: 20px;
+  body.header-overlap .header-left { opacity: 0; pointer-events: none; width: 0; overflow: hidden; min-width: 0; }
+  body.header-overlap .header-center { width: 80%; }
+
+  @media (max-width: 1100px) {
+    .header-left, .header-right { display: none !important; }
+    .header-center { position: relative; left: auto; transform: none; width: 100%; max-width: 100%; }
+    header { padding: 0 20px; }
+    .header-search { width: 100% !important; }
   }
-  .header-search:focus { background: rgba(255,255,255,1); color: #000; border-color: #fff; box-shadow: 0 0 30px rgba(255,255,255,0.3); }
   
-  .search-dropdown { 
-      position: absolute; top: calc(100% + 8px); left: 0; width: 100%; 
-      background: var(--bg-card); border-radius: 15px; color: var(--text-main);
-      box-shadow: 0 10px 40px rgba(0,0,0,0.4); border: 1px solid var(--border-card); 
-      overflow: hidden; display: none; max-height: 400px; overflow-y: auto; z-index: 2002; 
+  .logo-text { font-size: 20px; font-weight: 800; white-space: nowrap; cursor: pointer; transition: opacity 0.2s; }
+  .logo-text:hover { opacity: 0.8; }
+  
+  .breadcrumb { display: flex; align-items: center; color: #94a3b8; font-weight: 500; font-size: 16px; margin-left: 10px; }
+  .crumb-link { cursor: pointer; transition: color 0.2s; }
+  .crumb-link:hover { color: #fff; } 
+  .crumb-current { cursor: default; } 
+
+  .header-search {
+    width: 100%; 
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50px; padding: 12px 30px; color: #fff; font-size: 16px; font-weight: 600;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'%3E%3Cpath d='M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: 25px center; background-size: 20px;
+    padding-left: 55px; transition: 0.3s;
+    background-color: var(--navy);
+  }
+  .header-search:focus { outline: none; background-color: var(--navy); border-color: rgba(255,255,255,0.5); box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+  .header-search::placeholder { color: rgba(255,255,255,0.5); font-weight: 400; }
+
+  .search-dropdown {
+    position: absolute; top: 110%; left: 0; right: 0; width: 100%; margin: 0 auto;
+    background: var(--bg-card); border-radius: 15px; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 1px solid var(--border-card);
+    overflow: hidden; display: none; max-height: 400px; overflow-y: auto;
   }
   .search-dropdown.active { display: block; }
-  .result-item { padding: 12px 20px; cursor: pointer; border-bottom: 1px solid var(--btn-border); display: flex; justify-content: space-between; align-items: center; transition:0.2s; }
+  .result-item { padding: 12px 20px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--btn-border); transition: 0.2s; }
   .result-item:hover { background: rgba(var(--theme-rgb), 0.05); }
-
-  /* 우측 헤더 */
-  .header-right { display: flex; align-items: center; gap: 15px; z-index: 10; flex-shrink: 0; }
-  .theme-toggle { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); margin-right: 10px; }
-  .theme-btn { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; opacity: 0.5; }
-  .theme-btn.active { background: #fff; opacity: 1; color: var(--navy); }
-  .theme-btn svg { width: 16px; height: 16px; fill: currentColor; }
-  .settings-btn { display: flex; padding: 8px; width: 34px; height: 34px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.3s; color: #cbd5e1; }
-  .settings-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+  .result-info { display: flex; flex-direction: column; gap: 2px; text-align: left; }
+  .res-title { font-weight: 700; color: var(--text-main); font-size: 14px; }
+  .res-path { font-size: 11px; color: var(--text-sub); opacity: 0.7; }
+  .res-tag { font-size: 12px; font-weight: 900; padding: 4px 10px; border-radius: 6px; color: #fff; min-width: 50px; text-align: center; }
+  
   .kac-logo-img { height: 30px; width: auto; display: block; object-fit: contain; }
 
-  /* 사이드바 (Facility와 동일) */
-  .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 3000; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(2px); }
-  .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
-  .sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background: var(--bg-card); z-index: 3001; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; border-right: 1px solid var(--btn-border); }
-  .sidebar.active { left: 0; }
-  .sidebar-header { height: var(--header-h); display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--btn-border); font-weight: 800; font-size: 18px; justify-content: space-between; color: var(--text-main); }
-  .sidebar-content { flex: 1; overflow-y: auto; padding: 10px; }
-  .sb-item { padding: 12px 15px; cursor: pointer; border-radius: 10px; color: var(--text-main); font-weight: 600; transition: 0.2s; display: flex; align-items: center; justify-content: space-between; font-size: 14px; }
-  .sb-item:hover { background: var(--btn-bg); color: #2563eb; }
-  .sb-item.active { background: #eff6ff; border-left: 4px solid #2563eb; color: #2563eb; }
-  
-  /* === [세로형 트리 레이아웃] === */
-  .mindmap-container {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      height: 100vh;
-      overflow-y: auto;
-      overflow-x: hidden;
-      align-items: center;
-      /* 헤더 겹침 방지 위해 상단 여백 충분히 확보 */
-      padding-top: 130px; 
-      padding-bottom: 150px;
-  }
+  .theme-toggle { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); margin-right: 10px; }
+  .theme-btn { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; opacity: 0.5; }
+  .theme-btn:hover { opacity: 1; background: rgba(255,255,255,0.1); }
+  .theme-btn.active { background: #fff; opacity: 1; color: var(--navy); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+  .theme-btn svg { width: 16px; height: 16px; fill: currentColor; }
 
-  .mindmap-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-      max-width: 900px;
-      transform: translateX(var(--layout-x-pos)); /* 가로 이동 설정 */
-      transition: transform 0.3s ease;
-      position: relative;
+  .settings-btn { 
+    display: flex; padding: 8px; width: 34px; height: 34px; 
+    border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); 
+    align-items: center; justify-content: center; font-size: 18px; 
+    cursor: pointer; transition: 0.3s; color: #cbd5e1;
   }
+  .settings-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
 
-  /* 1. Root Card (대제목) - Facility와 이질감 없도록 */
-  .root-card {
-      background: var(--bg-card);
-      border: 3px solid var(--theme-color);
-      border-radius: 20px;
-      padding: 20px 40px;
-      display: flex; align-items: center; gap: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      min-width: 350px;
-      justify-content: center;
-      position: relative; z-index: 2;
-      cursor: pointer;
-      transition: transform 0.2s;
-  }
-  .root-card:hover { transform: scale(1.02); }
-  
-  .root-icon-box {
-      width: 50px; height: 50px; border-radius: 15px;
-      background: rgba(var(--theme-rgb), 0.1); color: var(--theme-color);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 24px; font-weight: 800; border: 1px solid rgba(var(--theme-rgb), 0.2);
-  }
-  .root-title { font-size: 22px; font-weight: 800; color: var(--text-main); }
+  body.preview-active .add-card { display: none !important; }
+  body.preview-active .ctrl-btns { visibility: hidden; }
 
-  /* 2. Branch Bus (중앙 연결 세로선) - "꼴랑 줄 하나" */
-  .branch-bus {
-      width: 4px;
-      background: rgba(var(--theme-rgb), 0.3);
-      flex-grow: 1;
-      position: absolute;
-      top: 80px; bottom: 40px; left: 60px; /* 트리 구조 위치 */
-      border-radius: 4px;
-      z-index: 0;
-  }
+  main { flex: 1; overflow-y: auto; padding: 40px; padding-bottom: 150px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
 
-  /* 3. List Section (과목 리스트) */
-  .list-section {
-      display: flex; flex-direction: column; gap: 20px;
-      width: 100%;
-      padding-top: 40px;
-      padding-left: 100px; /* 줄과의 간격 */
-      z-index: 2;
-  }
-
-  /* 리스트 카드 스타일 (기존 디자인 복구) */
+  /* 카드 설정 */
   .subject-card { 
-    background: var(--bg-card); width: 100%; padding: 25px 35px; border-radius: 18px; 
+    background: var(--bg-card); width: 100%; max-width: 900px; padding: 25px 35px; border-radius: 18px; 
     box-shadow: var(--shadow); 
-    border: 2px solid transparent; 
+    border: 1px solid transparent;
     display: flex; justify-content: space-between; align-items: center; transition: 0.3s;
+    border-left: 10px solid var(--theme-color); 
     cursor: pointer; color: var(--text-main);
     position: relative;
+    overflow: visible; 
+  }
+  .subject-card:hover { transform: translateX(10px); border-color: var(--theme-color); box-shadow: 0 5px 20px rgba(var(--theme-rgb), 0.2); }
+  .subject-card.inactive { border-left-color: #94a3b8 !important; opacity: 0.7; background: #f8fafc; }
+  body.dark-mode .subject-card.inactive { background: #1e293b; opacity: 0.6; }
+  .subject-card.dragging { opacity: 0.5; border: 2px dashed #94a3b8; background: rgba(255,255,255,0.05); }
+  .subject-card.drag-over { border: 2px solid var(--theme-color); transform: scale(1.02); box-shadow: 0 0 15px rgba(var(--theme-rgb), 0.2); z-index: 10; }
+
+  .last-viewed-icon {
+    position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+    display: none; 
+    align-items: center; justify-content: center; gap: 8px;
+    color: #10b981; 
+    font-size: 13px; font-weight: 800; white-space: nowrap;
+    background: rgba(16, 185, 129, 0.1); padding: 8px 16px; border-radius: 50px; 
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    z-index: 0; pointer-events: none;
   }
 
-  /* Hover 시 녹색 테두리 (요청사항) */
-  .subject-card:hover { 
-      border-color: #10b981; 
-      transform: translateX(5px); 
-      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.15); 
+  body.admin-mode .last-viewed-icon {
+    right: -140px !important; 
+    background: #10b981; 
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    z-index: 100;
   }
   
-  /* [트리 구조] 좌측 연결 점과 선 */
-  .subject-card::before {
-      content: ''; position: absolute;
-      left: -42px; top: 50%;
-      width: 40px; height: 2px;
-      background: rgba(var(--theme-rgb), 0.3);
-  }
-  .subject-card::after {
-      content: ''; position: absolute;
-      left: -46px; top: 50%; transform: translateY(-50%);
-      width: 10px; height: 10px; border-radius: 50%;
-      background: var(--theme-color);
-      border: 2px solid var(--bg-main);
-  }
+  .subject-card.last-viewed { border: 2px solid #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
+  .subject-card.last-viewed .last-viewed-icon { display: flex; }
+  .last-viewed-icon svg { width: 24px; height: 24px; fill: currentColor; }
 
-  /* Last Viewed 스타일 */
-  .subject-card.last-viewed {
-      border-color: #10b981;
-      box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
-  }
-  
-  /* 카드 내부 컨텐츠 (심플 텍스트) */
-  .subj-title { font-size: 18px; font-weight: 800; color: var(--title-color); display: flex; align-items: center; gap: 8px; }
-  
-  /* 외부 링크 아이콘 */
-  .ext-link-icon { color: #64748b; width: 16px; height: 16px; }
+  .subj-title { font-size: 20px; font-weight: 800; color: var(--title-color); transition: 0.3s; }
+  body.dark-mode .subj-title { text-shadow: 0 0 15px rgba(255,255,255,0.15); }
 
-  /* 상태 뱃지 (기존 녹색/파란색) */
-  .status-group { display: flex; gap: 8px; margin-top: 0; }
-  .status-pill { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 6px; background: var(--pill-bg); color: var(--pill-text); border: 1px solid var(--pill-border); display: flex; align-items: center; gap: 4px; }
+  .add-card { border: 2px dashed #cbd5e1; background: transparent; justify-content: center; color: #94a3b8; font-weight: 800; }
+  .add-card:hover { border-color: #64748b; color: #64748b; background: rgba(255,255,255,0.5); transform: none; box-shadow: none; }
+
+  .status-group { display: flex; gap: 8px; margin-top: 8px; }
+  .status-pill { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 6px; background: var(--pill-bg); color: var(--pill-text); border: 1px solid var(--pill-border); }
   .status-pill.on { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
   body.dark-mode .status-pill.on { background: rgba(22, 163, 74, 0.2); color: #86efac; border-color: #166534; }
   .status-pill.link { background: #dbeafe; color: #1e40af; border-color: #bfdbfe; }
   body.dark-mode .status-pill.link { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border-color: #1e40af; }
+  .status-pill.dev { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
+  body.dark-mode .status-pill.dev { background: rgba(255,255,255,0.1); color: #94a3b8; border-color: rgba(255,255,255,0.1); }
 
-  /* 하단 네비게이션 바 (기존 복구) */
+  .ctrl-btns { display: flex; gap: 10px; z-index: 50; position: relative; }
+  .btn-action { 
+    padding: 8px 14px; border-radius: 8px; border: 1px solid var(--btn-border); background: var(--btn-bg); 
+    font-size: 12px; font-weight: 700; color: var(--btn-text); cursor: pointer; transition: 0.2s; 
+    display: flex; align-items: center; gap: 5px;
+  }
+  .btn-action:hover { background: rgba(128,128,128,0.2); color: var(--text-main); }
+  .btn-del { color: #ef4444; border-color: #fee2e2; }
+  .btn-del:hover { background: #fee2e2; }
+
+  #pdfOverlay { 
+    position: fixed; inset: 0; background: #000; display: none; z-index: 7000; overflow: hidden; 
+    transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    touch-action: none;
+  }
+  
+  .v-header { position: absolute; top: 0; left: 0; right: 0; height: 80px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 8000; color: #fff; background: transparent; }
+  .v-header-left { display: flex; align-items: center; gap: 25px; }
+  .close-v { font-size: 32px; cursor: pointer; transition: 0.3s; z-index: 8100; opacity: 0.8; }
+  .close-v:hover { color: #ef4444; opacity: 1; }
+  .v-title-box { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); padding: 10px 25px; border-radius: 100px; backdrop-filter: blur(5px); font-weight: 800; font-size: 16px; letter-spacing: -0.5px; }
+  .v-header-right { display: flex; align-items: center; gap: 20px; }
+  
+  .v-icon-btn { cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; z-index: 8100; opacity: 0.8; padding: 5px; position: relative; }
+  .v-icon-btn:hover { opacity: 1; transform: scale(1.05); }
+  .v-icon-btn.active { color: #facc15; opacity: 1; transform: scale(1.1); }
+  .v-icon-btn.disabled { opacity: 0.2; pointer-events: none; cursor: default; }
+  .v-icon-btn svg { width: 26px; height: 26px; fill: currentColor; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+  
+  #audioPanel { position: absolute; top: -110px; left: 50%; transform: translateX(-50%); width: 480px; height: 80px; background: #fff; border-radius: 0 0 20px 20px; display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 10px 25px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 7900; box-shadow: 0 10px 30px rgba(0,0,0,0.5); color: #000; }
+  #audioPanel.open { top: 0px; }
+  .audio-ctrl-row { display: flex; align-items: center; gap: 15px; }
+  .audio-btn { background: var(--navy); color: #fff; border: none; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; flex-shrink: 0; }
+  #audioProgress { flex: 1; accent-color: var(--navy); cursor: pointer; }
+  .volume-row { display: flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 800; color: #666; margin-left: 45px; }
+  #volumeControl { width: 80px; accent-color: #64748b; height: 4px; }
+  
+  .progress-hit-area { position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; z-index: 9000; cursor: pointer; display: flex; align-items: flex-end; }
+  .progress-track { width: 100%; height: 6px; background: rgba(255,255,255,0.3); position: relative; transition: height 0.2s, background 0.2s; }
+  .progress-hit-area:hover .progress-track { background: rgba(255,255,255,0.5); height: 8px; }
+  .progress-fill { height: 100%; width: 0%; background: #ef4444; position: relative; }
+  .progress-handle { position: absolute; right: -7px; bottom: 0; width: 14px; height: 9px; background: #ef4444; border-radius: 7px 7px 0 0; border: 2px solid #fff; border-bottom: none; box-shadow: 0 -2px 10px rgba(0,0,0,0.3); z-index: 9100; }
+  .progress-flag { position: absolute; right: -30px; bottom: 35px; background: #1e293b; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 800; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; transform: translateY(10px); box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 9200; }
+  .progress-flag::after { content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); border-width: 5px 5px 0; border-style: solid; border-color: #1e293b transparent transparent transparent; }
+  .progress-hit-area:hover .progress-flag, .progress-hit-area.dragging .progress-flag { opacity: 1; transform: translateY(0); }
+  
+  .side-nav { position: absolute; top: 0; bottom: 0; width: 12%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 7500; background: transparent; border: none; transition: 0.3s; }
+  .side-nav svg { width: 50px; height: 50px; fill: #fff; opacity: 0.15; transition: 0.3s; }
+  .side-nav:hover svg { opacity: 0.7; }
+  .nav-L { left: 0; } .nav-R { right: 0; }
+  
+  /* 뷰어 바디 */
+  .viewer-body { 
+    width: 100%; height: 100%; 
+    display: flex; justify-content: center; align-items: center; 
+    cursor: default; 
+    overflow: hidden; 
+  }
+  
+  /* [중요 수정] 캔버스 CSS 강제 설정 및 애니메이션 분기 */
+  canvas { 
+    box-shadow: 0 0 50px rgba(0,0,0,0.8); 
+    pointer-events: none; 
+    max-width: 100%; /* 화면 너비 절대 넘지 않음 */
+    height: auto;    /* 비율 유지 */
+    object-fit: contain; 
+    opacity: 1;
+    transition: none; /* 기본(PC)은 트랜지션 없음 */
+  }
+
+  /* 모바일에서만 페이드 애니메이션 적용 */
+  @media (max-width: 768px) {
+      canvas { transition: opacity 0.3s ease-out; }
+      .slide-enter { opacity: 0; }
+      .slide-active { opacity: 1; }
+  }
+
+  #pageContainer { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; min-height: 100%; }
+
   .bottom-nav { 
     position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); 
     background: var(--navy); padding: 15px 45px; border-radius: 100px; 
@@ -247,182 +278,261 @@
     box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000; border: 1px solid rgba(255,255,255,0.1); 
   }
   .nav-item { 
-    color: #fff; cursor: pointer; font-size: 16px; font-weight: 700; transition: 0.3s; opacity: 0.8; 
+    color: #fff; cursor: pointer; font-size: 18px; font-weight: 700; transition: 0.3s; opacity: 0.8; 
     display: flex; align-items: center; gap: 10px;
   }
   .nav-item:hover { opacity: 1; transform: translateY(-3px); }
   .nav-icon { width: 24px; height: 24px; fill: currentColor; }
 
-  /* 관리자 버튼 */
-  .ctrl-btns { display: flex; gap: 5px; opacity: 0; transition: 0.2s; }
-  .subject-card:hover .ctrl-btns { opacity: 1; }
-  .btn-xs { padding: 5px 10px; font-size: 11px; border-radius: 6px; border: 1px solid var(--btn-border); background: var(--btn-card); cursor: pointer; }
-  .btn-del { color: #ef4444; border-color: #fee2e2; }
-  
-  /* 모바일 반응형 */
-  @media (max-width: 768px) {
-      .mindmap-wrapper { padding: 20px; transform: none !important; width: 100%; }
-      .branch-bus { display: none; } /* 모바일에선 라인 숨김 */
-      .list-section { padding-left: 0; gap: 15px; }
-      .subject-card::before, .subject-card::after { display: none; }
-      .header-center { display: none; }
-      .bottom-nav { width: 90%; bottom: 20px; padding: 12px 0; justify-content: center; }
+  /* [수정] 야간 모드일 때 하단 버튼 시인성 개선 */
+  body.dark-mode .bottom-nav {
+    background: rgba(30, 41, 59, 0.95); /* 밝은 남색 */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* 밝은 테두리 */
+  }
+  body.dark-mode .nav-item {
+    color: #e2e8f0; /* 밝은 회색 텍스트 */
+    opacity: 1;
   }
 
-  /* 모달 스타일 (기존 복구) */
+  /* [모바일 전용 스타일 수정] */
+  .mobile-close-btn { display: none; } /* 기본 숨김 */
+
+  @media (max-width: 768px) {
+    /* 1. 상단 제목 등 PC 전용 UI 숨김 */
+    .v-title-box, .v-icon-btn, .close-v { display: none !important; }
+    
+    /* 2. 카드: Last Viewed 뱃지 겹침 방지 */
+    .subject-card {
+        padding: 20px 15px;
+    }
+    .subj-title {
+        padding-right: 95px; /* 뱃지 공간 확보 */
+        word-break: break-all;
+    }
+    .last-viewed-icon { 
+        right: 15px; 
+        transform: translateY(-50%) scale(0.85); 
+        transform-origin: right center;
+    }
+
+    /* 3. 닫기 버튼: 플로팅 캡슐 형태 */
+    .mobile-close-btn {
+      display: flex;
+      position: fixed;
+      bottom: 40px; 
+      left: 50%; 
+      transform: translateX(-50%);
+      width: auto;
+      height: auto;
+      padding: 12px 30px;
+      border-radius: 50px;
+      background: rgba(0, 0, 0, 0.7); 
+      color: #fff;
+      font-size: 15px; 
+      font-weight: 700;
+      align-items: center; 
+      justify-content: center;
+      gap: 8px;
+      z-index: 9999;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.2);
+      backdrop-filter: blur(5px);
+      
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    
+    .mobile-close-btn.visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .mobile-close-btn:active { background: #ef4444; }
+
+    /* 4. 리스트 하단 네비게이션 */
+    .bottom-nav {
+      width: 90%;
+      bottom: 20px;
+      padding: 12px 0;
+      justify-content: center;
+      gap: 30px;
+      border-radius: 20px;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(10px);
+    }
+    
+    /* 모바일 야간모드 */
+    body.dark-mode .bottom-nav {
+        background: rgba(30, 41, 59, 0.95);
+    }
+
+    .nav-item { font-size: 14px; gap: 6px; }
+    .nav-icon { width: 20px; height: 20px; }
+
+    /* 5. 검색창 디자인 */
+    .header-search {
+      font-size: 14px;
+      padding: 10px 20px 10px 45px;
+      background-size: 18px;
+      background-position: 15px center;
+    }
+
+    /* 6. 뷰어 바디: 스크롤 허용 및 가로 스크롤 방지 */
+    .viewer-body { 
+        padding-bottom: 0; 
+        padding-top: 0; 
+        align-items: flex-start; /* 세로 스크롤 위함 */
+        overflow-y: auto; 
+        overflow-x: hidden; /* 중요: 좌우 스크롤 차단 */
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* 7. 기타 카드 스타일 */
+    .status-text { display: none !important; }
+    .status-pill { padding: 6px 8px; font-size: 14px; }
+    .pill-icon { margin-right: 0 !important; }
+  }
+
+  .creator-info { position: fixed; bottom: 5px; width: 100%; text-align: center; font-size: 11px; color: var(--text-sub); opacity: 0.5; font-weight: 500; z-index: 500; pointer-events: none; }
+  .creator-info b { font-weight: 700; }
+  body.dark-mode .creator-info { color: #fff; opacity: 0.3; }
+
+  /* 범용 모달 스타일 */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none; align-items: center; justify-content: center; }
-  .modal-card { background: var(--bg-card); padding: 30px; border-radius: 20px; width: 500px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); color: var(--text-main); }
+  .modal-card { background: var(--bg-card); padding: 35px; border-radius: 25px; width: 500px; color: var(--text-main); box-shadow: 0 20px 50px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
+  .modal-title { font-size: 20px; font-weight: 800; margin-bottom: 20px; border-bottom: 1px solid var(--btn-border); padding-bottom: 10px; }
+  .setting-group { margin-bottom: 25px; }
   .setting-label { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; display: block; }
-  .setting-input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--text-main); }
-  .btn-modal { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; margin-top: 5px; }
+  .setting-input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--text-main); font-size: 14px; }
+  
+  /* [수정] 야간 모드 팝업창(모달) 입력필드 시인성 개선 */
+  body.dark-mode .setting-input, 
+  body.dark-mode select.setting-input {
+      background-color: #334155 !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255,255,255,0.3);
+  }
+  body.dark-mode select.setting-input option {
+      background-color: #1e293b;
+      color: #ffffff;
+  }
+  
+  /* 야간 모드 모달 카드 배경 */
+  body.dark-mode .modal-card {
+      background-color: #1e293b;
+      border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 30px; }
+  .btn-modal { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; }
   .btn-primary { background: var(--navy); color: #fff; }
   .btn-secondary { background: var(--btn-border); color: var(--text-sub); }
   .btn-danger { background: #ef4444; color: #fff; }
 
-  /* 테이블 스타일 (일괄등록용) */
+  /* 일괄 등록 테이블 스타일 */
   .batch-table { width: 100%; border-collapse: collapse; font-size: 12px; }
   .batch-table th, .batch-table td { padding: 8px; border: 1px solid var(--btn-border); text-align: center; }
   .batch-table th { background: var(--btn-bg); font-weight: 700; color: var(--text-sub); }
   .batch-input { width: 100%; border: none; background: transparent; color: var(--text-main); }
-
-  /* PDF 뷰어 오버레이 */
-  #pdfOverlay { position: fixed; inset: 0; background: #000; display: none; z-index: 7000; touch-action: none; }
-  .viewer-body { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-  canvas { box-shadow: 0 0 50px rgba(0,0,0,0.8); max-width: 100%; height: auto; }
-  
-  /* 오디오 패널 */
-  #audioPanel { position: absolute; top: -100px; left: 50%; transform: translateX(-50%); background: #fff; padding: 10px 20px; border-radius: 0 0 20px 20px; z-index: 8000; transition: 0.3s; display: flex; gap: 10px; align-items: center; }
-  #audioPanel.open { top: 0; }
-  
-  /* 닫기 버튼 (모바일) */
-  .mobile-close-btn { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); color: #fff; padding: 10px 25px; border-radius: 30px; z-index: 9000; display: none; cursor: pointer; }
 </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
+<!-- 검색 배경 오버레이 -->
 <div id="searchOverlay"></div>
 
-<!-- 사이드바 -->
-<div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
-<div id="sidebar" class="sidebar">
-  <div class="sidebar-header" style="padding:20px; font-weight:800;">
-    <span>전체 메뉴</span>
-    <span onclick="toggleSidebar()" style="cursor:pointer; float:right;">✕</span>
-  </div>
-  <div class="sidebar-content" id="sidebarContent" style="padding:10px;"></div>
-</div>
-
 <header>
-  <div class="header-left">
-    <div class="hamburger-btn" onclick="toggleSidebar()">
-      <svg viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
-    </div>
+  <div class="header-left" id="headerLeft">
     <div class="logo-text" onclick="location.href='index.html'">KAC CNS Training Platform</div>
-    <!-- 브레드크럼 (기존 회색조 복구) -->
-    <div class="breadcrumb" id="bcContainer"></div>
+    <div class="breadcrumb" id="breadcrumbContainer"></div>
   </div>
 
-  <div class="header-center">
-    <input type="text" id="searchInput" class="header-search" placeholder="자료 검색..." autocomplete="off">
+  <div class="header-center" id="headerCenter">
+    <input type="text" id="searchInput" class="header-search" placeholder="예시) 항공통신용 데이터링크, VOR, ILS..." autocomplete="off">
     <div id="searchDropdown" class="search-dropdown"></div>
   </div>
 
   <div class="header-right">
     <div class="theme-toggle">
-        <div class="theme-btn" id="btnDay" onclick="setTheme('light')" title="주간">
-            <svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg>
-        </div>
-        <div class="theme-btn" id="btnNight" onclick="setTheme('dark')" title="야간">
-            <svg viewBox="0 0 24 24"><path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C6.94,10.39 9.79,16.87 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z"/></svg>
-        </div>
+      <div class="theme-btn" id="btnDay" onclick="setTheme('light')" title="주간 모드"><svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg></div>
+      <div class="theme-btn" id="btnNight" onclick="setTheme('dark')" title="야간 모드"><svg viewBox="0 0 24 24"><path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C6.94,10.39 9.79,16.87 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z"/></svg></div>
     </div>
-    <div class="settings-btn" onclick="openSettings()">⚙️</div>
+    
+    <div class="settings-btn" onclick="openSettings()" title="설정">⚙️</div>
     <img src="logo.png" alt="KAC Logo" class="kac-logo-img">
   </div>
 </header>
 
-<!-- [세로형 트리 레이아웃] -->
-<div class="mindmap-container">
-    <div class="mindmap-wrapper">
-        <!-- 1. Root Section (대제목) -->
-        <div class="root-card" onclick="goParent()">
-             <div class="root-icon-box" id="rootIconBox">?</div>
-             <div class="root-title" id="rootTitleDisplay">Loading...</div>
-        </div>
+<main id="subjectList" style="padding-top: 40px;"></main>
 
-        <!-- 2. Connection Line (세로 줄) -->
-        <div class="branch-bus"></div>
+<!-- 개별 업로드 모달 -->
+<div id="uploadModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-title">자료 등록 및 수정</div>
+    <input type="text" id="editSubjectName" placeholder="과목명을 입력하세요" class="setting-input" style="margin-bottom:15px;">
+    <label class="setting-label">상태 설정</label>
+    <select id="editActiveStatus" class="setting-input" style="margin-bottom:15px;">
+        <option value="true">🟢 활성 (서비스 중)</option>
+        <option value="false">🚧 비활성 (개발 중)</option>
+    </select>
+    
+    <label class="setting-label">📄 PDF 파일 경로 (예: COMM/manual.pdf)</label>
+    <input type="text" id="inputPdfName" class="setting-input" placeholder="예: COMM/manual.pdf" style="margin-bottom:10px;">
+    
+    <label class="setting-label">🔗 외부 링크 주소 (선택)</label>
+    <input type="text" id="inputLinkUrl" class="setting-input" placeholder="예: https://..." style="margin-bottom:10px;">
 
-        <!-- 3. List Section (카드 리스트) -->
-        <div id="listSection" class="list-section"></div>
+    <label class="setting-label">🎵 오디오 파일 경로 (예: COMM/audio.mp3)</label>
+    <input type="text" id="inputAudioName" class="setting-input" placeholder="예: COMM/audio.mp3" style="margin-bottom:20px;">
+    
+    <div class="btn-row">
+      <button onclick="saveFiles()" class="btn-modal btn-primary">저장</button>
+      <button onclick="document.getElementById('uploadModal').style.display='none'" class="btn-modal btn-secondary">취소</button>
     </div>
-</div>
-
-<!-- 하단 네비게이션 (기존 복구) -->
-<div class="bottom-nav">
-  <div class="nav-item" onclick="history.back()">
-    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-    뒤로가기
-  </div>
-  <div class="nav-item" onclick="location.href='index.html'">
-    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-    홈으로
   </div>
 </div>
 
-<!-- 설정 모달 (기존 디자인 및 기능 복구 + 가로이동 추가) -->
+<!-- 이동 모달 -->
+<div id="moveModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-title">📂 과목 이동</div>
+    <p style="font-size:13px; color:var(--text-sub); margin-bottom:20px;">
+      선택한 과목을 다른 메뉴로 이동합니다.
+    </p>
+    <select id="moveTargetSelect" class="setting-input" style="margin-bottom:20px;"></select>
+    <div class="btn-row">
+      <button onclick="executeMove()" class="btn-modal btn-primary">이동 확인</button>
+      <button onclick="document.getElementById('moveModal').style.display='none'" class="btn-modal btn-secondary">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- 설정 모달 -->
 <div id="settingsModal" class="modal-overlay">
   <div class="modal-card">
     <div class="modal-title">⚙️ 설정 및 관리</div>
     
-    <div class="setting-group" id="guestMsg">
-       <p style="color:#94a3b8; margin-bottom:10px;">관리자 권한이 필요합니다.</p>
-       <button class="btn-modal btn-primary" onclick="toggleAdmin()">관리자 로그인</button>
+    <div class="setting-group">
+      <label class="setting-label">🛠️ 시스템 관리</label>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button id="modalAdminBtn" class="btn-modal btn-secondary" onclick="toggleAdmin()">관리자 로그인</button>
+        <button id="modalPreviewBtn" class="btn-modal btn-secondary" onclick="togglePreview()" style="display:none;">👁️ 미리보기</button>
+      </div>
     </div>
 
-    <div id="adminControls" style="display:none;">
-        <div class="setting-group">
-            <label class="setting-label">🛠️ 시스템 관리</label>
-            <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                <button class="btn-modal btn-danger" onclick="toggleAdmin()">로그아웃</button>
-                <button id="modalPreviewBtn" class="btn-modal btn-secondary" onclick="togglePreview()">👁️ 미리보기</button>
-            </div>
-        </div>
-
-        <div class="setting-group">
-            <label class="setting-label">📦 대량 등록 관리</label>
-            <div style="display:flex; gap:10px; margin-bottom:10px;">
-                <button class="btn-modal btn-primary" style="flex:1" onclick="openBatchAddModal()">일괄 입력 (신규)</button>
-                <button class="btn-modal btn-secondary" style="flex:1" onclick="openBatchEditModal()">일괄 수정 (기존)</button>
-            </div>
-            <p style="font-size:11px; color:var(--text-sub);">* GitHub files 폴더 내의 경로를 입력하세요.</p>
-        </div>
-        
-        <div class="setting-group">
-            <label class="setting-label">↔️ 컨텐츠 전체 가로 이동 (px)</label>
-            <div style="display:flex; gap:10px; align-items:center;">
-                <input type="range" id="layoutXRange" min="-300" max="300" step="10" style="flex:1" oninput="updateLayoutX(this.value)">
-                <input type="number" id="layoutXNum" class="setting-input" style="width:70px;" oninput="updateLayoutX(this.value)">
-            </div>
-            <button class="btn-modal btn-primary" style="margin-top:10px;" onclick="saveSettings()">설정 저장</button>
-        </div>
+    <div id="batchAdminGroup" class="setting-group" style="display:none;">
+      <label class="setting-label">📦 대량 등록 관리</label>
+      <div style="display:flex; gap:10px; margin-bottom:10px;">
+        <button class="btn-modal btn-primary" style="flex:1" onclick="openBatchAddModal()">일괄 입력 (신규)</button>
+        <button class="btn-modal btn-secondary" style="flex:1" onclick="openBatchEditModal()">일괄 수정 (기존)</button>
+      </div>
+      <p style="font-size:11px; color:var(--text-sub);">* GitHub files 폴더 내의 경로를 입력하세요.</p>
     </div>
-    
-    <button class="btn-modal btn-secondary" onclick="document.getElementById('settingsModal').style.display='none'" style="margin-top:10px;">닫기</button>
-  </div>
-</div>
 
-<!-- 자료 등록/수정 모달 -->
-<div id="uploadModal" class="modal-overlay">
-  <div class="modal-card">
-    <div class="modal-title">자료 수정</div>
-    <input type="text" id="editName" class="setting-input" placeholder="제목" style="margin-bottom:10px;">
-    <input type="text" id="editPdf" class="setting-input" placeholder="PDF 경로 (예: file.pdf)" style="margin-bottom:10px;">
-    <input type="text" id="editLink" class="setting-input" placeholder="외부 링크 (선택)" style="margin-bottom:10px;">
-    <input type="text" id="editAudio" class="setting-input" placeholder="오디오 경로 (선택)" style="margin-bottom:10px;">
-    <div style="display:flex; gap:10px; margin-top:20px;">
-        <button class="btn-modal btn-primary" onclick="saveSubject()">저장</button>
-        <button class="btn-modal btn-secondary" onclick="document.getElementById('uploadModal').style.display='none'">취소</button>
+    <div class="btn-row">
+      <button class="btn-modal btn-secondary" onclick="document.getElementById('settingsModal').style.display='none'">닫기</button>
     </div>
   </div>
 </div>
@@ -452,395 +562,409 @@
   </div>
 </div>
 
-<!-- PDF 뷰어 -->
-<div id="pdfOverlay" onclick="closeViewer()">
-    <div class="mobile-close-btn" onclick="closeViewer()" style="display:block;">✕ 닫기</div>
-    <div id="audioPanel" onclick="event.stopPropagation()">
-        <button onclick="toggleAudio()" style="border:none; background:none; font-size:20px; cursor:pointer;">▶</button>
-        <input type="range" id="audioSeek" style="width:150px;">
+<div id="pdfOverlay" onmousedown="handleMouseNav(event)">
+  <div class="v-header" onmousedown="event.stopPropagation()">
+    <div class="v-header-left">
+      <div class="close-v" onclick="closeViewer()">✕</div>
+      <div id="vTitle" class="v-title-box"></div>
     </div>
-    <div class="viewer-body" id="viewerBody"></div>
+    <div class="v-header-right">
+      <div class="v-icon-btn" id="fsBtn" onmousedown="event.stopPropagation()" onclick="toggleFullScreen(event)" title="전체화면 전환">
+        <svg id="iconExpand" viewBox="0 0 24 24"><path d="M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17H7V14H5V19H10V17Z"/></svg>
+        <svg id="iconCompress" viewBox="0 0 24 24" style="display:none;"><path d="M14,14H19V16H16V19H14V14M5,14H10V19H8V16H5V14M8,5H10V10H5V8H8V5M14,5H16V8H19V10H14V5Z"/></svg>
+      </div>
+      <div class="v-icon-btn" onmousedown="event.stopPropagation()" onclick="downloadPdf(event)" title="다운로드">
+        <svg viewBox="0 0 24 24"><path d="M14,2L20,8V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V4A2,2 0 0,1 6,2H14M18,20V9H13V4H6V20H18M12,19L8,15H10.5V11H13.5V15H16L12,19Z"/></svg>
+      </div>
+      <div id="audioBtn" class="v-icon-btn" onmousedown="event.stopPropagation()" onclick="toggleAudioPanel(event)" title="오디오">
+        <svg viewBox="0 0 24 24"><path d="M12,2A3,3 0 0,0 9,5V11A3,3 0 0,0 12,14A3,3 0 0,0 15,11V5A3,3 0 0,0 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,1 12,16A5,5 0 0,1 17,11H19Z"/></svg>
+        <span>(Audio)</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="audioPanel" onmousedown="event.stopPropagation()">
+    <div class="audio-ctrl-row">
+      <button id="playBtn" class="audio-btn">▶</button>
+      <input type="range" id="audioProgress" value="0">
+      <span id="audioTime" style="font-size:11px; font-weight:800; color:var(--navy); width:40px;">00:00</span>
+    </div>
+    <div class="volume-row">
+      🔊 <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="1">
+    </div>
+  </div>
+
+  <button id="btnPrev" class="side-nav nav-L" onmousedown="event.stopPropagation(); prevPage()"><svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
+  <button id="btnNext" class="side-nav nav-R" onmousedown="event.stopPropagation(); nextPage()"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></button>
+
+  <div id="viewerBody" class="viewer-body">
+    <div id="pageContainer"></div>
+  </div>
+
+  <!-- [수정] 모바일 플로팅 닫기 버튼 -->
+  <div class="mobile-close-btn" onclick="closeViewer()" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+    ✕ 닫기
+  </div>
+
+  <div id="progressHitArea" class="progress-hit-area" onmousedown="event.stopPropagation()">
+    <div class="progress-track">
+      <div id="pageFill" class="progress-fill">
+        <div class="progress-handle"></div>
+        <div id="progressFlag" class="progress-flag">0 / 0</div>
+      </div>
+    </div>
+  </div>
 </div>
+
 <audio id="mainAudio"></audio>
 
+<div class="bottom-nav">
+  <div class="nav-item" onclick="history.back()">
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    뒤로가기
+  </div>
+  <div class="nav-item" onclick="location.href='index.html'">
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    홈으로
+  </div>
+</div>
+
+<div class="creator-info">Developed by <b>DooSeok, JANG</b> (jds0616@airport.co.kr)</div>
+
 <script>
-  // 기본 설정
+  // [보안 및 설정] 초기 변수 및 PDF Worker 설정
   pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
-  
+
   const params = new URLSearchParams(location.search);
   const type = params.get('type');
   const menuName = params.get('menu');
   const menuId = params.get('id');
-  const autoOpen = params.get('autoOpen');
   
   let isAdmin = localStorage.getItem('kac_admin_mode') === '1';
-  let subjects = [];
-  let currentEditIdx = -1;
-  let pdfDoc = null;
   let isPreview = localStorage.getItem('kac_preview_active') === '1';
+
+  let globalSecurity = {
+      admin_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c"
+  };
+
+  let subjects = [];
+
+  // [중요] UI 요소 변수 선언 (함수 실행 전 미리 확보)
+  let pdfDoc = null, pageNum = 1, isRendering = false, isDragging = false;
+  const canvasContainer = document.getElementById('pageContainer');
+  const viewerBody = document.getElementById('viewerBody');
+  const overlay = document.getElementById('pdfOverlay');
+  const hitArea = document.getElementById('progressHitArea');
+  const audioPlayer = document.getElementById('mainAudio');
   
-  function init() {
-      setTheme(localStorage.getItem('kac_theme') || 'light');
-      if(isPreview) document.body.classList.add('preview-active');
-      
-      loadLayoutSettings();
-      loadData();
-      renderSidebar();
-      renderList();
-      
-      if(autoOpen) setTimeout(() => openViewerById(autoOpen), 300);
-      
-      // 검색창 이벤트 (블러 효과 포함)
-      const sInput = document.getElementById('searchInput');
-      const sOverlay = document.getElementById('searchOverlay');
-      const sDrop = document.getElementById('searchDropdown');
-      
-      sInput.addEventListener('focus', () => { 
-          document.body.classList.add('search-mode');
-          sOverlay.classList.add('active');
-          if(sInput.value) sDrop.classList.add('active');
-      });
-      
-      sInput.addEventListener('input', handleSearch);
-      
-      sOverlay.addEventListener('click', () => {
-          document.body.classList.remove('search-mode');
-          sOverlay.classList.remove('active');
-          sDrop.classList.remove('active');
-      });
-  }
-  
-  function goParent() {
-      location.href = `facility.html?type=${type}`;
+  // 검색 관련 요소
+  const searchInput = document.getElementById('searchInput');
+  const searchDropdown = document.getElementById('searchDropdown');
+  const sOverlay = document.getElementById('searchOverlay');
+
+  async function init() {
+    try {
+        setTheme(localStorage.getItem('kac_theme') || 'light');
+        if(isAdmin) document.body.classList.add('admin-mode');
+        if(isPreview) document.body.classList.add('preview-active');
+        
+        // 1. 서버 데이터 가져오기
+        let serverData = null;
+        try {
+            const res = await fetch('data.json?v=' + Date.now());
+            if(res.ok) serverData = await res.json();
+        } catch(e) { console.log("data.json 로드 실패, 로컬 데이터만 사용합니다."); }
+
+        if(serverData && serverData.security) {
+            globalSecurity = serverData.security;
+        }
+
+        // 2. 로컬 데이터 확인 및 분기
+        const hasLocalData = localStorage.getItem('kac_index_order');
+        let loaded = loadSubjectsFromLocal();
+
+        // 관리자 모드이거나 로컬 데이터가 있으면 로컬 우선
+        if (isAdmin && hasLocalData) {
+            console.log("🛠️ Admin: Using Local Data");
+        } 
+        // 일반 사용자이거나 로컬 데이터가 없으면 서버 데이터로 강제 동기화
+        else if (serverData) {
+            console.log("🔄 User: Syncing with Server");
+            
+            // LocalStorage에 쓰기 (백그라운드)
+            serverData.categories.forEach(cat => {
+                if(cat) {
+                    cat.menus.forEach(m => {
+                        localStorage.setItem(`kac_subs_${cat.id}_${m.id}`, JSON.stringify(m.subjects));
+                    });
+                }
+            });
+
+            // 서버 데이터에서 현재 페이지에 해당하는 subjects 직접 찾아서 로드 (동기화 지연 방지)
+            const currentCat = serverData.categories.find(c => c && c.id === type);
+            if(currentCat) {
+                const currentMenu = currentCat.menus.find(m => m.id === menuId);
+                if(currentMenu) {
+                    subjects = currentMenu.subjects;
+                    loaded = true;
+                }
+            }
+        }
+
+        if (!loaded) subjects = [];
+
+        // 스타일 적용
+        const sData = localStorage.getItem(`kac_style_${type}`);
+        const style = sData ? JSON.parse(sData) : { name: type, color: '#2563eb' };
+        applyStyles(style);
+
+        render();
+        buildSearchIndex();
+        checkAutoOpen();
+
+    } catch (err) {
+        console.error("Initialization Error:", err);
+        alert("페이지 로딩 중 오류가 발생했습니다.\n" + err.message);
+    }
   }
 
-  function loadLayoutSettings() {
-      const x = localStorage.getItem('kac_viewer_layout_x') || 0;
-      updateLayoutX(x);
-  }
+  // 동기화 이벤트
+  window.addEventListener('pageshow', () => {
+      const savedStatus = localStorage.getItem('kac_admin_mode') === '1';
+      if (isAdmin !== savedStatus) location.reload();
+      const savedPreview = localStorage.getItem('kac_preview_active') === '1';
+      if(isPreview !== savedPreview) location.reload();
+  });
 
-  function updateLayoutX(val) {
-      document.documentElement.style.setProperty('--layout-x-pos', val + 'px');
-      document.getElementById('layoutXRange').value = val;
-      document.getElementById('layoutXNum').value = val;
-  }
-  
-  function saveSettings() {
-      localStorage.setItem('kac_viewer_layout_x', document.getElementById('layoutXRange').value);
-      alert("저장되었습니다.");
-      document.getElementById('settingsModal').style.display = 'none';
-  }
+  window.addEventListener('storage', (e) => {
+      if (e.key === 'kac_admin_mode' || e.key === 'kac_preview_active') location.reload();
+  });
 
-  function loadData() {
-      const key = `kac_subs_${type}_${menuId}`;
-      const saved = localStorage.getItem(key);
-      subjects = saved ? JSON.parse(saved) : [];
-      
-      const sData = localStorage.getItem(`kac_style_${type}`);
-      const style = sData ? JSON.parse(sData) : { name: type, color: '#2563eb', code: '?' };
-      
-      document.documentElement.style.setProperty('--theme-color', style.color);
-      document.documentElement.style.setProperty('--theme-rgb', hexToRgb(style.color));
-      
-      // 브레드크럼 (회색조)
-      const bc = document.getElementById('bcContainer');
-      bc.innerHTML = `
-        <span>&nbsp;&gt;&nbsp;</span>
-        <span class="crumb-link" onclick="location.href='facility.html?type=${type}'">${style.name}</span>
-        <span>&nbsp;&gt;&nbsp;</span>
-        <span>${menuName}</span>
-      `;
-      
-      // Root Card
-      document.getElementById('rootTitleDisplay').textContent = menuName;
-      document.getElementById('rootIconBox').textContent = style.code;
-      document.getElementById('rootIconBox').style.color = style.color;
-  }
-  
-  function renderList() {
-      const list = document.getElementById('listSection');
-      list.innerHTML = '';
-      
-      if(subjects.length === 0 && !isAdmin) {
-          list.innerHTML = `<div style="text-align:center; color:#94a3b8; padding:30px;">등록된 자료가 없습니다.</div>`;
-          return;
+  function loadSubjectsFromLocal() {
+      if(!type || !menuId) return false;
+      const data = localStorage.getItem(`kac_subs_${type}_${menuId}`);
+      if (data) {
+          try {
+            subjects = JSON.parse(data);
+            return true;
+          } catch(e) { return false; }
       }
+      return false;
+  }
 
-      const lastId = sessionStorage.getItem('kac_last_viewed_sub');
-
-      subjects.forEach((sub, idx) => {
-          const card = document.createElement('div');
-          const isLast = sub.id === lastId;
-          card.className = `subject-card ${isLast ? 'last-viewed' : ''}`;
-          card.onclick = () => handleClick(idx);
-
-          const extLinkHtml = sub.link 
-            ? `<svg class="ext-link-icon" viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor; margin-top:2px;"><path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z" /></svg>` 
-            : '';
-
-          const adminBtns = isAdmin && !isPreview ? `
-            <div class="ctrl-btns" onclick="event.stopPropagation()">
-                <button class="btn-xs" onclick="openEdit(${idx})">수정</button>
-                <button class="btn-xs btn-del" onclick="deleteItem(${idx})">삭제</button>
-            </div>
-          ` : '';
-
-          // 기존 심플 디자인 (녹색/파란색 뱃지)
-          card.innerHTML = `
-              <div class="subj-title">
-                  ${sub.name}
-                  ${extLinkHtml}
-              </div>
-              <div class="status-group">
-                 ${sub.pdfName ? `<span class="status-pill on">📄 PDF</span>` : ''}
-                 ${sub.audioName ? `<span class="status-pill on">🎧 Audio</span>` : ''}
-                 ${sub.link ? `<span class="status-pill link">🔗 Link</span>` : ''}
-              </div>
-              ${adminBtns}
-          `;
-          list.appendChild(card);
-          
-          if(isLast) {
-              setTimeout(() => card.scrollIntoView({behavior:'smooth', block:'center'}), 500);
-          }
-      });
+  function applyStyles(style) {
+      const typeName = style.name || type || 'Unknown';
+      const themeColor = style.color || '#2563eb';
       
-      if(isAdmin && !isPreview) {
-          const addBtn = document.createElement('div');
-          addBtn.className = 'subject-card';
-          addBtn.style.justifyContent = 'center';
-          addBtn.style.color = '#94a3b8';
-          addBtn.style.border = '2px dashed #cbd5e1';
-          addBtn.innerHTML = '+ 자료 추가';
-          addBtn.onclick = () => openEdit('NEW');
-          list.appendChild(addBtn);
+      document.documentElement.style.setProperty('--theme-color', themeColor);
+      document.documentElement.style.setProperty('--theme-rgb', hexToRgb(themeColor));
+
+      const bc = document.getElementById('breadcrumbContainer');
+      if(bc) {
+          bc.innerHTML = '';
+          const midSpan = document.createElement('span');
+          midSpan.innerHTML = ` &nbsp;>&nbsp; ${typeName}`;
+          midSpan.className = 'crumb-link';
+          midSpan.onclick = () => location.href = `facility.html?type=${type}`;
+          const currSpan = document.createElement('span');
+          currSpan.innerHTML = ` &nbsp;>&nbsp; ${menuName || '상세'}`;
+          currSpan.className = 'crumb-current';
+          bc.appendChild(midSpan);
+          bc.appendChild(currSpan);
       }
   }
 
-  function handleClick(idx) {
-      const sub = subjects[idx];
-      sessionStorage.setItem('kac_last_viewed_sub', sub.id);
-      renderList(); 
-
-      if(sub.link) {
-          window.open(sub.link, '_blank');
-      } else if(sub.pdfName) {
-          openViewer(sub);
-      } else {
-          alert("연결된 파일이나 링크가 없습니다.");
-      }
+  function hexToRgb(hex) {
+    let c;
+    if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
+        c= hex.substring(1).split('');
+        if(c.length== 3){ c= [c[0], c[0], c[1], c[1], c[2], c[2]]; }
+        c= '0x'+c.join('');
+        return [(c>>16)&255, (c>>8)&255, c&255].join(',');
+    }
+    return '37, 99, 235'; 
   }
 
-  async function openViewer(sub) {
-      document.getElementById('pdfOverlay').style.display = 'block';
-      const container = document.getElementById('viewerBody');
-      container.innerHTML = 'Loading...';
-      
-      // [자동 전체화면 시도]
-      try {
-          const ov = document.getElementById('pdfOverlay');
-          if (ov.requestFullscreen) await ov.requestFullscreen();
-          else if (ov.webkitRequestFullscreen) await ov.webkitRequestFullscreen();
-      } catch(e) {}
+  function checkHeaderOverlap() {
+    const left = document.getElementById('headerLeft');
+    const center = document.getElementById('headerCenter');
+    if(!left || !center) return;
+    if (left.getBoundingClientRect().right + 20 > center.getBoundingClientRect().left) {
+        document.body.classList.add('header-overlap');
+    } else {
+        document.body.classList.remove('header-overlap');
+    }
+  }
+  window.addEventListener('resize', checkHeaderOverlap);
+  window.addEventListener('load', checkHeaderOverlap);
 
-      try {
-          // [PDF 확장자 자동 보정]
-          let url = sub.pdfName;
-          if (!url.toLowerCase().endsWith('.pdf')) url += '.pdf';
-          
-          // 경로: files/파일명
-          const finalUrl = `files/${url}`;
-          
-          const loadingTask = pdfjsLib.getDocument(finalUrl);
-          pdfDoc = await loadingTask.promise;
-          
-          container.innerHTML = '';
-          const canvas = document.createElement('canvas');
-          container.appendChild(canvas);
-          
-          const page = await pdfDoc.getPage(1);
-          // 모바일/PC 분기
-          const isMobile = window.innerWidth <= 768;
-          let scale = isMobile ? (window.innerWidth / page.getViewport({scale:1}).width)*1.5 : 1.5;
-          
-          const viewport = page.getViewport({scale: scale});
-          canvas.width = viewport.width;
-          canvas.height = viewport.height;
-          
-          const ctx = canvas.getContext('2d');
-          page.render({canvasContext: ctx, viewport: viewport});
-          
-          const audioPanel = document.getElementById('audioPanel');
-          const player = document.getElementById('mainAudio');
-          if(sub.audioName) {
-              player.src = `files/${sub.audioName}`;
-              audioPanel.classList.add('open');
-          } else {
-              audioPanel.classList.remove('open');
-          }
-      } catch(e) {
-          container.innerHTML = `<p style="color:#fff">파일을 찾을 수 없습니다.<br>${sub.pdfName}</p>`;
-      }
-  }
-  
-  function closeViewer() {
-      if (document.fullscreenElement) document.exitFullscreen();
-      document.getElementById('pdfOverlay').style.display = 'none';
-      document.getElementById('mainAudio').pause();
-  }
-  
-  function toggleAudio() {
-      const p = document.getElementById('mainAudio');
-      if(p.paused) p.play(); else p.pause();
+  function setTheme(mode) {
+    document.body.className = (document.body.className.replace('dark-mode','').trim() + (mode==='dark' ? ' dark-mode' : '')).trim();
+    localStorage.setItem('kac_theme', mode);
+    document.getElementById('btnDay').classList.toggle('active', mode==='light');
+    document.getElementById('btnNight').classList.toggle('active', mode==='dark');
   }
 
-  // 관리자 기능
-  function openEdit(idx) {
-      currentEditIdx = idx;
-      if(idx === 'NEW') {
-          document.getElementById('editName').value = '';
-          document.getElementById('editPdf').value = '';
-          document.getElementById('editLink').value = '';
-          document.getElementById('editAudio').value = '';
-      } else {
-          const s = subjects[idx];
-          document.getElementById('editName').value = s.name;
-          document.getElementById('editPdf').value = s.pdfName || '';
-          document.getElementById('editLink').value = s.link || '';
-          document.getElementById('editAudio').value = s.audioName || '';
-      }
-      document.getElementById('uploadModal').style.display = 'flex';
-  }
-  
-  function saveSubject() {
-      const newItem = {
-          id: (currentEditIdx === 'NEW') ? Date.now().toString() : subjects[currentEditIdx].id,
-          name: document.getElementById('editName').value,
-          pdfName: document.getElementById('editPdf').value,
-          link: document.getElementById('editLink').value,
-          audioName: document.getElementById('editAudio').value,
-          active: true
-      };
-      
-      if(currentEditIdx === 'NEW') subjects.push(newItem);
-      else subjects[currentEditIdx] = newItem;
-      
-      localStorage.setItem(`kac_subs_${type}_${menuId}`, JSON.stringify(subjects));
-      document.getElementById('uploadModal').style.display = 'none';
-      renderList();
-  }
-  
-  function deleteItem(idx) {
-      if(confirm("삭제하시겠습니까?")) {
-          subjects.splice(idx, 1);
-          localStorage.setItem(`kac_subs_${type}_${menuId}`, JSON.stringify(subjects));
-          renderList();
-      }
-  }
-
-  function openSettings() {
-      const isAdm = localStorage.getItem('kac_admin_mode') === '1';
-      document.getElementById('guestMsg').style.display = isAdm ? 'none' : 'block';
-      document.getElementById('adminControls').style.display = isAdm ? 'block' : 'none';
-      
-      // 미리보기 버튼 텍스트 변경
-      const pBtn = document.getElementById('modalPreviewBtn');
-      if(pBtn) {
-          pBtn.textContent = isPreview ? "미리보기 종료" : "👁️ 미리보기";
-          pBtn.className = isPreview ? "btn-modal btn-primary" : "btn-modal btn-secondary";
-      }
-      
-      document.getElementById('settingsModal').style.display = 'flex';
+  async function sha256(message) {
+      const msgBuffer = new TextEncoder().encode(message);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
   async function toggleAdmin() {
-      if(isAdmin) {
-          if(confirm("로그아웃?")) { localStorage.setItem('kac_admin_mode','0'); location.reload(); }
-      } else {
-          const pw = prompt("비밀번호");
-          if(pw === "admin") { 
-              localStorage.setItem('kac_admin_mode','1'); location.reload(); 
-          }
-      }
+    if(isAdmin) { 
+        if(confirm("로그아웃?")) { localStorage.setItem('kac_admin_mode','0'); location.reload(); } 
+    } else { 
+        const pw = prompt("비밀번호"); if(!pw) return;
+        const inputHash = await sha256(pw.toUpperCase());
+        const storedHash = globalSecurity.admin_pw;
+        if(inputHash === storedHash) { localStorage.setItem('kac_admin_mode','1'); location.reload(); } 
+        else alert('비밀번호 불일치');
+    } 
   }
-  
+
   function togglePreview() {
-      isPreview = !isPreview;
-      localStorage.setItem('kac_preview_active', isPreview ? '1' : '0');
-      location.reload();
+    isPreview = !isPreview;
+    localStorage.setItem('kac_preview_active', isPreview ? '1' : '0');
+    document.body.classList.toggle('preview-active', isPreview);
+    location.reload();
   }
 
-  function setTheme(m) {
-      document.body.className = m==='dark'?'dark-mode':'';
-      localStorage.setItem('kac_theme', m);
-      document.getElementById('btnDay').classList.toggle('active', m==='light'); 
-      document.getElementById('btnNight').classList.toggle('active', m==='dark'); 
-  }
-  
-  function hexToRgb(hex) {
-      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-      return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '37, 99, 235';
-  }
-  
-  function handleSearch(e) {
-      const q = e.target.value.toLowerCase();
-      const drop = document.getElementById('searchDropdown');
-      if(!q) { drop.style.display='none'; document.getElementById('searchOverlay').classList.remove('active'); return; }
+  let currentEditIdx = -1;
+  let viewingIndex = -1; 
+
+  async function render() {
+    const list = document.getElementById('subjectList'); list.innerHTML = '';
+    
+    // 세션 스토리지에서 마지막으로 본 ID 가져오기
+    const lastViewedId = sessionStorage.getItem('kac_last_viewed_id');
+
+    // 데이터가 없을 경우 안내 메시지
+    if(subjects.length === 0) {
+        list.innerHTML = `<div style="text-align:center; padding:50px; color:var(--text-sub); opacity:0.7;">
+            <div style="font-size:40px; margin-bottom:10px;">📭</div>
+            <div style="font-weight:700;">표시할 데이터가 없습니다.</div>
+        </div>`;
+    }
+
+    for (let i = 0; i < subjects.length; i++) {
+      const sub = subjects[i];
+      const isActive = sub.active !== false; 
+      const hasPdf = !!sub.pdfName;
+      const hasAudio = !!sub.audioName;
+      const hasLink = !!sub.link;
       
-      const matches = subjects.filter(s => s.name.toLowerCase().includes(q));
-      drop.innerHTML = matches.map(s => `
-        <div class="result-item" onclick="openViewerById('${s.id}')">
-            <div style="font-weight:700;">${s.name}</div>
+      const card = document.createElement('div'); 
+      const isLast = lastViewedId === sub.id;
+      card.className = `subject-card ${isActive ? '' : 'inactive'} ${isLast ? 'last-viewed' : ''}`;
+      card.id = `card-${i}`; 
+
+      if(isAdmin && !isPreview) {
+        card.setAttribute('draggable', 'true');
+        card.ondragstart = (e) => handleDragStart(e, i);
+        card.ondragover = (e) => handleDragOver(e);
+        card.ondrop = (e) => handleDrop(e, i);
+        card.ondragend = (e) => handleDragEnd(e);
+      }
+      
+      card.onclick = () => { 
+        if(!isActive) { 
+            if(isAdmin) {
+                if(!confirm("현재 개발 중인 과정입니다.\n관리자 권한으로 열람하시겠습니까?")) return;
+            } else {
+                alert("현재 과정 개발중으로 사용 불가합니다."); 
+                return; 
+            }
+        } 
+        
+        sessionStorage.setItem('kac_last_viewed_id', sub.id);
+        document.querySelectorAll('.subject-card').forEach(c => c.classList.remove('last-viewed'));
+        card.classList.add('last-viewed');
+
+        if(hasLink) {
+            window.open(sub.link, '_blank');
+            return;
+        }
+        openViewer(i); 
+      };
+
+      const statusTag = isActive ? '' : '<span class="status-pill dev">🚧 개발중</span>';
+      const moveBtn = (isAdmin && !isPreview) ? `<button class="btn-action" onclick="event.stopPropagation(); openMoveModal(${i})" title="이동"><svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M20,6h-8l-2-2H4C2.89,4,2,4.89,2,6v12c0,1.1,0.89,2,2,2h16c1.1,0,2-0.9,2-2V8C22,6.9,21.1,6,20,6z M20,18H4V6h5.17l2,2H20V18z M12,14h2v2h-2v2l-3.5-3.5L12,11V14z"/></svg> 이동</button>` : '';
+
+      const pdfLabel = hasPdf 
+        ? `<span class="status-pill on"><span class="pill-icon">📄</span> <span class="status-text">PDF ${sub.pdfName}</span></span>` 
+        : `<span class="status-pill"><span class="pill-icon">📄</span> <span class="status-text">PDF 미등록</span></span>`;
+        
+      const audioLabel = hasAudio 
+        ? `<span class="status-pill on"><span class="pill-icon">🎧</span> <span class="status-text">Audio ${sub.audioName}</span></span>` 
+        : `<span class="status-pill"><span class="pill-icon">🎧</span> <span class="status-text">Audio 미등록</span></span>`;
+
+      card.innerHTML = `
+        <div class="last-viewed-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <span>Last Viewed</span>
         </div>
-      `).join('');
-      drop.style.display = 'block';
-      drop.classList.add('active');
-  }
-  
-  function openViewerById(id) {
-      const idx = subjects.findIndex(s => s.id === id);
-      if(idx >= 0) handleClick(idx);
-  }
-
-  // 사이드바 로직 (Facility와 동일)
-  function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('active');
-      document.getElementById('sidebarOverlay').classList.toggle('active');
-  }
-  function renderSidebar() {
-      const content = document.getElementById('sidebarContent');
-      content.innerHTML = '';
-      const order = JSON.parse(localStorage.getItem('kac_index_order') || '[]');
-      
-      order.forEach(tid => {
-          if(!tid) return;
-          const style = JSON.parse(localStorage.getItem(`kac_style_${tid}`) || '{}');
-          const ms = JSON.parse(localStorage.getItem(`kac_menu_${tid}`) || '[]');
-          
-          let subHtml = '';
-          if(ms.length > 0) {
-              subHtml = `<div style="padding-left:20px; margin-bottom:10px;">`;
-              ms.forEach(m => {
-                  subHtml += `<div style="padding:8px 10px; font-size:13px; cursor:pointer; color:#64748b;" onclick="location.href='viewer_list.html?type=${tid}&menu=${encodeURIComponent(m.label)}&id=${m.dataId}'">${m.label}</div>`;
-              });
-              subHtml += `</div>`;
-          }
-
-          const item = document.createElement('div');
-          item.innerHTML = `
-            <div class="sb-item ${tid===type?'active':''}">
-                <span style="display:flex;align-items:center;gap:10px;">
-                    <span style="width:10px;height:10px;border-radius:50%;background:${style.color}"></span>
-                    ${style.name}
-                </span>
+        <div>
+            <div class="subj-title">${statusTag} ${sub.name}</div>
+            <div class="status-group">
+                ${pdfLabel}
+                ${audioLabel}
+                ${hasLink ? `<span class="status-pill link">🔗 <span class="status-text">Link 연결됨</span></span>` : ''}
             </div>
-            ${subHtml}
-          `;
-          content.appendChild(item);
-      });
+        </div>
+        <div class="ctrl-btns">${(isAdmin && !isPreview) ? `${moveBtn}<button class="btn-action" onclick="event.stopPropagation(); openUploadMenu(${i})">수정</button><button class="btn-action btn-del" onclick="event.stopPropagation(); deleteSubject(${i})">삭제</button>` : `<button class="btn-action" style="visibility:hidden">.</button>`}</div>`;
+      list.appendChild(card);
+    }
+
+    if(isAdmin && !isPreview) {
+      const addBtn = document.createElement('div');
+      addBtn.className = 'subject-card add-card';
+      addBtn.innerHTML = '+ 새로운 교육 과정(Subject) 추가';
+      addBtn.onclick = () => { const n = prompt("새 과목명을 입력하세요"); if(n) { subjects.push({ id: Date.now().toString(), name: n, active: true }); saveSubjects(); } };
+      list.appendChild(addBtn);
+    }
+    
+    // AutoOpen 처리 및 헤더 겹침 체크
+    checkAutoOpen();
+    checkHeaderOverlap();
+    
+    if(lastViewedId) {
+        const activeCard = document.querySelector('.subject-card.last-viewed');
+        if(activeCard) {
+             setTimeout(() => activeCard.scrollIntoView({ behavior: 'smooth', block: 'center' }), 500);
+        }
+    }
   }
-  
-  // 일괄등록(Batch) 관련 함수 복구
+
+  function openSettings() {
+    const adminBtn = document.getElementById('modalAdminBtn');
+    const batchGroup = document.getElementById('batchAdminGroup');
+    const previewBtn = document.getElementById('modalPreviewBtn');
+
+    if(isAdmin) {
+        adminBtn.textContent = "관리자 로그아웃";
+        adminBtn.className = "btn-modal btn-danger";
+        previewBtn.style.display = 'block';
+        batchGroup.style.display = 'block';
+    } else {
+        adminBtn.textContent = "관리자 로그인";
+        adminBtn.className = "btn-modal btn-primary";
+        previewBtn.style.display = 'none';
+        batchGroup.style.display = 'none';
+    }
+
+    if(isPreview) {
+        previewBtn.textContent = "미리보기 종료";
+        previewBtn.style.background = "#10b981";
+        previewBtn.style.color = "#fff";
+    } else {
+        previewBtn.textContent = "미리보기 시작";
+        previewBtn.style.background = "";
+        previewBtn.style.color = "";
+    }
+    document.getElementById('settingsModal').style.display = 'flex';
+  }
+
   function openBatchAddModal() {
     if(!isAdmin) return alert("관리자 권한이 필요합니다.");
     document.getElementById('batchModalTitle').textContent = "📋 일괄 자료 등록 (신규 추가)";
@@ -904,6 +1028,392 @@
     if(updatedCount > 0) { saveSubjects(); alert("수정되었습니다."); document.getElementById('batchModal').style.display = 'none'; }
   }
 
+  // 검색 인덱스 생성
+  let allSubjectsIndex = [];
+  function buildSearchIndex() {
+    allSubjectsIndex = [];
+    try {
+        const order = JSON.parse(localStorage.getItem('kac_index_order') || '[]');
+        order.forEach(t => {
+            if(!t) return;
+            const ms = JSON.parse(localStorage.getItem(`kac_menu_${t}`) || '[]');
+            const s = JSON.parse(localStorage.getItem(`kac_style_${t}`) || '{}');
+            ms.forEach(m => {
+                const subData = localStorage.getItem(`kac_subs_${t}_${m.dataId}`);
+                if(subData) {
+                    JSON.parse(subData).forEach(sub => {
+                        allSubjectsIndex.push({ 
+                            name: sub.name, type: t, code: s.code || t.substring(0,1), 
+                            menuName: m.label, menuId: m.dataId, subId: sub.id, 
+                            active: sub.active !== false, link: sub.link, color: s.color 
+                        });
+                    });
+                }
+            });
+        });
+    } catch(e) { console.error("Search Index Build Error", e); }
+  }
+
+  // 검색 기능 이벤트 리스너
+  if(searchInput) {
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.trim().toLowerCase();
+        if(query.length === 0) { searchDropdown.classList.remove('active'); return; }
+        const matches = allSubjectsIndex.filter(item => item.name.toLowerCase().includes(query) || item.menuName.toLowerCase().includes(query));
+        renderSearchResults(matches, query);
+    });
+    
+    searchInput.addEventListener('focus', () => { 
+        document.body.classList.add('search-mode');
+        sOverlay.classList.add('active');
+        if(searchInput.value.trim().length > 0) searchDropdown.classList.add('active'); 
+    });
+  }
+  
+  if(sOverlay) {
+    sOverlay.addEventListener('click', () => {
+        document.body.classList.remove('search-mode');
+        sOverlay.classList.remove('active');
+        searchDropdown.classList.remove('active');
+    });
+  }
+
+  function renderSearchResults(list, query) {
+    searchDropdown.innerHTML = ''; searchDropdown.classList.add('active');
+    if(list.length === 0) { searchDropdown.innerHTML = `<div style="padding:15px; text-align:center; opacity:0.6;">검색 결과 없음</div>`; return; }
+    list.forEach(item => {
+      const div = document.createElement('div'); div.className = 'result-item';
+      const highlightName = item.name.replace(new RegExp(`(${query})`, 'gi'), `<span style="color:${item.color}; font-weight:900;">$1</span>`);
+      div.innerHTML = `<div class="result-info"><div class="res-title">${highlightName}</div><div class="res-path">${item.type} > ${item.menuName}</div></div><div class="res-tag" style="background:${item.color}">${item.code}</div>`;
+      div.onclick = () => { 
+        if(!item.active && !isAdmin) { alert("현재 과정 개발중으로 사용 불가합니다."); return; } 
+        if(item.link) { window.open(item.link, '_blank'); return; }
+        location.href = `viewer_list.html?type=${item.type}&menu=${encodeURIComponent(item.menuName)}&id=${item.menuId}&autoOpen=${item.subId}`; 
+      };
+      searchDropdown.appendChild(div);
+    });
+  }
+
+  function checkAutoOpen() {
+    const autoId = params.get('autoOpen');
+    if(autoId && subjects.length > 0) { 
+        const targetIdx = subjects.findIndex(s => s.id === autoId); 
+        if(targetIdx !== -1) setTimeout(() => openViewer(targetIdx), 300); 
+    }
+  }
+
+  let dragSrcIndex = null;
+  function handleDragStart(e, index) { dragSrcIndex = index; e.target.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
+  function handleDragOver(e) { if (e.preventDefault) e.preventDefault(); e.target.closest('.subject-card').classList.add('drag-over'); e.dataTransfer.dropEffect = 'move'; return false; }
+  function handleDrop(e, index) { if (e.stopPropagation) e.stopPropagation(); e.target.closest('.subject-card').classList.remove('drag-over'); if (dragSrcIndex !== null && dragSrcIndex !== index) { const movedItem = subjects.splice(dragSrcIndex, 1)[0]; subjects.splice(index, 0, movedItem); saveSubjects(); } return false; }
+  function handleDragEnd(e) { document.querySelectorAll('.subject-card').forEach(card => { card.classList.remove('dragging'); card.classList.remove('drag-over'); }); }
+
+  function saveSubjects() { localStorage.setItem(`kac_subs_${type}_${menuId}`, JSON.stringify(subjects)); render(); }
+  
+  async function deleteSubject(i) {
+    const input = prompt("삭제하려면 관리자 비밀번호를 입력하세요.");
+    if (!input) return;
+
+    const inputHash = await sha256(input.toUpperCase());
+    const targetHash = globalSecurity.admin_pw;
+
+    if(inputHash === targetHash) {
+        if(confirm("정말 삭제하시겠습니까?")) {
+            subjects.splice(i, 1);
+            saveSubjects();
+            alert("삭제되었습니다.");
+        }
+    } else {
+        alert("비밀번호가 일치하지 않습니다.");
+    }
+  }
+
+  function saveFiles() {
+    const idx = currentEditIdx;
+    const name = document.getElementById('editSubjectName').value;
+    const isActiveStr = document.getElementById('editActiveStatus').value; 
+    
+    if(!name) return alert("과목명은 필수입니다.");
+    
+    subjects[idx].name = name;
+    subjects[idx].active = (isActiveStr === 'true');
+    subjects[idx].pdfName = document.getElementById('inputPdfName').value.trim();
+    subjects[idx].link = document.getElementById('inputLinkUrl').value.trim();
+    subjects[idx].audioName = document.getElementById('inputAudioName').value.trim();
+    
+    saveSubjects();
+    document.getElementById('uploadModal').style.display = 'none';
+  }
+
+  function openUploadMenu(idx) { 
+    currentEditIdx = idx; 
+    const sub = subjects[idx];
+    document.getElementById('editSubjectName').value = sub.name; 
+    document.getElementById('editActiveStatus').value = (sub.active !== false).toString();
+    document.getElementById('inputPdfName').value = sub.pdfName || '';
+    document.getElementById('inputLinkUrl').value = sub.link || '';
+    document.getElementById('inputAudioName').value = sub.audioName || '';
+    document.getElementById('uploadModal').style.display = 'flex'; 
+  }
+
+  let movingSubjectIndex = -1;
+  function openMoveModal(idx) {
+    movingSubjectIndex = idx;
+    const select = document.getElementById('moveTargetSelect');
+    select.innerHTML = '<option value="">-- 이동할 메뉴 선택 --</option>';
+    const types = JSON.parse(localStorage.getItem('kac_index_order') || '[]');
+    
+    types.forEach(t => {
+      if(!t) return;
+      const menus = JSON.parse(localStorage.getItem(`kac_menu_${t}`) || '[]');
+      const style = JSON.parse(localStorage.getItem(`kac_style_${t}`) || '{}');
+      if(menus.length > 0) {
+        const group = document.createElement('optgroup');
+        group.label = style.name || t;
+        menus.forEach(m => {
+          if (t === type && m.dataId === menuId) return;
+          const option = document.createElement('option');
+          option.value = `${t}|${m.dataId}`;
+          option.textContent = m.label;
+          group.appendChild(option);
+        });
+        if (group.children.length > 0) select.appendChild(group);
+      }
+    });
+    document.getElementById('moveModal').style.display = 'flex';
+  }
+
+  function executeMove() {
+    const value = document.getElementById('moveTargetSelect').value;
+    if(!value) return alert("선택해주세요.");
+    const [targetType, targetMenuId] = value.split('|');
+    const subjectToMove = subjects[movingSubjectIndex];
+    const targetKey = `kac_subs_${targetType}_${targetMenuId}`;
+    const targetSubjects = JSON.parse(localStorage.getItem(targetKey) || '[]');
+    targetSubjects.push(subjectToMove);
+    localStorage.setItem(targetKey, JSON.stringify(targetSubjects));
+    subjects.splice(movingSubjectIndex, 1);
+    saveSubjects();
+    alert("이동되었습니다.");
+    document.getElementById('moveModal').style.display = 'none';
+  }
+
+  async function openViewer(idx) {
+    document.querySelectorAll('.subject-card').forEach(c => c.classList.remove('last-viewed'));
+    viewingIndex = idx; 
+
+    const sub = subjects[idx];
+    let pdfName = sub.pdfName;
+    
+    if(!pdfName) return alert("등록된 PDF 파일이 없습니다.");
+    if (!pdfName.toLowerCase().endsWith('.pdf')) pdfName += '.pdf';
+
+    const pdfUrl = `files/${pdfName}`;
+    const audioUrl = sub.audioName ? `files/${sub.audioName}` : null;
+
+    overlay.style.display = 'block';
+    
+    try {
+      if (overlay.requestFullscreen) await overlay.requestFullscreen();
+      else if (overlay.webkitRequestFullscreen) await overlay.webkitRequestFullscreen();
+    } catch(e) { console.log(e); }
+
+    document.getElementById('vTitle').textContent = sub.name;
+    
+    try {
+        const task = pdfjsLib.getDocument(pdfUrl);
+        pdfDoc = await task.promise;
+        viewerBody.innerHTML = ''; viewerBody.appendChild(canvasContainer); canvasContainer.innerHTML = '';
+        pageNum = 1; renderPage('none');
+    } catch(e) {
+        alert("PDF 로드 실패: " + pdfUrl + "\n파일 경로를 확인하세요.");
+        closeViewer();
+        return;
+    }
+    
+    const audioBtn = document.getElementById('audioBtn');
+    if(audioUrl) {
+        audioPlayer.src = audioUrl;
+        audioPlayer.load();
+        audioBtn.classList.remove('disabled');
+    } else {
+        audioPlayer.src = "";
+        audioBtn.classList.add('disabled');
+    }
+    updateIconState(); 
+  }
+
+  function toggleFullScreen(e) {
+    e.stopPropagation();
+    if (!document.fullscreenElement) document.getElementById('pdfOverlay').requestFullscreen().catch(err => {});
+    else if (document.exitFullscreen) document.exitFullscreen();
+  }
+
+  function updateIconState() {
+    const isFs = !!document.fullscreenElement;
+    document.getElementById('iconExpand').style.display = isFs ? 'none' : 'block';
+    document.getElementById('iconCompress').style.display = isFs ? 'block' : 'none';
+  }
+  document.addEventListener('fullscreenchange', updateIconState);
+
+  function closeViewer() { 
+    if (document.fullscreenElement) document.exitFullscreen(); 
+    overlay.style.display = 'none'; 
+    document.getElementById('audioPanel').classList.remove('open'); 
+    audioPlayer.pause(); 
+    
+    if(viewingIndex !== -1) {
+        const card = document.getElementById(`card-${viewingIndex}`);
+        if(card) {
+            card.classList.add('last-viewed');
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+  }
+
+  function downloadPdf(e) { 
+      e.stopPropagation(); 
+      if(pdfDoc) {
+          const sub = subjects[viewingIndex];
+          let pdfName = sub.pdfName;
+          if (!pdfName.toLowerCase().endsWith('.pdf')) pdfName += '.pdf';
+          const a = document.createElement('a'); 
+          a.href = `files/${pdfName}`; 
+          a.download = pdfName; 
+          a.click(); 
+      }
+  }
+  
+  function toggleAudioPanel(e) { 
+    if(document.getElementById('audioBtn').classList.contains('disabled')) return;
+    e.stopPropagation(); 
+    document.getElementById('audioPanel').classList.toggle('open'); 
+  }
+
+  async function renderPage(dir) {
+    if(isRendering) return; isRendering = true;
+    if(pdfDoc) { document.getElementById('pageFill').style.width = `${((pageNum-1)/(pdfDoc.numPages-1))*100}%`; document.getElementById('progressFlag').textContent = `${pageNum} / ${pdfDoc.numPages}`; }
+    
+    if(canvasContainer.firstChild) {
+        canvasContainer.firstChild.classList.remove('slide-active');
+    }
+
+    const newCanvas = document.createElement('canvas'); 
+    newCanvas.className = 'slide-enter';
+    
+    const ctx = newCanvas.getContext('2d');
+    const page = await pdfDoc.getPage(pageNum);
+    
+    // [중요] 뷰포트 스케일 계산 로직 (모바일 vs 데스크탑 분기)
+    const isMobile = window.innerWidth <= 768;
+    let viewport;
+    
+    if (isMobile) {
+        // 모바일: 너비 기준 맞춤 + 고해상도 (1.5배) + 스크롤 허용
+        const unscaledViewport = page.getViewport({ scale: 1 });
+        const scale = (window.innerWidth / unscaledViewport.width) * 1.5; 
+        viewport = page.getViewport({ scale: scale });
+    } else {
+        // PC: 화면 높이에 딱 맞춤 (스크롤 없음)
+        const unscaledViewport = page.getViewport({ scale: 1 });
+        const scaleX = window.innerWidth / unscaledViewport.width;
+        const scaleY = window.innerHeight / unscaledViewport.height;
+        const baseScale = Math.min(scaleX, scaleY) * 0.98; // 여백 약간
+        viewport = page.getViewport({ scale: baseScale }); 
+    }
+    
+    newCanvas.width = viewport.width; newCanvas.height = viewport.height;
+    
+    await page.render({ canvasContext: ctx, viewport }).promise;
+    
+    canvasContainer.innerHTML = ''; 
+    canvasContainer.appendChild(newCanvas);
+    
+    requestAnimationFrame(() => {
+        newCanvas.classList.add('slide-active');
+    });
+
+    isRendering = false;
+  }
+
+  function nextPage() { if(pdfDoc && pageNum < pdfDoc.numPages) { pageNum++; renderPage('next'); } }
+  function prevPage() { if(pdfDoc && pageNum > 1) { pageNum--; renderPage('prev'); } }
+  
+  function handleMouseNav(e) { 
+    if(isDragging) return; 
+    if(e.button === 0) nextPage(); 
+    if(e.button === 2) prevPage(); 
+  }
+
+  if(hitArea) {
+      hitArea.addEventListener('mousedown', (e) => { e.preventDefault(); e.stopPropagation(); isDragging = true; hitArea.classList.add('dragging'); updateProgress(e); });
+      window.addEventListener('mousemove', (e) => { if(!isDragging || !pdfDoc) return; updateProgress(e); });
+      window.addEventListener('mouseup', () => { if(isDragging) { isDragging = false; hitArea.classList.remove('dragging'); renderPage('none'); } });
+  }
+
+  function updateProgress(e) {
+    const rect = hitArea.getBoundingClientRect(); const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+    const newPage = Math.max(1, Math.min(Math.round((x/rect.width) * (pdfDoc.numPages - 1)) + 1, pdfDoc.numPages));
+    if(newPage !== pageNum) { pageNum = newPage; document.getElementById('pageFill').style.width = `${((pageNum-1)/(pdfDoc.numPages-1))*100}%`; document.getElementById('progressFlag').textContent = `${pageNum} / ${pdfDoc.numPages}`; renderPage('none'); }
+  }
+
+  document.getElementById('playBtn').onclick = (e) => { e.stopPropagation(); if(audioPlayer.paused) { audioPlayer.play(); document.getElementById('playBtn').textContent = "⏸"; } else { audioPlayer.pause(); document.getElementById('playBtn').textContent = "▶"; } };
+  audioPlayer.ontimeupdate = () => { document.getElementById('audioProgress').value = (audioPlayer.currentTime / audioPlayer.duration) * 100 || 0; const m = Math.floor(audioPlayer.currentTime/60), s = Math.floor(audioPlayer.currentTime%60); document.getElementById('audioTime').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; };
+  document.getElementById('audioProgress').oninput = (e) => { audioPlayer.currentTime = (e.target.value / 100) * audioPlayer.duration; };
+  document.getElementById('volumeControl').oninput = (e) => { audioPlayer.volume = e.target.value; };
+  
+  window.onkeydown = (e) => { 
+    if(overlay.style.display === 'block') { 
+        if(e.key === "ArrowRight") nextPage(); 
+        if(e.key === "ArrowLeft") prevPage(); 
+        if(e.key === "Escape") closeViewer();
+    } 
+  };
+
+  // [수정] 모바일 화면 터치 시 닫기 버튼 3초간 노출 로직
+  let touchStartY = 0;
+  let touchEndY = 0;
+  let closeBtnTimeout = null;
+  const minSwipeDistance = 50; 
+  const mobileCloseBtn = document.querySelector('.mobile-close-btn');
+
+  function showMobileCloseBtn() {
+      if (!mobileCloseBtn || window.innerWidth > 768) return;
+      
+      mobileCloseBtn.classList.add('visible');
+      
+      if(closeBtnTimeout) clearTimeout(closeBtnTimeout);
+      
+      closeBtnTimeout = setTimeout(() => {
+          mobileCloseBtn.classList.remove('visible');
+      }, 2500); // 2.5초 후 사라짐
+  }
+
+  overlay.addEventListener('touchstart', e => {
+      touchStartY = e.changedTouches[0].screenY;
+      showMobileCloseBtn(); // 터치 시작 시 버튼 보이기
+  }, {passive: true});
+
+  overlay.addEventListener('touchend', e => {
+      touchEndY = e.changedTouches[0].screenY;
+      handleSwipe();
+  }, {passive: true});
+  
+  // 클릭시에도 버튼 보이기 (PDF 넘기기 클릭 등)
+  overlay.addEventListener('click', () => {
+      showMobileCloseBtn();
+  });
+
+  function handleSwipe() {
+      const distance = touchStartY - touchEndY;
+      if (distance > minSwipeDistance) {
+          nextPage();
+      } else if (distance < -minSwipeDistance) {
+          prevPage();
+      }
+  }
+  
+  // 모든 설정이 끝난 후 초기화 실행
   init();
 </script>
 </body>
