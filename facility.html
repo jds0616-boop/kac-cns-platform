@@ -1,3 +1,5 @@
+--- START OF FILE facility.html ---
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -205,7 +207,8 @@
       display: flex; align-items: center; justify-content: center; gap: 8px;
       transition: 0.2s;
   }
-  .card-home-btn:hover {
+  /* [수정 1] 카드 전체 호버 시 하단 버튼 색상 채우기 */
+  .root-card-integrated:hover .card-home-btn {
       background: var(--theme-color);
       color: #fff;
   }
@@ -214,7 +217,9 @@
       width: 80px; height: 80px; border-radius: 25px;
       background: var(--icon-bg); border: 2px solid var(--icon-border);
       display: flex; align-items: center; justify-content: center;
-      font-size: 32px; font-weight: 900; color: var(--theme-color);
+      /* [수정 2] 글자 크기 대폭 확대 (32px -> 56px) */
+      font-size: 56px; 
+      font-weight: 900; color: var(--theme-color);
   }
   .root-title { font-size: 20px; font-weight: 800; word-break: keep-all; line-height: 1.3; text-align: center; }
 
@@ -242,23 +247,6 @@
       margin-bottom: 50px;
   }
   
-  /* 버스 라인과 루트 연결 (높이 정밀 조정) */
-  /* 카드 높이가 커졌으므로(홈버튼 포함) 연결점 높이도 재조정 필요 */
-  /* 카드 전체 높이 약 250px -> 중간점 약 125px */
-  /* Sticky(100) + Margin(50) + 125 = 275px 지점 */
-  /* Branch Bus 시작점 Top(20) 기준 약 255px */
-  /* 하지만 삼각형이 가리키는 곳에 딱 맞아야 하므로 시각적 보정 */
-  .branch-bus::before {
-      content: ''; position: absolute; 
-      top: 175px; /* 삼각형 꼭짓점 위치에 맞춤 */
-      left: 0;
-      width: 20px; /* 삼각형 끝에서 기둥까지 거리 */
-      height: 8px; 
-      background: transparent; /* 선 대신 삼각형이 연결하므로 투명 처리하거나 삭제 가능 */
-      /* 여기서는 삼각형이 직접 기둥을 찌르는 디자인이므로 가로선 삭제 */
-      display: none; 
-  }
-
   /* [우측] 리스트 섹션 */
   .list-section {
       display: flex; flex-direction: column; gap: 20px;
@@ -285,6 +273,9 @@
       box-shadow: 0 8px 25px rgba(var(--theme-rgb), 0.15);
       z-index: 20; 
   }
+  /* [추가] 드래그 앤 드롭 시각 효과 */
+  .menu-bar.dragging { opacity: 0.4; border: 2px dashed var(--theme-color); background: #f8fafc; }
+  .menu-bar.drag-over { border-top: 3px solid var(--theme-color); transform: translateY(-2px); }
   
   /* Last Viewed 뱃지 */
   .last-viewed-icon {
@@ -537,6 +528,22 @@
 
 </div>
 
+<!-- [추가] 메뉴 이동 모달 -->
+<div id="moveMenuModal" class="modal-overlay" style="display:none;">
+  <div class="modal-card">
+    <h3>📂 메뉴 이동</h3>
+    <p style="font-size:13px; color:#64748b; margin-bottom:15px;">이 메뉴를 어느 시설로 보내시겠습니까?</p>
+    <div class="setting-group">
+        <label class="setting-label">이동할 목적지 시설</label>
+        <select id="moveTargetSelect" class="setting-input" style="cursor:pointer;"></select>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:20px;">
+        <button class="btn-modal btn-primary" onclick="executeMoveMenu()">이동 확인</button>
+        <button class="btn-modal" style="background:#e2e8f0; color:#333" onclick="closeModal('moveMenuModal')">취소</button>
+    </div>
+  </div>
+</div>
+
 <!-- 설정 모달 -->
 <div id="settingsModal" class="modal-overlay" style="display:none;">
   <div class="modal-card">
@@ -619,6 +626,7 @@
   let isPreview = localStorage.getItem('kac_preview_active') === '1';
   let menus = [];
   let currentEditIdx = -1;
+  let dragSrcIndex = null; // [추가] 드래그 소스 인덱스
   const storedHash = "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c";
 
   async function init() {
@@ -715,6 +723,38 @@
           bar.className = 'menu-bar';
           bar.id = `menu-${menu.dataId}`;
           
+          // [추가] 관리자 모드일 때 드래그 앤 드롭 이벤트 연결
+          if(isAdmin && !isPreview) {
+              bar.setAttribute('draggable', 'true');
+              bar.ondragstart = (e) => {
+                  dragSrcIndex = idx;
+                  e.target.classList.add('dragging');
+                  e.dataTransfer.effectAllowed = 'move';
+              };
+              bar.ondragover = (e) => {
+                  e.preventDefault(); 
+                  e.dataTransfer.dropEffect = 'move';
+                  bar.classList.add('drag-over');
+              };
+              bar.ondragleave = () => {
+                  bar.classList.remove('drag-over');
+              };
+              bar.ondrop = (e) => {
+                  e.preventDefault();
+                  bar.classList.remove('drag-over');
+                  if (dragSrcIndex !== null && dragSrcIndex !== idx) {
+                      const movedItem = menus.splice(dragSrcIndex, 1)[0];
+                      menus.splice(idx, 0, movedItem);
+                      localStorage.setItem(`kac_menu_${type}`, JSON.stringify(menus));
+                      render();
+                  }
+              };
+              bar.ondragend = () => {
+                  bar.classList.remove('dragging');
+                  document.querySelectorAll('.menu-bar').forEach(b => b.classList.remove('drag-over'));
+              };
+          }
+
           bar.onmouseenter = () => {
               const rect = bar.getBoundingClientRect();
               const isNearTop = rect.top < 200; 
@@ -771,8 +811,10 @@
 
           let adminHtml = '';
           if(isAdmin && !isPreview) {
+              // [수정] '이동' 버튼 추가
               adminHtml = `
                 <div class="admin-btns admin-only" onclick="event.stopPropagation()">
+                   <button class="btn-xs" style="color:#2563eb; border-color:#bfdbfe;" onclick="openMoveMenu(${idx})">이동</button>
                    <button class="btn-xs" onclick="openEdit(${idx})">수정</button>
                    <button class="btn-xs" style="color:#ef4444" onclick="deleteMenu(${idx})">삭제</button>
                 </div>
@@ -785,7 +827,7 @@
 
           bar.innerHTML = `
               <div class="last-viewed-icon">
-                <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
                 Last Viewed
               </div>
               <div class="menu-pill-icon">${iconInner}</div>
@@ -805,6 +847,60 @@
           addBtn.onclick = () => openEdit('NEW');
           container.appendChild(addBtn);
       }
+  }
+  
+  // [추가] 메뉴 이동 모달 열기
+  function openMoveMenu(idx) {
+      currentEditIdx = idx;
+      const select = document.getElementById('moveTargetSelect');
+      select.innerHTML = '';
+      
+      const order = JSON.parse(localStorage.getItem('kac_index_order') || '[]');
+      let hasOption = false;
+
+      order.forEach(tid => {
+          if(!tid || tid === type) return; 
+          const style = JSON.parse(localStorage.getItem(`kac_style_${tid}`) || '{}');
+          const option = document.createElement('option');
+          option.value = tid;
+          option.textContent = style.name || tid;
+          select.appendChild(option);
+          hasOption = true;
+      });
+
+      if(!hasOption) {
+          alert("이동할 다른 시설 카테고리가 없습니다.");
+          return;
+      }
+      document.getElementById('moveMenuModal').style.display = 'flex';
+  }
+
+  // [추가] 메뉴 이동 실행
+  function executeMoveMenu() {
+      const targetType = document.getElementById('moveTargetSelect').value;
+      if(!targetType) return;
+
+      const itemToMove = menus[currentEditIdx]; 
+      
+      menus.splice(currentEditIdx, 1);
+      localStorage.setItem(`kac_menu_${type}`, JSON.stringify(menus));
+
+      const targetMenus = JSON.parse(localStorage.getItem(`kac_menu_${targetType}`) || '[]');
+      targetMenus.push(itemToMove);
+      localStorage.setItem(`kac_menu_${targetType}`, JSON.stringify(targetMenus));
+
+      const oldKey = `kac_subs_${type}_${itemToMove.dataId}`;
+      const newKey = `kac_subs_${targetType}_${itemToMove.dataId}`;
+      const subsData = localStorage.getItem(oldKey);
+      
+      if(subsData) {
+          localStorage.setItem(newKey, subsData);
+          localStorage.removeItem(oldKey);
+      }
+
+      alert(`[${itemToMove.label}] 메뉴가 이동되었습니다.`);
+      closeModal('moveMenuModal');
+      render();
   }
 
   function openEdit(idx) {
