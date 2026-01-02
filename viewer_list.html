@@ -40,51 +40,84 @@
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
   body { background: var(--bg-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: var(--text-main); transition: 0.3s; }
 
-  /* 헤더 스타일 */
+  /* === 헤더 스타일 (Facility와 동일하게 복구) === */
   header { 
     height: var(--header-h); background: var(--navy); 
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 40px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-    z-index: 1000; flex-shrink: 0; gap: 20px; position: relative; transition: 0.3s;
+    display: flex; align-items: center; justify-content: space-between; 
+    padding: 0 20px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.15); 
+    z-index: 2000; flex-shrink: 0; 
+    position: fixed; top: 0; left: 0; width: 100%;
   }
   
-  .header-left { display: flex; align-items: center; min-width: 250px; z-index: 10; white-space: nowrap; transition: opacity 0.2s; }
-  .header-right { display: flex; align-items: center; gap: 15px; min-width: 250px; justify-content: flex-end; z-index: 10; }
+  .header-left { display: flex; align-items: center; gap: 15px; z-index: 10; min-width: 0; flex-shrink: 0; }
+  .hamburger-btn { cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; flex-shrink: 0; }
+  .hamburger-btn:hover { background: rgba(255,255,255,0.1); }
+  .hamburger-btn svg { width: 24px; height: 24px; fill: #fff; }
+  .logo-text { font-size: 20px; font-weight: 800; cursor: pointer; white-space: nowrap; }
   
-  .logo-text { font-size: 20px; font-weight: 800; white-space: nowrap; cursor: pointer; transition: opacity 0.2s; margin-right: 15px; }
-  .logo-text:hover { opacity: 0.8; }
-  
-  /* 브레드크럼 스타일 개선 */
-  .breadcrumb { display: flex; align-items: center; color: #94a3b8; font-weight: 500; font-size: 15px; gap: 8px; }
-  .crumb-item { display: flex; align-items: center; gap: 8px; }
+  /* 브레드크럼 (기존 회색조 복구) */
+  .breadcrumb { 
+      display: none; align-items: center; 
+      color: #94a3b8; font-weight: 500; font-size: 16px; 
+      margin-left: 10px; white-space: nowrap; 
+  }
+  @media(min-width: 1024px) { .breadcrumb { display: flex; } }
+  .breadcrumb span { display: flex; align-items: center; }
   .crumb-link { cursor: pointer; transition: color 0.2s; }
-  .crumb-link:hover { color: #fff; text-decoration: underline; }
-  .crumb-current { color: #fff; font-weight: 700; cursor: default; }
-  .crumb-divider { opacity: 0.5; font-size: 12px; }
+  .crumb-link:hover { color: #fff; }
 
-  .header-center { position: absolute; left: 50%; transform: translateX(-50%); width: 500px; max-width: 100%; z-index: 20; transition: width 0.3s; }
-  .header-search {
-    width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 50px; padding: 10px 30px; color: #fff; font-size: 14px; font-weight: 600;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'%3E%3Cpath d='M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: 20px center; background-size: 18px; padding-left: 50px; transition: 0.3s;
+  /* 중앙 검색창 */
+  .header-center { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 400px; max-width: 40vw; z-index: 2001; }
+  .header-search { 
+    width: 100%; padding: 12px 20px 12px 45px; border-radius: 50px; 
+    border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.15); 
+    color: #fff; font-size: 15px; outline: none; transition: 0.3s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'%3E%3Cpath d='M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z'/%3E%3C/svg%3E"); 
+    background-repeat: no-repeat; background-position: 15px center; background-size: 20px;
   }
-  .header-search:focus { outline: none; background-color: var(--navy); border-color: rgba(255,255,255,0.5); }
-  .search-dropdown { position: absolute; top: 110%; left: 0; width: 100%; background: var(--bg-card); border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 1px solid var(--border-card); overflow: hidden; display: none; max-height: 400px; overflow-y: auto; }
+  .header-search:focus { background: rgba(255,255,255,1); color: #000; border-color: #fff; box-shadow: 0 0 30px rgba(255,255,255,0.3); }
+  
+  .search-dropdown { 
+      position: absolute; top: calc(100% + 8px); left: 0; width: 100%; 
+      background: var(--bg-card); border-radius: 15px; color: var(--text-main);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.4); border: 1px solid var(--border-card); 
+      overflow: hidden; display: none; max-height: 400px; overflow-y: auto; z-index: 2002; 
+  }
   .search-dropdown.active { display: block; }
+  .result-item { padding: 12px 20px; cursor: pointer; border-bottom: 1px solid var(--btn-border); display: flex; justify-content: space-between; align-items: center; transition:0.2s; }
+  .result-item:hover { background: rgba(var(--theme-rgb), 0.05); }
 
+  /* 우측 헤더 */
+  .header-right { display: flex; align-items: center; gap: 15px; z-index: 10; flex-shrink: 0; }
+  .theme-toggle { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); margin-right: 10px; }
+  .theme-btn { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; opacity: 0.5; }
+  .theme-btn.active { background: #fff; opacity: 1; color: var(--navy); }
+  .settings-btn { display: flex; padding: 8px; width: 34px; height: 34px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.3s; color: #cbd5e1; }
+  .settings-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+  .kac-logo-img { height: 30px; width: auto; display: block; object-fit: contain; }
+
+  /* 사이드바 (Facility와 동일) */
+  .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 3000; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(2px); }
+  .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
+  .sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background: var(--bg-card); z-index: 3001; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; border-right: 1px solid var(--btn-border); }
+  .sidebar.active { left: 0; }
+  .sidebar-header { height: var(--header-h); display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--btn-border); font-weight: 800; font-size: 18px; justify-content: space-between; color: var(--text-main); }
+  .sidebar-content { flex: 1; overflow-y: auto; padding: 10px; }
+  .sb-item { padding: 12px 15px; cursor: pointer; border-radius: 10px; color: var(--text-main); font-weight: 600; transition: 0.2s; display: flex; align-items: center; justify-content: space-between; font-size: 14px; }
+  .sb-item:hover { background: var(--btn-bg); color: #2563eb; }
+  .sb-item.active { background: #eff6ff; border-left: 4px solid #2563eb; color: #2563eb; }
+  
   /* === [세로형 트리 레이아웃] === */
   .mindmap-container {
-      flex: 1;
       display: flex;
       flex-direction: column;
       width: 100%;
-      height: 100%;
+      height: 100vh;
       overflow-y: auto;
       overflow-x: hidden;
       align-items: center;
-      padding-bottom: 100px;
-      position: relative;
+      padding-top: calc(var(--header-h) + 40px);
+      padding-bottom: 150px; /* 하단 네비게이션 공간 */
   }
 
   .mindmap-wrapper {
@@ -93,23 +126,27 @@
       align-items: center;
       width: 100%;
       max-width: 900px;
-      padding-top: 50px;
       transform: translateX(var(--layout-x-pos)); /* 가로 이동 */
       transition: transform 0.3s ease;
+      position: relative;
   }
 
-  /* 1. Root Card (상단 시설명) */
-  .root-section { margin-bottom: 0px; z-index: 2; position: relative; }
+  /* 1. Root Card (상단 대제목) - Facility 스타일 계승 */
   .root-card {
       background: var(--bg-card);
       border: 3px solid var(--theme-color);
       border-radius: 20px;
       padding: 20px 40px;
-      display: flex; align-items: center; justify-content: space-between; gap: 30px;
+      display: flex; align-items: center; gap: 20px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      min-width: 400px;
-      position: relative;
+      min-width: 350px;
+      justify-content: center;
+      position: relative; z-index: 2;
+      cursor: pointer; /* 클릭 가능 표시 */
+      transition: transform 0.2s;
   }
+  .root-card:hover { transform: scale(1.02); }
+  
   .root-icon-box {
       width: 50px; height: 50px; border-radius: 15px;
       background: rgba(var(--theme-rgb), 0.1); color: var(--theme-color);
@@ -117,25 +154,16 @@
       font-size: 24px; font-weight: 800; border: 1px solid rgba(var(--theme-rgb), 0.2);
   }
   .root-title { font-size: 22px; font-weight: 800; color: var(--text-main); }
-  
-  .home-btn {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 13px; font-weight: 700; color: var(--theme-color);
-      cursor: pointer; padding: 8px 15px; border-radius: 50px;
-      background: rgba(var(--theme-rgb), 0.05); transition: 0.2s;
-  }
-  .home-btn:hover { background: var(--theme-color); color: #fff; }
 
   /* 2. Branch Bus (중앙 연결선) */
   .branch-bus {
       width: 4px;
       background: rgba(var(--theme-rgb), 0.3);
       flex-grow: 1;
-      margin-left: -350px; /* 카드 좌측으로 라인 배치 */
       position: absolute;
-      top: 100px; bottom: 50px; left: 50%;
+      top: 80px; bottom: 40px; left: 60px; /* 위치 정밀 조정 */
       border-radius: 4px;
-      z-index: 1;
+      z-index: 0;
   }
 
   /* 3. List Section (과목 리스트) */
@@ -143,41 +171,37 @@
       display: flex; flex-direction: column; gap: 20px;
       width: 100%;
       padding-top: 40px;
-      padding-left: 60px; /* 라인과의 거리 */
+      padding-left: 100px; /* 라인과의 거리 */
       z-index: 2;
   }
 
-  /* 리스트 카드 스타일 */
-  .subject-card {
-      background: var(--bg-card);
-      border-radius: 18px;
-      padding: 20px 25px;
-      box-shadow: var(--shadow);
-      border: 2px solid transparent; /* 기본 테두리 투명 */
-      display: flex; align-items: center; justify-content: space-between;
-      position: relative;
-      transition: 0.2s;
-      cursor: pointer;
-      min-height: 80px;
+  /* 리스트 카드 스타일 (기존 디자인 복구) */
+  .subject-card { 
+    background: var(--bg-card); width: 100%; padding: 25px 35px; border-radius: 18px; 
+    box-shadow: var(--shadow); 
+    border: 2px solid transparent; /* 기본 테두리 투명 */
+    display: flex; justify-content: space-between; align-items: center; transition: 0.3s;
+    cursor: pointer; color: var(--text-main);
+    position: relative;
   }
 
-  /* [요청사항] 마우스 오버 시 녹색 테두리 */
-  .subject-card:hover {
-      border-color: #10b981;
-      transform: translateX(5px);
-      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.15);
+  /* Hover 시 녹색 테두리 */
+  .subject-card:hover { 
+      border-color: #10b981; 
+      transform: translateX(5px); 
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.15); 
   }
-
-  /* 좌측 연결선 (Branch) */
+  
+  /* [트리 구조] 좌측 연결 점과 선 */
   .subject-card::before {
       content: ''; position: absolute;
-      left: -62px; top: 50%;
-      width: 60px; height: 2px;
+      left: -42px; top: 50%;
+      width: 40px; height: 2px;
       background: rgba(var(--theme-rgb), 0.3);
   }
   .subject-card::after {
       content: ''; position: absolute;
-      left: -66px; top: 50%; transform: translateY(-50%);
+      left: -46px; top: 50%; transform: translateY(-50%);
       width: 10px; height: 10px; border-radius: 50%;
       background: var(--theme-color);
       border: 2px solid var(--bg-main);
@@ -188,76 +212,55 @@
       border-color: #10b981;
       box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
   }
-  .last-viewed-badge {
-      position: absolute; right: -100px; top: 50%; transform: translateY(-50%);
-      background: #10b981; color: #fff; font-size: 11px; font-weight: 800;
-      padding: 5px 10px; border-radius: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      display: none; animation: fadeIn 0.3s;
-  }
-  .subject-card.last-viewed .last-viewed-badge { display: block; }
-
-  /* 카드 내부 컨텐츠 */
-  .subj-info { display: flex; align-items: center; gap: 15px; flex: 1; }
   
-  /* 알약 뱃지 (Pill) */
-  .type-pill {
-      background: rgba(var(--theme-rgb), 0.1); color: var(--theme-color);
-      font-size: 12px; font-weight: 800; padding: 6px 12px; border-radius: 8px;
-      min-width: 60px; text-align: center; white-space: nowrap;
-  }
+  /* 카드 내부 컨텐츠 (기존 심플 스타일) */
+  .subj-title { font-size: 18px; font-weight: 800; color: var(--title-color); display: flex; align-items: center; gap: 8px; }
   
-  .subj-title { 
-      font-size: 18px; font-weight: 700; color: var(--text-main); 
-      display: flex; align-items: center; gap: 8px; 
-  }
-  
-  /* [요청사항] 외부 링크 아이콘 */
+  /* 외부 링크 아이콘 */
   .ext-link-icon { color: #64748b; width: 16px; height: 16px; }
 
-  .meta-info { display: flex; gap: 8px; }
-  .status-pill { font-size: 11px; padding: 4px 8px; border-radius: 6px; background: var(--pill-bg); color: var(--pill-text); border: 1px solid var(--pill-border); font-weight: 600; display: flex; align-items: center; gap: 4px; }
+  /* 상태 뱃지 (기존 녹색/파란색) */
+  .status-group { display: flex; gap: 8px; margin-top: 0; }
+  .status-pill { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 6px; background: var(--pill-bg); color: var(--pill-text); border: 1px solid var(--pill-border); display: flex; align-items: center; gap: 4px; }
   .status-pill.on { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
   body.dark-mode .status-pill.on { background: rgba(22, 163, 74, 0.2); color: #86efac; border-color: #166534; }
+  .status-pill.link { background: #dbeafe; color: #1e40af; border-color: #bfdbfe; }
+  body.dark-mode .status-pill.link { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border-color: #1e40af; }
+
+  /* 하단 네비게이션 바 (기존 복구) */
+  .bottom-nav { 
+    position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); 
+    background: var(--navy); padding: 15px 45px; border-radius: 100px; 
+    display: flex; gap: 40px; align-items: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000; border: 1px solid rgba(255,255,255,0.1); 
+  }
+  .nav-item { 
+    color: #fff; cursor: pointer; font-size: 16px; font-weight: 700; transition: 0.3s; opacity: 0.8; 
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-item:hover { opacity: 1; transform: translateY(-3px); }
+  .nav-icon { width: 24px; height: 24px; fill: currentColor; }
 
   /* 관리자 버튼 */
   .ctrl-btns { display: flex; gap: 5px; opacity: 0; transition: 0.2s; }
   .subject-card:hover .ctrl-btns { opacity: 1; }
   .btn-xs { padding: 5px 10px; font-size: 11px; border-radius: 6px; border: 1px solid var(--btn-border); background: var(--btn-card); cursor: pointer; }
   .btn-del { color: #ef4444; border-color: #fee2e2; }
-
-  /* 추가 버튼 */
-  .add-card {
-      border: 2px dashed #cbd5e1; background: transparent;
-      justify-content: center; color: #94a3b8; font-weight: 700;
-      box-shadow: none;
-  }
-  .add-card:hover { border-color: var(--theme-color); color: var(--theme-color); transform: none; box-shadow: none; }
-  .add-card::before, .add-card::after { display: none; }
-
+  
   /* 모바일 반응형 */
   @media (max-width: 768px) {
       .mindmap-wrapper { padding: 20px; transform: none !important; width: 100%; }
-      .root-card { min-width: 100%; flex-direction: column; padding: 20px; gap: 15px; text-align: center; }
       .branch-bus { display: none; } /* 모바일에선 라인 숨김 */
       .list-section { padding-left: 0; gap: 15px; }
       .subject-card::before, .subject-card::after { display: none; }
-      .last-viewed-badge { right: 10px; top: 10px; transform: none; }
       .header-center { display: none; }
+      .bottom-nav { width: 90%; bottom: 20px; padding: 12px 0; justify-content: center; }
   }
-  
-  /* 기타 필수 스타일 */
-  .theme-toggle { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); }
-  .theme-btn { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0.5; }
-  .theme-btn.active { background: #fff; opacity: 1; color: var(--navy); }
-  .settings-btn { display: flex; padding: 8px; width: 34px; height: 34px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); align-items: center; justify-content: center; cursor: pointer; color: #cbd5e1; }
-  
+
   /* 모달 스타일 */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none; align-items: center; justify-content: center; }
   .modal-card { background: var(--bg-card); padding: 30px; border-radius: 20px; width: 450px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); color: var(--text-main); }
-  .setting-group { margin-bottom: 20px; }
   .setting-label { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; display: block; }
-  .setting-input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--text-main); }
   .btn-modal { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; margin-top: 5px; }
   .btn-primary { background: var(--navy); color: #fff; }
 
@@ -276,10 +279,25 @@
 </head>
 <body>
 
+<div id="searchOverlay"></div>
+
+<!-- 사이드바 -->
+<div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-header" style="padding:20px; font-weight:800;">
+    <span>전체 메뉴</span>
+    <span onclick="toggleSidebar()" style="cursor:pointer; float:right;">✕</span>
+  </div>
+  <div class="sidebar-content" id="sidebarContent" style="padding:10px;"></div>
+</div>
+
 <header>
   <div class="header-left">
+    <div class="hamburger-btn" onclick="toggleSidebar()">
+      <svg viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
+    </div>
     <div class="logo-text" onclick="location.href='index.html'">KAC CNS Training Platform</div>
-    <!-- [요청사항] 브레드크럼 -->
+    <!-- 브레드크럼 (기존 회색조) -->
     <div class="breadcrumb" id="bcContainer"></div>
   </div>
 
@@ -290,28 +308,25 @@
 
   <div class="header-right">
     <div class="theme-toggle">
-        <div class="theme-btn" id="btnDay" onclick="setTheme('light')">☀</div>
-        <div class="theme-btn" id="btnNight" onclick="setTheme('dark')">🌙</div>
+        <div class="theme-btn" id="btnDay" onclick="setTheme('light')" title="주간">
+            <svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg>
+        </div>
+        <div class="theme-btn" id="btnNight" onclick="setTheme('dark')" title="야간">
+            <svg viewBox="0 0 24 24"><path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C6.94,10.39 9.79,16.87 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z"/></svg>
+        </div>
     </div>
     <div class="settings-btn" onclick="openSettings()">⚙️</div>
+    <img src="logo.png" alt="KAC Logo" class="kac-logo-img">
   </div>
 </header>
 
-<!-- [새로운 트리 레이아웃] -->
+<!-- [세로형 트리 레이아웃] -->
 <div class="mindmap-container">
     <div class="mindmap-wrapper">
-        <!-- 1. Root Section -->
-        <div class="root-section">
-            <div class="root-card">
-                <div style="display:flex; align-items:center; gap:20px;">
-                    <div class="root-icon-box" id="rootIconBox">C</div>
-                    <div class="root-title" id="rootTitleDisplay">Loading...</div>
-                </div>
-                <div class="home-btn" onclick="location.href='index.html'">
-                    <svg style="width:14px;height:14px;fill:currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-                    홈으로 이동
-                </div>
-            </div>
+        <!-- 1. Root Section (홈으로 버튼 삭제, 상위 시설로 이동) -->
+        <div class="root-card" onclick="goParent()">
+             <div class="root-icon-box" id="rootIconBox">?</div>
+             <div class="root-title" id="rootTitleDisplay">Loading...</div>
         </div>
 
         <!-- 2. Connection Line -->
@@ -320,6 +335,18 @@
         <!-- 3. List Section -->
         <div id="listSection" class="list-section"></div>
     </div>
+</div>
+
+<!-- 하단 네비게이션 (기존 복구) -->
+<div class="bottom-nav">
+  <div class="nav-item" onclick="history.back()">
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    뒤로가기
+  </div>
+  <div class="nav-item" onclick="location.href='index.html'">
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    홈으로
+  </div>
 </div>
 
 <!-- 설정 모달 -->
@@ -340,8 +367,6 @@
             <input type="range" id="layoutXRange" min="-300" max="300" step="10" style="flex:1" oninput="updateLayoutX(this.value)">
             <input type="number" id="layoutXNum" class="setting-input" style="width:70px;" oninput="updateLayoutX(this.value)">
         </div>
-        <p style="font-size:11px; color:#64748b; margin-top:-10px; margin-bottom:20px;">* 음수: 왼쪽, 양수: 오른쪽 이동</p>
-
         <button class="btn-modal btn-primary" onclick="saveSettings()">설정 저장</button>
     </div>
     
@@ -349,14 +374,14 @@
   </div>
 </div>
 
-<!-- 자료 등록/수정 모달 (기존 기능 유지) -->
+<!-- 자료 등록/수정 모달 -->
 <div id="uploadModal" class="modal-overlay">
   <div class="modal-card">
     <h3>자료 수정</h3>
     <input type="text" id="editName" class="setting-input" placeholder="제목" style="margin-bottom:10px;">
-    <input type="text" id="editPdf" class="setting-input" placeholder="PDF 경로 (예: file.pdf)" style="margin-bottom:10px;">
-    <input type="text" id="editLink" class="setting-input" placeholder="외부 링크 (선택)" style="margin-bottom:10px;">
-    <input type="text" id="editAudio" class="setting-input" placeholder="오디오 경로 (선택)" style="margin-bottom:10px;">
+    <input type="text" id="editPdf" class="setting-input" placeholder="PDF 경로" style="margin-bottom:10px;">
+    <input type="text" id="editLink" class="setting-input" placeholder="외부 링크" style="margin-bottom:10px;">
+    <input type="text" id="editAudio" class="setting-input" placeholder="오디오 경로" style="margin-bottom:10px;">
     <div style="display:flex; gap:10px;">
         <button class="btn-modal btn-primary" onclick="saveSubject()">저장</button>
         <button class="btn-modal" onclick="document.getElementById('uploadModal').style.display='none'">취소</button>
@@ -364,7 +389,7 @@
   </div>
 </div>
 
-<!-- PDF 뷰어 (기존 유지) -->
+<!-- PDF 뷰어 -->
 <div id="pdfOverlay" onclick="closeViewer()">
     <div class="mobile-close-btn" onclick="closeViewer()" style="display:block;">✕ 닫기</div>
     <div id="audioPanel" onclick="event.stopPropagation()">
@@ -390,20 +415,21 @@
   let currentEditIdx = -1;
   let pdfDoc = null;
   
-  // 초기화
   function init() {
       setTheme(localStorage.getItem('kac_theme') || 'light');
       loadLayoutSettings();
       loadData();
-      renderRoot();
+      renderSidebar();
       renderList();
       
       if(autoOpen) setTimeout(() => openViewerById(autoOpen), 300);
-      
-      // 검색창 이벤트
       document.getElementById('searchInput').addEventListener('input', handleSearch);
   }
   
+  function goParent() {
+      location.href = `facility.html?type=${type}`;
+  }
+
   function loadLayoutSettings() {
       const x = localStorage.getItem('kac_viewer_layout_x') || 0;
       updateLayoutX(x);
@@ -426,31 +452,27 @@
       const saved = localStorage.getItem(key);
       subjects = saved ? JSON.parse(saved) : [];
       
-      // 스타일 로드
       const sData = localStorage.getItem(`kac_style_${type}`);
       const style = sData ? JSON.parse(sData) : { name: type, color: '#2563eb', code: '?' };
       
       document.documentElement.style.setProperty('--theme-color', style.color);
       document.documentElement.style.setProperty('--theme-rgb', hexToRgb(style.color));
       
-      // [요청사항] 브레드크럼 업데이트 (KAC... > 대분류 > 소분류)
+      // 브레드크럼 (회색조)
       const bc = document.getElementById('bcContainer');
       bc.innerHTML = `
-        <span class="crumb-divider">&gt;</span>
+        <span>&nbsp;&gt;&nbsp;</span>
         <span class="crumb-link" onclick="location.href='facility.html?type=${type}'">${style.name}</span>
-        <span class="crumb-divider">&gt;</span>
-        <span class="crumb-current">${menuName}</span>
+        <span>&nbsp;&gt;&nbsp;</span>
+        <span>${menuName}</span>
       `;
       
-      // Root Card 정보
+      // Root Card
       document.getElementById('rootTitleDisplay').textContent = menuName;
       document.getElementById('rootIconBox').textContent = style.code;
+      document.getElementById('rootIconBox').style.color = style.color;
   }
   
-  function renderRoot() {
-      // 이미 HTML에 구조가 잡혀있음 (데이터만 바인딩)
-  }
-
   function renderList() {
       const list = document.getElementById('listSection');
       list.innerHTML = '';
@@ -468,16 +490,9 @@
           card.className = `subject-card ${isLast ? 'last-viewed' : ''}`;
           card.onclick = () => handleClick(idx);
 
-          // [요청사항] 외부 링크 아이콘 로직
           const extLinkHtml = sub.link 
             ? `<svg class="ext-link-icon" viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor; margin-top:2px;"><path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z" /></svg>` 
             : '';
-
-          // 뱃지 아이콘 (PDF/Audio/Link)
-          let typeText = 'DOC';
-          if(sub.link) typeText = 'LINK';
-          else if(sub.audioName) typeText = 'AUDIO';
-          else if(sub.pdfName) typeText = 'PDF';
 
           const adminBtns = isAdmin ? `
             <div class="ctrl-btns" onclick="event.stopPropagation()">
@@ -486,18 +501,16 @@
             </div>
           ` : '';
 
+          // 기존 심플 디자인 (녹색/파란색 뱃지)
           card.innerHTML = `
-              <div class="last-viewed-badge">Last Viewed</div>
-              <div class="subj-info">
-                  <div class="type-pill">${typeText}</div>
-                  <div class="subj-title">
-                    ${sub.name}
-                    ${extLinkHtml}
-                  </div>
+              <div class="subj-title">
+                  ${sub.name}
+                  ${extLinkHtml}
               </div>
-              <div class="meta-info">
-                 ${sub.pdfName ? '<span class="status-pill on">PDF</span>' : ''}
-                 ${sub.audioName ? '<span class="status-pill on">♫</span>' : ''}
+              <div class="status-group">
+                 ${sub.pdfName ? `<span class="status-pill on">📄 PDF</span>` : ''}
+                 ${sub.audioName ? `<span class="status-pill on">🎧 Audio</span>` : ''}
+                 ${sub.link ? `<span class="status-pill link">🔗 Link</span>` : ''}
               </div>
               ${adminBtns}
           `;
@@ -510,7 +523,10 @@
       
       if(isAdmin) {
           const addBtn = document.createElement('div');
-          addBtn.className = 'subject-card add-card';
+          addBtn.className = 'subject-card';
+          addBtn.style.justifyContent = 'center';
+          addBtn.style.color = '#94a3b8';
+          addBtn.style.border = '2px dashed #cbd5e1';
           addBtn.innerHTML = '+ 자료 추가';
           addBtn.onclick = () => openEdit('NEW');
           list.appendChild(addBtn);
@@ -520,7 +536,7 @@
   function handleClick(idx) {
       const sub = subjects[idx];
       sessionStorage.setItem('kac_last_viewed_sub', sub.id);
-      renderList(); // highlight 갱신
+      renderList(); 
 
       if(sub.link) {
           window.open(sub.link, '_blank');
@@ -537,7 +553,6 @@
       container.innerHTML = 'Loading...';
       
       try {
-          // 실제 파일 경로 (files/ 폴더 가정)
           const url = `files/${sub.pdfName}`;
           const loadingTask = pdfjsLib.getDocument(url);
           pdfDoc = await loadingTask.promise;
@@ -546,7 +561,6 @@
           const canvas = document.createElement('canvas');
           container.appendChild(canvas);
           
-          // 첫 페이지만 렌더링 (단순화)
           const page = await pdfDoc.getPage(1);
           const viewport = page.getViewport({scale: 1.5});
           canvas.width = viewport.width;
@@ -555,7 +569,6 @@
           const ctx = canvas.getContext('2d');
           page.render({canvasContext: ctx, viewport: viewport});
           
-          // 오디오 처리
           const audioPanel = document.getElementById('audioPanel');
           const player = document.getElementById('mainAudio');
           if(sub.audioName) {
@@ -635,7 +648,7 @@
           if(confirm("로그아웃?")) { localStorage.setItem('kac_admin_mode','0'); location.reload(); }
       } else {
           const pw = prompt("비밀번호");
-          if(pw === "admin") { // 임시 비번
+          if(pw === "admin") { // 임시
               localStorage.setItem('kac_admin_mode','1'); location.reload(); 
           }
       }
@@ -644,6 +657,8 @@
   function setTheme(m) {
       document.body.className = m==='dark'?'dark-mode':'';
       localStorage.setItem('kac_theme', m);
+      document.getElementById('btnDay').classList.toggle('active', m==='light'); 
+      document.getElementById('btnNight').classList.toggle('active', m==='dark'); 
   }
   
   function hexToRgb(hex) {
@@ -651,17 +666,16 @@
       return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '37, 99, 235';
   }
   
-  // 검색 기능 (간소화)
   function handleSearch(e) {
       const q = e.target.value.toLowerCase();
       const drop = document.getElementById('searchDropdown');
       if(!q) { drop.style.display='none'; return; }
       
-      // 실제로는 전체 데이터 검색 구현 필요 (현재 페이지 내에서만 예시)
       const matches = subjects.filter(s => s.name.toLowerCase().includes(q));
       drop.innerHTML = matches.map(s => `
-        <div style="padding:10px; cursor:pointer; border-bottom:1px solid #eee;" 
-             onclick="openViewerById('${s.id}')">${s.name}</div>
+        <div class="result-item" onclick="openViewerById('${s.id}')">
+            <div style="font-weight:700;">${s.name}</div>
+        </div>
       `).join('');
       drop.style.display = 'block';
   }
@@ -669,6 +683,44 @@
   function openViewerById(id) {
       const idx = subjects.findIndex(s => s.id === id);
       if(idx >= 0) handleClick(idx);
+  }
+
+  // 사이드바 로직 (Facility와 동일)
+  function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('active');
+      document.getElementById('sidebarOverlay').classList.toggle('active');
+  }
+  function renderSidebar() {
+      const content = document.getElementById('sidebarContent');
+      content.innerHTML = '';
+      const order = JSON.parse(localStorage.getItem('kac_index_order') || '[]');
+      
+      order.forEach(tid => {
+          if(!tid) return;
+          const style = JSON.parse(localStorage.getItem(`kac_style_${tid}`) || '{}');
+          const ms = JSON.parse(localStorage.getItem(`kac_menu_${tid}`) || '[]');
+          
+          let subHtml = '';
+          if(ms.length > 0) {
+              subHtml = `<div style="padding-left:20px; margin-bottom:10px;">`;
+              ms.forEach(m => {
+                  subHtml += `<div style="padding:8px 10px; font-size:13px; cursor:pointer; color:#64748b;" onclick="location.href='viewer_list.html?type=${tid}&menu=${encodeURIComponent(m.label)}&id=${m.dataId}'">${m.label}</div>`;
+              });
+              subHtml += `</div>`;
+          }
+
+          const item = document.createElement('div');
+          item.innerHTML = `
+            <div class="sb-item ${tid===type?'active':''}">
+                <span style="display:flex;align-items:center;gap:10px;">
+                    <span style="width:10px;height:10px;border-radius:50%;background:${style.color}"></span>
+                    ${style.name}
+                </span>
+            </div>
+            ${subHtml}
+          `;
+          content.appendChild(item);
+      });
   }
 
   init();
