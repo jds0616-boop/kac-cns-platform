@@ -1,11 +1,14 @@
 {
   "meta": {
     "version": "2.0",
-    "lastUpdated": "2026-01-01"
+    "lastUpdated": "2026-01-02"
   },
   "config": {
     "iconSize": 110,
-    "labelSize": 28
+    "labelSize": 28,
+    "pageTitles": {
+      "1": "항행안전시설 표준교보재 "
+    }
   },
   "categories": [
     {
@@ -705,6 +708,7 @@
         }
       ]
     },
+    null,
     {
       "id": "M_1767154255680",
       "name": "관제 및 SWIM",
@@ -754,7 +758,6 @@
       "color": "#e60000",
       "menus": []
     },
-    null,
     null,
     null,
     null
