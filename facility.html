@@ -152,17 +152,17 @@
       position: relative;
       transform: translateX(var(--layout-x-pos));
       transition: transform 0.3s ease;
-      padding-bottom: 100px; /* 하단 여백 확보 */
+      padding-bottom: 100px;
   }
 
   /* [좌측] 루트 섹션 (Sticky 고정) */
   .root-section {
       width: 300px; flex-shrink: 0;
-      display: flex; flex-direction: column; /* 세로 배치 (카드 + 홈버튼) */
+      display: flex; flex-direction: column;
       align-items: center;
       padding-right: 40px; 
       
-      /* [중요] Sticky 고정 */
+      /* Sticky 고정 */
       position: sticky;
       top: 100px; /* 헤더 + 여백 */
       z-index: 10;
@@ -192,18 +192,19 @@
   }
   .root-title { font-size: 20px; font-weight: 800; word-break: keep-all; line-height: 1.3; }
 
-  /* 루트 카드 우측 연결선 */
+  /* [수정] 루트 카드 우측 연결선 (높이 정밀 조정) */
   .connector-line {
-      position: absolute; right: 0; top: 90px;
+      position: absolute; right: 0; 
+      top: 50%; transform: translateY(-50%); /* 정확히 중앙 정렬 */
       width: 44px; height: 8px; 
       background: var(--theme-color);
       z-index: 1;
   }
   
-  /* [수정] 홈으로 버튼 (좌측 카드 하단 배치) */
+  /* 홈으로 버튼 */
   .side-home-btn {
       margin-top: 20px;
-      width: 220px; /* 카드 너비와 동일 */
+      width: 220px;
       padding: 12px 0;
       border-radius: 15px;
       background: var(--bg-card);
@@ -222,7 +223,7 @@
       box-shadow: 0 8px 20px rgba(var(--theme-rgb), 0.25);
   }
   
-  /* [수정] 중앙 세로 줄 (Branch Bus) 디자인 개선 */
+  /* 중앙 세로 줄 (Branch Bus) */
   .branch-bus {
       width: 8px; 
       background: rgba(var(--theme-rgb), 0.2);
@@ -230,16 +231,19 @@
       margin-right: 40px;
       flex-shrink: 0;
       align-self: stretch; 
-      
-      /* 헤더 바로 아래까지 뻗음 */
       margin-top: 20px; 
       margin-bottom: 50px;
   }
   
-  /* 버스 라인과 루트 연결 지점 */
+  /* [수정] 버스 라인과 루트 연결 지점 (높이 정밀 조정) */
+  /* 루트 카드가 Sticky(top:100px + margin-top:50px) = 150px 위치
+     카드 높이는 약 200px -> 중앙은 약 100px
+     즉 화면 상단 기준 약 250px 지점이 연결선.
+     branch-bus는 top:20px에서 시작.
+     ::before를 상대적 위치로 맞추는 대신, 시각적으로 정확한 지점(루트 카드 중앙)으로 설정 */
   .branch-bus::before {
       content: ''; position: absolute; 
-      top: 120px; /* Sticky top(50) + 카드 내 연결선 위치(70) 보정 */
+      top: 130px; /* 루트 카드 중앙과 일치하도록 높이 조정 */
       left: 0;
       width: 44px; height: 8px; 
       background: var(--theme-color);
@@ -250,7 +254,7 @@
   .list-section {
       display: flex; flex-direction: column; gap: 20px;
       width: 600px; padding-bottom: 50px;
-      padding-top: 50px; /* 루트 섹션과 시작점 맞춤 */
+      padding-top: 50px; 
   }
 
   /* 메뉴 카드 */
@@ -287,49 +291,48 @@
   .menu-bar.last-viewed { border: 2px solid #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
   .menu-bar.last-viewed .last-viewed-icon { display: flex; }
   
-  /* 관리자 모드일 때 Last Viewed 위치 */
   body.admin-mode .menu-bar.last-viewed .last-viewed-icon {
       right: -130px; 
       background: #10b981; color: #fff;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   }
 
-  /* [수정] 마우스 오버 미리보기 팝업 (위치 자동 조정 및 너비 확장) */
+  /* [수정] 미리보기 팝업 (너비 대폭 확장) */
   .preview-popup {
       position: absolute;
-      left: 100%; top: 50%; /* 기본값: 중앙 정렬 */
+      left: 100%; top: 50%; 
       transform: translate(15px, -50%);
       background: var(--bg-card);
       border: 1px solid var(--btn-border);
       box-shadow: 0 10px 40px rgba(0,0,0,0.25);
       border-radius: 15px;
-      padding: 18px;
+      padding: 20px;
       
-      /* [수정] 너비 확장 */
-      min-width: 340px; 
-      max-width: 400px;
+      /* [중요] 너비 대폭 확장 */
+      min-width: 500px; 
+      max-width: 600px;
+      
       z-index: 100;
       opacity: 0; pointer-events: none;
       transition: opacity 0.2s;
       display: none; 
   }
   
-  /* 상단에 있는 메뉴일 때 적용할 클래스 (JS로 제어) */
   .preview-popup.align-top {
       top: 0; 
-      transform: translate(15px, 0); /* 위쪽 정렬 */
+      transform: translate(15px, 0); 
   }
 
   .menu-bar:hover .preview-popup {
       display: block; opacity: 1; pointer-events: none;
   }
   
-  .pp-title { font-size: 13px; font-weight: 800; color: var(--text-sub); margin-bottom: 10px; border-bottom: 1px solid var(--btn-border); padding-bottom: 8px; }
-  .pp-list { display: flex; flex-direction: column; gap: 6px; }
-  .pp-item { font-size: 14px; color: var(--text-main); display: flex; align-items: flex-start; gap: 8px; line-height: 1.4; }
-  .pp-status-dot { width: 6px; height: 6px; border-radius: 50%; background: #cbd5e1; margin-top: 7px; flex-shrink: 0; }
+  .pp-title { font-size: 14px; font-weight: 800; color: var(--text-sub); margin-bottom: 12px; border-bottom: 1px solid var(--btn-border); padding-bottom: 8px; }
+  .pp-list { display: flex; flex-direction: column; gap: 8px; }
+  .pp-item { font-size: 14px; color: var(--text-main); display: flex; align-items: flex-start; gap: 8px; line-height: 1.5; }
+  .pp-status-dot { width: 6px; height: 6px; border-radius: 50%; background: #cbd5e1; margin-top: 8px; flex-shrink: 0; }
   .pp-status-dot.active { background: #10b981; }
-  .pp-more { font-size: 12px; color: var(--text-sub); margin-top: 8px; text-align: center; font-weight: 700; background: var(--btn-bg); padding: 5px; border-radius: 6px; }
+  .pp-more { font-size: 12px; color: var(--text-sub); margin-top: 10px; text-align: center; font-weight: 700; background: var(--btn-bg); padding: 6px; border-radius: 6px; }
 
   /* 좌측 연결선 */
   .menu-bar::before {
@@ -357,7 +360,6 @@
   .menu-info { flex: 1; display: flex; align-items: center; gap: 10px; }
   .menu-title { font-size: var(--label-size-fac); font-weight: 700; color: var(--text-main); }
   
-  /* [추가] 외부 링크 아이콘 */
   .ext-link-icon { color: var(--text-sub); opacity: 0.5; }
   .menu-bar:hover .ext-link-icon { opacity: 1; color: var(--theme-color); }
 
@@ -374,7 +376,6 @@
   .add-menu-btn:hover { border-color: var(--theme-color); color: var(--theme-color); background: rgba(var(--theme-rgb), 0.05); }
   .add-menu-btn::before, .add-menu-btn::after { display: none; }
 
-  /* [추가] 녹색 활성화 버튼 (UI 통일) */
   .btn-preview-active { background: #10b981 !important; color: #fff !important; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
 
   /* === [모바일 반응형] === */
@@ -405,7 +406,6 @@
     .root-title { font-size: 16px; flex: 1; text-align: left; }
     .connector-line, .branch-bus { display: none; } 
 
-    /* 모바일 홈버튼 */
     .side-home-btn { 
         width: 100%; margin-top: 5px; 
     }
@@ -707,9 +707,8 @@
           
           // [Hover Preview] 
           bar.onmouseenter = () => {
-              // 위치 계산: 팝업이 위로 솟아야 할지 아래로 펼쳐져야 할지
               const rect = bar.getBoundingClientRect();
-              const isNearTop = rect.top < 200; // 상단 200px 이내면 위쪽 정렬
+              const isNearTop = rect.top < 200; 
 
               const subsData = localStorage.getItem(`kac_subs_${type}_${menu.dataId}`);
               let previewHtml = '';
@@ -739,7 +738,7 @@
               
               const popup = document.createElement('div');
               popup.className = 'preview-popup';
-              if(isNearTop) popup.classList.add('align-top'); // 상단 정렬 클래스 추가
+              if(isNearTop) popup.classList.add('align-top'); 
               popup.innerHTML = previewHtml;
               bar.appendChild(popup);
           };
@@ -771,7 +770,6 @@
               `;
           }
           
-          // 외부 링크 아이콘 여부
           const linkIconHtml = menu.link ? 
             `<svg class="ext-link-icon" viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z" /></svg>` 
             : '';
