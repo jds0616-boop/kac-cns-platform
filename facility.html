@@ -26,7 +26,7 @@
     /* 사용자 설정 변수 (기본값) */
     --icon-size-fac: 28px;
     --label-size-fac: 18px;
-    --layout-x-pos: 0px; /* 전체 가로 위치 이동 변수 */
+    --layout-x-pos: 0px;
   }
   body.dark-mode {
     --navy: #020617; --bg-main: #0f172a; --bg-card: #1e293b; 
@@ -58,7 +58,6 @@
   }
   #searchOverlay.active { display: block; }
   
-  /* 검색 활성화 시 주변 요소 흐리게 처리 */
   body.search-mode .header-left, 
   body.search-mode .header-right { 
       opacity: 0.1; pointer-events: none; transition: 0.3s; 
@@ -82,11 +81,9 @@
   .breadcrumb { color: rgba(255,255,255,0.7); font-weight: 500; font-size: 16px; margin-left: 10px; white-space: nowrap; display: none; }
   @media(min-width: 1024px) { .breadcrumb { display: inline-block; } }
 
-  /* 헤더 중앙 검색창 (Spotlight 효과 적용) */
   .header-center { 
       position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); 
-      width: 400px; max-width: 40vw; 
-      z-index: 2001; /* 오버레이보다 위에 배치 */
+      width: 400px; max-width: 40vw; z-index: 2001; 
   }
   .header-search { 
     width: 100%; padding: 12px 20px 12px 45px; border-radius: 50px; 
@@ -96,7 +93,6 @@
     background-repeat: no-repeat; background-position: 15px center; background-size: 20px;
   }
   .header-search:focus { background: rgba(255,255,255,1); color: #000; border-color: #fff; box-shadow: 0 0 30px rgba(255,255,255,0.3); }
-  .header-search:focus::placeholder { color: #666; }
   
   .search-dropdown { 
       position: absolute; top: calc(100% + 8px); left: 0; width: 100%; 
@@ -136,37 +132,35 @@
   .sb-sub-item { padding: 8px 15px; font-size: 13px; color: var(--text-sub); cursor: pointer; border-left: 2px solid var(--btn-border); transition: 0.2s; }
   .sb-sub-item:hover { border-left-color: #2563eb; color: #2563eb; background: rgba(37,99,235,0.05); }
 
-  /* === [마인드맵 레이아웃 수정] === */
-  /* 스크롤 버그 해결: overflow-y: auto를 컨테이너에 적용 */
+  /* === [마인드맵 레이아웃] === */
   .mindmap-container {
       display: flex;
-      flex-direction: row; /* 가로 배치 */
+      flex-direction: row;
       width: 100%; height: 100vh;
-      padding-top: calc(var(--header-h) + 50px); /* 헤더 아래 여백 */
+      padding-top: calc(var(--header-h) + 30px); /* 상단 여백 확보 */
       padding-bottom: 100px;
       position: relative;
-      overflow-y: auto; /* 세로 스크롤 허용 */
+      overflow-y: auto;
       overflow-x: hidden;
-      align-items: flex-start; /* [중요] 상단 정렬로 변경 */
-      justify-content: center; /* 기본 중앙 정렬, offset으로 이동 */
+      align-items: flex-start;
+      justify-content: center;
   }
 
-  /* 컨텐츠 전체 래퍼 (가로 이동 설정을 위해 추가) */
   .mindmap-wrapper {
       display: flex;
-      align-items: flex-start; /* 상단 정렬 */
+      align-items: flex-start;
       position: relative;
-      transform: translateX(var(--layout-x-pos)); /* [설정] 가로 위치 이동 */
+      transform: translateX(var(--layout-x-pos));
       transition: transform 0.3s ease;
   }
 
-  /* [좌측] 루트 섹션 (헤더 아래 위치) */
+  /* [좌측] 루트 섹션 */
   .root-section {
       width: 300px; flex-shrink: 0;
       display: flex; justify-content: flex-end;
       padding-right: 40px; 
       position: relative; z-index: 10;
-      margin-top: 20px; /* 리스트와 높이 맞춤 */
+      margin-top: 30px; /* 리스트와 높이 맞춤 */
   }
   .root-card {
       background: var(--bg-card);
@@ -190,41 +184,47 @@
   }
   .root-title { font-size: 20px; font-weight: 800; word-break: keep-all; line-height: 1.3; }
 
-  /* 연결선 */
+  /* 루트 카드 우측 연결선 */
   .connector-line {
-      position: absolute; right: 0; top: 80px; /* 카드 중간 쯤 */
-      width: 40px; height: 4px; background: var(--theme-color);
-      border-radius: 4px; z-index: 1;
+      position: absolute; right: 0; top: 90px;
+      width: 44px; height: 8px; /* [수정] 두께 8px */
+      background: var(--theme-color);
+      z-index: 1;
   }
   
-  /* 분기 버스 라인 (세로선) */
+  /* [수정] 중앙 세로 줄 (Branch Bus) 디자인 개선 */
   .branch-bus {
-      width: 4px; 
+      width: 8px; /* [수정] 두께 8px */
       background: rgba(var(--theme-rgb), 0.2);
       border-radius: 4px;
       margin-right: 40px;
       flex-shrink: 0;
-      /* 리스트 길이에 따라 자동으로 늘어남 */
       align-self: stretch; 
-      margin-top: 100px; /* 루트 카드 연결 지점부터 시작 */
-      margin-bottom: 50px;
+      
+      /* [수정] 위로 길게 뽑기 */
+      margin-top: 0;
       position: relative;
+      top: 50px; /* 헤더 아래에서 시작 */
+      margin-bottom: 50px;
   }
-  /* 버스 라인과 루트 연결 */
+  
+  /* 버스 라인과 루트 연결 지점 */
   .branch-bus::before {
-      content: ''; position: absolute; top: 0; left: 0;
-      width: 100%; height: 4px; background: var(--theme-color);
-      transform: translateX(-100%); width: 40px; /* 좌측 연결 */
+      content: ''; position: absolute; 
+      top: 70px; /* 루트 카드 연결선 높이에 맞춤 (margin-top + top + 90px 고려) */
+      left: 0;
+      width: 44px; height: 8px; /* [수정] 두께 8px */
+      background: var(--theme-color);
+      transform: translateX(-100%);
   }
 
   /* [우측] 리스트 섹션 */
   .list-section {
       display: flex; flex-direction: column; gap: 20px;
-      width: 600px; /* 고정 폭 또는 max-width */
-      padding-bottom: 50px;
+      width: 600px; padding-bottom: 50px;
   }
 
-  /* 메뉴 카드 디자인 */
+  /* 메뉴 카드 */
   .menu-bar {
       background: var(--bg-card);
       border-radius: 18px;
@@ -241,9 +241,58 @@
   .menu-bar:hover {
       transform: translateX(5px);
       box-shadow: 0 8px 25px rgba(var(--theme-rgb), 0.15);
+      z-index: 20; /* 팝업을 위해 z-index 높임 */
   }
   
-  /* 메뉴 좌측 연결선 */
+  /* [추가] Last Viewed (마지막 위치) 뱃지 */
+  .last-viewed-icon {
+    position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+    display: none; 
+    align-items: center; justify-content: center; gap: 6px;
+    color: #10b981; 
+    font-size: 12px; font-weight: 800; white-space: nowrap;
+    background: rgba(16, 185, 129, 0.1); padding: 6px 12px; border-radius: 50px; 
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    pointer-events: none;
+  }
+  .menu-bar.last-viewed { border: 2px solid #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
+  .menu-bar.last-viewed .last-viewed-icon { display: flex; }
+  
+  /* 관리자 모드일 때 Last Viewed 위치 변경 (버튼 겹침 방지) */
+  body.admin-mode .menu-bar.last-viewed .last-viewed-icon {
+      right: -130px; /* 카드 바깥으로 뺌 */
+      background: #10b981; color: #fff;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  /* [추가] 마우스 오버 미리보기 팝업 */
+  .preview-popup {
+      position: absolute;
+      left: 100%; top: 50%;
+      transform: translate(15px, -50%); /* 우측으로 약간 띄움 */
+      background: var(--bg-card);
+      border: 1px solid var(--btn-border);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      border-radius: 15px;
+      padding: 15px;
+      min-width: 200px;
+      z-index: 100;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      display: none; /* 기본 숨김 */
+  }
+  .menu-bar:hover .preview-popup {
+      display: block; opacity: 1; pointer-events: none;
+  }
+  
+  .pp-title { font-size: 12px; font-weight: 800; color: var(--text-sub); margin-bottom: 8px; border-bottom: 1px solid var(--btn-border); padding-bottom: 5px; }
+  .pp-list { display: flex; flex-direction: column; gap: 4px; }
+  .pp-item { font-size: 13px; color: var(--text-main); display: flex; align-items: center; gap: 5px; }
+  .pp-status-dot { width: 6px; height: 6px; border-radius: 50%; background: #cbd5e1; }
+  .pp-status-dot.active { background: #10b981; }
+  .pp-more { font-size: 11px; color: var(--text-sub); margin-top: 5px; text-align: center; font-weight: 700; }
+
+  /* 좌측 연결선 */
   .menu-bar::before {
       content: ''; position: absolute; left: -44px; top: 50%;
       width: 44px; height: 2px; background: rgba(var(--theme-rgb), 0.3);
@@ -282,7 +331,7 @@
   .add-menu-btn:hover { border-color: var(--theme-color); color: var(--theme-color); background: rgba(var(--theme-rgb), 0.05); }
   .add-menu-btn::before, .add-menu-btn::after { display: none; }
 
-  /* 하단 버튼 (뒤로가기/홈) - 리스트 아래에 위치 */
+  /* 하단 버튼 */
   .bottom-nav-area { 
     display: flex; justify-content: center; gap: 20px; 
     margin-top: 40px; width: 100%;
@@ -296,18 +345,23 @@
   }
   .nav-item:hover { background: #1e293b; transform: translateY(-2px); }
   body.dark-mode .nav-item { background: #1e293b; border-color: rgba(255,255,255,0.3); }
+  
+  /* [추가] 녹색 활성화 버튼 (UI 통일) */
+  .btn-preview-active { background: #10b981 !important; color: #fff !important; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
 
-  /* === [모바일 반응형: 기존 유지] === */
+  /* === [모바일 반응형] === */
   @media (max-width: 768px) {
     .mindmap-container { 
         flex-direction: column; overflow-y: auto; padding-top: var(--header-h); 
-        display: block; /* 모바일은 블록 요소로 */
+        display: block; 
     }
     .mindmap-wrapper { 
-        display: block; transform: none !important; /* 모바일은 가로 이동 설정 무시 */
+        display: block; transform: none !important; 
         width: 100%;
     }
     .header-center { display: none; } 
+    /* 모바일에서는 미리보기 팝업 숨김 */
+    .preview-popup { display: none !important; }
 
     .root-section { 
         width: 100%; height: auto; padding: 20px 20px 0 20px; 
@@ -336,8 +390,13 @@
     .menu-bar::before { left: -27px; width: 27px; } 
     .menu-bar::after { left: -30px; width: 6px; height: 6px; }
     
+    /* 모바일 Last Viewed 위치 조정 */
+    .menu-bar.last-viewed .last-viewed-icon {
+        right: 10px; top: 50%; transform: translateY(-50%) scale(0.8);
+    }
+    
     .menu-pill-icon { font-size: 11px; padding: 4px 10px; min-width: auto; }
-    .menu-title { font-size: 15px; }
+    .menu-title { font-size: 15px; padding-right: 20px; }
     
     .admin-btns { flex-direction: row; gap: 4px; } 
     .bottom-nav-area { flex-direction: row; gap: 10px; margin-top: 20px; }
@@ -526,7 +585,6 @@
   let isPreview = localStorage.getItem('kac_preview_active') === '1';
   let menus = [];
   let currentEditIdx = -1;
-  // 글로벌 보안 변수 (SHA-256)
   const storedHash = "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c";
 
   async function init() {
@@ -538,10 +596,24 @@
 
       await loadData();
       loadStyleData();
-      loadUISettings(); // UI 설정 적용
+      loadUISettings();
       render();
       renderSidebar();
       buildSearchIndex();
+      
+      // [Last Viewed] 자동 스크롤
+      const lastId = sessionStorage.getItem('kac_last_viewed_menu_id');
+      if(lastId) {
+          setTimeout(() => {
+              const el = document.getElementById(`menu-${lastId}`);
+              if(el) {
+                  el.scrollIntoView({behavior: "smooth", block: "center"});
+                  el.classList.add('last-viewed');
+                  // 1회성 동작 후 삭제하고 싶다면 아래 주석 해제
+                  // sessionStorage.removeItem('kac_last_viewed_menu_id');
+              }
+          }, 300);
+      }
   }
   
   async function loadData() {
@@ -555,6 +627,11 @@
                        dataId: m.id, label: m.label, line1: m.line1, line2: m.line2, link: m.link
                    }))));
                    localStorage.setItem(`kac_style_${type}`, JSON.stringify({name: cat.name, code: cat.code, color: cat.color}));
+                   
+                   // [중요] 미리보기용 하위 과목 데이터도 로컬에 캐싱
+                   cat.menus.forEach(m => {
+                       localStorage.setItem(`kac_subs_${type}_${m.id}`, JSON.stringify(m.subjects));
+                   });
               }
           }
       } catch(e) {}
@@ -604,7 +681,53 @@
 
           const bar = document.createElement('div');
           bar.className = 'menu-bar';
+          bar.id = `menu-${menu.dataId}`;
+          
+          // [Hover Preview] 마우스 오버 시 미리보기 데이터 로드 및 표시
+          bar.onmouseenter = () => {
+              const subsData = localStorage.getItem(`kac_subs_${type}_${menu.dataId}`);
+              let previewHtml = '';
+              if(subsData) {
+                  const subs = JSON.parse(subsData);
+                  if(subs.length > 0) {
+                      const displayLimit = 10;
+                      const showList = subs.slice(0, displayLimit);
+                      previewHtml = `
+                        <div class="pp-title">포함된 교육 과정 (${subs.length})</div>
+                        <div class="pp-list">
+                            ${showList.map(s => `
+                                <div class="pp-item">
+                                    <div class="pp-status-dot ${s.active!==false?'active':''}"></div>
+                                    <span>${s.name}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        ${subs.length > displayLimit ? `<div class="pp-more">...외 ${subs.length - displayLimit}건 더 있음</div>` : ''}
+                      `;
+                  } else {
+                      previewHtml = `<div class="pp-title">교육 과정 없음</div><div style="font-size:11px; color:#94a3b8;">등록된 과목이 없습니다.</div>`;
+                  }
+              } else {
+                   previewHtml = `<div class="pp-title">교육 과정 없음</div><div style="font-size:11px; color:#94a3b8;">데이터가 없습니다.</div>`;
+              }
+              
+              const popup = document.createElement('div');
+              popup.className = 'preview-popup';
+              popup.innerHTML = previewHtml;
+              bar.appendChild(popup);
+          };
+          
+          bar.onmouseleave = () => {
+              const popup = bar.querySelector('.preview-popup');
+              if(popup) popup.remove();
+          };
+
           bar.onclick = () => {
+              // 클릭 시 현재 위치 기억
+              sessionStorage.setItem('kac_last_viewed_menu_id', menu.dataId);
+              document.querySelectorAll('.menu-bar').forEach(b => b.classList.remove('last-viewed'));
+              bar.classList.add('last-viewed');
+
               if(menu.link) window.open(menu.link, '_blank');
               else location.href = `viewer_list.html?type=${type}&menu=${encodeURIComponent(menu.label)}&id=${menu.dataId}`;
           };
@@ -623,6 +746,10 @@
           }
 
           bar.innerHTML = `
+              <div class="last-viewed-icon">
+                <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                Last Viewed
+              </div>
               <div class="menu-pill-icon">${iconInner}</div>
               <div class="menu-info">
                   <div class="menu-title">${menu.label}</div>
@@ -686,7 +813,6 @@
       }
   }
   
-  /* 일괄 수정 기능 */
   function openBulkEdit() {
       const container = document.getElementById('bulkRowContainer');
       container.innerHTML = '';
@@ -732,7 +858,6 @@
 
   function closeModal(id) { document.getElementById(id).style.display = 'none'; }
   
-  /* 설정 관련 로직 */
   function openSettings() {
       const g = document.getElementById('guestSettings');
       const a = document.getElementById('adminSettings');
@@ -740,7 +865,6 @@
       a.style.display = isAdmin ? 'block' : 'none';
       
       if(isAdmin) {
-          // 값 불러오기
           const iSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--icon-size-fac')) || 28;
           const lSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--label-size-fac')) || 18;
           const xPos = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--layout-x-pos')) || 0;
@@ -752,12 +876,12 @@
           
           const pBtn = document.getElementById('modalPreviewBtn');
           pBtn.textContent = isPreview ? "미리보기 종료" : "미리보기 시작";
-          pBtn.className = isPreview ? "btn-modal btn-success" : "btn-modal";
+          // [UI 통일] 미리보기 활성 시 녹색 버튼 적용
+          pBtn.className = isPreview ? "btn-modal btn-preview-active" : "btn-modal btn-secondary";
       }
       document.getElementById('settingsModal').style.display = 'flex';
   }
   
-  // 실시간 미리보기 (가로 이동)
   function updateLayoutPreview(val) {
       document.getElementById('rangeLayoutX').value = val;
       document.getElementById('setLayoutX').value = val;
@@ -771,7 +895,7 @@
       
       localStorage.setItem('kac_fac_icon_size', iSize);
       localStorage.setItem('kac_fac_label_size', lSize);
-      localStorage.setItem('kac_fac_layout_x', xPos); // index.json 연동용 키
+      localStorage.setItem('kac_fac_layout_x', xPos);
       
       loadUISettings();
       closeModal('settingsModal');
@@ -786,7 +910,6 @@
       closeModal('settingsModal');
   }
 
-  /* 보안 및 관리자 인증 */
   async function sha256(message) {
       const msgBuffer = new TextEncoder().encode(message);
       const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -881,14 +1004,12 @@
   const sRes = document.getElementById('searchDropdown');
   const sOverlay = document.getElementById('searchOverlay');
   
-  // Spotlight 검색 효과
   sInput.onfocus = () => { 
       document.body.classList.add('search-mode'); 
       sOverlay.classList.add('active'); 
       if(sInput.value) sRes.classList.add('active'); 
   };
   
-  // 오버레이 클릭 시 검색 모드 종료
   sOverlay.onclick = () => { 
       document.body.classList.remove('search-mode'); 
       sOverlay.classList.remove('active'); 
