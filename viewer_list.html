@@ -3,10 +3,8 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8" />
-<!-- 모바일 화면 꽉 차게 설정 -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>과목 리스트 - KAC CNS Training Platform</title>
-<!-- 로그인 체크 -->
 <script>
   if(sessionStorage.getItem('kac_access_token') !== 'granted') {
     location.replace('login.html'); 
@@ -27,6 +25,9 @@
     --pill-bg: #f1f5f9; --pill-text: #94a3b8; --pill-border: #e2e8f0;
     --title-color: #1e293b;
     --header-h: 75px;
+
+    /* [추가] 트리 레이아웃 위치 변수 */
+    --tree-pos-x: 0px; 
   }
   body.dark-mode {
     --navy: #020617; --bg-main: #0f172a; --bg-card: #1e293b; 
@@ -41,6 +42,20 @@
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
   body { background: var(--bg-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: var(--text-main); transition: 0.3s; }
 
+  /* [추가] 사이드바 스타일 (facility.html에서 가져옴) */
+  .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 6000; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(2px); }
+  .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
+  .sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background: var(--bg-card); z-index: 6001; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; border-right: 1px solid var(--btn-border); }
+  .sidebar.active { left: 0; }
+  .sidebar-header { height: var(--header-h); display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--btn-border); font-weight: 800; font-size: 18px; justify-content: space-between; color: var(--text-main); }
+  .sidebar-close { cursor: pointer; padding: 8px; border-radius: 50%; transition: 0.2s; }
+  .sidebar-close:hover { background: var(--btn-bg); }
+  .sidebar-content { flex: 1; overflow-y: auto; padding: 10px; }
+  .sb-item { padding: 12px 15px; cursor: pointer; border-radius: 10px; color: var(--text-main); font-weight: 600; transition: 0.2s; display: flex; align-items: center; justify-content: space-between; font-size: 14px; }
+  .sb-item:hover { background: var(--btn-bg); color: #2563eb; }
+  .sb-item.active { background: #eff6ff; border-left: 4px solid #2563eb; color: #2563eb; }
+  body.dark-mode .sb-item.active { background: rgba(37,99,235,0.1); }
+
   /* 검색 오버레이 */
   #searchOverlay { 
     position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
@@ -48,7 +63,6 @@
   }
   #searchOverlay.active { display: block; }
   
-  /* 검색 모드 스타일 */
   body.search-mode header { z-index: 2000; position: relative; }
   body.search-mode .header-center { z-index: 2001; }
   body.search-mode .search-dropdown { z-index: 2002; }
@@ -64,13 +78,18 @@
   header { 
     height: var(--header-h); background: var(--navy); 
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0 40px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+    padding: 0 20px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
     z-index: 1000; flex-shrink: 0; gap: 20px; position: relative; transition: 0.3s;
   }
   
-  .header-left { display: flex; align-items: center; min-width: 250px; z-index: 10; white-space: nowrap; transition: opacity 0.2s; }
+  .header-left { display: flex; align-items: center; min-width: 250px; z-index: 10; white-space: nowrap; transition: opacity 0.2s; gap: 15px; } /* gap 추가 */
   .header-center { position: absolute; left: 50%; transform: translateX(-50%); width: 600px; max-width: 100%; z-index: 20; transition: width 0.3s; }
   .header-right { display: flex; align-items: center; gap: 15px; min-width: 250px; justify-content: flex-end; z-index: 10; }
+
+  /* [추가] 햄버거 버튼 스타일 */
+  .hamburger-btn { cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; flex-shrink: 0; }
+  .hamburger-btn:hover { background: rgba(255,255,255,0.1); }
+  .hamburger-btn svg { width: 24px; height: 24px; fill: #fff; }
 
   body.header-overlap .header-left { opacity: 0; pointer-events: none; width: 0; overflow: hidden; min-width: 0; }
   body.header-overlap .header-center { width: 80%; }
@@ -85,7 +104,7 @@
   .logo-text { font-size: 20px; font-weight: 800; white-space: nowrap; cursor: pointer; transition: opacity 0.2s; }
   .logo-text:hover { opacity: 0.8; }
   
-  .breadcrumb { display: flex; align-items: center; color: #94a3b8; font-weight: 500; font-size: 16px; margin-left: 10px; }
+  .breadcrumb { display: flex; align-items: center; color: #94a3b8; font-weight: 500; font-size: 16px; margin-left: 0px; }
   .crumb-link { cursor: pointer; transition: color 0.2s; }
   .crumb-link:hover { color: #fff; } 
   .crumb-current { cursor: default; } 
@@ -135,11 +154,54 @@
   body.preview-active .add-card { display: none !important; }
   body.preview-active .ctrl-btns { visibility: hidden; }
 
-  main { flex: 1; overflow-y: auto; padding: 40px; padding-bottom: 150px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+  main { flex: 1; overflow-y: auto; padding: 40px; padding-bottom: 150px; display: flex; flex-direction: column; align-items: center; gap: 0px; }
 
-  /* 카드 설정 */
+  /* [수정/추가] 트리 레이아웃 관련 스타일 */
+  .tree-container {
+      display: flex; flex-direction: column; align-items: center; width: 100%; position: relative;
+      transform: translateX(var(--tree-pos-x, 0px)); /* 가로 위치 조정 변수 */
+      transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+
+  /* 상단 명칭 카드 (Category Title Card) */
+  .cat-title-card {
+      background: var(--navy); color: #fff;
+      padding: 15px 40px; border-radius: 50px;
+      font-size: 18px; font-weight: 800;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      z-index: 5; margin-bottom: 30px;
+      display: flex; align-items: center; gap: 10px;
+      border: 2px solid rgba(255,255,255,0.1);
+  }
+
+  /* 세로 연결선 (Vertical Line) */
+  .tree-spine {
+      position: absolute; top: 50px; bottom: 30px; left: 50%;
+      width: 4px; background: #cbd5e1;
+      transform: translateX(-50%); z-index: 0;
+      border-radius: 2px;
+  }
+  body.dark-mode .tree-spine { background: rgba(255,255,255,0.1); }
+
+  /* 카드 래퍼 (Card Wrapper) - 선과 연결하기 위함 */
+  .card-wrapper {
+      position: relative; width: 100%; max-width: 900px;
+      display: flex; justify-content: center;
+      margin-bottom: 25px; z-index: 1;
+  }
+  
+  /* 연결 점 (Connector Dot) */
+  .card-wrapper::before {
+      content: ''; position: absolute; top: 50%; left: 50%;
+      width: 12px; height: 12px; background: var(--theme-color);
+      border-radius: 50%; transform: translate(-50%, -50%);
+      z-index: -1; box-shadow: 0 0 0 4px var(--bg-main);
+  }
+
+  /* 카드 설정 (기존 유지 + 트리용 수정) */
   .subject-card { 
-    background: var(--bg-card); width: 100%; max-width: 900px; padding: 25px 35px; border-radius: 18px; 
+    background: var(--bg-card); width: 100%; /* max-width 제거, wrapper가 제어 */ 
+    padding: 25px 35px; border-radius: 18px; 
     box-shadow: var(--shadow); 
     border: 1px solid transparent;
     display: flex; justify-content: space-between; align-items: center; transition: 0.3s;
@@ -243,7 +305,6 @@
   .side-nav:hover svg { opacity: 0.7; }
   .nav-L { left: 0; } .nav-R { right: 0; }
   
-  /* 뷰어 바디 */
   .viewer-body { 
     width: 100%; height: 100%; 
     display: flex; justify-content: center; align-items: center; 
@@ -251,18 +312,16 @@
     overflow: hidden; 
   }
   
-  /* [중요 수정] 캔버스 CSS 강제 설정 및 애니메이션 분기 */
   canvas { 
     box-shadow: 0 0 50px rgba(0,0,0,0.8); 
     pointer-events: none; 
-    max-width: 100%; /* 화면 너비 절대 넘지 않음 */
-    height: auto;    /* 비율 유지 */
+    max-width: 100%; 
+    height: auto; 
     object-fit: contain; 
     opacity: 1;
-    transition: none; /* 기본(PC)은 트랜지션 없음 */
+    transition: none;
   }
 
-  /* 모바일에서만 페이드 애니메이션 적용 */
   @media (max-width: 768px) {
       canvas { transition: opacity 0.3s ease-out; }
       .slide-enter { opacity: 0; }
@@ -284,122 +343,57 @@
   .nav-item:hover { opacity: 1; transform: translateY(-3px); }
   .nav-icon { width: 24px; height: 24px; fill: currentColor; }
 
-  /* [수정] 야간 모드일 때 하단 버튼 시인성 개선 */
   body.dark-mode .bottom-nav {
-    background: rgba(30, 41, 59, 0.95); /* 밝은 남색 */
-    border: 1px solid rgba(255, 255, 255, 0.3); /* 밝은 테두리 */
+    background: rgba(30, 41, 59, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
   }
-  body.dark-mode .nav-item {
-    color: #e2e8f0; /* 밝은 회색 텍스트 */
-    opacity: 1;
-  }
+  body.dark-mode .nav-item { color: #e2e8f0; opacity: 1; }
 
-  /* [모바일 전용 스타일 수정] */
-  .mobile-close-btn { display: none; } /* 기본 숨김 */
+  .mobile-close-btn { display: none; }
 
   @media (max-width: 768px) {
-    /* 1. 상단 제목 등 PC 전용 UI 숨김 */
     .v-title-box, .v-icon-btn, .close-v { display: none !important; }
     
-    /* 2. 카드: Last Viewed 뱃지 겹침 방지 */
-    .subject-card {
-        padding: 20px 15px;
-    }
-    .subj-title {
-        padding-right: 95px; /* 뱃지 공간 확보 */
-        word-break: break-all;
-    }
-    .last-viewed-icon { 
-        right: 15px; 
-        transform: translateY(-50%) scale(0.85); 
-        transform-origin: right center;
-    }
+    .subject-card { padding: 20px 15px; }
+    .subj-title { padding-right: 95px; word-break: break-all; }
+    .last-viewed-icon { right: 15px; transform: translateY(-50%) scale(0.85); transform-origin: right center; }
 
-    /* 3. 닫기 버튼: 플로팅 캡슐 형태 */
     .mobile-close-btn {
-      display: flex;
-      position: fixed;
-      bottom: 40px; 
-      left: 50%; 
-      transform: translateX(-50%);
-      width: auto;
-      height: auto;
-      padding: 12px 30px;
-      border-radius: 50px;
-      background: rgba(0, 0, 0, 0.7); 
-      color: #fff;
-      font-size: 15px; 
-      font-weight: 700;
-      align-items: center; 
-      justify-content: center;
-      gap: 8px;
-      z-index: 9999;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-      cursor: pointer;
-      border: 1px solid rgba(255,255,255,0.2);
-      backdrop-filter: blur(5px);
-      
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
+      display: flex; position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+      width: auto; height: auto; padding: 12px 30px; border-radius: 50px;
+      background: rgba(0, 0, 0, 0.7); color: #fff; font-size: 15px; font-weight: 700;
+      align-items: center; justify-content: center; gap: 8px; z-index: 9999;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3); cursor: pointer; border: 1px solid rgba(255,255,255,0.2);
+      backdrop-filter: blur(5px); opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
     }
     
-    .mobile-close-btn.visible {
-        opacity: 1;
-        pointer-events: auto;
-    }
-
+    .mobile-close-btn.visible { opacity: 1; pointer-events: auto; }
     .mobile-close-btn:active { background: #ef4444; }
 
-    /* 4. 리스트 하단 네비게이션 */
-    .bottom-nav {
-      width: 90%;
-      bottom: 20px;
-      padding: 12px 0;
-      justify-content: center;
-      gap: 30px;
-      border-radius: 20px;
-      background: rgba(15, 23, 42, 0.95);
-      backdrop-filter: blur(10px);
-    }
-    
-    /* 모바일 야간모드 */
-    body.dark-mode .bottom-nav {
-        background: rgba(30, 41, 59, 0.95);
-    }
+    .bottom-nav { width: 90%; bottom: 20px; padding: 12px 0; justify-content: center; gap: 30px; border-radius: 20px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); }
+    body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.95); }
 
     .nav-item { font-size: 14px; gap: 6px; }
     .nav-icon { width: 20px; height: 20px; }
 
-    /* 5. 검색창 디자인 */
-    .header-search {
-      font-size: 14px;
-      padding: 10px 20px 10px 45px;
-      background-size: 18px;
-      background-position: 15px center;
-    }
-
-    /* 6. 뷰어 바디: 스크롤 허용 및 가로 스크롤 방지 */
-    .viewer-body { 
-        padding-bottom: 0; 
-        padding-top: 0; 
-        align-items: flex-start; /* 세로 스크롤 위함 */
-        overflow-y: auto; 
-        overflow-x: hidden; /* 중요: 좌우 스크롤 차단 */
-        -webkit-overflow-scrolling: touch;
-    }
+    .header-search { font-size: 14px; padding: 10px 20px 10px 45px; background-size: 18px; background-position: 15px center; }
+    .viewer-body { padding-bottom: 0; padding-top: 0; align-items: flex-start; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
     
-    /* 7. 기타 카드 스타일 */
     .status-text { display: none !important; }
     .status-pill { padding: 6px 8px; font-size: 14px; }
     .pill-icon { margin-right: 0 !important; }
+    
+    /* 모바일에서는 트리 레이아웃 해제 (화면 좁음) */
+    .tree-spine { display: none; }
+    .cat-title-card { width: 100%; border-radius: 20px; margin-bottom: 20px; padding: 15px; font-size: 16px; justify-content: center; }
+    .card-wrapper { display: block; margin-bottom: 15px; }
+    .card-wrapper::before { display: none; }
   }
 
   .creator-info { position: fixed; bottom: 5px; width: 100%; text-align: center; font-size: 11px; color: var(--text-sub); opacity: 0.5; font-weight: 500; z-index: 500; pointer-events: none; }
   .creator-info b { font-weight: 700; }
   body.dark-mode .creator-info { color: #fff; opacity: 0.3; }
 
-  /* 범용 모달 스타일 */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none; align-items: center; justify-content: center; }
   .modal-card { background: var(--bg-card); padding: 35px; border-radius: 25px; width: 500px; color: var(--text-main); box-shadow: 0 20px 50px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
   .modal-title { font-size: 20px; font-weight: 800; margin-bottom: 20px; border-bottom: 1px solid var(--btn-border); padding-bottom: 10px; }
@@ -407,23 +401,10 @@
   .setting-label { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; display: block; }
   .setting-input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--text-main); font-size: 14px; }
   
-  /* [수정] 야간 모드 팝업창(모달) 입력필드 시인성 개선 */
   body.dark-mode .setting-input, 
-  body.dark-mode select.setting-input {
-      background-color: #334155 !important;
-      color: #ffffff !important;
-      border: 1px solid rgba(255,255,255,0.3);
-  }
-  body.dark-mode select.setting-input option {
-      background-color: #1e293b;
-      color: #ffffff;
-  }
-  
-  /* 야간 모드 모달 카드 배경 */
-  body.dark-mode .modal-card {
-      background-color: #1e293b;
-      border: 1px solid rgba(255,255,255,0.1);
-  }
+  body.dark-mode select.setting-input { background-color: #334155 !important; color: #ffffff !important; border: 1px solid rgba(255,255,255,0.3); }
+  body.dark-mode select.setting-input option { background-color: #1e293b; color: #ffffff; }
+  body.dark-mode .modal-card { background-color: #1e293b; border: 1px solid rgba(255,255,255,0.1); }
 
   .btn-row { display: flex; gap: 10px; margin-top: 30px; }
   .btn-modal { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; }
@@ -431,7 +412,6 @@
   .btn-secondary { background: var(--btn-border); color: var(--text-sub); }
   .btn-danger { background: #ef4444; color: #fff; }
 
-  /* 일괄 등록 테이블 스타일 */
   .batch-table { width: 100%; border-collapse: collapse; font-size: 12px; }
   .batch-table th, .batch-table td { padding: 8px; border: 1px solid var(--btn-border); text-align: center; }
   .batch-table th { background: var(--btn-bg); font-weight: 700; color: var(--text-sub); }
@@ -443,8 +423,24 @@
 <!-- 검색 배경 오버레이 -->
 <div id="searchOverlay"></div>
 
+<!-- 사이드바 -->
+<div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-header">
+    <span>전체 메뉴</span>
+    <div class="sidebar-close" onclick="toggleSidebar()">✕</div>
+  </div>
+  <div class="sidebar-content" id="sidebarContent">
+    <!-- JS로 동적 생성 -->
+  </div>
+</div>
+
 <header>
   <div class="header-left" id="headerLeft">
+    <!-- [추가] 햄버거 버튼 -->
+    <div class="hamburger-btn" onclick="toggleSidebar()">
+      <svg viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
+    </div>
     <div class="logo-text" onclick="location.href='index.html'">KAC CNS Training Platform</div>
     <div class="breadcrumb" id="breadcrumbContainer"></div>
   </div>
@@ -456,7 +452,7 @@
 
   <div class="header-right">
     <div class="theme-toggle">
-      <div class="theme-btn" id="btnDay" onclick="setTheme('light')" title="주간 모드"><svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg></div>
+      <div class="theme-btn" id="btnDay" onclick="setTheme('light')" title="주간 모드"><svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 7,12A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg></div>
       <div class="theme-btn" id="btnNight" onclick="setTheme('dark')" title="야간 모드"><svg viewBox="0 0 24 24"><path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C6.94,10.39 9.79,16.87 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z"/></svg></div>
     </div>
     
@@ -520,6 +516,16 @@
         <button id="modalAdminBtn" class="btn-modal btn-secondary" onclick="toggleAdmin()">관리자 로그인</button>
         <button id="modalPreviewBtn" class="btn-modal btn-secondary" onclick="togglePreview()" style="display:none;">👁️ 미리보기</button>
       </div>
+    </div>
+    
+    <!-- [추가] 트리 레이아웃 위치 조정 메뉴 -->
+    <div class="setting-group">
+      <label class="setting-label">↔️ 트리 레이아웃 가로 위치 조정 (px)</label>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <input type="range" id="treePosRange" min="-500" max="500" step="10" style="flex:1" oninput="updateTreePos(this.value)">
+        <span id="treePosVal" style="font-size:12px; font-weight:700; width:50px; text-align:right;">0</span>
+      </div>
+      <p style="font-size:11px; color:var(--text-sub); margin-top:5px;">* 중앙 기준으로 좌(-) 우(+)로 이동합니다.</p>
     </div>
 
     <div id="batchAdminGroup" class="setting-group" style="display:none;">
@@ -601,7 +607,6 @@
     <div id="pageContainer"></div>
   </div>
 
-  <!-- [수정] 모바일 플로팅 닫기 버튼 -->
   <div class="mobile-close-btn" onclick="closeViewer()" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
     ✕ 닫기
   </div>
@@ -632,7 +637,6 @@
 <div class="creator-info">Developed by <b>DooSeok, JANG</b> (jds0616@airport.co.kr)</div>
 
 <script>
-  // [보안 및 설정] 초기 변수 및 PDF Worker 설정
   pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
 
   const params = new URLSearchParams(location.search);
@@ -649,7 +653,6 @@
 
   let subjects = [];
 
-  // [중요] UI 요소 변수 선언 (함수 실행 전 미리 확보)
   let pdfDoc = null, pageNum = 1, isRendering = false, isDragging = false;
   const canvasContainer = document.getElementById('pageContainer');
   const viewerBody = document.getElementById('viewerBody');
@@ -657,7 +660,6 @@
   const hitArea = document.getElementById('progressHitArea');
   const audioPlayer = document.getElementById('mainAudio');
   
-  // 검색 관련 요소
   const searchInput = document.getElementById('searchInput');
   const searchDropdown = document.getElementById('searchDropdown');
   const sOverlay = document.getElementById('searchOverlay');
@@ -668,30 +670,23 @@
         if(isAdmin) document.body.classList.add('admin-mode');
         if(isPreview) document.body.classList.add('preview-active');
         
-        // 1. 서버 데이터 가져오기
         let serverData = null;
         try {
             const res = await fetch('data.json?v=' + Date.now());
             if(res.ok) serverData = await res.json();
-        } catch(e) { console.log("data.json 로드 실패, 로컬 데이터만 사용합니다."); }
+        } catch(e) { console.log("data.json 로드 실패"); }
 
         if(serverData && serverData.security) {
             globalSecurity = serverData.security;
         }
 
-        // 2. 로컬 데이터 확인 및 분기
         const hasLocalData = localStorage.getItem('kac_index_order');
         let loaded = loadSubjectsFromLocal();
 
-        // 관리자 모드이거나 로컬 데이터가 있으면 로컬 우선
         if (isAdmin && hasLocalData) {
             console.log("🛠️ Admin: Using Local Data");
         } 
-        // 일반 사용자이거나 로컬 데이터가 없으면 서버 데이터로 강제 동기화
         else if (serverData) {
-            console.log("🔄 User: Syncing with Server");
-            
-            // LocalStorage에 쓰기 (백그라운드)
             serverData.categories.forEach(cat => {
                 if(cat) {
                     cat.menus.forEach(m => {
@@ -699,8 +694,6 @@
                     });
                 }
             });
-
-            // 서버 데이터에서 현재 페이지에 해당하는 subjects 직접 찾아서 로드 (동기화 지연 방지)
             const currentCat = serverData.categories.find(c => c && c.id === type);
             if(currentCat) {
                 const currentMenu = currentCat.menus.find(m => m.id === menuId);
@@ -713,14 +706,18 @@
 
         if (!loaded) subjects = [];
 
-        // 스타일 적용
         const sData = localStorage.getItem(`kac_style_${type}`);
         const style = sData ? JSON.parse(sData) : { name: type, color: '#2563eb' };
         applyStyles(style);
 
+        // [추가] 저장된 트리 위치 불러오기
+        const savedPos = localStorage.getItem('kac_tree_pos') || 0;
+        document.documentElement.style.setProperty('--tree-pos-x', savedPos + 'px');
+
         render();
         buildSearchIndex();
         checkAutoOpen();
+        renderSidebar(); // 사이드바 로드
 
     } catch (err) {
         console.error("Initialization Error:", err);
@@ -728,7 +725,39 @@
     }
   }
 
-  // 동기화 이벤트
+  // 사이드바 로직
+  function toggleSidebar() {
+      const sb = document.getElementById('sidebar');
+      const ov = document.getElementById('sidebarOverlay');
+      sb.classList.toggle('active');
+      ov.classList.toggle('active');
+  }
+
+  function renderSidebar() {
+      const content = document.getElementById('sidebarContent');
+      content.innerHTML = '';
+      const order = JSON.parse(localStorage.getItem('kac_index_order') || '[]');
+      
+      order.forEach(tid => {
+          if(!tid) return;
+          const style = JSON.parse(localStorage.getItem(`kac_style_${tid}`) || '{}');
+          
+          const isActive = tid === type; 
+          const itemClass = isActive ? 'sb-item active' : 'sb-item';
+
+          const item = document.createElement('div');
+          item.innerHTML = `
+            <div class="${itemClass}" onclick="location.href='facility.html?type=${tid}'">
+                <span style="display:flex;align-items:center;gap:10px;">
+                    <span style="width:10px;height:10px;border-radius:50%;background:${style.color || '#2563eb'}"></span>
+                    ${style.name || tid}
+                </span>
+            </div>
+          `;
+          content.appendChild(item);
+      });
+  }
+
   window.addEventListener('pageshow', () => {
       const savedStatus = localStorage.getItem('kac_admin_mode') === '1';
       if (isAdmin !== savedStatus) location.reload();
@@ -830,21 +859,44 @@
     location.reload();
   }
 
+  // [추가] 트리 위치 업데이트 함수
+  function updateTreePos(val) {
+      document.documentElement.style.setProperty('--tree-pos-x', val + 'px');
+      document.getElementById('treePosVal').textContent = val;
+      localStorage.setItem('kac_tree_pos', val);
+  }
+
   let currentEditIdx = -1;
   let viewingIndex = -1; 
 
   async function render() {
     const list = document.getElementById('subjectList'); list.innerHTML = '';
-    
-    // 세션 스토리지에서 마지막으로 본 ID 가져오기
     const lastViewedId = sessionStorage.getItem('kac_last_viewed_id');
 
-    // 데이터가 없을 경우 안내 메시지
+    // [수정] 트리 컨테이너 생성
+    const treeContainer = document.createElement('div');
+    treeContainer.className = 'tree-container';
+    
+    // [수정] 상단 명칭 카드 추가
+    const catCard = document.createElement('div');
+    catCard.className = 'cat-title-card';
+    // 시설 이름 가져오기 (메뉴명이 있다면 표시, 없으면 '시설 정보')
+    catCard.textContent = menuName || "교육 과정 목록";
+    treeContainer.appendChild(catCard);
+
+    // [수정] 중앙 세로선 추가
+    const spine = document.createElement('div');
+    spine.className = 'tree-spine';
+    treeContainer.appendChild(spine);
+
     if(subjects.length === 0) {
-        list.innerHTML = `<div style="text-align:center; padding:50px; color:var(--text-sub); opacity:0.7;">
-            <div style="font-size:40px; margin-bottom:10px;">📭</div>
-            <div style="font-weight:700;">표시할 데이터가 없습니다.</div>
-        </div>`;
+        const emptyMsg = document.createElement('div');
+        emptyMsg.style.textAlign = 'center';
+        emptyMsg.style.padding = '50px';
+        emptyMsg.style.color = 'var(--text-sub)';
+        emptyMsg.style.opacity = '0.7';
+        emptyMsg.innerHTML = `<div style="font-size:40px; margin-bottom:10px;">📭</div><div style="font-weight:700;">표시할 데이터가 없습니다.</div>`;
+        treeContainer.appendChild(emptyMsg);
     }
 
     for (let i = 0; i < subjects.length; i++) {
@@ -854,6 +906,10 @@
       const hasAudio = !!sub.audioName;
       const hasLink = !!sub.link;
       
+      // [수정] 카드를 wrapper로 감싸서 트리 선과 연결
+      const wrapper = document.createElement('div');
+      wrapper.className = 'card-wrapper';
+
       const card = document.createElement('div'); 
       const isLast = lastViewedId === sub.id;
       card.className = `subject-card ${isActive ? '' : 'inactive'} ${isLast ? 'last-viewed' : ''}`;
@@ -901,7 +957,7 @@
 
       card.innerHTML = `
         <div class="last-viewed-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
             <span>Last Viewed</span>
         </div>
         <div>
@@ -913,18 +969,24 @@
             </div>
         </div>
         <div class="ctrl-btns">${(isAdmin && !isPreview) ? `${moveBtn}<button class="btn-action" onclick="event.stopPropagation(); openUploadMenu(${i})">수정</button><button class="btn-action btn-del" onclick="event.stopPropagation(); deleteSubject(${i})">삭제</button>` : `<button class="btn-action" style="visibility:hidden">.</button>`}</div>`;
-      list.appendChild(card);
+      
+      wrapper.appendChild(card);
+      treeContainer.appendChild(wrapper);
     }
 
     if(isAdmin && !isPreview) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'card-wrapper';
       const addBtn = document.createElement('div');
       addBtn.className = 'subject-card add-card';
       addBtn.innerHTML = '+ 새로운 교육 과정(Subject) 추가';
       addBtn.onclick = () => { const n = prompt("새 과목명을 입력하세요"); if(n) { subjects.push({ id: Date.now().toString(), name: n, active: true }); saveSubjects(); } };
-      list.appendChild(addBtn);
+      wrapper.appendChild(addBtn);
+      treeContainer.appendChild(wrapper);
     }
     
-    // AutoOpen 처리 및 헤더 겹침 체크
+    list.appendChild(treeContainer);
+
     checkAutoOpen();
     checkHeaderOverlap();
     
@@ -962,6 +1024,12 @@
         previewBtn.style.background = "";
         previewBtn.style.color = "";
     }
+
+    // [추가] 설정값 로드
+    const currentPos = localStorage.getItem('kac_tree_pos') || 0;
+    document.getElementById('treePosRange').value = currentPos;
+    document.getElementById('treePosVal').textContent = currentPos;
+
     document.getElementById('settingsModal').style.display = 'flex';
   }
 
@@ -1028,7 +1096,6 @@
     if(updatedCount > 0) { saveSubjects(); alert("수정되었습니다."); document.getElementById('batchModal').style.display = 'none'; }
   }
 
-  // 검색 인덱스 생성
   let allSubjectsIndex = [];
   function buildSearchIndex() {
     allSubjectsIndex = [];
@@ -1054,7 +1121,6 @@
     } catch(e) { console.error("Search Index Build Error", e); }
   }
 
-  // 검색 기능 이벤트 리스너
   if(searchInput) {
     searchInput.addEventListener('input', (e) => {
         const query = e.target.value.trim().toLowerCase();
@@ -1304,21 +1370,18 @@
     const ctx = newCanvas.getContext('2d');
     const page = await pdfDoc.getPage(pageNum);
     
-    // [중요] 뷰포트 스케일 계산 로직 (모바일 vs 데스크탑 분기)
     const isMobile = window.innerWidth <= 768;
     let viewport;
     
     if (isMobile) {
-        // 모바일: 너비 기준 맞춤 + 고해상도 (1.5배) + 스크롤 허용
         const unscaledViewport = page.getViewport({ scale: 1 });
         const scale = (window.innerWidth / unscaledViewport.width) * 1.5; 
         viewport = page.getViewport({ scale: scale });
     } else {
-        // PC: 화면 높이에 딱 맞춤 (스크롤 없음)
         const unscaledViewport = page.getViewport({ scale: 1 });
         const scaleX = window.innerWidth / unscaledViewport.width;
         const scaleY = window.innerHeight / unscaledViewport.height;
-        const baseScale = Math.min(scaleX, scaleY) * 0.98; // 여백 약간
+        const baseScale = Math.min(scaleX, scaleY) * 0.98; 
         viewport = page.getViewport({ scale: baseScale }); 
     }
     
@@ -1370,7 +1433,6 @@
     } 
   };
 
-  // [수정] 모바일 화면 터치 시 닫기 버튼 3초간 노출 로직
   let touchStartY = 0;
   let touchEndY = 0;
   let closeBtnTimeout = null;
@@ -1381,39 +1443,19 @@
       if (!mobileCloseBtn || window.innerWidth > 768) return;
       
       mobileCloseBtn.classList.add('visible');
-      
       if(closeBtnTimeout) clearTimeout(closeBtnTimeout);
-      
-      closeBtnTimeout = setTimeout(() => {
-          mobileCloseBtn.classList.remove('visible');
-      }, 2500); // 2.5초 후 사라짐
+      closeBtnTimeout = setTimeout(() => { mobileCloseBtn.classList.remove('visible'); }, 2500);
   }
 
-  overlay.addEventListener('touchstart', e => {
-      touchStartY = e.changedTouches[0].screenY;
-      showMobileCloseBtn(); // 터치 시작 시 버튼 보이기
-  }, {passive: true});
-
-  overlay.addEventListener('touchend', e => {
-      touchEndY = e.changedTouches[0].screenY;
-      handleSwipe();
-  }, {passive: true});
-  
-  // 클릭시에도 버튼 보이기 (PDF 넘기기 클릭 등)
-  overlay.addEventListener('click', () => {
-      showMobileCloseBtn();
-  });
+  overlay.addEventListener('touchstart', e => { touchStartY = e.changedTouches[0].screenY; showMobileCloseBtn(); }, {passive: true});
+  overlay.addEventListener('touchend', e => { touchEndY = e.changedTouches[0].screenY; handleSwipe(); }, {passive: true});
+  overlay.addEventListener('click', () => { showMobileCloseBtn(); });
 
   function handleSwipe() {
       const distance = touchStartY - touchEndY;
-      if (distance > minSwipeDistance) {
-          nextPage();
-      } else if (distance < -minSwipeDistance) {
-          prevPage();
-      }
+      if (distance > minSwipeDistance) { nextPage(); } else if (distance < -minSwipeDistance) { prevPage(); }
   }
   
-  // 모든 설정이 끝난 후 초기화 실행
   init();
 </script>
 </body>
