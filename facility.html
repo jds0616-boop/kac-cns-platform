@@ -47,13 +47,12 @@
     overflow: hidden; color: var(--text-main); transition: background 0.3s, color 0.3s; 
   }
 
-  /* [중요] 모달 스타일 최상단 배치 및 강제 숨김 처리 */
+  /* 모달 스타일 최상단 배치 및 강제 숨김 처리 */
   .modal-overlay { 
       position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
-      z-index: 9999; display: none !important; /* 기본 숨김 강제 */
+      z-index: 9999; display: none !important; 
       align-items: center; justify-content: center; 
   }
-  /* JS에서 display: flex로 변경 시 보이도록 설정 */
   .modal-overlay[style*="display: flex"] { display: flex !important; }
 
   body.preview-active .admin-ctrl, body.preview-active .add-btn-wrap { display: none !important; }
@@ -68,7 +67,7 @@
     display: flex; align-items: center; justify-content: space-between; 
     padding: 0 20px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.15); 
     z-index: 1000; flex-shrink: 0; 
-    position: fixed; top: 0; left: 0; width: 100%; /* PC/모바일 모두 고정 */
+    position: fixed; top: 0; left: 0; width: 100%;
   }
   
   .header-left { display: flex; align-items: center; gap: 15px; z-index: 10; min-width: 0; flex-shrink: 1; }
@@ -84,8 +83,16 @@
   .header-center-title {
       position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
       font-size: 24px; font-weight: 800; color: #fff; letter-spacing: -0.5px;
-      display: flex; align-items: center; gap: 8px; z-index: 5;
+      display: flex; align-items: center; gap: 10px; z-index: 5;
       white-space: nowrap; pointer-events: none;
+  }
+  
+  /* [추가] 헤더 중앙 아이콘 뱃지 */
+  .title-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; border-radius: 8px;
+      font-size: 18px; font-weight: 900; color: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   }
 
   .header-right { display: flex; align-items: center; gap: 15px; z-index: 10; flex-shrink: 0; }
@@ -107,18 +114,18 @@
   .sidebar-close { cursor: pointer; padding: 8px; border-radius: 50%; transition: 0.2s; }
   .sidebar-close:hover { background: var(--btn-bg); }
   .sidebar-content { flex: 1; overflow-y: auto; padding: 10px; }
+  
   .sb-item { padding: 12px 15px; cursor: pointer; border-radius: 10px; color: var(--text-main); font-weight: 600; transition: 0.2s; display: flex; align-items: center; justify-content: space-between; font-size: 14px; }
   .sb-item:hover { background: var(--btn-bg); color: #2563eb; }
-  .sb-sub-list { display: none; padding-left: 20px; margin-bottom: 5px; }
-  .sb-sub-list.open { display: block; animation: slideDown 0.2s; }
-  .sb-sub-item { padding: 8px 15px; font-size: 13px; color: var(--text-sub); cursor: pointer; border-left: 2px solid var(--btn-border); transition: 0.2s; }
-  .sb-sub-item:hover { border-left-color: #2563eb; color: #2563eb; background: rgba(37,99,235,0.05); }
+  /* [추가] 사이드바 현재 위치 하이라이트 */
+  .sb-item.active { background: #eff6ff; border-left: 4px solid #2563eb; color: #2563eb; }
+  body.dark-mode .sb-item.active { background: rgba(37,99,235,0.1); }
 
-  /* 컨텐츠 영역 (헤더 높이만큼 패딩 추가) */
+  /* 컨텐츠 영역 */
   .content-wrapper { 
       flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; 
       width: 100%; overflow-y: auto; 
-      padding-top: 100px; /* 헤더 공간 확보 */
+      padding-top: 100px; /* 기존 여백 유지 */
       padding-bottom: 80px; 
       position: relative; 
   }
@@ -154,7 +161,9 @@
   
   /* 카드 스타일 */
   .menu-card { 
-    background: var(--bg-card); width: 280px; min-height: 280px; height: auto; padding: 35px 25px; 
+    background: var(--bg-card); width: 280px; 
+    min-height: 230px; /* [수정] 카드 높이 축소 (280 -> 230) */
+    height: auto; padding: 30px 25px; 
     border-radius: 25px; box-shadow: var(--shadow); border: 2px solid transparent; 
     cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; 
     align-items: center; justify-content: flex-start; position: relative; 
@@ -197,26 +206,32 @@
   .page-dot { width: 12px; height: 12px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--btn-border); color: transparent; cursor: pointer; transition: 0.3s; font-size: 0; }
   .page-dot.active { background: var(--theme-color); transform: scale(1.3); }
   
-  /* 로딩 & 하단바 */
+  /* 로딩 */
   #loadingSpinner { position: fixed; inset: 0; background: var(--bg-main); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
   .spinner { width: 50px; height: 50px; border: 5px solid #cbd5e1; border-top-color: #2563eb; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
 
-  /* [수정] 하단 플로팅 버튼 가독성 개선 (진한 배경) */
+  /* [수정] PC 하단 버튼 우측 하단 배치 */
   .bottom-nav { 
-    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
-    background: #1e293b; /* 진한 네이비 */
-    padding: 15px 45px; border-radius: 100px; 
-    display: flex; gap: 40px; align-items: center; 
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000; 
-    border: 1px solid rgba(255,255,255,0.2); 
+    position: fixed; bottom: 30px; right: 30px; left: auto; transform: none; /* PC: 우측 하단 */
+    background: rgba(255, 255, 255, 0.9); 
+    padding: 12px 30px; border-radius: 100px; 
+    display: flex; gap: 30px; align-items: center; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 1000; 
+    border: 1px solid rgba(0,0,0,0.1); 
+    backdrop-filter: blur(5px);
   }
-  .nav-item { color: #fff; cursor: pointer; font-size: 18px; font-weight: 700; transition: 0.3s; opacity: 0.9; display: flex; align-items: center; gap: 10px; }
-  .nav-item:hover { opacity: 1; transform: translateY(-3px); }
+  .nav-item { color: #0f172a; cursor: pointer; font-size: 16px; font-weight: 700; transition: 0.3s; opacity: 0.9; display: flex; align-items: center; gap: 8px; }
+  .nav-item:hover { opacity: 1; transform: translateY(-2px); }
   
+  body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(255, 255, 255, 0.3); }
+  body.dark-mode .nav-item { color: #e2e8f0; }
+
+  /* [수정] 하단바 Sticky Footer */
   .main-footer {
     width: 100%; background: var(--navy); padding: 30px 20px;
     text-align: center; color: rgba(255,255,255,0.7);
-    margin-top: auto; flex-shrink: 0; font-size: 13px; line-height: 1.6;
+    margin-top: auto; /* Sticky */
+    flex-shrink: 0; font-size: 13px; line-height: 1.6;
     border-top: 1px solid rgba(255,255,255,0.1); box-sizing: border-box;
   }
   .main-footer p { margin: 0; word-break: keep-all; }
@@ -230,12 +245,14 @@
     
     header { position: fixed; top: 0; left: 0; width: 100%; padding: 0 10px; z-index: 2500; }
     
+    /* 헤더 중앙 제목 모바일에서 숨김 */
+    .header-center-title { display: none; }
+
     .content-wrapper { height: auto; overflow: visible; padding-top: 90px; padding-bottom: 120px; display: block; }
     
     .header-left { gap: 5px; flex: 1; }
     .logo-text { font-size: 13px; max-width: none; white-space: nowrap; }
     .kac-logo-img { display: none; }
-    .header-center-title { display: none; }
     .breadcrumb { display: none; }
     
     .header-right { gap: 8px; }
@@ -274,15 +291,34 @@
     /* 모바일에서 화살표 숨김 */
     .arrow-nav { display: none; }
     
-    .bottom-nav { width: 90%; bottom: 20px; padding: 12px 0; justify-content: center; gap: 30px; border-radius: 20px; }
-    .nav-item { font-size: 14px; gap: 6px; }
+    /* [수정] 모바일 하단 버튼 디자인 (Fit-content, 가독성 강화) */
+    .bottom-nav { 
+        position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+        right: auto;
+        width: auto; max-width: 90%; 
+        padding: 12px 30px; 
+        justify-content: center; gap: 30px; border-radius: 30px;
+        
+        /* 주간 모드: 흰색 배경, 진한 테두리 */
+        background: rgba(255,255,255,0.95);
+        border: 1px solid #94a3b8;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    }
+    .nav-item { font-size: 14px; gap: 6px; color: #334155; }
 
     .main-footer { padding: 25px 15px; margin-top: 30px; }
     .main-footer p { font-size: 11px; white-space: normal; }
     .main-footer .copyright { font-size: 11px; }
   }
+  
+  /* 모바일 야간 모드 버튼 */
+  body.dark-mode .bottom-nav {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid #475569;
+  }
+  body.dark-mode .bottom-nav .nav-item { color: #e2e8f0; }
 
-  /* 모달 스타일 */
+  /* 모달 스타일 (초기 로딩 시 display: none으로 숨김 처리) */
   .modal-card { background: var(--bg-card); padding: 40px; border-radius: 30px; width: 500px; color: var(--text-main); box-shadow: 0 20px 50px rgba(0,0,0,0.5); max-height: 95vh; overflow-y: auto; }
   .modal-title { font-size: 22px; font-weight: 800; margin-bottom: 25px; border-bottom: 1px solid var(--btn-border); padding-bottom: 12px; display: flex; align-items: center; gap: 10px; }
   .setting-group { margin-bottom: 25px; }
@@ -291,6 +327,7 @@
   .btn-modal { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 15px; margin-top: 12px; }
   .btn-primary { background: #0f172a; color: #fff; }
   .btn-secondary { background: #e2e8f0; color: #64748b; }
+  .btn-preview-active { background: #10b981 !important; color: #fff !important; }
   
   @keyframes spin { 100% { transform: rotate(360deg); } }
   @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
@@ -326,8 +363,9 @@
     <span class="breadcrumb" id="bc"></span>
   </div>
   
-  <!-- 헤더 중앙 제목 (PC용) -->
+  <!-- 헤더 중앙 제목 (PC용) + 아이콘 뱃지 -->
   <div class="header-center-title">
+      <div id="titleBadge" class="title-badge"></div>
       <span id="pageHeadline"></span>
   </div>
 
@@ -354,6 +392,7 @@
   </div>
 
   <div id="gridWrapper">
+    <!-- 좌우 화살표 내비게이션 -->
     <div id="prevArrow" class="arrow-nav left" onclick="goPrevPage()">
         <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
     </div>
@@ -526,6 +565,13 @@
       // 헤더 중앙 제목 설정
       document.getElementById('pageHeadline').textContent = style.name || type;
       
+      // [추가] 헤더 뱃지(C, N 등) 설정
+      const badge = document.getElementById('titleBadge');
+      if(badge) {
+          badge.textContent = style.code || type.charAt(0);
+          badge.style.backgroundColor = style.color || '#2563eb';
+      }
+
       // 브레드크럼 설정
       document.getElementById('bc').textContent = ` > ${style.name || type}`;
       
@@ -557,9 +603,12 @@
           if(!tid) return;
           const style = JSON.parse(localStorage.getItem(`kac_style_${tid}`) || '{}');
           
+          const isActive = tid === type; // 현재 페이지인지 확인
+          const itemClass = isActive ? 'sb-item active' : 'sb-item';
+
           const item = document.createElement('div');
           item.innerHTML = `
-            <div class="sb-item" onclick="location.href='facility.html?type=${tid}'">
+            <div class="${itemClass}" onclick="location.href='facility.html?type=${tid}'">
                 <span style="display:flex;align-items:center;gap:10px;">
                     <span style="width:10px;height:10px;border-radius:50%;background:${style.color || '#2563eb'}"></span>
                     ${style.name || tid}
@@ -683,11 +732,14 @@
     gSet.style.display = isAdmin ? 'none' : 'block';
     aSet.style.display = isAdmin ? 'block' : 'none';
     if(isAdmin) {
+      // [수정] 설정값 프리셋 자동 채우기
       document.getElementById('setFacIconSize').value = localStorage.getItem('kac_fac_icon_size') || 28; 
       document.getElementById('setFacLabelSize').value = localStorage.getItem('kac_fac_label_size') || 18; 
+      
       const pBtn = document.getElementById('modalPreviewBtn'); 
       pBtn.textContent = isPreview ? "미리보기 종료" : "미리보기 시작"; 
-      pBtn.classList.toggle('btn-preview-active', isPreview); 
+      if(isPreview) pBtn.classList.add('btn-preview-active');
+      else pBtn.classList.remove('btn-preview-active');
     }
     const modal = document.getElementById('settingsModal');
     modal.style.display = 'flex';
