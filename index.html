@@ -37,7 +37,7 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
   
-  /* PC 기본: 스크롤 막고 내부에서 처리 */
+  /* [PC 기본] 스크롤 막고 내부에서 처리 (모바일에서 해제됨) */
   html, body { width: 100%; height: 100%; overflow: hidden; }
   
   body { 
@@ -198,19 +198,27 @@
   body.admin-mode .footer-edit-btn { display: inline-block; }
 
   /* ========================================= */
-  /* [모바일 전용 최적화] */
+  /* [모바일 전용 최적화] - 수정됨 */
   /* ========================================= */
   @media (max-width: 768px) {
-    /* [수정] 모바일에서는 html/body의 스크롤 고정을 해제해야 자연스럽게 스크롤 됩니다. */
-    html { height: auto; overflow: visible; }
-    body { display: block; height: auto; overflow: visible; overflow-x: hidden; position: relative; }
+    /* [중요] 모바일에서는 html/body의 스크롤 고정 및 높이 제한을 해제해야 함 */
+    html, body { 
+        width: 100%; 
+        height: auto !important; 
+        overflow: visible !important; 
+        overflow-x: hidden !important;
+        position: static !important;
+    }
     
     header { position: fixed; top: 0; padding: 0 10px; z-index: 5000; }
 
+    /* [중요] 중앙 정렬 해제 및 기본 블록 배치로 변경하여 키보드 밀림 방지 */
     .content-wrapper { 
-        height: auto; overflow: visible; 
-        padding-top: 85px; padding-bottom: 0; 
-        display: block; 
+        height: auto !important; 
+        overflow: visible !important; 
+        padding-top: 90px; 
+        padding-bottom: 50px; 
+        display: block !important; 
     }
     
     .center-content-box { display: block; width: 100%; }
@@ -242,11 +250,15 @@
     .card-ctrl { top: 50%; right: 10px; transform: translateY(-50%); width: auto; flex-direction: row; }
     .btn-sm { padding: 6px 10px; }
 
-    /* [수정] 모바일 푸터: 고정(absolute) 해제 및 문서 흐름에 따름(relative/static) */
+    /* [중요] 모바일 푸터: 절대 위치(고정) 해제하고 문서 흐름에 따름 */
     .main-footer { 
-        padding: 25px 15px; margin-top: 30px; 
-        position: relative; /* 고정 위치 해제 */
-        height: auto; bottom: auto; left: auto;
+        position: relative !important; 
+        bottom: auto !important; 
+        left: auto !important;
+        margin-top: 30px; 
+        height: auto; 
+        padding: 25px 15px; 
+        width: 100%;
     }
     .main-footer p { font-size: 11px; white-space: normal; }
   }
