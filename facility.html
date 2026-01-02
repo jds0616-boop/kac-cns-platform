@@ -104,8 +104,9 @@
   .sb-sub-item { padding: 8px 15px; font-size: 13px; color: var(--text-sub); cursor: pointer; border-left: 2px solid var(--btn-border); transition: 0.2s; }
   .sb-sub-item:hover { border-left-color: #2563eb; color: #2563eb; background: rgba(37,99,235,0.05); }
 
-  /* 컨텐츠 영역 */
-  .content-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; width: 100%; overflow-y: auto; padding: 60px 0 0 0; position: relative; }
+  /* 컨텐츠 영역 (PC용 여백 복구) */
+  .content-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; width: 100%; overflow-y: auto; padding: 120px 0 0 0; position: relative; }
+  
   .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 30px; flex-shrink: 0; z-index: 2000; position: relative; padding: 0 20px; }
   .search-container { position: relative; width: 600px; max-width: 100%; }
   
@@ -184,10 +185,22 @@
   #loadingSpinner { position: fixed; inset: 0; background: var(--bg-main); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
   .spinner { width: 50px; height: 50px; border: 5px solid #cbd5e1; border-top-color: #2563eb; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
 
-  .bottom-nav { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); background: var(--navy); padding: 15px 45px; border-radius: 100px; display: flex; gap: 40px; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000; border: 1px solid rgba(255,255,255,0.1); }
-  .nav-item { color: #fff; cursor: pointer; font-size: 18px; font-weight: 700; transition: 0.3s; opacity: 0.8; display: flex; align-items: center; gap: 10px; }
+  /* [수정] 하단 플로팅 버튼 가독성 개선 */
+  .bottom-nav { 
+    position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); 
+    background: rgba(255, 255, 255, 0.85); /* 밝은 배경 */
+    padding: 15px 45px; border-radius: 100px; 
+    display: flex; gap: 40px; align-items: center; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 1000; 
+    border: 1px solid rgba(0,0,0,0.1); 
+    backdrop-filter: blur(10px);
+  }
+  .nav-item { color: #0f172a; cursor: pointer; font-size: 18px; font-weight: 700; transition: 0.3s; opacity: 0.9; display: flex; align-items: center; gap: 10px; }
   .nav-item:hover { opacity: 1; transform: translateY(-3px); }
-  body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.95); }
+  
+  /* 야간 모드용 하단 버튼 */
+  body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(255, 255, 255, 0.3); }
+  body.dark-mode .nav-item { color: #e2e8f0; }
 
   .main-footer {
     width: 100%; background: var(--navy); padding: 30px 20px;
@@ -220,24 +233,39 @@
 
     /* 리스트형 카드 변환 */
     #trainGrid { gap: 15px; padding: 10px 0; min-height: auto; flex-direction: column; flex-wrap: nowrap; }
+    
     .menu-card { 
       width: 100%; height: auto; min-height: 80px; 
-      flex-direction: row; justify-content: flex-start; 
+      flex-direction: row; justify-content: flex-start; align-items: center;
       padding: 15px 20px; gap: 15px; border-radius: 16px; 
       border-top: 2px solid var(--border-card); border-left: 6px solid var(--theme-color);
     }
     .menu-card:hover { transform: translateY(-3px); }
+    
+    /* [수정] 아이콘 박스 유동 확장 및 폰트 축소 */
     .icon-circle { 
-        min-width: 50px; width: 50px; height: 50px; min-height: 50px; 
-        border-radius: 15px; margin-bottom: 0; font-size: 20px; flex-shrink: 0; padding: 0;
+        width: auto !important; min-width: 55px; height: auto !important; min-height: 50px;
+        padding: 8px 12px !important;
+        border-radius: 15px; margin-bottom: 0; 
+        font-size: 13px !important; line-height: 1.2;
+        flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+        aspect-ratio: auto;
     }
-    .menu-label { font-size: 16px !important; text-align: left; word-break: keep-all; flex: 1; }
+    
+    /* [수정] 메뉴명 좌측 정렬 및 줄바꿈 허용 */
+    .menu-label { 
+        font-size: 16px !important; text-align: left !important; 
+        word-break: keep-all; flex: 1; 
+        white-space: normal; line-height: 1.4;
+    }
+    
     .admin-ctrl { flex-direction: row; width: auto; gap: 4px; margin-top: 0; }
     .btn-sm { padding: 5px 8px; font-size: 10px; }
 
     /* 모바일에서 화살표 숨김 (터치 스크롤 사용) */
     .arrow-nav { display: none; }
-    .bottom-nav { width: 90%; bottom: 20px; padding: 12px 0; justify-content: center; gap: 30px; border-radius: 20px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); }
+    
+    .bottom-nav { width: 90%; bottom: 20px; padding: 12px 0; justify-content: center; gap: 30px; border-radius: 20px; }
     .nav-item { font-size: 14px; gap: 6px; }
 
     .main-footer { padding: 25px 15px; margin-top: 30px; }
@@ -297,7 +325,7 @@
   <div class="header-right">
     <div class="theme-toggle">
       <div class="theme-btn" id="btnDay" onclick="setTheme('light')" title="주간">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg>
       </div>
       <div class="theme-btn" id="btnNight" onclick="setTheme('dark')" title="야간">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C6.94,10.39 9.79,16.87 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z"/></svg>
