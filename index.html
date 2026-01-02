@@ -37,21 +37,20 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
   
-  html, body { width: 100%; height: 100%; overflow: hidden; }
+  /* [중요] 가로 스크롤 방지 */
+  html, body { width: 100%; overflow-x: hidden; }
   
   body { 
-    background: var(--bg-main); display: flex; flex-direction: column; 
-    color: var(--text-main); transition: background 0.3s, color 0.3s; 
+    background: var(--bg-main); 
+    height: 100vh; 
+    display: flex; 
+    flex-direction: column; 
+    overflow: hidden; /* PC 기본 */
+    color: var(--text-main); 
+    transition: background 0.3s, color 0.3s; 
   }
 
-  /* 모달 스타일 */
-  .modal-overlay { 
-      position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
-      z-index: 9999; display: none !important; 
-      align-items: center; justify-content: center; 
-  }
-  .modal-overlay[style*="display: flex"] { display: flex !important; }
-
+  /* 관리자/미리보기 제어 */
   body.preview-active .card-ctrl, body.preview-active .add-slot { display: none !important; }
   
   /* 헤더 스타일 */
@@ -59,8 +58,8 @@
     height: var(--header-h); background: var(--navy); 
     display: flex; align-items: center; justify-content: space-between; 
     padding: 0 20px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.15); 
-    z-index: 1000; flex-shrink: 0; 
-    position: fixed; top: 0; left: 0; width: 100%;
+    z-index: 1000; flex-shrink: 0; position: relative; 
+    width: 100%;
   }
   
   .header-left { display: flex; align-items: center; gap: 15px; z-index: 10; min-width: 0; flex-shrink: 1; }
@@ -68,9 +67,13 @@
   .hamburger-btn:hover { background: rgba(255,255,255,0.1); }
   .hamburger-btn svg { width: 24px; height: 24px; fill: #fff; }
 
-  .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .logo-text { 
+    font-size: 20px; font-weight: 800; letter-spacing: -0.5px; 
+    cursor: pointer; white-space: nowrap; 
+    overflow: hidden; text-overflow: ellipsis;
+  }
   
-  /* 헤더 중앙 페이지 제목 */
+  /* 헤더 중앙 페이지 제목 영역 */
   .header-center-title {
       position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
       font-size: 24px; font-weight: 800; color: #fff; letter-spacing: -0.5px;
@@ -93,7 +96,7 @@
   .settings-btn { display: flex; padding: 8px; width: 34px; height: 34px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.3s; color: #cbd5e1; }
   .settings-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
 
-  /* 사이드바 */
+  /* [수정] 사이드바 z-index 상향 조정 (검색창 2000보다 높게) */
   .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 3000; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(2px); }
   .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
   
@@ -120,37 +123,20 @@
   /* 컨텐츠 영역 */
   .content-wrapper { 
       flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; 
-      width: 100%; overflow-y: auto; 
-      padding-top: 135px; /* 헤더 + 여백 */
-      padding-bottom: 0; position: relative; 
+      width: 100%; overflow-y: auto; padding: 120px 0 0 0; position: relative; 
   }
   
-  /* [수정] 검색창 여백 늘려서 카드 내리기, pointer-events 조정하여 클릭 허용 */
-  .search-wrapper-outer { 
-      width: 100%; display: flex; justify-content: center; 
-      margin-bottom: 50px; /* 카드와 간격 벌림 (약 1cm) */
-      flex-shrink: 0; z-index: 2000; position: relative; padding: 0 20px; 
-      pointer-events: none; /* 빈 공간 클릭 통과 */
-  }
-  .search-container { 
-      position: relative; width: 600px; max-width: 100%; 
-      pointer-events: auto; /* 검색창은 클릭 가능 */
-  }
+  .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 30px; flex-shrink: 0; z-index: 2000; position: relative; padding: 0 20px; }
+  .search-container { position: relative; width: 600px; max-width: 100%; }
   
-  /* [수정] 검색창 디자인 복구 */
   .search-bar { 
-    width: 100%; padding: 18px 30px; border-radius: 50px; 
-    border: 2px solid #cbd5e1; /* 테두리 명확하게 */
-    background: #ffffff; color: #000000; /* 배경 흰색, 글자 검정 */
-    font-size: 16px; font-weight: 600; 
-    box-shadow: 0 8px 30px rgba(15, 23, 42, 0.12); transition: 0.3s; 
+    width: 100%; padding: 18px 30px; border-radius: 50px; border: 2px solid var(--search-border);
+    background: var(--bg-card); color: var(--text-main); font-size: 16px; font-weight: 600; 
+    box-shadow: var(--search-shadow); transition: 0.3s; 
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'%3E%3Cpath d='M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z'/%3E%3C/svg%3E"); 
     background-repeat: no-repeat; background-position: 25px center; background-size: 24px; padding-left: 65px; 
   }
   .search-bar:focus { outline: none; border-color: #2563eb; box-shadow: 0 12px 40px rgba(37, 99, 235, 0.18); transform: translateY(-2px); }
-  
-  /* 야간 모드 검색창 */
-  body.dark-mode .search-bar { background: #1e293b; color: #fff; border-color: #475569; }
 
   .search-results { position: absolute; top: calc(100% + 15px); left: 0; right: 0; width: 100%; background: var(--bg-card); border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); border: 1px solid var(--border-card); overflow: hidden; display: none; max-height: 400px; overflow-y: auto; z-index: 2001; }
   .search-results.active { display: block; animation: slideDown 0.2s ease-out; }
@@ -159,16 +145,13 @@
 
   /* 메인 카드 영역 & 애니메이션 */
   #cardContainerWrapper { width: 100%; max-width: 1700px; overflow: hidden; padding: 0 20px; flex: 1; }
-  
   #cardContainer { 
     display: flex; flex-wrap: wrap; gap: 30px; width: 100%; justify-content: center; padding: 20px; 
-    transform-style: preserve-3d; 
-    min-height: auto; /* [수정] 높이 자동 조절로 점과 간격 좁힘 */
-    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s;
+    transform-style: preserve-3d; min-height: 400px; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s;
   }
   
-  .card { background: var(--bg-card); width: 280px; height: 280px; padding: 30px 20px; border-radius: 25px; box-shadow: var(--shadow); border: var(--border-card); cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; border-left: 10px solid transparent; color: var(--text-main); --card-color: #64748b; border-left-color: var(--card-color); z-index: 1; }
-  .card:hover { transform: translateY(-10px); border-color: var(--card-color); box-shadow: 0 15px 30px -5px var(--card-color); z-index: 2; }
+  .card { background: var(--bg-card); width: 280px; height: 280px; padding: 30px 20px; border-radius: 25px; box-shadow: var(--shadow); border: var(--border-card); cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; border-left: 10px solid transparent; color: var(--text-main); --card-color: #64748b; border-left-color: var(--card-color); }
+  .card:hover { transform: translateY(-10px); border-color: var(--card-color); box-shadow: 0 15px 30px -5px var(--card-color); }
   .card.dragging { opacity: 0.4; border: 2px dashed #94a3b8; }
   .card.drag-over { transform: scale(1.05); box-shadow: 0 0 20px rgba(37, 99, 235, 0.3); border-color: #2563eb; z-index: 10; }
 
@@ -182,14 +165,47 @@
   .icon-box { width: 100px; height: 100px; border-radius: 30px; margin-bottom: 20px; font-weight: 900; display: flex; align-items: center; justify-content: center; background: var(--btn-bg); border: 1px solid var(--btn-border); font-size: var(--icon-size-idx, 60px); color: var(--card-color); pointer-events: none; }
   .card h2 { font-size: var(--label-size-idx, 24px); font-weight: 800; text-align: center; pointer-events: none; }
 
-  /* [수정] 모바일 전용 카드 스타일 (리스트형) */
+  /* 모바일 전용 UI 최적화 */
   @media (max-width: 768px) {
-    .header-center-title { font-size: 18px; max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
+    /* 전체 스크롤 허용 */
+    body { 
+        display: block; 
+        height: auto; 
+        overflow-y: auto; 
+        overflow-x: hidden; 
+    }
     
-    .content-wrapper { padding-top: 105px; padding-bottom: 120px; } /* 상하 여백 조정 */
-    .search-wrapper-outer { margin-bottom: 30px; } /* 모바일에서는 여백 줄임 */
+    header { 
+        position: sticky; 
+        top: 0; 
+        padding: 0 10px;
+    }
 
-    #cardContainer { gap: 15px; padding: 10px; min-height: auto; flex-direction: column; flex-wrap: nowrap; }
+    .content-wrapper { 
+        height: auto; 
+        overflow: visible; 
+        padding-top: 30px; 
+        padding-bottom: 120px; /* 하단 여백 */
+        display: block;
+    }
+
+    .header-left { gap: 5px; flex: 1; }
+    .logo-text { font-size: 13px; max-width: none; white-space: nowrap; }
+    .kac-logo-img { display: none; }
+    .header-center-title { display: none; }
+    
+    .header-right { gap: 8px; }
+    .theme-toggle { margin-right: 5px; }
+    .settings-btn { width: 30px; height: 30px; font-size: 16px; padding: 0; }
+
+    #cardContainerWrapper { padding: 0 15px; }
+    #cardContainer { 
+        gap: 15px; padding: 10px 0; 
+        min-height: auto; 
+        flex-direction: column; 
+        flex-wrap: nowrap;
+    }
+    
     .card { 
       width: 100%; height: auto; min-height: 90px; 
       flex-direction: row; justify-content: flex-start; 
@@ -200,40 +216,32 @@
     .card h2 { font-size: 18px; text-align: left; word-break: keep-all; flex: 1; }
     .card-ctrl { top: 50%; right: 10px; transform: translateY(-50%); width: auto; flex-direction: row; }
     .btn-sm { padding: 6px 10px; }
+
+    .main-footer { padding: 25px 15px; margin-top: 30px; }
+    .main-footer p { font-size: 11px; white-space: normal; }
+    .main-footer .copyright { font-size: 11px; }
   }
 
-  /* [수정] 페이지네이션 (카드 바로 밑에 붙도록 마진 조정) */
-  .pagination { 
-      display: flex; gap: 10px; 
-      margin-top: 5px; margin-bottom: 15px; /* 위쪽 여백 줄임 */
-      align-items: center; justify-content: center; flex-shrink: 0; 
-  }
+  .pagination { display: flex; gap: 10px; margin-top: 20px; align-items: center; justify-content: center; padding-bottom: 40px; flex-shrink: 0; }
   .page-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--btn-border); cursor: pointer; transition: 0.3s; }
   .page-dot.active { background: var(--navy); transform: scale(1.3); }
 
-  /* 하단바 (Footer) - 화면 바닥 고정 */
+  /* 하단바 (Footer) */
   .main-footer {
-    width: 100%; background: var(--navy); padding: 25px 20px;
-    text-align: center; color: rgba(255,255,255,0.7);
-    font-size: 13px; line-height: 1.6;
-    border-top: 1px solid rgba(255,255,255,0.1); box-sizing: border-box;
-    position: absolute; bottom: 0; left: 0; 
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    width: 100%;
+    background: var(--navy);
+    padding: 30px 20px;
+    text-align: center;
+    color: rgba(255,255,255,0.7);
+    margin-top: auto; 
+    flex-shrink: 0;
+    font-size: 13px;
+    line-height: 1.6;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    box-sizing: border-box;
   }
   .main-footer p { margin: 0; word-break: keep-all; }
   .main-footer .copyright { font-weight: 700; margin-top: 8px; color: rgba(255,255,255,0.9); }
-  
-  /* 하단바 텍스트 수정 버튼 */
-  .footer-edit-btn { margin-top: 8px; font-size: 11px; cursor: pointer; opacity: 0.5; color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 4px; display: none; }
-  .footer-edit-btn:hover { opacity: 1; background: rgba(255,255,255,0.1); }
-  body.admin-mode .footer-edit-btn { display: inline-block; }
-
-  /* [추가] 모바일 하단바 정렬 */
-  @media (max-width: 768px) {
-    .main-footer { padding: 20px 10px; position: static; } /* 모바일은 흐름 배치 */
-    .main-footer p { font-size: 3.2vw; white-space: nowrap; }
-    .main-footer .copyright { font-size: 3vw; }
-  }
 
   #loadingSpinner { position: fixed; inset: 0; background: var(--bg-main); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
   .spinner { width: 50px; height: 50px; border: 5px solid #cbd5e1; border-top-color: #2563eb; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
@@ -242,17 +250,30 @@
   .btn-del { color: #ef4444; border-color: #fee2e2; }
   .btn-move { color: #3b82f6; border-color: #dbeafe; }
 
-  /* 통합 관리자 모달 스타일 */
+  /* 통합 관리자 모달 스타일 (트리 UI 개선) */
   .tree-container { display: flex; height: 500px; border: 1px solid var(--btn-border); border-radius: 10px; overflow: hidden; margin-top: 15px; }
   .tree-sidebar { width: 35%; background: var(--bg-main); border-right: 1px solid var(--btn-border); overflow-y: auto; padding: 10px; }
   .tree-content { width: 65%; padding: 20px; overflow-y: auto; background: var(--bg-card); }
   
-  .t-node { padding: 8px; cursor: pointer; border-radius: 6px; font-size: 13px; color: var(--text-main); display: flex; align-items: center; gap: 5px; margin-bottom: 2px; }
-  .t-node:hover { background: rgba(37,99,235,0.1); }
-  .t-node.selected { background: #2563eb; color: #fff; }
-  .t-depth-0 { font-weight: 800; }
-  .t-depth-1 { padding-left: 20px; font-weight: 600; }
-  .t-depth-2 { padding-left: 40px; color: var(--text-sub); }
+  /* 트리 노드 스타일 */
+  .t-node-row { display: flex; align-items: center; padding: 4px 0; }
+  .t-toggle-btn { 
+      width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; 
+      cursor: pointer; font-size: 10px; color: var(--text-sub); flex-shrink: 0; 
+      transition: transform 0.2s;
+  }
+  .t-toggle-btn:hover { color: #2563eb; }
+  .t-toggle-btn.empty { cursor: default; opacity: 0; } /* 하위 없음 */
+  
+  .t-label { 
+      padding: 6px 10px; cursor: pointer; border-radius: 6px; font-size: 13px; 
+      color: var(--text-main); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .t-label:hover { background: rgba(37,99,235,0.1); }
+  .t-label.selected { background: #2563eb; color: #fff; }
+  
+  .t-children { display: none; padding-left: 18px; border-left: 1px solid var(--btn-border); margin-left: 11px; }
+  .t-children.open { display: block; }
 
   /* 공통 모달 */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none; align-items: center; justify-content: center; }
@@ -312,7 +333,7 @@
     <div class="logo-text" onclick="location.reload()">KAC CNS Training Platform</div>
   </div>
   
-  <!-- 헤더 중앙: 페이지 제목 -->
+  <!-- 헤더 중앙: 페이지 제목 (모바일에서는 자동 숨김) -->
   <div class="header-center-title">
       <span id="pageHeadline"></span>
       <span class="title-edit-icon" onclick="editPageTitle()">✏️</span>
@@ -343,9 +364,9 @@
 
   <!-- 하단바 (Footer) -->
   <footer class="main-footer">
-    <p></p>
+    <p>본 웹사이트는 한국공항공사 항공기술훈련원의 항행안전시설 분야 교육 관련 플랫폼입니다.</p>
+    <p>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)</p>
     <p class="copyright">© 2026 Korea Airports Corporation. All rights reserved.</p>
-    <span class="footer-edit-btn" onclick="editFooterText()">텍스트 수정</span>
   </footer>
 </div>
 
@@ -538,9 +559,6 @@
 
     // 페이지 타이틀 초기화
     if(!globalData.config.pageTitles) globalData.config.pageTitles = {};
-    
-    // 푸터 텍스트 로드
-    loadFooterText();
 
     ensurePageSlots();
     renderCards(false); 
@@ -552,26 +570,7 @@
       setTimeout(() => document.getElementById('loadingSpinner').style.display='none', 500);
     }, 500);
 
-    if(isAdmin) {
-        document.body.classList.add('admin-mode');
-        document.getElementById('headlineEditBtn').style.display = 'block';
-    }
-  }
-  
-  function loadFooterText() {
-      const savedText = localStorage.getItem('kac_footer_text');
-      const defaultText = "본 웹사이트는 한국공항공사 항공기술훈련원의 항행안전시설 분야 교육 관련 플랫폼입니다.<br>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)";
-      document.querySelector('.main-footer p').innerHTML = savedText || defaultText;
-  }
-
-  function editFooterText() {
-      const current = document.querySelector('.main-footer p').innerHTML;
-      const newVal = prompt("하단 문구를 입력하세요 (HTML 태그 사용 가능):", current.replace(/<br>/g, "\n"));
-      if(newVal !== null) {
-          const formatted = newVal.replace(/\n/g, "<br>");
-          localStorage.setItem('kac_footer_text', formatted);
-          loadFooterText();
-      }
+    if(isAdmin) document.body.classList.add('admin-mode');
   }
   
   function reconstructGlobalDataFromLocal() {
@@ -706,12 +705,12 @@
           }
 
           item.innerHTML = `
-            <div class="sb-item" onclick="toggleSubMenu('${cat.id}', this)">
+            <div class="sb-item" onclick="toggleSubMenu('${cat.id}')">
                 <span style="display:flex;align-items:center;gap:10px;">
                     <span style="width:10px;height:10px;border-radius:50%;background:${cat.color}"></span>
                     ${cat.name}
                 </span>
-                <span class="sb-toggle">▶</span>
+                <span style="font-size:10px;">▼</span>
             </div>
             ${subHtml}
           `;
@@ -719,17 +718,9 @@
       });
   }
 
-  function toggleSubMenu(id, element) {
+  function toggleSubMenu(id) {
       const el = document.getElementById(`sb-sub-${id}`);
-      if(el) {
-          if(el.classList.contains('open')) {
-              el.classList.remove('open');
-              element.querySelector('.sb-toggle').textContent = '▶';
-          } else {
-              el.classList.add('open');
-              element.querySelector('.sb-toggle').textContent = '▼';
-          }
-      }
+      if(el) el.classList.toggle('open');
   }
 
   /* 페이지 헤드라인 로직 */
@@ -797,7 +788,6 @@
             const card = document.createElement('div');
             card.className = 'card';
             card.style.setProperty('--card-color', cat.color);
-            // [수정] 카드 클릭 시 페이지 이동 (pointer-events: none 영역 피함)
             card.onclick = () => location.href = `facility.html?type=${cat.id}`;
             
             if(isAdmin && !isPreview) {
@@ -943,7 +933,7 @@
     renderCards(false);
   }
 
-  /* 종합 관리자 (Tree Editor) 로직 - 3단계까지 확장 */
+  /* 종합 관리자 (Tree Editor) 로직 - 접기/펼치기 적용 */
   function openIntegratedAdmin() {
     document.getElementById('settingsModal').style.display='none';
     document.getElementById('integratedAdminModal').style.display='flex';
@@ -958,7 +948,7 @@
       
       globalData.categories.forEach((cat, cIdx) => {
           if(!cat) return;
-          // Category Node
+          // Category
           const cDiv = createTreeNode(`📂 ${cat.name}`, 'cat', cIdx, null, null, true);
           root.appendChild(cDiv);
 
@@ -970,7 +960,7 @@
 
           if(cat.menus) {
               cat.menus.forEach((menu, mIdx) => {
-                  // Menu Node
+                  // Menu
                   const mDiv = createTreeNode(`📁 ${menu.label}`, 'menu', cIdx, mIdx, null, true);
                   cChildren.appendChild(mDiv);
 
@@ -980,7 +970,7 @@
                   mChildren.id = `child-menu-${cIdx}-${mIdx}`;
                   cChildren.appendChild(mChildren);
 
-                  // Subject Node (3단계)
+                  // Subjects
                   if(menu.subjects) {
                       menu.subjects.forEach((subj, sIdx) => {
                           const sDiv = createTreeNode(`📄 ${subj.name}`, 'subj', cIdx, mIdx, sIdx, false);
@@ -996,6 +986,7 @@
       const row = document.createElement('div');
       row.className = 't-node-row';
       
+      // 토글 버튼 (화살표)
       const toggleBtn = document.createElement('div');
       toggleBtn.className = hasChildren ? 't-toggle-btn' : 't-toggle-btn empty';
       toggleBtn.textContent = hasChildren ? '▶' : '';
@@ -1007,6 +998,7 @@
           };
       }
       
+      // 라벨 (선택)
       const labelDiv = document.createElement('div');
       labelDiv.className = 't-label';
       labelDiv.textContent = label;
@@ -1093,7 +1085,7 @@
       if(!cat.menus) cat.menus = [];
       cat.menus.push(newMenu);
       renderTree();
-      alert("메뉴가 추가되었습니다.");
+      alert("메뉴가 추가되었습니다. (새로고침 없이 반영)");
   }
   
   function addChildSubject() {
@@ -1115,7 +1107,7 @@
           globalData.categories[cIdx].menus[mIdx].subjects.splice(sIdx, 1);
       }
       renderTree();
-      document.getElementById('treeDetail').innerHTML = '';
+      document.getElementById('treeDetail').innerHTML = '<div style="display:flex; height:100%; align-items:center; justify-content:center; color:var(--text-sub);">삭제되었습니다.</div>';
       currentTreeSelection = null;
   }
 
