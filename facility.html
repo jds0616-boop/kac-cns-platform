@@ -72,7 +72,6 @@
   .hamburger-btn svg { width: 24px; height: 24px; fill: #fff; }
   .logo-text { font-size: 20px; font-weight: 800; cursor: pointer; white-space: nowrap; }
   
-  /* [수정] Breadcrumb 정렬 완벽 수정 */
   .breadcrumb { 
       display: none; 
       align-items: center; 
@@ -81,10 +80,10 @@
       font-size: 16px; 
       margin-left: 10px; 
       white-space: nowrap; 
-      height: 100%; /* 부모 높이 상속 */
+      height: 100%;
   }
   @media(min-width: 1024px) { .breadcrumb { display: flex; } }
-  .breadcrumb span { display: flex; align-items: center; } /* 내부 텍스트 수직 정렬 */
+  .breadcrumb span { display: flex; align-items: center; }
 
   .header-center { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 400px; max-width: 40vw; z-index: 2001; }
   .header-search { 
@@ -172,60 +171,63 @@
       height: fit-content;
   }
   
-  .root-card {
+  /* [수정] 대제목 카드 일체형 디자인 */
+  .root-card-integrated {
       background: var(--bg-card);
       border: 3px solid var(--theme-color);
       border-radius: 22px;
-      padding: 30px 20px;
-      width: 220px;
+      width: 240px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      text-align: center;
-      position: relative; /* 중요: 연결선의 기준점 */
+      position: relative;
       z-index: 2;
-      display: flex; flex-direction: column; align-items: center; gap: 15px;
-      cursor: pointer; transition: transform 0.2s;
+      display: flex; flex-direction: column;
+      overflow: hidden; /* 내부 버튼 radius 처리용 */
+      transition: transform 0.2s;
   }
-  .root-card:hover { transform: scale(1.03); }
+  .root-card-integrated:hover { transform: scale(1.03); }
+
+  /* 카드 상단 내용 영역 */
+  .card-content {
+      padding: 30px 20px;
+      display: flex; flex-direction: column; align-items: center; gap: 15px;
+      cursor: pointer;
+      background: var(--bg-card);
+  }
+  
+  /* 카드 하단 홈 버튼 영역 (일체형) */
+  .card-home-btn {
+      padding: 15px 0;
+      background: var(--bg-card); /* 기본 배경 */
+      border-top: 1px solid rgba(var(--theme-rgb), 0.2);
+      color: var(--theme-color);
+      font-weight: 800; font-size: 14px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: 0.2s;
+  }
+  .card-home-btn:hover {
+      background: var(--theme-color);
+      color: #fff;
+  }
+
   .root-icon {
       width: 80px; height: 80px; border-radius: 25px;
       background: var(--icon-bg); border: 2px solid var(--icon-border);
       display: flex; align-items: center; justify-content: center;
       font-size: 32px; font-weight: 900; color: var(--theme-color);
   }
-  .root-title { font-size: 20px; font-weight: 800; word-break: keep-all; line-height: 1.3; }
+  .root-title { font-size: 20px; font-weight: 800; word-break: keep-all; line-height: 1.3; text-align: center; }
 
-  /* [중요 수정] 루트 카드 우측 연결선 (위치 보정) */
-  /* 이제 .root-card 내부에 있으므로 top: 50%는 카드 높이의 50%가 됨 (버튼 영향 안 받음) */
-  .connector-line {
+  /* [수정] 우측 삼각형 포인터 */
+  .triangle-pointer {
       position: absolute;
-      right: -44px; /* 카드 밖으로 44px 뻗어나감 (버스 라인까지 닿도록) */
-      top: 50%; 
-      transform: translateY(-50%); /* 정확히 중앙 정렬 */
-      width: 44px; height: 8px; 
-      background: var(--theme-color);
-      z-index: 1;
-  }
-  
-  /* 홈으로 버튼 */
-  .side-home-btn {
-      margin-top: 20px;
-      width: 220px;
-      padding: 12px 0;
-      border-radius: 15px;
-      background: var(--bg-card);
-      border: 2px solid var(--theme-color);
-      color: var(--theme-color);
-      font-weight: 800; font-size: 15px;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      transition: 0.2s;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-  }
-  .side-home-btn:hover {
-      background: var(--theme-color);
-      color: #fff;
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(var(--theme-rgb), 0.25);
+      right: -24px; /* 카드 우측으로 뺌 */
+      top: 50%; transform: translateY(-50%);
+      width: 0; height: 0;
+      border-left: 24px solid var(--theme-color); /* 왼쪽이 넓고 오른쪽이 뾰족 */
+      border-top: 14px solid transparent;
+      border-bottom: 14px solid transparent;
+      z-index: 5;
   }
   
   /* 중앙 세로 줄 (Branch Bus) */
@@ -240,18 +242,21 @@
       margin-bottom: 50px;
   }
   
-  /* [수정] 버스 라인 연결 지점 높이 재조정 */
-  /* 카드 높이의 절반 + Sticky offset 등을 고려하여 눈대중으로 맞추던 것을 좀 더 정밀하게 조정 */
+  /* 버스 라인과 루트 연결 (높이 정밀 조정) */
+  /* 카드 높이가 커졌으므로(홈버튼 포함) 연결점 높이도 재조정 필요 */
+  /* 카드 전체 높이 약 250px -> 중간점 약 125px */
+  /* Sticky(100) + Margin(50) + 125 = 275px 지점 */
+  /* Branch Bus 시작점 Top(20) 기준 약 255px */
+  /* 하지만 삼각형이 가리키는 곳에 딱 맞아야 하므로 시각적 보정 */
   .branch-bus::before {
       content: ''; position: absolute; 
-      /* Sticky Top(100) + Margin Top(50) + 카드 절반(약 100~110) = 250~260 */
-      /* Branch Bus 시작점 Top(20) */
-      /* 따라서 Branch Bus 기준 약 230~240px 지점 */
-      top: 140px; 
+      top: 175px; /* 삼각형 꼭짓점 위치에 맞춤 */
       left: 0;
-      width: 44px; height: 8px; 
-      background: var(--theme-color);
-      transform: translateX(-100%);
+      width: 20px; /* 삼각형 끝에서 기둥까지 거리 */
+      height: 8px; 
+      background: transparent; /* 선 대신 삼각형이 연결하므로 투명 처리하거나 삭제 가능 */
+      /* 여기서는 삼각형이 직접 기둥을 찌르는 디자인이므로 가로선 삭제 */
+      display: none; 
   }
 
   /* [우측] 리스트 섹션 */
@@ -370,6 +375,7 @@
   .btn-xs { padding: 4px 8px; font-size: 11px; border-radius: 6px; border: 1px solid #e2e8f0; background: #fff; cursor: pointer; color: #64748b; }
   .btn-xs:hover { background: #f1f5f9; color: #0f172a; }
 
+  /* 추가 버튼 */
   .add-menu-btn {
       border: 2px dashed #cbd5e1; background: transparent;
       justify-content: center; color: #94a3b8; font-weight: 700;
@@ -399,18 +405,23 @@
         background: var(--bg-main); z-index: 20; 
         margin-top: 0; flex-direction: row; gap: 10px; flex-wrap: wrap;
     }
-    .root-card { 
-        position: static; width: 100%; padding: 15px; 
-        display: flex; align-items: center; gap: 15px; text-align: left; 
+    /* 모바일에서는 일체형 카드 레이아웃 조정 */
+    .root-card-integrated { 
+        position: static; width: 100%; 
         flex-direction: row; border-width: 2px; margin: 0;
+        align-items: center;
     }
+    .card-content {
+        flex: 1; padding: 15px; flex-direction: row; gap: 15px;
+    }
+    .card-home-btn {
+        width: auto; padding: 0 20px; border-top: none; border-left: 1px solid rgba(var(--theme-rgb), 0.2);
+        height: 100%;
+    }
+    
     .root-icon { margin-bottom: 0; font-size: 24px; width: 50px; height: 50px; border-radius: 15px; }
     .root-title { font-size: 16px; flex: 1; text-align: left; }
-    .connector-line, .branch-bus { display: none; } 
-
-    .side-home-btn { 
-        width: 100%; margin-top: 5px; 
-    }
+    .triangle-pointer, .branch-bus { display: none; } 
 
     .list-section { 
         padding: 20px; overflow: visible; 
@@ -434,7 +445,7 @@
     .admin-btns { flex-direction: row; gap: 4px; } 
   }
 
-  /* 모달 등 나머지 스타일은 기존 유지 */
+  /* 모달 등 나머지 스타일 */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none !important; align-items: center; justify-content: center; }
   .modal-overlay[style*="display: flex"] { display: flex !important; }
   .modal-card { background: var(--bg-card); padding: 30px; border-radius: 20px; width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); color: var(--text-main); }
@@ -472,7 +483,7 @@
       <svg viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
     </div>
     <div class="logo-text" onclick="location.href='index.html'">KAC CNS Training Platform</div>
-    <!-- [수정] Breadcrumb 구조 변경 -->
+    <!-- Breadcrumb -->
     <div class="breadcrumb" id="bc"></div>
   </div>
   
@@ -500,17 +511,18 @@
   <div class="mindmap-wrapper">
       <!-- [좌측] 루트 노드 (Sticky) -->
       <div class="root-section">
-        <div class="root-card" onclick="location.href='index.html'">
-          <div id="rootIcon" class="root-icon">?</div>
-          <div id="rootTitle" class="root-title">Loading...</div>
-          <!-- [수정] 연결선을 카드 내부로 이동 -->
-          <div class="connector-line"></div>
-        </div>
-        
-        <!-- 홈으로 버튼 -->
-        <div class="side-home-btn" onclick="location.href='index.html'">
-            <svg style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-            홈으로 이동
+        <!-- 일체형 카드 -->
+        <div class="root-card-integrated">
+            <div class="card-content" onclick="location.href='index.html'">
+                <div id="rootIcon" class="root-icon">?</div>
+                <div id="rootTitle" class="root-title">Loading...</div>
+            </div>
+            <div class="card-home-btn" onclick="location.href='index.html'">
+                <svg style="width:16px;height:16px;fill:currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                홈으로 이동
+            </div>
+            <!-- 삼각형 포인터 -->
+            <div class="triangle-pointer"></div>
         </div>
       </div>
 
@@ -525,8 +537,7 @@
 
 </div>
 
-<!-- 설정/수정 모달은 그대로 유지 -->
-<!-- ... -->
+<!-- 설정 모달 -->
 <div id="settingsModal" class="modal-overlay" style="display:none;">
   <div class="modal-card">
     <h3>⚙️ 시스템 설정</h3>
@@ -572,6 +583,7 @@
   </div>
 </div>
 
+<!-- 개별 수정 모달 -->
 <div id="itemEditModal" class="modal-overlay" style="display:none;">
   <div class="modal-card">
     <h3>📦 메뉴 수정/추가</h3>
@@ -584,6 +596,7 @@
   </div>
 </div>
 
+<!-- 일괄 수정 모달 -->
 <div id="bulkEditModal" class="modal-overlay" style="display:none;">
   <div class="modal-card modal-card large">
     <h3>📋 메뉴 일괄 수정</h3>
@@ -667,7 +680,6 @@
       document.getElementById('rootIcon').style.color = style.color;
       document.getElementById('rootTitle').textContent = style.name;
       
-      // [수정] Breadcrumb에 HTML 주입 (Flex 정렬을 위해 태그 구조 사용)
       const bc = document.getElementById('bc');
       if(bc) bc.innerHTML = `<span>&nbsp;&gt;&nbsp;</span><span>${style.name}</span>`;
   }
@@ -715,7 +727,7 @@
                       const displayLimit = 10;
                       const showList = subs.slice(0, displayLimit);
                       previewHtml = `
-                        <div class="pp-title">포함된 교육 과정 (${subs.length})</div>
+                        <div class="pp-title">포함된 교육 교보재 (${subs.length})</div>
                         <div class="pp-list">
                             ${showList.map(s => `
                                 <div class="pp-item">
@@ -727,10 +739,10 @@
                         ${subs.length > displayLimit ? `<div class="pp-more">...외 ${subs.length - displayLimit}건 더 있음</div>` : ''}
                       `;
                   } else {
-                      previewHtml = `<div class="pp-title">교육 과정 없음</div><div style="font-size:11px; color:#94a3b8;">등록된 과목이 없습니다.</div>`;
+                      previewHtml = `<div class="pp-title">교육 교보재 없음</div><div style="font-size:11px; color:#94a3b8;">등록된 과목이 없습니다.</div>`;
                   }
               } else {
-                   previewHtml = `<div class="pp-title">교육 과정 없음</div><div style="font-size:11px; color:#94a3b8;">데이터가 없습니다.</div>`;
+                   previewHtml = `<div class="pp-title">교육 교보재 없음</div><div style="font-size:11px; color:#94a3b8;">데이터가 없습니다.</div>`;
               }
               
               const popup = document.createElement('div');
@@ -773,7 +785,7 @@
 
           bar.innerHTML = `
               <div class="last-viewed-icon">
-                <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
                 Last Viewed
               </div>
               <div class="menu-pill-icon">${iconInner}</div>
