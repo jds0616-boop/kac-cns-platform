@@ -23,10 +23,6 @@
     --icon-bg: #f1f5f9; --icon-border: #e2e8f0;
     --header-h: 75px;
     --search-border: #cbd5e1;
-    
-    /* [복구] 사용자 설정 변수 (기본값) */
-    --icon-size-fac: 28px;
-    --label-size-fac: 18px;
   }
   body.dark-mode {
     --navy: #020617; --bg-main: #0f172a; --bg-card: #1e293b; 
@@ -66,7 +62,7 @@
   }
   #searchOverlay.active { display: block; }
 
-  /* 헤더 스타일 (Index와 동일) */
+  /* 헤더 스타일 */
   header { 
     height: var(--header-h); background: var(--navy); 
     display: flex; align-items: center; justify-content: space-between; 
@@ -110,8 +106,6 @@
   .search-dropdown.active { display: block; }
   .result-item { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid var(--btn-border); display: flex; justify-content: space-between; align-items: center; }
   .result-item:hover { background: rgba(var(--theme-rgb), 0.1); }
-  .res-title { font-weight: 700; font-size: 14px; }
-  .res-path { font-size: 11px; opacity: 0.7; }
   .res-tag { font-size: 11px; padding: 2px 8px; border-radius: 4px; background: var(--theme-color); color: #fff; }
 
   .header-right { display: flex; align-items: center; gap: 15px; z-index: 10; flex-shrink: 0; }
@@ -136,28 +130,37 @@
   .sb-item:hover { background: var(--btn-bg); color: #2563eb; }
   .sb-item.active { background: #eff6ff; border-left: 4px solid #2563eb; color: #2563eb; }
   body.dark-mode .sb-item.active { background: rgba(37,99,235,0.1); }
+  /* 사이드바 하위 메뉴 */
   .sb-sub-list { display: none; padding-left: 20px; margin-bottom: 5px; }
   .sb-sub-list.open { display: block; animation: slideDown 0.2s; }
   .sb-sub-item { padding: 8px 15px; font-size: 13px; color: var(--text-sub); cursor: pointer; border-left: 2px solid var(--btn-border); transition: 0.2s; }
   .sb-sub-item:hover { border-left-color: #2563eb; color: #2563eb; background: rgba(37,99,235,0.05); }
 
-  /* 마인드맵 컨테이너 (중앙 정렬) */
+  /* [핵심] 마인드맵 컨테이너 (스크롤 문제 해결) */
   .mindmap-container {
       display: flex;
-      width: 100%; height: 100%;
+      width: 100%; 
+      height: 100%; /* 전체 높이 */
       padding-top: var(--header-h); 
       position: relative;
-      overflow: hidden;
-      align-items: center; /* [수정] 수직 중앙 정렬 */
+      overflow: hidden; /* 전체 스크롤 방지 */
+      
+      /* [수정] 가로 중앙 정렬 / 세로 시작점 정렬 */
+      justify-content: center;
+      align-items: flex-start;
   }
 
-  /* [좌측] 루트 섹션 (고정) */
+  /* [좌측] 루트 섹션 (Sticky 고정) */
   .root-section {
       width: 320px; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: flex-end;
-      padding-right: 40px; position: relative;
+      display: flex; align-items: flex-start; justify-content: flex-end;
+      padding-right: 40px; 
+      
+      /* [수정] 스크롤 시에도 화면에 고정 */
+      position: sticky; top: 120px; 
       z-index: 10;
   }
+  /* 대분류 카드 디자인 (클릭 시 인덱스로) */
   .root-card {
       background: var(--bg-card);
       border: 3px solid var(--theme-color);
@@ -186,36 +189,35 @@
       width: 40px; height: 4px; background: var(--theme-color);
       border-radius: 4px; z-index: 1;
   }
+  /* 중앙 세로선 (Bus) */
   .branch-bus {
       position: absolute; left: 320px; top: 0; bottom: 0;
       width: 4px; background: rgba(var(--theme-rgb), 0.2);
       z-index: 1;
   }
 
-  /* [우측] 리스트 섹션 (스크롤) */
+  /* [우측] 리스트 섹션 (스크롤 가능 영역) */
   .list-section {
       flex: 1;
-      height: 100%; /* 전체 높이 사용 */
-      overflow-y: auto;
+      height: 100%; /* 전체 높이 */
+      overflow-y: auto; /* 여기만 스크롤 됨 */
       padding: 50px 40px 100px 40px; 
       display: flex; flex-direction: column; gap: 20px;
       position: relative;
-      scrollbar-width: none; -ms-overflow-style: none;
+      max-width: 900px; /* 너무 넓어지지 않게 */
       
-      /* [수정] 리스트 내부 중앙 정렬 (내용 적을때) */
-      justify-content: center;
+      /* 스크롤바 숨김 */
+      scrollbar-width: none; -ms-overflow-style: none;
   }
   .list-section::-webkit-scrollbar { display: none; }
-  
-  /* 리스트 컨텐츠 래퍼 (스크롤을 위해) */
+
+  /* 리스트 컨테이너 */
   #menuListContainer {
       display: flex; flex-direction: column; gap: 20px;
-      width: 100%; max-width: 800px;
-      /* 리스트가 많을 때는 위쪽 정렬 */
-      margin: auto 0; 
+      width: 100%;
   }
 
-  /* 메뉴 카드 디자인 */
+  /* [수정] 메뉴 카드 디자인 (호버 효과) */
   .menu-bar {
       background: var(--bg-card);
       border-radius: 18px;
@@ -223,17 +225,37 @@
       box-shadow: var(--shadow);
       display: flex; align-items: center; gap: 20px;
       position: relative;
-      transition: transform 0.2s, box-shadow 0.2s;
-      border: 1px solid var(--border-card);
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      
+      /* 기본 테두리 */
+      border: 2px solid transparent; 
+      /* 좌측 컬러바 */
       border-left: 6px solid var(--theme-color);
+      
       cursor: pointer;
       min-height: 80px;
   }
-  .menu-bar:hover {
-      transform: translateX(5px);
-      box-shadow: 0 8px 25px rgba(var(--theme-rgb), 0.15);
-  }
   
+  /* [수정] 마우스 호버 시 효과 */
+  .menu-bar:hover {
+      transform: translateY(-3px) scale(1.01);
+      box-shadow: 0 10px 30px rgba(var(--theme-rgb), 0.2);
+      border-color: var(--theme-color); /* 테두리에 테마색 들어옴 */
+  }
+
+  /* [추가] Last Viewed 스타일 */
+  .menu-bar.last-viewed {
+      border-color: #10b981; /* 녹색 테두리 */
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+  }
+  .last-viewed-badge {
+      font-size: 10px; font-weight: 800; color: #10b981;
+      border: 1px solid #10b981; padding: 2px 6px; border-radius: 4px;
+      margin-left: auto; display: none;
+  }
+  .menu-bar.last-viewed .last-viewed-badge { display: inline-block; }
+
+  /* 연결점 */
   .menu-bar::before {
       content: ''; position: absolute; left: -44px; top: 50%;
       width: 44px; height: 2px; background: rgba(var(--theme-rgb), 0.3);
@@ -249,7 +271,7 @@
       border: 1px solid rgba(var(--theme-rgb), 0.2);
       padding: 6px 14px;
       border-radius: 20px;
-      font-size: var(--icon-size-fac); font-weight: 800;
+      font-size: 13px; font-weight: 800;
       white-space: nowrap;
       min-width: 60px; text-align: center;
       display: flex; flex-direction: column; align-items: center;
@@ -257,8 +279,9 @@
   .pill-sub { font-size: 10px; opacity: 0.8; font-weight: 600; margin-top: 2px; }
 
   .menu-info { flex: 1; display: flex; align-items: center; }
-  .menu-title { font-size: var(--label-size-fac); font-weight: 700; color: var(--text-main); }
+  .menu-title { font-size: 18px; font-weight: 700; color: var(--text-main); }
 
+  /* 관리자 버튼 그룹 */
   .admin-btns { display: flex; gap: 5px; margin-left: auto; }
   .btn-xs { padding: 4px 8px; font-size: 11px; border-radius: 6px; border: 1px solid #e2e8f0; background: #fff; cursor: pointer; color: #64748b; }
   .btn-xs:hover { background: #f1f5f9; color: #0f172a; }
@@ -275,7 +298,7 @@
   /* 하단 버튼 (뒤로가기/홈) */
   .bottom-nav-area { 
     display: flex; justify-content: center; gap: 20px; 
-    margin-top: 40px; margin-bottom: 20px; width: 100%; max-width: 800px;
+    margin-top: 40px; margin-bottom: 20px;
   }
   .nav-item { 
     color: #fff; cursor: pointer; font-size: 16px; font-weight: 700; 
@@ -287,32 +310,41 @@
   .nav-item:hover { background: #1e293b; transform: translateY(-2px); }
   body.dark-mode .nav-item { background: #1e293b; border-color: rgba(255,255,255,0.3); }
 
-  /* 모바일 반응형 */
+  /* ========================================= */
+  /* [모바일 반응형] */
+  /* ========================================= */
   @media (max-width: 768px) {
-    .mindmap-container { flex-direction: column; overflow-y: auto; }
+    .mindmap-container { 
+        flex-direction: column; 
+        overflow-y: auto; /* 모바일은 전체 스크롤 */
+        display: block; 
+    }
+    
     .header-center { display: none; } 
 
+    /* 상단 루트 카드 */
     .root-section { 
         width: 100%; height: auto; padding: 20px 20px 0 20px; 
-        justify-content: center; position: sticky; top: 0; 
-        background: var(--bg-main); z-index: 20; 
+        justify-content: center; 
+        position: static; /* 모바일은 스크롤 흐름 따름 */
+        background: transparent; z-index: 1; 
         margin-top: 0;
     }
     .root-card { 
-        position: static; width: 100%; padding: 15px; 
-        display: flex; align-items: center; gap: 15px; text-align: left; 
+        width: 100%; padding: 15px; display: flex; align-items: center; gap: 15px; text-align: left; 
         flex-direction: row; border-width: 2px; margin: 0;
+        position: static;
     }
     .root-icon { margin-bottom: 0; font-size: 24px; width: 50px; height: 50px; border-radius: 15px; }
     .root-title { font-size: 16px; flex: 1; text-align: left; }
     .connector-line, .branch-bus { display: none; } 
 
+    /* 리스트 섹션 */
     .list-section { 
         padding: 20px; overflow: visible; 
         border-left: 2px solid rgba(var(--theme-rgb), 0.2);
         margin-left: 45px; margin-right: 20px;
         gap: 15px;
-        display: block; /* 모바일은 block */
     }
 
     .menu-bar { padding: 15px; gap: 12px; min-height: 60px; }
@@ -323,23 +355,21 @@
     .menu-title { font-size: 15px; }
     
     .admin-btns { flex-direction: row; gap: 4px; } 
+    
     .bottom-nav-area { flex-direction: row; gap: 10px; margin-top: 20px; }
     .nav-item { padding: 8px 15px; font-size: 13px; }
   }
 
   /* 모달 */
   .modal-card { background: var(--bg-card); padding: 30px; border-radius: 20px; width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-  .modal-card.large { width: 900px; max-width: 95%; }
-  .setting-group { margin-bottom: 20px; }
-  .setting-label { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; display: block; }
-  .setting-input { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; color: var(--text-main); }
+  .setting-input { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; }
   .btn-modal { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; margin-top: 5px; }
   .btn-primary { background: #0f172a; color: #fff; }
   
   /* 일괄 수정 테이블 */
   .bulk-list-container { display: flex; flex-direction: column; gap: 5px; border: 1px solid var(--btn-border); border-radius: 10px; overflow-y: auto; max-height: 50vh; background: #fff; padding: 10px; }
   .bulk-header-row { display: grid; grid-template-columns: 40px 100px 100px 1fr 1fr; background: #f1f5f9; padding: 10px; font-weight: 700; font-size: 12px; text-align: center; position: sticky; top: 0; }
-  .bulk-row { display: grid; grid-template-columns: 40px 100px 100px 1fr 1fr; gap: 5px; padding: 5px; border-bottom: 1px solid #eee; align-items: center; }
+  .bulk-row { display: grid; grid-template-columns: 40px 100px 100px 1fr 1fr; gap: 5px; padding: 5px; border-bottom: 1px solid #f1f5f9; align-items: center; }
   .bulk-input { padding: 8px; border: 1px solid #ddd; border-radius: 5px; width: 100%; text-align: center; }
 
   @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
@@ -362,10 +392,11 @@
 
 <header>
   <div class="header-left">
-    <div class="hamburger-btn" onclick="toggleSidebar()">
-      <svg viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
+    <div class="hamburger-btn" onclick="toggleSidebar()" style="cursor:pointer; padding:5px;">
+      <svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:#fff"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
     </div>
     <div class="logo-text" onclick="location.href='index.html'">KAC CNS Training Platform</div>
+    <!-- 브레드크럼 -->
     <span class="breadcrumb" id="bc"></span>
   </div>
   
@@ -386,7 +417,7 @@
 
 <div class="mindmap-container">
   
-  <!-- [좌측] 루트 노드 -->
+  <!-- [좌측] 루트 노드 (Sticky) -->
   <div class="root-section">
     <div class="root-card" onclick="location.href='index.html'">
       <div id="rootIcon" class="root-icon">?</div>
@@ -398,10 +429,12 @@
   <!-- [중앙] 연결 버스 라인 -->
   <div class="branch-bus"></div>
 
-  <!-- [우측] 메뉴 리스트 -->
+  <!-- [우측] 메뉴 리스트 (스크롤) -->
   <div id="menuListSection" class="list-section">
+    <!-- JS로 메뉴 바 생성됨 -->
     <div id="menuListContainer"></div>
     
+    <!-- 하단 버튼 -->
     <div class="bottom-nav-area">
         <div class="nav-item" onclick="history.back()">
           <svg style="width:20px;height:20px;fill:currentColor" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg> 뒤로가기
@@ -414,7 +447,7 @@
 
 </div>
 
-<!-- 설정 모달 (기능 복구) -->
+<!-- 설정 모달 -->
 <div id="settingsModal" class="modal-overlay" style="display:none;">
   <div class="modal-card">
     <h3>⚙️ 시스템 설정</h3>
@@ -492,7 +525,7 @@
 
       await loadData();
       loadStyleData();
-      loadUISettings(); // UI 설정 적용
+      loadUISettings(); 
       render();
       renderSidebar();
       buildSearchIndex();
@@ -544,6 +577,9 @@
   function render() {
       const container = document.getElementById('menuListContainer');
       container.innerHTML = '';
+      
+      // Last Viewed 확인
+      const lastViewedId = sessionStorage.getItem('kac_last_viewed_menu');
 
       if(menus.length === 0 && !isAdmin) {
           container.innerHTML = `<div style="text-align:center; color:#94a3b8; padding:50px;">등록된 메뉴가 없습니다.</div>`;
@@ -555,7 +591,14 @@
 
           const bar = document.createElement('div');
           bar.className = 'menu-bar';
+          
+          // Last Viewed 체크
+          if(menu.dataId === lastViewedId) {
+              bar.classList.add('last-viewed');
+          }
+
           bar.onclick = () => {
+              sessionStorage.setItem('kac_last_viewed_menu', menu.dataId);
               if(menu.link) window.open(menu.link, '_blank');
               else location.href = `viewer_list.html?type=${type}&menu=${encodeURIComponent(menu.label)}&id=${menu.dataId}`;
           };
@@ -577,6 +620,7 @@
               <div class="menu-pill-icon">${iconInner}</div>
               <div class="menu-info">
                   <div class="menu-title">${menu.label}</div>
+                  <span class="last-viewed-badge">Last Viewed</span>
               </div>
               ${adminHtml}
           `;
@@ -589,6 +633,14 @@
           addBtn.innerHTML = '+ 새 메뉴 추가';
           addBtn.onclick = () => openEdit('NEW');
           container.appendChild(addBtn);
+      }
+      
+      // 스크롤 이동
+      if(lastViewedId) {
+          setTimeout(() => {
+              const target = document.querySelector('.menu-bar.last-viewed');
+              if(target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 300);
       }
   }
 
@@ -641,7 +693,6 @@
   function openBulkEdit() {
       const container = document.getElementById('bulkRowContainer');
       container.innerHTML = '';
-      // 기존 메뉴 + 빈 슬롯
       const totalRows = Math.max(menus.length + 5, 20);
       
       for(let i=0; i<totalRows; i++) {
@@ -722,6 +773,7 @@
           if(confirm("로그아웃?")) { localStorage.setItem('kac_admin_mode','0'); location.reload(); }
       } else {
           const pw = prompt("비밀번호");
+          // 간단 구현 (실제론 해시 비교 권장)
           if(pw) { localStorage.setItem('kac_admin_mode','1'); location.reload(); }
       }
   }
