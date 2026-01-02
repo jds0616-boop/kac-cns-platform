@@ -37,6 +37,7 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
   
+  /* [중요] PC 화면 스크롤 제거 및 높이 고정 */
   html, body { width: 100%; height: 100%; overflow: hidden; }
   
   body { 
@@ -44,6 +45,7 @@
     color: var(--text-main); transition: background 0.3s, color 0.3s; 
   }
 
+  /* 모달 스타일 */
   .modal-overlay { 
       position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
       z-index: 9999; display: none !important; 
@@ -66,8 +68,13 @@
   .hamburger-btn:hover { background: rgba(255,255,255,0.1); }
   .hamburger-btn svg { width: 24px; height: 24px; fill: #fff; }
 
-  .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .logo-text { 
+    font-size: 20px; font-weight: 800; letter-spacing: -0.5px; 
+    cursor: pointer; white-space: nowrap; 
+    overflow: hidden; text-overflow: ellipsis;
+  }
   
+  /* 헤더 중앙 페이지 제목 */
   .header-center-title {
       position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
       display: flex; align-items: center; justify-content: center; gap: 10px;
@@ -113,7 +120,8 @@
   /* 컨텐츠 영역 (PC: 수직 중앙 정렬) */
   .content-wrapper { 
       width: 100%; height: 100%;
-      padding-top: var(--header-h); 
+      /* [수정] JS에서 이 값을 변경하여 위치 조정 가능 */
+      padding-top: 135px; 
       padding-bottom: 120px; 
       overflow: hidden; 
       position: relative; 
@@ -202,8 +210,6 @@
     }
     
     .center-content-box { display: block; width: 100%; }
-
-    /* [수정] 검색창 스크롤 시 헤더 아래로 숨겨짐 */
     .search-wrapper-outer { margin-bottom: 30px; z-index: 10; }
 
     .header-left { gap: 5px; flex: 1; }
@@ -215,7 +221,6 @@
     .theme-toggle { margin-right: 5px; }
     .settings-btn { width: 30px; height: 30px; font-size: 16px; padding: 0; }
 
-    /* 리스트형 카드 */
     #cardContainerWrapper { padding: 0 15px; }
     #cardContainer { gap: 15px; padding: 10px 0; min-height: auto; flex-direction: column; flex-wrap: nowrap; }
     .card { 
@@ -229,7 +234,6 @@
     .card-ctrl { top: 50%; right: 10px; transform: translateY(-50%); width: auto; flex-direction: row; }
     .btn-sm { padding: 6px 10px; }
 
-    /* 모바일 하단바 */
     .main-footer { padding: 25px 15px; margin-top: 30px; position: static; height: auto; }
     .main-footer p { font-size: 11px; white-space: normal; }
   }
@@ -246,14 +250,6 @@
   .tree-sidebar { width: 35%; background: var(--bg-main); border-right: 1px solid var(--btn-border); overflow-y: auto; padding: 10px; }
   .tree-content { width: 65%; padding: 20px; overflow-y: auto; background: var(--bg-card); }
   
-  .t-node { padding: 8px; cursor: pointer; border-radius: 6px; font-size: 13px; color: var(--text-main); display: flex; align-items: center; gap: 5px; margin-bottom: 2px; }
-  .t-node:hover { background: rgba(37,99,235,0.1); }
-  .t-node.selected { background: #2563eb; color: #fff; }
-  .t-depth-0 { font-weight: 800; }
-  .t-depth-1 { padding-left: 20px; font-weight: 600; }
-  .t-depth-2 { padding-left: 40px; color: var(--text-sub); }
-  
-  /* 트리 화살표/라벨 분리 */
   .t-node-row { display: flex; align-items: center; padding: 4px 0; }
   .t-toggle-btn { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 10px; color: var(--text-sub); flex-shrink: 0; transition: transform 0.2s; }
   .t-toggle-btn:hover { color: #2563eb; }
@@ -271,7 +267,7 @@
   .setting-label { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; display: block; }
   .setting-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--text-main); font-size: 14px; outline: none; }
   
-  /* [수정] 하단 텍스트 수정용 팝업 (넓게) */
+  /* 하단 텍스트 수정용 팝업 (넓게) */
   #footerEditModal .modal-card { width: 800px; max-width: 90%; }
   .setting-textarea { width: 100%; padding: 15px; border-radius: 10px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--text-main); font-size: 14px; outline: none; resize: vertical; min-height: 200px; line-height: 1.6; }
 
@@ -399,6 +395,15 @@
         
         <button class="btn-modal btn-danger" style="margin-top:15px; background:#ef4444; opacity:0.8;" onclick="resetToDataJson()">⚠️ 서버 원본으로 초기화 (수정취소)</button>
       </div>
+      
+      <!-- [추가] 콘텐츠 위치 조정 -->
+      <div class="setting-group" style="background: rgba(0,0,0,0.02); padding: 15px; border-radius: 15px; border: 1px solid var(--btn-border);">
+        <label class="setting-label">↕️ 콘텐츠 위치 조정 (상단 여백)</label>
+        <div style="display:flex; gap:10px;">
+          <input type="number" id="setContentTop" class="setting-input" placeholder="기본값 135" value="135">
+        </div>
+      </div>
+
       <div class="setting-group" style="background: rgba(0,0,0,0.02); padding: 15px; border-radius: 15px; border: 1px solid var(--btn-border);">
         <label class="setting-label">🎨 카드 UI 크기 설정 (px)</label>
         <div style="display:flex; gap:15px; align-items: center; margin-bottom: 10px;">
@@ -577,6 +582,12 @@
     // 푸터 텍스트 로드
     loadFooterText();
 
+    // 컨텐츠 위치 로드
+    const contentTop = localStorage.getItem('kac_content_top');
+    if(contentTop) {
+        document.querySelector('.content-wrapper').style.paddingTop = contentTop + 'px';
+    }
+
     ensurePageSlots();
     renderCards(false); 
     buildSearchIndex();
@@ -662,6 +673,10 @@
     const savedTitles = localStorage.getItem('kac_page_titles');
     globalData.config.pageTitles = savedTitles ? JSON.parse(savedTitles) : {};
     globalData.config.footerText = localStorage.getItem('kac_full_footer');
+    
+    // [추가] 컨텐츠 위치 값 복원
+    const contentTop = localStorage.getItem('kac_content_top');
+    if(contentTop) globalData.config.contentTop = contentTop;
 
     applyConfig(globalData.config);
 
@@ -735,6 +750,9 @@
         }
         if(data.config.footerText) {
             localStorage.setItem('kac_full_footer', data.config.footerText);
+        }
+        if(data.config.contentTop) {
+            localStorage.setItem('kac_content_top', data.config.contentTop);
         }
     }
   }
@@ -987,6 +1005,8 @@
     if(isAdmin) {
         document.getElementById('setIconSize').value = globalData.config.iconSize || 60;
         document.getElementById('setLabelSize').value = globalData.config.labelSize || 24;
+        document.getElementById('setContentTop').value = localStorage.getItem('kac_content_top') || 135; // [추가] 값 불러오기
+
         const pBtn = document.getElementById('modalPreviewBtn');
         pBtn.textContent = isPreview ? "미리보기 종료" : "미리보기 시작";
         pBtn.classList.toggle('btn-preview-active', isPreview);
@@ -997,12 +1017,22 @@
   function saveUISettings() {
     const is = document.getElementById('setIconSize').value;
     const ls = document.getElementById('setLabelSize').value;
+    const ct = document.getElementById('setContentTop').value; // [추가]
+
     globalData.config.iconSize = parseInt(is);
     globalData.config.labelSize = parseInt(ls);
+    globalData.config.contentTop = parseInt(ct);
+
     applyConfig(globalData.config);
+    
     // 설정 변경사항 로컬 저장
     localStorage.setItem('kac_idx_icon_size', globalData.config.iconSize);
     localStorage.setItem('kac_idx_label_size', globalData.config.labelSize);
+    localStorage.setItem('kac_content_top', globalData.config.contentTop);
+    
+    // [추가] 즉시 적용
+    document.querySelector('.content-wrapper').style.paddingTop = ct + 'px';
+
     document.getElementById('settingsModal').style.display='none';
   }
 
