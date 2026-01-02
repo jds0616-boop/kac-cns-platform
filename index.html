@@ -37,29 +37,31 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
   
-  /* [중요] 가로 스크롤 방지 */
-  html, body { width: 100%; overflow-x: hidden; }
+  /* [중요] 가로 스크롤 방지 & 높이 고정 */
+  html, body { width: 100%; height: 100%; overflow: hidden; }
   
   body { 
-    background: var(--bg-main); 
-    height: 100vh; 
-    display: flex; 
-    flex-direction: column; 
-    overflow: hidden; /* PC 기본 */
-    color: var(--text-main); 
-    transition: background 0.3s, color 0.3s; 
+    background: var(--bg-main); display: flex; flex-direction: column; 
+    color: var(--text-main); transition: background 0.3s, color 0.3s; 
   }
 
-  /* 관리자/미리보기 제어 */
+  /* 모달 스타일 최상단 배치 및 강제 숨김 처리 */
+  .modal-overlay { 
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
+      z-index: 9999; display: none !important; 
+      align-items: center; justify-content: center; 
+  }
+  .modal-overlay[style*="display: flex"] { display: flex !important; }
+
   body.preview-active .card-ctrl, body.preview-active .add-slot { display: none !important; }
   
-  /* 헤더 스타일 */
+  /* 헤더 스타일 (PC/모바일 공통 고정) */
   header { 
     height: var(--header-h); background: var(--navy); 
     display: flex; align-items: center; justify-content: space-between; 
     padding: 0 20px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.15); 
-    z-index: 1000; flex-shrink: 0; position: relative; 
-    width: 100%;
+    z-index: 1000; flex-shrink: 0; 
+    position: fixed; top: 0; left: 0; width: 100%;
   }
   
   .header-left { display: flex; align-items: center; gap: 15px; z-index: 10; min-width: 0; flex-shrink: 1; }
@@ -73,17 +75,17 @@
     overflow: hidden; text-overflow: ellipsis;
   }
   
-  /* 헤더 중앙 페이지 제목 영역 */
+  /* 헤더 중앙 페이지 제목 (연필 아이콘 제거됨) */
   .header-center-title {
       position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
       font-size: 24px; font-weight: 800; color: #fff; letter-spacing: -0.5px;
-      display: flex; align-items: center; gap: 8px; z-index: 5;
-      white-space: nowrap; pointer-events: none;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 5; white-space: nowrap;
+      cursor: default; /* 기본 커서 */
   }
-  .header-center-title span { pointer-events: auto; } 
-  .title-edit-icon { cursor: pointer; opacity: 0.3; transition: 0.2s; font-size: 16px; display: none; }
-  .title-edit-icon:hover { opacity: 1; color: #60a5fa; }
-  body.admin-mode .title-edit-icon { display: block; }
+  /* 관리자 모드일 때만 포인터 커서 */
+  body.admin-mode .header-center-title { cursor: pointer; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: rgba(255,255,255,0.3); }
+  body.admin-mode .header-center-title:hover { color: #93c5fd; }
 
   .header-right { display: flex; align-items: center; gap: 15px; z-index: 10; flex-shrink: 0; }
   
@@ -96,7 +98,7 @@
   .settings-btn { display: flex; padding: 8px; width: 34px; height: 34px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.3s; color: #cbd5e1; }
   .settings-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
 
-  /* [수정] 사이드바 z-index 상향 조정 (검색창 2000보다 높게) */
+  /* [수정] 사이드바 z-index 최상위 (검색창 2000보다 높게 3000) */
   .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 3000; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(2px); }
   .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
   
@@ -120,27 +122,39 @@
   .sb-sub-item { padding: 8px 15px; font-size: 13px; color: var(--text-sub); cursor: pointer; border-left: 2px solid var(--btn-border); transition: 0.2s; }
   .sb-sub-item:hover { border-left-color: #2563eb; color: #2563eb; background: rgba(37,99,235,0.05); }
 
-  /* 컨텐츠 영역 (PC 레이아웃) */
+  /* 컨텐츠 영역 (PC: 수직 중앙 정렬) */
   .content-wrapper { 
-      flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; 
-      width: 100%; overflow-y: auto; 
-      /* [수정] 헤더(75px) + 여백(60px) = 135px */
-      padding-top: 135px; 
-      padding-bottom: 0; position: relative; 
+      flex: 1; display: flex; flex-direction: column; 
+      /* [수정] 수직 중앙 정렬 */
+      justify-content: center; align-items: center; 
+      width: 100%; height: 100%;
+      padding-top: 75px; /* 헤더 높이 */
+      padding-bottom: 100px; /* 푸터 높이 등 고려 */
+      overflow-y: scroll; /* 스크롤바 숨김 */
+      scrollbar-width: none; -ms-overflow-style: none;
+      position: relative; 
   }
+  .content-wrapper::-webkit-scrollbar { display: none; }
   
-  /* [수정] 검색창 하단 여백 60px (위아래 밸런스 1:1) */
-  .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 60px; flex-shrink: 0; z-index: 2000; position: relative; padding: 0 20px; }
-  .search-container { position: relative; width: 600px; max-width: 100%; }
+  /* [수정] 검색창 여백 및 z-index */
+  .search-wrapper-outer { 
+      width: 100%; display: flex; justify-content: center; 
+      margin-bottom: 40px; /* 카드와 간격 */
+      flex-shrink: 0; z-index: 2000; position: relative; padding: 0 20px; 
+      pointer-events: none; /* 빈공간 클릭 투과 */
+  }
+  .search-container { position: relative; width: 600px; max-width: 100%; pointer-events: auto; }
   
   .search-bar { 
-    width: 100%; padding: 18px 30px; border-radius: 50px; border: 2px solid var(--search-border);
-    background: var(--bg-card); color: var(--text-main); font-size: 16px; font-weight: 600; 
-    box-shadow: var(--search-shadow); transition: 0.3s; 
+    width: 100%; padding: 18px 30px; border-radius: 50px; 
+    border: 2px solid #cbd5e1; background: #fff; color: #000;
+    font-size: 16px; font-weight: 600; 
+    box-shadow: 0 8px 30px rgba(15, 23, 42, 0.12); transition: 0.3s; 
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'%3E%3Cpath d='M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z'/%3E%3C/svg%3E"); 
     background-repeat: no-repeat; background-position: 25px center; background-size: 24px; padding-left: 65px; 
   }
   .search-bar:focus { outline: none; border-color: #2563eb; box-shadow: 0 12px 40px rgba(37, 99, 235, 0.18); transform: translateY(-2px); }
+  body.dark-mode .search-bar { background: #1e293b; color: #fff; border-color: #475569; }
 
   .search-results { position: absolute; top: calc(100% + 15px); left: 0; right: 0; width: 100%; background: var(--bg-card); border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); border: 1px solid var(--border-card); overflow: hidden; display: none; max-height: 400px; overflow-y: auto; z-index: 2001; }
   .search-results.active { display: block; animation: slideDown 0.2s ease-out; }
@@ -148,14 +162,18 @@
   #searchOverlay.active { display: block; }
 
   /* 메인 카드 영역 & 애니메이션 */
-  #cardContainerWrapper { width: 100%; max-width: 1700px; overflow: hidden; padding: 0 20px; flex: 1; }
+  #cardContainerWrapper { 
+      width: 100%; max-width: 1700px; overflow: hidden; padding: 0 20px; 
+      flex-shrink: 0; /* 크기 유지 */
+  }
   #cardContainer { 
     display: flex; flex-wrap: wrap; gap: 30px; width: 100%; justify-content: center; padding: 20px; 
-    transform-style: preserve-3d; min-height: 400px; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s;
+    transform-style: preserve-3d; min-height: auto; 
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s;
   }
   
-  .card { background: var(--bg-card); width: 280px; height: 280px; padding: 30px 20px; border-radius: 25px; box-shadow: var(--shadow); border: var(--border-card); cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; border-left: 10px solid transparent; color: var(--text-main); --card-color: #64748b; border-left-color: var(--card-color); }
-  .card:hover { transform: translateY(-10px); border-color: var(--card-color); box-shadow: 0 15px 30px -5px var(--card-color); }
+  .card { background: var(--bg-card); width: 280px; height: 280px; padding: 30px 20px; border-radius: 25px; box-shadow: var(--shadow); border: var(--border-card); cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; border-left: 10px solid transparent; color: var(--text-main); --card-color: #64748b; border-left-color: var(--card-color); z-index: 1; }
+  .card:hover { transform: translateY(-10px); border-color: var(--card-color); box-shadow: 0 15px 30px -5px var(--card-color); z-index: 2; }
   .card.dragging { opacity: 0.4; border: 2px dashed #94a3b8; }
   .card.drag-over { transform: scale(1.05); box-shadow: 0 0 20px rgba(37, 99, 235, 0.3); border-color: #2563eb; z-index: 10; }
 
@@ -169,23 +187,17 @@
   .icon-box { width: 100px; height: 100px; border-radius: 30px; margin-bottom: 20px; font-weight: 900; display: flex; align-items: center; justify-content: center; background: var(--btn-bg); border: 1px solid var(--btn-border); font-size: var(--icon-size-idx, 60px); color: var(--card-color); pointer-events: none; }
   .card h2 { font-size: var(--label-size-idx, 24px); font-weight: 800; text-align: center; pointer-events: none; }
 
-  .pagination { display: flex; gap: 10px; margin-top: 20px; align-items: center; justify-content: center; padding-bottom: 40px; flex-shrink: 0; }
+  .pagination { display: flex; gap: 10px; margin-top: 20px; align-items: center; justify-content: center; padding-bottom: 0px; flex-shrink: 0; }
   .page-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--btn-border); cursor: pointer; transition: 0.3s; }
   .page-dot.active { background: var(--navy); transform: scale(1.3); }
 
-  /* 하단바 (Footer) */
+  /* 하단바 (Footer) - PC 절대 고정 */
   .main-footer {
-    width: 100%;
-    background: var(--navy);
-    padding: 30px 20px;
-    text-align: center;
-    color: rgba(255,255,255,0.7);
-    margin-top: auto; 
-    flex-shrink: 0;
-    font-size: 13px;
-    line-height: 1.6;
-    border-top: 1px solid rgba(255,255,255,0.1);
-    box-sizing: border-box;
+    width: 100%; background: var(--navy); padding: 25px 20px;
+    text-align: center; color: rgba(255,255,255,0.7);
+    font-size: 13px; line-height: 1.6;
+    border-top: 1px solid rgba(255,255,255,0.1); box-sizing: border-box;
+    position: absolute; bottom: 0; left: 0; flex-shrink: 0;
     display: flex; flex-direction: column; align-items: center;
   }
   .main-footer p { margin: 0; word-break: keep-all; }
@@ -194,6 +206,53 @@
   .footer-edit-btn { margin-top: 10px; font-size: 11px; cursor: pointer; opacity: 0.5; color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 4px; display: none; }
   .footer-edit-btn:hover { opacity: 1; background: rgba(255,255,255,0.1); }
   body.admin-mode .footer-edit-btn { display: inline-block; }
+
+  /* ========================================= */
+  /* [모바일 전용 최적화 스타일] */
+  /* ========================================= */
+  @media (max-width: 768px) {
+    /* 네이티브 스크롤 허용 */
+    body { display: block; height: auto; overflow-y: auto; overflow-x: hidden; }
+    
+    header { position: fixed; top: 0; padding: 0 10px; }
+
+    /* [수정] 모바일 상단 여백 축소 (85px) 및 상단 정렬 */
+    .content-wrapper { 
+        height: auto; overflow: visible; 
+        padding-top: 85px; padding-bottom: 0; display: block; 
+        overflow-y: visible;
+    }
+    
+    .header-left { gap: 5px; flex: 1; }
+    .logo-text { font-size: 13px; max-width: none; white-space: nowrap; }
+    .kac-logo-img { display: none; }
+    
+    /* 모바일에서는 헤더 중앙 제목 숨김 */
+    .header-center-title { display: none; }
+    
+    .header-right { gap: 8px; }
+    .theme-toggle { margin-right: 5px; }
+    .settings-btn { width: 30px; height: 30px; font-size: 16px; padding: 0; }
+
+    /* 리스트형 카드 */
+    #cardContainerWrapper { padding: 0 15px; }
+    #cardContainer { gap: 15px; padding: 10px 0; min-height: auto; flex-direction: column; flex-wrap: nowrap; }
+    .card { 
+      width: 100%; height: auto; min-height: 90px; 
+      flex-direction: row; justify-content: flex-start; 
+      padding: 15px 25px; gap: 20px; border-radius: 20px;
+    }
+    .card:hover { transform: translateY(-3px); }
+    .icon-box { width: 50px; height: 50px; border-radius: 15px; margin-bottom: 0; font-size: 24px; flex-shrink: 0; }
+    .card h2 { font-size: 18px; text-align: left; word-break: keep-all; flex: 1; }
+    .card-ctrl { top: 50%; right: 10px; transform: translateY(-50%); width: auto; flex-direction: row; }
+    .btn-sm { padding: 6px 10px; }
+
+    /* 모바일 하단바 (Flow) */
+    .main-footer { padding: 25px 15px; margin-top: 30px; position: static; }
+    .main-footer p { font-size: 11px; white-space: normal; }
+    .main-footer .copyright { font-size: 11px; }
+  }
 
   #loadingSpinner { position: fixed; inset: 0; background: var(--bg-main); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
   .spinner { width: 50px; height: 50px; border: 5px solid #cbd5e1; border-top-color: #2563eb; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
@@ -207,23 +266,21 @@
   .tree-sidebar { width: 35%; background: var(--bg-main); border-right: 1px solid var(--btn-border); overflow-y: auto; padding: 10px; }
   .tree-content { width: 65%; padding: 20px; overflow-y: auto; background: var(--bg-card); }
   
-  /* 트리 노드 스타일 */
-  .t-node-row { display: flex; align-items: center; padding: 4px 0; }
-  .t-toggle-btn { 
-      width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; 
-      cursor: pointer; font-size: 10px; color: var(--text-sub); flex-shrink: 0; 
-      transition: transform 0.2s;
-  }
-  .t-toggle-btn:hover { color: #2563eb; }
-  .t-toggle-btn.empty { cursor: default; opacity: 0; } 
+  .t-node { padding: 8px; cursor: pointer; border-radius: 6px; font-size: 13px; color: var(--text-main); display: flex; align-items: center; gap: 5px; margin-bottom: 2px; }
+  .t-node:hover { background: rgba(37,99,235,0.1); }
+  .t-node.selected { background: #2563eb; color: #fff; }
+  .t-depth-0 { font-weight: 800; }
+  .t-depth-1 { padding-left: 20px; font-weight: 600; }
+  .t-depth-2 { padding-left: 40px; color: var(--text-sub); }
   
-  .t-label { 
-      padding: 6px 10px; cursor: pointer; border-radius: 6px; font-size: 13px; 
-      color: var(--text-main); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
+  /* 트리 화살표/라벨 분리 */
+  .t-node-row { display: flex; align-items: center; padding: 4px 0; }
+  .t-toggle-btn { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 10px; color: var(--text-sub); flex-shrink: 0; transition: transform 0.2s; }
+  .t-toggle-btn:hover { color: #2563eb; }
+  .t-toggle-btn.empty { cursor: default; opacity: 0; }
+  .t-label { padding: 6px 10px; cursor: pointer; border-radius: 6px; font-size: 13px; color: var(--text-main); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .t-label:hover { background: rgba(37,99,235,0.1); }
   .t-label.selected { background: #2563eb; color: #fff; }
-  
   .t-children { display: none; padding-left: 18px; border-left: 1px solid var(--btn-border); margin-left: 11px; }
   .t-children.open { display: block; }
 
@@ -234,9 +291,12 @@
   .setting-group { margin-bottom: 20px; }
   .setting-label { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; display: block; }
   .setting-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--text-main); font-size: 14px; outline: none; }
+  
+  /* 하단 텍스트 수정용 Textarea */
+  .setting-textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--text-main); font-size: 14px; outline: none; resize: vertical; min-height: 120px; line-height: 1.5; }
 
   /* 야간 모드 입력창 시인성 */
-  body.dark-mode .setting-input, body.dark-mode select.setting-input { background-color: #334155; color: #fff; border-color: rgba(255,255,255,0.2); }
+  body.dark-mode .setting-input, body.dark-mode select.setting-input, body.dark-mode .setting-textarea { background-color: #334155; color: #fff; border-color: rgba(255,255,255,0.2); }
 
   .btn-modal { width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; margin-top: 5px; }
   .btn-primary { background: var(--navy); color: #fff; }
@@ -250,80 +310,6 @@
   .res-title { font-weight: 700; font-size: 15px; }
   .res-path { font-size: 11px; opacity: 0.7; }
   .res-tag { font-size: 12px; font-weight: 900; padding: 4px 10px; border-radius: 6px; color: #fff; min-width: 50px; text-align: center; }
-  
-  /* ========================================= */
-  /* [모바일 전용 최적화 스타일] */
-  /* ========================================= */
-  @media (max-width: 768px) {
-    /* 1. 전체 구조 변경: Flex 해제하고 네이티브 스크롤 사용 */
-    body { 
-        display: block; 
-        height: auto; 
-        overflow-y: auto; /* 세로 스크롤 허용 */
-        overflow-x: hidden; /* 가로 스크롤 방지 */
-    }
-    
-    /* 2. 헤더 상단 고정 (Sticky) */
-    header { 
-        position: sticky; 
-        top: 0; 
-        padding: 0 10px;
-    }
-
-    /* 3. 콘텐츠 영역 (PC의 135px 대신 105px 적용) */
-    .content-wrapper { 
-        height: auto; 
-        overflow: visible; 
-        /* [수정] 헤더(75px) + 여백(30px) */
-        padding-top: 105px; 
-        padding-bottom: 120px; /* 하단 여백 */
-        display: block;
-    }
-    
-    /* [수정] 검색창 하단 여백 30px (PC 60px의 절반) */
-    .search-wrapper-outer { margin-bottom: 30px; }
-
-    /* 4. 상단바 텍스트 최적화 (잘림 방지) */
-    .header-left { gap: 5px; flex: 1; }
-    .logo-text { 
-        font-size: 13px; /* 폰트 축소 */
-        white-space: nowrap; 
-        max-width: none; /* 너비 제한 해제 */
-        text-overflow: clip;
-    }
-    .kac-logo-img { display: none; } /* 공간 확보를 위해 이미지 로고 숨김 */
-    
-    .header-center-title { display: none; } /* 공간 부족 시 중앙 제목 숨김 (깔끔하게) */
-    
-    .header-right { gap: 8px; }
-    .theme-toggle { margin-right: 5px; }
-    .settings-btn { width: 30px; height: 30px; font-size: 16px; padding: 0; }
-
-    /* 5. 카드 리스트 스타일 */
-    #cardContainerWrapper { padding: 0 15px; }
-    #cardContainer { 
-        gap: 15px; padding: 10px 0; 
-        min-height: auto; 
-        flex-direction: column; /* 세로 나열 */
-        flex-wrap: nowrap;
-    }
-    
-    .card { 
-      width: 100%; height: auto; min-height: 90px; 
-      flex-direction: row; justify-content: flex-start; 
-      padding: 15px 25px; gap: 20px; border-radius: 20px;
-    }
-    .card:hover { transform: translateY(-3px); }
-    .icon-box { width: 50px; height: 50px; border-radius: 15px; margin-bottom: 0; font-size: 24px; flex-shrink: 0; }
-    .card h2 { font-size: 18px; text-align: left; word-break: keep-all; flex: 1; }
-    .card-ctrl { top: 50%; right: 10px; transform: translateY(-50%); width: auto; flex-direction: row; }
-    .btn-sm { padding: 6px 10px; }
-
-    /* 6. 하단바 폰트 반응형 */
-    .main-footer { padding: 25px 15px; margin-top: 30px; }
-    .main-footer p { font-size: 11px; white-space: normal; }
-    .main-footer .copyright { font-size: 11px; }
-  }
 
   @keyframes spin { 100% { transform: rotate(360deg); } }
   @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
@@ -360,14 +346,13 @@
   </div>
   
   <!-- 헤더 중앙: 페이지 제목 -->
-  <div class="header-center-title">
+  <div class="header-center-title" onclick="editPageTitle()">
       <span id="pageHeadline"></span>
-      <span class="title-edit-icon" onclick="editPageTitle()">✏️</span>
   </div>
 
   <div class="header-right">
     <div class="theme-toggle">
-      <div class="theme-btn" id="btnDay" onclick="setTheme('light')"><svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg></div>
+      <div class="theme-btn" id="btnDay" onclick="setTheme('light')"><svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg></div>
       <div class="theme-btn" id="btnNight" onclick="setTheme('dark')"><svg viewBox="0 0 24 24"><path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C6.94,10.39 9.79,16.87 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z"/></svg></div>
     </div>
     <div class="settings-btn" onclick="openSettings()">⚙️</div>
@@ -393,7 +378,7 @@
     <p>본 웹사이트는 한국공항공사 항공기술훈련원의 항행안전시설 분야 교육 관련 플랫폼입니다.</p>
     <p>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)</p>
     <p class="copyright">© 2026 Korea Airports Corporation. All rights reserved.</p>
-    <span class="footer-edit-btn" onclick="editFooterText()">텍스트 수정</span>
+    <span class="footer-edit-btn" onclick="openFooterEditModal()">텍스트 수정</span>
   </footer>
 </div>
 
@@ -517,6 +502,21 @@
   </div>
 </div>
 
+<!-- 하단바 텍스트 수정 모달 -->
+<div id="footerEditModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-title">📝 하단바 문구 수정</div>
+    <div class="setting-group">
+      <label class="setting-label">내용 입력 (줄바꿈 가능)</label>
+      <textarea id="footerTextInput" class="setting-textarea"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn-modal btn-primary" onclick="saveFooterText()">저장 및 적용</button>
+      <button class="btn-modal btn-secondary" onclick="document.getElementById('footerEditModal').style.display='none'">취소</button>
+    </div>
+  </div>
+</div>
+
 <!-- 카드 수정 모달 (간편) -->
 <div id="cardEditModal" class="modal-overlay">
   <div class="modal-card">
@@ -602,24 +602,29 @@
 
     if(isAdmin) {
         document.body.classList.add('admin-mode');
-        document.getElementById('headlineEditBtn').style.display = 'block';
     }
   }
   
   function loadFooterText() {
       const savedText = localStorage.getItem('kac_footer_text');
       const defaultText = "본 웹사이트는 한국공항공사 항공기술훈련원의 항행안전시설 분야 교육 관련 플랫폼입니다.<br>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)";
-      document.querySelector('.main-footer p').innerHTML = savedText || defaultText;
+      const finalText = savedText || defaultText;
+      document.querySelector('.main-footer p:first-child').innerHTML = finalText;
   }
 
-  function editFooterText() {
-      const current = document.querySelector('.main-footer p').innerHTML;
-      const newVal = prompt("하단 문구를 입력하세요 (HTML 태그 사용 가능):", current.replace(/<br>/g, "\n"));
-      if(newVal !== null) {
-          const formatted = newVal.replace(/\n/g, "<br>");
-          localStorage.setItem('kac_footer_text', formatted);
-          loadFooterText();
-      }
+  function openFooterEditModal() {
+      const current = document.querySelector('.main-footer p:first-child').innerHTML;
+      document.getElementById('footerTextInput').value = current.replace(/<br>/g, "\n");
+      document.getElementById('footerEditModal').style.display = 'flex';
+  }
+
+  function saveFooterText() {
+      const val = document.getElementById('footerTextInput').value;
+      const formatted = val.replace(/\n/g, "<br>");
+      localStorage.setItem('kac_footer_text', formatted);
+      loadFooterText();
+      document.getElementById('footerEditModal').style.display = 'none';
+      alert("하단 문구가 저장되었습니다.");
   }
   
   function reconstructGlobalDataFromLocal() {
@@ -739,7 +744,7 @@
           return;
       }
 
-      cats.forEach(cat => {
+      cats.forEach((cat, cIdx) => {
           const item = document.createElement('div');
           
           let subHtml = '';
@@ -754,12 +759,12 @@
           }
 
           item.innerHTML = `
-            <div class="sb-item" onclick="toggleSubMenu('${cat.id}')">
+            <div class="sb-item" onclick="toggleSubMenu('${cat.id}', this)">
                 <span style="display:flex;align-items:center;gap:10px;">
                     <span style="width:10px;height:10px;border-radius:50%;background:${cat.color}"></span>
                     ${cat.name}
                 </span>
-                <span style="font-size:10px;">▼</span>
+                <span class="sb-toggle">▶</span>
             </div>
             ${subHtml}
           `;
@@ -767,9 +772,17 @@
       });
   }
 
-  function toggleSubMenu(id) {
+  function toggleSubMenu(id, element) {
       const el = document.getElementById(`sb-sub-${id}`);
-      if(el) el.classList.toggle('open');
+      if(el) {
+          if (el.classList.contains('open')) {
+              el.classList.remove('open');
+              element.querySelector('.sb-toggle').textContent = '▶';
+          } else {
+              el.classList.add('open');
+              element.querySelector('.sb-toggle').textContent = '▼';
+          }
+      }
   }
 
   /* 페이지 헤드라인 로직 */
@@ -783,15 +796,15 @@
          el.textContent = "제목 없음 (클릭 수정)";
          el.style.opacity = "0.5";
          el.style.cursor = "pointer";
-         el.onclick = editPageTitle;
       } else {
          el.style.opacity = "1";
-         el.style.cursor = "default";
-         el.onclick = null;
+         if(isAdmin) el.style.cursor = "pointer";
+         else el.style.cursor = "default";
       }
   }
 
   function editPageTitle() {
+      if(!isAdmin) return;
       const titles = globalData.config.pageTitles || {};
       const oldVal = titles[currentPage] || "";
       const newVal = prompt(`[${currentPage}페이지] 제목을 입력하세요:`, oldVal);
@@ -1134,7 +1147,7 @@
       if(!cat.menus) cat.menus = [];
       cat.menus.push(newMenu);
       renderTree();
-      alert("메뉴가 추가되었습니다. (새로고침 없이 반영)");
+      alert("메뉴가 추가되었습니다.");
   }
   
   function addChildSubject() {
