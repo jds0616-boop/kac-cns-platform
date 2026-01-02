@@ -1,21 +1,22 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<script>
+  // [보안] 로그인 세션 체크
+  if(sessionStorage.getItem('kac_access_token') !== 'granted') {
+    alert("로그인이 필요합니다.");
+    location.replace('login.html');
+  }
+</script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>과목 리스트 - KAC CNS Training Platform</title>
-<script>
-  if(sessionStorage.getItem('kac_access_token') !== 'granted') {
-    location.replace('login.html'); 
-  }
-</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
   :root { 
-    --theme-color: #2563eb; 
-    --theme-rgb: 37, 99, 235;
-
+    --theme-color: #2563eb; --theme-rgb: 37, 99, 235;
     --navy: #0f172a; --bg-main: #f0f4f8; --bg-card: #ffffff; 
     --text-main: #000000; --text-sub: #334155; 
     --border-card: transparent; --shadow: 0 5px 15px rgba(0,0,0,0.05);
@@ -40,7 +41,16 @@
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
   body { background: var(--bg-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: var(--text-main); transition: 0.3s; }
 
-  /* === 헤더 스타일 (Facility와 동일하게 복구) === */
+  /* 검색 모드 효과 */
+  #searchOverlay { 
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
+      z-index: 1500; display: none; backdrop-filter: blur(4px); animation: fadeIn 0.3s; 
+  }
+  #searchOverlay.active { display: block; }
+  body.search-mode .header-left, body.search-mode .header-right { opacity: 0.1; pointer-events: none; transition: 0.3s; }
+  body.search-mode .mindmap-container { filter: blur(2px); pointer-events: none; }
+
+  /* === 헤더 스타일 (Facility 원복) === */
   header { 
     height: var(--header-h); background: var(--navy); 
     display: flex; align-items: center; justify-content: space-between; 
@@ -55,7 +65,7 @@
   .hamburger-btn svg { width: 24px; height: 24px; fill: #fff; }
   .logo-text { font-size: 20px; font-weight: 800; cursor: pointer; white-space: nowrap; }
   
-  /* 브레드크럼 (기존 회색조 복구) */
+  /* 브레드크럼 (회색조 원복) */
   .breadcrumb { 
       display: none; align-items: center; 
       color: #94a3b8; font-weight: 500; font-size: 16px; 
@@ -92,6 +102,7 @@
   .theme-toggle { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); margin-right: 10px; }
   .theme-btn { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; opacity: 0.5; }
   .theme-btn.active { background: #fff; opacity: 1; color: var(--navy); }
+  .theme-btn svg { width: 16px; height: 16px; fill: currentColor; }
   .settings-btn { display: flex; padding: 8px; width: 34px; height: 34px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.3s; color: #cbd5e1; }
   .settings-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
   .kac-logo-img { height: 30px; width: auto; display: block; object-fit: contain; }
@@ -116,8 +127,9 @@
       overflow-y: auto;
       overflow-x: hidden;
       align-items: center;
-      padding-top: calc(var(--header-h) + 40px);
-      padding-bottom: 150px; /* 하단 네비게이션 공간 */
+      /* 헤더 겹침 방지 위해 상단 여백 충분히 확보 */
+      padding-top: 130px; 
+      padding-bottom: 150px;
   }
 
   .mindmap-wrapper {
@@ -126,12 +138,12 @@
       align-items: center;
       width: 100%;
       max-width: 900px;
-      transform: translateX(var(--layout-x-pos)); /* 가로 이동 */
+      transform: translateX(var(--layout-x-pos)); /* 가로 이동 설정 */
       transition: transform 0.3s ease;
       position: relative;
   }
 
-  /* 1. Root Card (상단 대제목) - Facility 스타일 계승 */
+  /* 1. Root Card (대제목) - Facility와 이질감 없도록 */
   .root-card {
       background: var(--bg-card);
       border: 3px solid var(--theme-color);
@@ -142,7 +154,7 @@
       min-width: 350px;
       justify-content: center;
       position: relative; z-index: 2;
-      cursor: pointer; /* 클릭 가능 표시 */
+      cursor: pointer;
       transition: transform 0.2s;
   }
   .root-card:hover { transform: scale(1.02); }
@@ -155,13 +167,13 @@
   }
   .root-title { font-size: 22px; font-weight: 800; color: var(--text-main); }
 
-  /* 2. Branch Bus (중앙 연결선) */
+  /* 2. Branch Bus (중앙 연결 세로선) - "꼴랑 줄 하나" */
   .branch-bus {
       width: 4px;
       background: rgba(var(--theme-rgb), 0.3);
       flex-grow: 1;
       position: absolute;
-      top: 80px; bottom: 40px; left: 60px; /* 위치 정밀 조정 */
+      top: 80px; bottom: 40px; left: 60px; /* 트리 구조 위치 */
       border-radius: 4px;
       z-index: 0;
   }
@@ -171,7 +183,7 @@
       display: flex; flex-direction: column; gap: 20px;
       width: 100%;
       padding-top: 40px;
-      padding-left: 100px; /* 라인과의 거리 */
+      padding-left: 100px; /* 줄과의 간격 */
       z-index: 2;
   }
 
@@ -179,13 +191,13 @@
   .subject-card { 
     background: var(--bg-card); width: 100%; padding: 25px 35px; border-radius: 18px; 
     box-shadow: var(--shadow); 
-    border: 2px solid transparent; /* 기본 테두리 투명 */
+    border: 2px solid transparent; 
     display: flex; justify-content: space-between; align-items: center; transition: 0.3s;
     cursor: pointer; color: var(--text-main);
     position: relative;
   }
 
-  /* Hover 시 녹색 테두리 */
+  /* Hover 시 녹색 테두리 (요청사항) */
   .subject-card:hover { 
       border-color: #10b981; 
       transform: translateX(5px); 
@@ -213,7 +225,7 @@
       box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
   }
   
-  /* 카드 내부 컨텐츠 (기존 심플 스타일) */
+  /* 카드 내부 컨텐츠 (심플 텍스트) */
   .subj-title { font-size: 18px; font-weight: 800; color: var(--title-color); display: flex; align-items: center; gap: 8px; }
   
   /* 외부 링크 아이콘 */
@@ -257,19 +269,28 @@
       .bottom-nav { width: 90%; bottom: 20px; padding: 12px 0; justify-content: center; }
   }
 
-  /* 모달 스타일 */
+  /* 모달 스타일 (기존 복구) */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none; align-items: center; justify-content: center; }
-  .modal-card { background: var(--bg-card); padding: 30px; border-radius: 20px; width: 450px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); color: var(--text-main); }
+  .modal-card { background: var(--bg-card); padding: 30px; border-radius: 20px; width: 500px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); color: var(--text-main); }
   .setting-label { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; display: block; }
-  .btn-modal { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; margin-top: 5px; }
+  .setting-input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--text-main); }
+  .btn-modal { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; margin-top: 5px; }
   .btn-primary { background: var(--navy); color: #fff; }
+  .btn-secondary { background: var(--btn-border); color: var(--text-sub); }
+  .btn-danger { background: #ef4444; color: #fff; }
 
-  /* PDF 뷰어 오버레이 (기존 유지) */
-  #pdfOverlay { position: fixed; inset: 0; background: #000; display: none; z-index: 7000; }
+  /* 테이블 스타일 (일괄등록용) */
+  .batch-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .batch-table th, .batch-table td { padding: 8px; border: 1px solid var(--btn-border); text-align: center; }
+  .batch-table th { background: var(--btn-bg); font-weight: 700; color: var(--text-sub); }
+  .batch-input { width: 100%; border: none; background: transparent; color: var(--text-main); }
+
+  /* PDF 뷰어 오버레이 */
+  #pdfOverlay { position: fixed; inset: 0; background: #000; display: none; z-index: 7000; touch-action: none; }
   .viewer-body { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; }
   canvas { box-shadow: 0 0 50px rgba(0,0,0,0.8); max-width: 100%; height: auto; }
   
-  /* 오디오 패널 (기존 유지) */
+  /* 오디오 패널 */
   #audioPanel { position: absolute; top: -100px; left: 50%; transform: translateX(-50%); background: #fff; padding: 10px 20px; border-radius: 0 0 20px 20px; z-index: 8000; transition: 0.3s; display: flex; gap: 10px; align-items: center; }
   #audioPanel.open { top: 0; }
   
@@ -297,7 +318,7 @@
       <svg viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
     </div>
     <div class="logo-text" onclick="location.href='index.html'">KAC CNS Training Platform</div>
-    <!-- 브레드크럼 (기존 회색조) -->
+    <!-- 브레드크럼 (기존 회색조 복구) -->
     <div class="breadcrumb" id="bcContainer"></div>
   </div>
 
@@ -323,16 +344,16 @@
 <!-- [세로형 트리 레이아웃] -->
 <div class="mindmap-container">
     <div class="mindmap-wrapper">
-        <!-- 1. Root Section (홈으로 버튼 삭제, 상위 시설로 이동) -->
+        <!-- 1. Root Section (대제목) -->
         <div class="root-card" onclick="goParent()">
              <div class="root-icon-box" id="rootIconBox">?</div>
              <div class="root-title" id="rootTitleDisplay">Loading...</div>
         </div>
 
-        <!-- 2. Connection Line -->
+        <!-- 2. Connection Line (세로 줄) -->
         <div class="branch-bus"></div>
 
-        <!-- 3. List Section -->
+        <!-- 3. List Section (카드 리스트) -->
         <div id="listSection" class="list-section"></div>
     </div>
 </div>
@@ -349,10 +370,10 @@
   </div>
 </div>
 
-<!-- 설정 모달 -->
+<!-- 설정 모달 (기존 디자인 및 기능 복구 + 가로이동 추가) -->
 <div id="settingsModal" class="modal-overlay">
   <div class="modal-card">
-    <h3>⚙️ 설정</h3>
+    <div class="modal-title">⚙️ 설정 및 관리</div>
     
     <div class="setting-group" id="guestMsg">
        <p style="color:#94a3b8; margin-bottom:10px;">관리자 권한이 필요합니다.</p>
@@ -360,31 +381,73 @@
     </div>
 
     <div id="adminControls" style="display:none;">
-        <button class="btn-modal btn-danger" onclick="toggleAdmin()" style="margin-bottom:20px;">로그아웃</button>
-        
-        <label class="setting-label">↔️ 컨텐츠 전체 가로 이동 (px)</label>
-        <div style="display:flex; gap:10px; align-items:center; margin-bottom:20px;">
-            <input type="range" id="layoutXRange" min="-300" max="300" step="10" style="flex:1" oninput="updateLayoutX(this.value)">
-            <input type="number" id="layoutXNum" class="setting-input" style="width:70px;" oninput="updateLayoutX(this.value)">
+        <div class="setting-group">
+            <label class="setting-label">🛠️ 시스템 관리</label>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="btn-modal btn-danger" onclick="toggleAdmin()">로그아웃</button>
+                <button id="modalPreviewBtn" class="btn-modal btn-secondary" onclick="togglePreview()">👁️ 미리보기</button>
+            </div>
         </div>
-        <button class="btn-modal btn-primary" onclick="saveSettings()">설정 저장</button>
+
+        <div class="setting-group">
+            <label class="setting-label">📦 대량 등록 관리</label>
+            <div style="display:flex; gap:10px; margin-bottom:10px;">
+                <button class="btn-modal btn-primary" style="flex:1" onclick="openBatchAddModal()">일괄 입력 (신규)</button>
+                <button class="btn-modal btn-secondary" style="flex:1" onclick="openBatchEditModal()">일괄 수정 (기존)</button>
+            </div>
+            <p style="font-size:11px; color:var(--text-sub);">* GitHub files 폴더 내의 경로를 입력하세요.</p>
+        </div>
+        
+        <div class="setting-group">
+            <label class="setting-label">↔️ 컨텐츠 전체 가로 이동 (px)</label>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <input type="range" id="layoutXRange" min="-300" max="300" step="10" style="flex:1" oninput="updateLayoutX(this.value)">
+                <input type="number" id="layoutXNum" class="setting-input" style="width:70px;" oninput="updateLayoutX(this.value)">
+            </div>
+            <button class="btn-modal btn-primary" style="margin-top:10px;" onclick="saveSettings()">설정 저장</button>
+        </div>
     </div>
     
-    <button class="btn-modal" onclick="document.getElementById('settingsModal').style.display='none'" style="margin-top:10px;">닫기</button>
+    <button class="btn-modal btn-secondary" onclick="document.getElementById('settingsModal').style.display='none'" style="margin-top:10px;">닫기</button>
   </div>
 </div>
 
 <!-- 자료 등록/수정 모달 -->
 <div id="uploadModal" class="modal-overlay">
   <div class="modal-card">
-    <h3>자료 수정</h3>
+    <div class="modal-title">자료 수정</div>
     <input type="text" id="editName" class="setting-input" placeholder="제목" style="margin-bottom:10px;">
-    <input type="text" id="editPdf" class="setting-input" placeholder="PDF 경로" style="margin-bottom:10px;">
-    <input type="text" id="editLink" class="setting-input" placeholder="외부 링크" style="margin-bottom:10px;">
-    <input type="text" id="editAudio" class="setting-input" placeholder="오디오 경로" style="margin-bottom:10px;">
-    <div style="display:flex; gap:10px;">
+    <input type="text" id="editPdf" class="setting-input" placeholder="PDF 경로 (예: file.pdf)" style="margin-bottom:10px;">
+    <input type="text" id="editLink" class="setting-input" placeholder="외부 링크 (선택)" style="margin-bottom:10px;">
+    <input type="text" id="editAudio" class="setting-input" placeholder="오디오 경로 (선택)" style="margin-bottom:10px;">
+    <div style="display:flex; gap:10px; margin-top:20px;">
         <button class="btn-modal btn-primary" onclick="saveSubject()">저장</button>
-        <button class="btn-modal" onclick="document.getElementById('uploadModal').style.display='none'">취소</button>
+        <button class="btn-modal btn-secondary" onclick="document.getElementById('uploadModal').style.display='none'">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- 일괄 등록/수정 모달 -->
+<div id="batchModal" class="modal-overlay">
+  <div class="modal-card" style="width: 1000px; max-width: 95%;">
+    <div class="modal-title" id="batchModalTitle">📋 일괄 자료 등록</div>
+    <div style="overflow-y:auto; max-height:50vh; border:1px solid var(--btn-border); margin-bottom:20px;">
+        <table class="batch-table" id="batchTable">
+            <thead>
+                <tr>
+                    <th style="width:40px;">No.</th>
+                    <th>과목명</th>
+                    <th style="width:200px;">PDF 경로</th>
+                    <th style="width:200px;">링크 주소</th>
+                    <th style="width:150px;">오디오 경로</th>
+                </tr>
+            </thead>
+            <tbody id="batchTbody"></tbody>
+        </table>
+    </div>
+    <div class="btn-row">
+      <button id="batchSaveBtn" class="btn-modal btn-primary">저장</button>
+      <button onclick="document.getElementById('batchModal').style.display='none'" class="btn-modal btn-secondary">취소</button>
     </div>
   </div>
 </div>
@@ -414,16 +477,37 @@
   let subjects = [];
   let currentEditIdx = -1;
   let pdfDoc = null;
+  let isPreview = localStorage.getItem('kac_preview_active') === '1';
   
   function init() {
       setTheme(localStorage.getItem('kac_theme') || 'light');
+      if(isPreview) document.body.classList.add('preview-active');
+      
       loadLayoutSettings();
       loadData();
       renderSidebar();
       renderList();
       
       if(autoOpen) setTimeout(() => openViewerById(autoOpen), 300);
-      document.getElementById('searchInput').addEventListener('input', handleSearch);
+      
+      // 검색창 이벤트 (블러 효과 포함)
+      const sInput = document.getElementById('searchInput');
+      const sOverlay = document.getElementById('searchOverlay');
+      const sDrop = document.getElementById('searchDropdown');
+      
+      sInput.addEventListener('focus', () => { 
+          document.body.classList.add('search-mode');
+          sOverlay.classList.add('active');
+          if(sInput.value) sDrop.classList.add('active');
+      });
+      
+      sInput.addEventListener('input', handleSearch);
+      
+      sOverlay.addEventListener('click', () => {
+          document.body.classList.remove('search-mode');
+          sOverlay.classList.remove('active');
+          sDrop.classList.remove('active');
+      });
   }
   
   function goParent() {
@@ -494,7 +578,7 @@
             ? `<svg class="ext-link-icon" viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor; margin-top:2px;"><path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z" /></svg>` 
             : '';
 
-          const adminBtns = isAdmin ? `
+          const adminBtns = isAdmin && !isPreview ? `
             <div class="ctrl-btns" onclick="event.stopPropagation()">
                 <button class="btn-xs" onclick="openEdit(${idx})">수정</button>
                 <button class="btn-xs btn-del" onclick="deleteItem(${idx})">삭제</button>
@@ -521,7 +605,7 @@
           }
       });
       
-      if(isAdmin) {
+      if(isAdmin && !isPreview) {
           const addBtn = document.createElement('div');
           addBtn.className = 'subject-card';
           addBtn.style.justifyContent = 'center';
@@ -552,9 +636,22 @@
       const container = document.getElementById('viewerBody');
       container.innerHTML = 'Loading...';
       
+      // [자동 전체화면 시도]
       try {
-          const url = `files/${sub.pdfName}`;
-          const loadingTask = pdfjsLib.getDocument(url);
+          const ov = document.getElementById('pdfOverlay');
+          if (ov.requestFullscreen) await ov.requestFullscreen();
+          else if (ov.webkitRequestFullscreen) await ov.webkitRequestFullscreen();
+      } catch(e) {}
+
+      try {
+          // [PDF 확장자 자동 보정]
+          let url = sub.pdfName;
+          if (!url.toLowerCase().endsWith('.pdf')) url += '.pdf';
+          
+          // 경로: files/파일명
+          const finalUrl = `files/${url}`;
+          
+          const loadingTask = pdfjsLib.getDocument(finalUrl);
           pdfDoc = await loadingTask.promise;
           
           container.innerHTML = '';
@@ -562,7 +659,11 @@
           container.appendChild(canvas);
           
           const page = await pdfDoc.getPage(1);
-          const viewport = page.getViewport({scale: 1.5});
+          // 모바일/PC 분기
+          const isMobile = window.innerWidth <= 768;
+          let scale = isMobile ? (window.innerWidth / page.getViewport({scale:1}).width)*1.5 : 1.5;
+          
+          const viewport = page.getViewport({scale: scale});
           canvas.width = viewport.width;
           canvas.height = viewport.height;
           
@@ -583,6 +684,7 @@
   }
   
   function closeViewer() {
+      if (document.fullscreenElement) document.exitFullscreen();
       document.getElementById('pdfOverlay').style.display = 'none';
       document.getElementById('mainAudio').pause();
   }
@@ -640,6 +742,14 @@
       const isAdm = localStorage.getItem('kac_admin_mode') === '1';
       document.getElementById('guestMsg').style.display = isAdm ? 'none' : 'block';
       document.getElementById('adminControls').style.display = isAdm ? 'block' : 'none';
+      
+      // 미리보기 버튼 텍스트 변경
+      const pBtn = document.getElementById('modalPreviewBtn');
+      if(pBtn) {
+          pBtn.textContent = isPreview ? "미리보기 종료" : "👁️ 미리보기";
+          pBtn.className = isPreview ? "btn-modal btn-primary" : "btn-modal btn-secondary";
+      }
+      
       document.getElementById('settingsModal').style.display = 'flex';
   }
 
@@ -648,10 +758,16 @@
           if(confirm("로그아웃?")) { localStorage.setItem('kac_admin_mode','0'); location.reload(); }
       } else {
           const pw = prompt("비밀번호");
-          if(pw === "admin") { // 임시
+          if(pw === "admin") { 
               localStorage.setItem('kac_admin_mode','1'); location.reload(); 
           }
       }
+  }
+  
+  function togglePreview() {
+      isPreview = !isPreview;
+      localStorage.setItem('kac_preview_active', isPreview ? '1' : '0');
+      location.reload();
   }
 
   function setTheme(m) {
@@ -669,7 +785,7 @@
   function handleSearch(e) {
       const q = e.target.value.toLowerCase();
       const drop = document.getElementById('searchDropdown');
-      if(!q) { drop.style.display='none'; return; }
+      if(!q) { drop.style.display='none'; document.getElementById('searchOverlay').classList.remove('active'); return; }
       
       const matches = subjects.filter(s => s.name.toLowerCase().includes(q));
       drop.innerHTML = matches.map(s => `
@@ -678,6 +794,7 @@
         </div>
       `).join('');
       drop.style.display = 'block';
+      drop.classList.add('active');
   }
   
   function openViewerById(id) {
@@ -721,6 +838,70 @@
           `;
           content.appendChild(item);
       });
+  }
+  
+  // 일괄등록(Batch) 관련 함수 복구
+  function openBatchAddModal() {
+    if(!isAdmin) return alert("관리자 권한이 필요합니다.");
+    document.getElementById('batchModalTitle').textContent = "📋 일괄 자료 등록 (신규 추가)";
+    const tbody = document.getElementById('batchTbody'); tbody.innerHTML = '';
+    for(let i=0; i<30; i++) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${i+1}</td><td><input type="text" class="batch-input" placeholder="과목명" name="name"></td><td><input type="text" class="batch-input" placeholder="PDF 경로" name="pdf"></td><td><input type="text" class="batch-input" placeholder="링크 주소" name="link"></td><td><input type="text" class="batch-input" placeholder="오디오 경로" name="audio"></td>`;
+        tbody.appendChild(tr);
+    }
+    document.getElementById('batchSaveBtn').onclick = saveBatchAddData;
+    document.getElementById('settingsModal').style.display = 'none';
+    document.getElementById('batchModal').style.display = 'flex';
+  }
+
+  function openBatchEditModal() {
+    if(!isAdmin) return alert("관리자 권한이 필요합니다.");
+    document.getElementById('batchModalTitle').textContent = "📋 일괄 자료 수정 (기존 목록)";
+    const tbody = document.getElementById('batchTbody'); tbody.innerHTML = '';
+    subjects.forEach((sub, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${i+1}</td><td><input type="text" class="batch-input" value="${sub.name}" name="name" data-idx="${i}"></td><td><input type="text" class="batch-input" value="${sub.pdfName || ''}" name="pdf" data-idx="${i}"></td><td><input type="text" class="batch-input" value="${sub.link || ''}" name="link" data-idx="${i}"></td><td><input type="text" class="batch-input" value="${sub.audioName || ''}" name="audio" data-idx="${i}"></td>`;
+        tbody.appendChild(tr);
+    });
+    document.getElementById('batchSaveBtn').onclick = saveBatchEditData;
+    document.getElementById('settingsModal').style.display = 'none';
+    document.getElementById('batchModal').style.display = 'flex';
+  }
+
+  function saveBatchAddData() {
+    const rows = document.querySelectorAll('#batchTbody tr');
+    let addedCount = 0;
+    for(const row of rows) {
+        const name = row.querySelector('input[name="name"]').value.trim();
+        const pdf = row.querySelector('input[name="pdf"]').value.trim();
+        const link = row.querySelector('input[name="link"]').value.trim();
+        const audio = row.querySelector('input[name="audio"]').value.trim();
+        if(name) {
+            const newId = Date.now().toString() + Math.random().toString(36).substr(2, 5);
+            subjects.push({ id: newId, name: name, active: true, pdfName: pdf, link: link, audioName: audio });
+            addedCount++;
+        }
+    }
+    if(addedCount > 0) { saveSubjects(); alert(`${addedCount}개 과목이 등록되었습니다.`); document.getElementById('batchModal').style.display = 'none'; } 
+    else { alert("입력된 과목이 없습니다."); }
+  }
+
+  function saveBatchEditData() {
+    const rows = document.querySelectorAll('#batchTbody tr');
+    let updatedCount = 0;
+    for(const row of rows) {
+        const nameInput = row.querySelector('input[name="name"]');
+        const idx = parseInt(nameInput.getAttribute('data-idx'));
+        if(subjects[idx]) {
+            subjects[idx].name = nameInput.value.trim();
+            subjects[idx].pdfName = row.querySelector('input[name="pdf"]').value.trim();
+            subjects[idx].link = row.querySelector('input[name="link"]').value.trim();
+            subjects[idx].audioName = row.querySelector('input[name="audio"]').value.trim();
+            updatedCount++;
+        }
+    }
+    if(updatedCount > 0) { saveSubjects(); alert("수정되었습니다."); document.getElementById('batchModal').style.display = 'none'; }
   }
 
   init();
