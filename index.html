@@ -3,7 +3,6 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>KAC CNS Training Platform</title>
 <script>
   // [보안] 로그인 세션 체크
@@ -36,56 +35,14 @@
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
-  
-  /* [중요] 가로 스크롤 방지 */
-  html, body { width: 100%; overflow-x: hidden; }
-  
-  body { 
-    background: var(--bg-main); 
-    height: 100vh; 
-    display: flex; 
-    flex-direction: column; 
-    overflow: hidden; /* PC 기본 */
-    color: var(--text-main); 
-    transition: background 0.3s, color 0.3s; 
-  }
+  body { background: var(--bg-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: var(--text-main); transition: 0.3s; }
 
   /* 관리자/미리보기 제어 */
   body.preview-active .card-ctrl, body.preview-active .add-slot { display: none !important; }
   
-  /* 헤더 스타일 */
-  header { 
-    height: var(--header-h); background: var(--navy); 
-    display: flex; align-items: center; justify-content: space-between; 
-    padding: 0 20px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.15); 
-    z-index: 1000; flex-shrink: 0; position: relative; 
-    width: 100%;
-  }
-  
-  .header-left { display: flex; align-items: center; gap: 15px; z-index: 10; min-width: 0; flex-shrink: 1; }
-  .hamburger-btn { cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; flex-shrink: 0; }
-  .hamburger-btn:hover { background: rgba(255,255,255,0.1); }
-  .hamburger-btn svg { width: 24px; height: 24px; fill: #fff; }
-
-  .logo-text { 
-    font-size: 20px; font-weight: 800; letter-spacing: -0.5px; 
-    cursor: pointer; white-space: nowrap; 
-    overflow: hidden; text-overflow: ellipsis;
-  }
-  
-  /* 헤더 중앙 페이지 제목 영역 */
-  .header-center-title {
-      position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-      font-size: 24px; font-weight: 800; color: #fff; letter-spacing: -0.5px;
-      display: flex; align-items: center; gap: 8px; z-index: 5;
-      white-space: nowrap; pointer-events: none;
-  }
-  .header-center-title span { pointer-events: auto; } 
-  .title-edit-icon { cursor: pointer; opacity: 0.3; transition: 0.2s; font-size: 16px; display: none; }
-  .title-edit-icon:hover { opacity: 1; color: #60a5fa; }
-  body.admin-mode .title-edit-icon { display: block; }
-
-  .header-right { display: flex; align-items: center; gap: 15px; z-index: 10; flex-shrink: 0; }
+  header { height: var(--header-h); background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.15); z-index: 1000; flex-shrink: 0; }
+  .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; cursor: pointer; }
+  .header-right { display: flex; align-items: center; gap: 15px; }
   
   .theme-toggle { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); margin-right: 10px; }
   .theme-btn { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; opacity: 0.5; }
@@ -96,38 +53,9 @@
   .settings-btn { display: flex; padding: 8px; width: 34px; height: 34px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.3s; color: #cbd5e1; }
   .settings-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
 
-  /* [수정] 사이드바 z-index 상향 조정 (검색창 2000보다 높게) */
-  .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 3000; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(2px); }
-  .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
-  
-  .sidebar { 
-    position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; 
-    background: var(--bg-card); z-index: 3001; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-    box-shadow: 5px 0 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; 
-    border-right: 1px solid var(--btn-border);
-  }
-  .sidebar.active { left: 0; }
-  
-  .sidebar-header { height: var(--header-h); display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--btn-border); font-weight: 800; font-size: 18px; justify-content: space-between; color: var(--text-main); }
-  .sidebar-close { cursor: pointer; padding: 8px; border-radius: 50%; transition: 0.2s; }
-  .sidebar-close:hover { background: var(--btn-bg); }
-  
-  .sidebar-content { flex: 1; overflow-y: auto; padding: 10px; }
-  .sb-item { padding: 12px 15px; cursor: pointer; border-radius: 10px; color: var(--text-main); font-weight: 600; transition: 0.2s; display: flex; align-items: center; justify-content: space-between; font-size: 14px; }
-  .sb-item:hover { background: var(--btn-bg); color: #2563eb; }
-  .sb-sub-list { display: none; padding-left: 20px; margin-bottom: 5px; }
-  .sb-sub-list.open { display: block; animation: slideDown 0.2s; }
-  .sb-sub-item { padding: 8px 15px; font-size: 13px; color: var(--text-sub); cursor: pointer; border-left: 2px solid var(--btn-border); transition: 0.2s; }
-  .sb-sub-item:hover { border-left-color: #2563eb; color: #2563eb; background: rgba(37,99,235,0.05); }
-
-  /* 컨텐츠 영역 */
-  .content-wrapper { 
-      flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; 
-      width: 100%; overflow-y: auto; padding: 120px 0 0 0; position: relative; 
-  }
-  
-  .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 30px; flex-shrink: 0; z-index: 2000; position: relative; padding: 0 20px; }
-  .search-container { position: relative; width: 600px; max-width: 100%; }
+  .content-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; width: 100%; overflow-y: auto; padding: 120px 20px 80px 20px; position: relative; }
+  .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 30px; flex-shrink: 0; z-index: 2000; position: relative; }
+  .search-container { position: relative; width: 600px; max-width: 90%; }
   
   .search-bar { 
     width: 100%; padding: 18px 30px; border-radius: 50px; border: 2px solid var(--search-border);
@@ -143,12 +71,8 @@
   #searchOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1500; display: none; backdrop-filter: blur(2px); animation: fadeIn 0.3s; }
   #searchOverlay.active { display: block; }
 
-  /* 메인 카드 영역 & 애니메이션 */
-  #cardContainerWrapper { width: 100%; max-width: 1700px; overflow: hidden; padding: 0 20px; flex: 1; }
-  #cardContainer { 
-    display: flex; flex-wrap: wrap; gap: 30px; width: 100%; justify-content: center; padding: 20px; 
-    transform-style: preserve-3d; min-height: 400px; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s;
-  }
+  /* 메인 카드 영역 */
+  #cardContainer { display: flex; flex-wrap: wrap; gap: 30px; width: 100%; max-width: 1700px; justify-content: center; padding: 20px; transform-style: preserve-3d; min-height: 400px; }
   
   .card { background: var(--bg-card); width: 280px; height: 280px; padding: 30px 20px; border-radius: 25px; box-shadow: var(--shadow); border: var(--border-card); cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; border-left: 10px solid transparent; color: var(--text-main); --card-color: #64748b; border-left-color: var(--card-color); }
   .card:hover { transform: translateY(-10px); border-color: var(--card-color); box-shadow: 0 15px 30px -5px var(--card-color); }
@@ -165,83 +89,9 @@
   .icon-box { width: 100px; height: 100px; border-radius: 30px; margin-bottom: 20px; font-weight: 900; display: flex; align-items: center; justify-content: center; background: var(--btn-bg); border: 1px solid var(--btn-border); font-size: var(--icon-size-idx, 60px); color: var(--card-color); pointer-events: none; }
   .card h2 { font-size: var(--label-size-idx, 24px); font-weight: 800; text-align: center; pointer-events: none; }
 
-  /* 모바일 전용 UI 최적화 */
-  @media (max-width: 768px) {
-    /* 전체 스크롤 허용 */
-    body { 
-        display: block; 
-        height: auto; 
-        overflow-y: auto; 
-        overflow-x: hidden; 
-    }
-    
-    header { 
-        position: sticky; 
-        top: 0; 
-        padding: 0 10px;
-    }
-
-    .content-wrapper { 
-        height: auto; 
-        overflow: visible; 
-        padding-top: 30px; 
-        padding-bottom: 120px; /* 하단 여백 */
-        display: block;
-    }
-
-    .header-left { gap: 5px; flex: 1; }
-    .logo-text { font-size: 13px; max-width: none; white-space: nowrap; }
-    .kac-logo-img { display: none; }
-    .header-center-title { display: none; }
-    
-    .header-right { gap: 8px; }
-    .theme-toggle { margin-right: 5px; }
-    .settings-btn { width: 30px; height: 30px; font-size: 16px; padding: 0; }
-
-    #cardContainerWrapper { padding: 0 15px; }
-    #cardContainer { 
-        gap: 15px; padding: 10px 0; 
-        min-height: auto; 
-        flex-direction: column; 
-        flex-wrap: nowrap;
-    }
-    
-    .card { 
-      width: 100%; height: auto; min-height: 90px; 
-      flex-direction: row; justify-content: flex-start; 
-      padding: 15px 25px; gap: 20px; border-radius: 20px;
-    }
-    .card:hover { transform: translateY(-3px); }
-    .icon-box { width: 50px; height: 50px; border-radius: 15px; margin-bottom: 0; font-size: 24px; flex-shrink: 0; }
-    .card h2 { font-size: 18px; text-align: left; word-break: keep-all; flex: 1; }
-    .card-ctrl { top: 50%; right: 10px; transform: translateY(-50%); width: auto; flex-direction: row; }
-    .btn-sm { padding: 6px 10px; }
-
-    .main-footer { padding: 25px 15px; margin-top: 30px; }
-    .main-footer p { font-size: 11px; white-space: normal; }
-    .main-footer .copyright { font-size: 11px; }
-  }
-
-  .pagination { display: flex; gap: 10px; margin-top: 20px; align-items: center; justify-content: center; padding-bottom: 40px; flex-shrink: 0; }
+  .pagination { display: flex; gap: 10px; margin-top: 20px; align-items: center; justify-content: center; padding-bottom: 20px; }
   .page-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--btn-border); cursor: pointer; transition: 0.3s; }
   .page-dot.active { background: var(--navy); transform: scale(1.3); }
-
-  /* 하단바 (Footer) */
-  .main-footer {
-    width: 100%;
-    background: var(--navy);
-    padding: 30px 20px;
-    text-align: center;
-    color: rgba(255,255,255,0.7);
-    margin-top: auto; 
-    flex-shrink: 0;
-    font-size: 13px;
-    line-height: 1.6;
-    border-top: 1px solid rgba(255,255,255,0.1);
-    box-sizing: border-box;
-  }
-  .main-footer p { margin: 0; word-break: keep-all; }
-  .main-footer .copyright { font-weight: 700; margin-top: 8px; color: rgba(255,255,255,0.9); }
 
   #loadingSpinner { position: fixed; inset: 0; background: var(--bg-main); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
   .spinner { width: 50px; height: 50px; border: 5px solid #cbd5e1; border-top-color: #2563eb; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
@@ -250,41 +100,11 @@
   .btn-del { color: #ef4444; border-color: #fee2e2; }
   .btn-move { color: #3b82f6; border-color: #dbeafe; }
 
-  /* 통합 관리자 모달 스타일 (트리 UI 개선) */
-  .tree-container { display: flex; height: 500px; border: 1px solid var(--btn-border); border-radius: 10px; overflow: hidden; margin-top: 15px; }
-  .tree-sidebar { width: 35%; background: var(--bg-main); border-right: 1px solid var(--btn-border); overflow-y: auto; padding: 10px; }
-  .tree-content { width: 65%; padding: 20px; overflow-y: auto; background: var(--bg-card); }
-  
-  /* 트리 노드 스타일 */
-  .t-node-row { display: flex; align-items: center; padding: 4px 0; }
-  .t-toggle-btn { 
-      width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; 
-      cursor: pointer; font-size: 10px; color: var(--text-sub); flex-shrink: 0; 
-      transition: transform 0.2s;
-  }
-  .t-toggle-btn:hover { color: #2563eb; }
-  .t-toggle-btn.empty { cursor: default; opacity: 0; } /* 하위 없음 */
-  
-  .t-label { 
-      padding: 6px 10px; cursor: pointer; border-radius: 6px; font-size: 13px; 
-      color: var(--text-main); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .t-label:hover { background: rgba(37,99,235,0.1); }
-  .t-label.selected { background: #2563eb; color: #fff; }
-  
-  .t-children { display: none; padding-left: 18px; border-left: 1px solid var(--btn-border); margin-left: 11px; }
-  .t-children.open { display: block; }
-
-  /* 공통 모달 */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none; align-items: center; justify-content: center; }
-  .modal-card { background: var(--bg-card); padding: 35px; border-radius: 25px; width: 450px; color: var(--text-main); box-shadow: 0 20px 50px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
-  .modal-card.large { width: 1000px; max-width: 95%; height: 85vh; }
+  .modal-card { background: var(--bg-card); padding: 35px; border-radius: 25px; width: 450px; color: var(--text-main); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
   .setting-group { margin-bottom: 20px; }
   .setting-label { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; display: block; }
   .setting-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--text-main); font-size: 14px; outline: none; }
-
-  /* 야간 모드 입력창 시인성 */
-  body.dark-mode .setting-input, body.dark-mode select.setting-input { background-color: #334155; color: #fff; border-color: rgba(255,255,255,0.2); }
 
   .btn-modal { width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; margin-top: 5px; }
   .btn-primary { background: var(--navy); color: #fff; }
@@ -299,9 +119,13 @@
   .res-path { font-size: 11px; opacity: 0.7; }
   .res-tag { font-size: 12px; font-weight: 900; padding: 4px 10px; border-radius: 6px; color: #fff; min-width: 50px; text-align: center; }
 
+  .creator-info { position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; padding: 15px; background: var(--bg-main); font-size: 12px; color: var(--text-sub); opacity: 0.8; pointer-events: none; z-index: 100; line-height: 1.6; }
+  .creator-info p { margin: 0; }
+  .creator-info .copyright { font-weight: 700; margin-top: 4px; color: #64748b; }
+  body.dark-mode .creator-info { color: #cbd5e1; background: var(--bg-main); }
+
   @keyframes spin { 100% { transform: rotate(360deg); } }
   @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 </style>
 </head>
 <body>
@@ -313,32 +137,8 @@
 
 <div id="searchOverlay"></div>
 
-<!-- 사이드바 -->
-<div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
-<div id="sidebar" class="sidebar">
-  <div class="sidebar-header">
-    <span>전체 메뉴</span>
-    <div class="sidebar-close" onclick="toggleSidebar()">✕</div>
-  </div>
-  <div class="sidebar-content" id="sidebarContent">
-    <!-- JS로 동적 생성 -->
-  </div>
-</div>
-
 <header>
-  <div class="header-left">
-    <div class="hamburger-btn" onclick="toggleSidebar()">
-      <svg viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
-    </div>
-    <div class="logo-text" onclick="location.reload()">KAC CNS Training Platform</div>
-  </div>
-  
-  <!-- 헤더 중앙: 페이지 제목 (모바일에서는 자동 숨김) -->
-  <div class="header-center-title">
-      <span id="pageHeadline"></span>
-      <span class="title-edit-icon" onclick="editPageTitle()">✏️</span>
-  </div>
-
+  <div class="logo-text" onclick="location.reload()">KAC CNS Training Platform</div>
   <div class="header-right">
     <div class="theme-toggle">
       <div class="theme-btn" id="btnDay" onclick="setTheme('light')"><svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg></div>
@@ -356,18 +156,8 @@
       <div id="searchResults" class="search-results"></div>
     </div>
   </div>
-  
-  <div id="cardContainerWrapper">
-    <main id="cardContainer"></main>
-  </div>
+  <main id="cardContainer"></main>
   <div id="pagination" class="pagination"></div>
-
-  <!-- 하단바 (Footer) -->
-  <footer class="main-footer">
-    <p>본 웹사이트는 한국공항공사 항공기술훈련원의 항행안전시설 분야 교육 관련 플랫폼입니다.</p>
-    <p>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)</p>
-    <p class="copyright">© 2026 Korea Airports Corporation. All rights reserved.</p>
-  </footer>
 </div>
 
 <!-- 설정 모달 -->
@@ -386,14 +176,9 @@
           <button class="btn-modal btn-secondary" onclick="openPwChangeModal()">비밀번호 변경</button>
           <button id="modalPreviewBtn" class="btn-modal btn-secondary" onclick="togglePreview()">미리보기 모드 시작</button>
         </div>
-        
-        <!-- 종합 관리 버튼 추가 -->
-        <button class="btn-modal btn-primary" style="margin-top:10px; background:#4f46e5;" onclick="openIntegratedAdmin()">
-            🗂️ 전체 데이터 종합 관리 (Tree Editor)
-        </button>
-
         <button class="btn-modal btn-success" onclick="exportJsonData()">변경사항 저장 (data.json 다운로드)</button>
         
+        <!-- GitHub 업로드 버튼 추가 -->
         <button class="btn-modal btn-primary" style="background:#24292f; margin-top:10px;" onclick="openGithubModal()">
           <svg style="width:16px;height:16px;vertical-align:middle;margin-right:5px;fill:white;" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
           GitHub에 바로 업로드
@@ -401,6 +186,7 @@
 
         <p style="font-size:11px; color:red; margin-top:5px;">* 중요: 비밀번호 변경 또는 데이터 수정 후 반드시 [변경사항 저장] 또는 [GitHub 업로드]를 해야 적용됩니다.</p>
         
+        <!-- 초기화 버튼 -->
         <button class="btn-modal btn-danger" style="margin-top:15px; background:#ef4444; opacity:0.8;" onclick="resetToDataJson()">⚠️ 서버 원본으로 초기화 (수정취소)</button>
       </div>
       <div class="setting-group" style="background: rgba(0,0,0,0.02); padding: 15px; border-radius: 15px; border: 1px solid var(--btn-border);">
@@ -413,31 +199,6 @@
       </div>
     </div>
     <button class="btn-modal btn-secondary" onclick="document.getElementById('settingsModal').style.display='none'">닫기</button>
-  </div>
-</div>
-
-<!-- 통합 관리자 (Tree Editor) 모달 -->
-<div id="integratedAdminModal" class="modal-overlay">
-  <div class="modal-card modal-card large">
-    <div class="modal-title">🗂️ 전체 데이터 종합 관리</div>
-    <p style="font-size:13px; color:var(--text-sub);">
-      좌측 트리에서 항목을 선택하여 수정하세요. '저장' 버튼을 누르면 즉시 반영됩니다.<br>
-      <b>▶ 화살표:</b> 접기/펼치기 &nbsp;|&nbsp; <b>텍스트:</b> 선택 및 편집
-    </p>
-    
-    <div class="tree-container">
-      <div class="tree-sidebar" id="treeRoot"></div>
-      <div class="tree-content" id="treeDetail">
-        <div style="display:flex; height:100%; align-items:center; justify-content:center; color:var(--text-sub);">
-          항목을 선택해주세요.
-        </div>
-      </div>
-    </div>
-
-    <div class="btn-row" style="margin-top:20px; display:flex; gap:10px;">
-      <button class="btn-modal btn-primary" onclick="saveIntegratedData()">전체 저장 및 적용</button>
-      <button class="btn-modal btn-secondary" onclick="document.getElementById('integratedAdminModal').style.display='none'">닫기</button>
-    </div>
   </div>
 </div>
 
@@ -490,7 +251,7 @@
   </div>
 </div>
 
-<!-- 카드 수정 모달 (간편) -->
+<!-- 카드 수정 모달 -->
 <div id="cardEditModal" class="modal-overlay">
   <div class="modal-card">
     <div class="modal-title">카테고리 수정</div>
@@ -513,6 +274,12 @@
   </div>
 </div>
 
+<div class="creator-info">
+  <p>본 웹사이트는 한국공항공사 항공기술훈련원의 항행안전시설 분야 교육 관련 플랫폼입니다.</p>
+  <p>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)</p>
+  <p class="copyright">© 2026 Korea Airports Corporation. All rights reserved.</p>
+</div>
+
 <script>
   let globalData = { categories: [], config: {}, security: {} };
   let isAdmin = localStorage.getItem('kac_admin_mode') === '1';
@@ -527,43 +294,48 @@
 
   // 드래그앤드롭
   let dragSrcIndex = null;
-  
-  // 종합 관리용 변수
-  let currentTreeSelection = null; // { type: 'cat'|'menu'|'subj', cIdx, mIdx, sIdx }
 
   async function init() {
     setTheme(localStorage.getItem('kac_theme') || 'light');
     if(isPreview) document.body.classList.add('preview-active');
 
-    const isAdminSession = localStorage.getItem('kac_admin_mode') === '1';
+    // 1. 현재 관리자 모드인지 확인 (세션 기준: 브라우저 끄면 풀리게 하려면 sessionStorage 권장, 
+    // 기존 코드와의 호환성을 위해 localStorage 유지 중이라면 localStorage 사용)
+    // * 문제 해결을 위해 관리자 여부 판단 변수를 명확히 합니다.
+    const isAdminSession = localStorage.getItem('kac_admin_mode') === '1'; // 혹은 sessionStorage
 
+    // 2. 서버 데이터 가져오기 (무조건)
     let serverData = null;
     try {
         const res = await fetch('data.json?v=' + Date.now());
         if(res.ok) serverData = await res.json();
     } catch(e) { console.log("data.json 로드 실패"); }
 
+    // 3. 로컬 데이터 확인
     const hasLocalData = localStorage.getItem('kac_index_order');
 
+    // [핵심 로직 변경]
+    // 관리자(수정 권한 있음)이고 + 수정 중인 데이터가 있으면 -> 로컬 데이터 사용
     if (isAdminSession && hasLocalData) {
         console.log("🛠️ 관리자 모드: 로컬 편집 데이터를 복원합니다.");
         reconstructGlobalDataFromLocal();
-        if(serverData && serverData.security) globalData.security = serverData.security;
+        
+        // 보안 설정은 서버 최신본으로 갱신 (비밀번호 동기화)
+        if(serverData && serverData.security) {
+            globalData.security = serverData.security;
+        }
     } 
+    // 일반 사용자이거나 + 로컬 데이터가 없으면 -> 서버 데이터로 강제 덮어쓰기
     else if (serverData) {
         console.log("🔄 일반 사용자: 서버 데이터로 강제 업데이트합니다.");
         globalData = serverData;
-        syncToLocalStorage(globalData);
+        syncToLocalStorage(globalData); // 로컬에 남은 찌꺼기 데이터를 최신 서버 데이터로 덮어씀
         applyConfig(globalData.config);
     }
 
-    // 페이지 타이틀 초기화
-    if(!globalData.config.pageTitles) globalData.config.pageTitles = {};
-
     ensurePageSlots();
-    renderCards(false); 
+    renderCards();
     buildSearchIndex();
-    renderSidebar(); 
     
     setTimeout(() => {
       document.getElementById('loadingSpinner').style.opacity = '0';
@@ -573,6 +345,7 @@
     if(isAdmin) document.body.classList.add('admin-mode');
   }
   
+  // 로컬스토리지 내용을 globalData로 역조립하는 함수 (비밀번호 보존)
   function reconstructGlobalDataFromLocal() {
     const currentSecurity = globalData.security || {
         entry_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c",
@@ -588,11 +361,6 @@
     
     globalData.config.iconSize = parseInt(localStorage.getItem('kac_idx_icon_size') || 60);
     globalData.config.labelSize = parseInt(localStorage.getItem('kac_idx_label_size') || 24);
-    
-    // 페이지 타이틀 복원
-    const savedTitles = localStorage.getItem('kac_page_titles');
-    globalData.config.pageTitles = savedTitles ? JSON.parse(savedTitles) : {};
-
     applyConfig(globalData.config);
 
     const orderRaw = localStorage.getItem('kac_index_order');
@@ -613,6 +381,7 @@
     }
   }
 
+  // 로컬 데이터 초기화 및 서버 원본 복구
   function resetToDataJson() {
     if(confirm("현재까지 수정한 모든 내용이 사라지고 서버의 원본 파일(data.json) 상태로 되돌아갑니다.\n계속하시겠습니까?")) {
         localStorage.clear();
@@ -660,9 +429,6 @@
     if(data.config) {
         localStorage.setItem('kac_idx_icon_size', data.config.iconSize);
         localStorage.setItem('kac_idx_label_size', data.config.labelSize);
-        if(data.config.pageTitles) {
-            localStorage.setItem('kac_page_titles', JSON.stringify(data.config.pageTitles));
-        }
     }
   }
 
@@ -672,192 +438,86 @@
     document.documentElement.style.setProperty('--label-size-idx', (cfg.labelSize||24)+'px');
   }
 
-  /* 사이드바 로직 */
-  function toggleSidebar() {
-      const sb = document.getElementById('sidebar');
-      const ov = document.getElementById('sidebarOverlay');
-      sb.classList.toggle('active');
-      ov.classList.toggle('active');
-  }
-
-  function renderSidebar() {
-      const content = document.getElementById('sidebarContent');
-      content.innerHTML = '';
-      
-      const cats = globalData.categories.filter(c => c !== null);
-      if(cats.length === 0) {
-          content.innerHTML = '<div style="padding:20px; text-align:center; color:#94a3b8;">메뉴가 없습니다.</div>';
-          return;
-      }
-
-      cats.forEach(cat => {
-          const item = document.createElement('div');
-          
-          let subHtml = '';
-          if(cat.menus && cat.menus.length > 0) {
-              subHtml = `<div class="sb-sub-list" id="sb-sub-${cat.id}">`;
-              cat.menus.forEach(m => {
-                  subHtml += `<div class="sb-sub-item" onclick="location.href='viewer_list.html?type=${cat.id}&menu=${encodeURIComponent(m.label)}&id=${m.id}'">
-                      ${m.label}
-                  </div>`;
-              });
-              subHtml += `</div>`;
-          }
-
-          item.innerHTML = `
-            <div class="sb-item" onclick="toggleSubMenu('${cat.id}')">
-                <span style="display:flex;align-items:center;gap:10px;">
-                    <span style="width:10px;height:10px;border-radius:50%;background:${cat.color}"></span>
-                    ${cat.name}
-                </span>
-                <span style="font-size:10px;">▼</span>
-            </div>
-            ${subHtml}
-          `;
-          content.appendChild(item);
-      });
-  }
-
-  function toggleSubMenu(id) {
-      const el = document.getElementById(`sb-sub-${id}`);
-      if(el) el.classList.toggle('open');
-  }
-
-  /* 페이지 헤드라인 로직 */
-  function updateHeadline() {
-      const el = document.getElementById('pageHeadline');
-      const titles = globalData.config.pageTitles || {};
-      const t = titles[currentPage] || "";
-      el.textContent = t;
-      
-      if(isAdmin && t === "") {
-         el.textContent = "제목 없음 (클릭 수정)";
-         el.style.opacity = "0.5";
-         el.style.cursor = "pointer";
-         el.onclick = editPageTitle;
-      } else {
-         el.style.opacity = "1";
-         el.style.cursor = "default";
-         el.onclick = null;
-      }
-  }
-
-  function editPageTitle() {
-      const titles = globalData.config.pageTitles || {};
-      const oldVal = titles[currentPage] || "";
-      const newVal = prompt(`[${currentPage}페이지] 제목을 입력하세요:`, oldVal);
-      if(newVal !== null) {
-          titles[currentPage] = newVal;
-          globalData.config.pageTitles = titles;
-          syncToLocalStorage(globalData); // 저장
-          updateHeadline();
-      }
-  }
-
-  /* 메인 카드 렌더링 (슬라이드 효과 적용) */
-  function renderCards(animate = true) {
-    const containerWrapper = document.getElementById('cardContainer');
+  function renderCards() {
+    const container = document.getElementById('cardContainer');
     const pagination = document.getElementById('pagination');
-    
-    // 애니메이션 처리
-    if(animate) {
-        containerWrapper.style.opacity = '0';
-        containerWrapper.style.transform = 'translateY(10px)';
-        setTimeout(() => {
-            performRender();
-            containerWrapper.style.opacity = '1';
-            containerWrapper.style.transform = 'translateY(0)';
-        }, 300);
-    } else {
-        performRender();
-    }
+    container.innerHTML = ''; 
+    pagination.innerHTML = '';
 
-    function performRender() {
-        containerWrapper.innerHTML = ''; 
-        pagination.innerHTML = '';
+    const totalPages = Math.ceil(globalData.categories.length / itemsPerPage) || 1;
+    if(currentPage > totalPages) currentPage = totalPages;
+    const startIdx = (currentPage - 1) * itemsPerPage;
+    const pageItems = globalData.categories.slice(startIdx, startIdx + itemsPerPage);
 
-        const totalPages = Math.ceil(globalData.categories.length / itemsPerPage) || 1;
-        if(currentPage > totalPages) currentPage = totalPages;
-        const startIdx = (currentPage - 1) * itemsPerPage;
-        const pageItems = globalData.categories.slice(startIdx, startIdx + itemsPerPage);
-
-        pageItems.forEach((cat, i) => {
-          const globalIdx = startIdx + i;
-          
-          if(cat) { 
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.style.setProperty('--card-color', cat.color);
-            card.onclick = () => location.href = `facility.html?type=${cat.id}`;
-            
-            if(isAdmin && !isPreview) {
-              card.setAttribute('draggable', 'true');
-              card.ondragstart = (e) => handleDragStart(e, globalIdx);
-              card.ondragover = (e) => handleDragOver(e);
-              card.ondrop = (e) => handleDrop(e, globalIdx);
-              card.ondragend = (e) => handleDragEnd(e);
-              
-              card.innerHTML = `
-                <div class="card-ctrl" onclick="event.stopPropagation()">
-                  <button class="btn-sm" onclick="openEdit('${cat.id}')">수정</button>
-                  <button class="btn-sm btn-move" onclick="openMovePageModal(${globalIdx})">이동</button>
-                  <button class="btn-sm btn-del" onclick="deleteCard('${globalIdx}')">삭제</button>
-                </div>
-                <div class="icon-box">${cat.code}</div>
-                <h2>${cat.name}</h2>
-              `;
-            } else {
-                card.innerHTML = `<div class="icon-box">${cat.code}</div><h2>${cat.name}</h2>`;
-            }
-            containerWrapper.appendChild(card);
-          } else { 
-            const empty = document.createElement('div');
-            empty.className = 'card add-slot';
-            if(isAdmin && !isPreview) {
-               empty.innerHTML = '<div style="font-size:40px;">+</div><div>카테고리 추가</div>';
-               empty.onclick = () => openEdit('NEW', globalIdx);
-               empty.ondragover = (e) => handleDragOver(e);
-               empty.ondrop = (e) => handleDrop(e, globalIdx);
-            }
-            containerWrapper.appendChild(empty);
-          }
-        });
-
-        for(let i=1; i<=totalPages; i++) {
-            const dot = document.createElement('div');
-            dot.className = `page-dot ${i === currentPage ? 'active' : ''}`;
-            dot.onclick = () => { 
-                if(i === currentPage) return;
-                currentPage = i; 
-                renderCards(true); 
-            };
-            pagination.appendChild(dot);
-        }
+    pageItems.forEach((cat, i) => {
+      const globalIdx = startIdx + i;
+      
+      if(cat) { 
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.setProperty('--card-color', cat.color);
+        card.onclick = () => location.href = `facility.html?type=${cat.id}`;
         
         if(isAdmin && !isPreview) {
-            const addPageBtn = document.createElement('div');
-            addPageBtn.className = 'page-dot';
-            addPageBtn.style.background = 'transparent';
-            addPageBtn.style.border = '1px solid #cbd5e1';
-            addPageBtn.innerText = '+';
-            addPageBtn.style.textAlign = 'center';
-            addPageBtn.style.lineHeight = '10px';
-            addPageBtn.onclick = () => {
-                for(let k=0; k<itemsPerPage; k++) globalData.categories.push(null);
-                currentPage = Math.ceil(globalData.categories.length / itemsPerPage);
-                renderCards(true);
-            };
-            pagination.appendChild(addPageBtn);
+          card.setAttribute('draggable', 'true');
+          card.ondragstart = (e) => handleDragStart(e, globalIdx);
+          card.ondragover = (e) => handleDragOver(e);
+          card.ondrop = (e) => handleDrop(e, globalIdx);
+          card.ondragend = (e) => handleDragEnd(e);
+          
+          card.innerHTML = `
+            <div class="card-ctrl" onclick="event.stopPropagation()">
+              <button class="btn-sm" onclick="openEdit('${cat.id}')">수정</button>
+              <button class="btn-sm btn-move" onclick="openMovePageModal(${globalIdx})">이동</button>
+              <button class="btn-sm btn-del" onclick="deleteCard('${globalIdx}')">삭제</button>
+            </div>
+            <div class="icon-box">${cat.code}</div>
+            <h2>${cat.name}</h2>
+          `;
+        } else {
+            card.innerHTML = `<div class="icon-box">${cat.code}</div><h2>${cat.name}</h2>`;
         }
-        
-        // 헤드라인 업데이트
-        updateHeadline();
+        container.appendChild(card);
+      } else { 
+        const empty = document.createElement('div');
+        empty.className = 'card add-slot';
+        if(isAdmin && !isPreview) {
+           empty.innerHTML = '<div style="font-size:40px;">+</div><div>카테고리 추가</div>';
+           empty.onclick = () => openEdit('NEW', globalIdx);
+           empty.ondragover = (e) => handleDragOver(e);
+           empty.ondrop = (e) => handleDrop(e, globalIdx);
+        }
+        container.appendChild(empty);
+      }
+    });
+
+    for(let i=1; i<=totalPages; i++) {
+        const dot = document.createElement('div');
+        dot.className = `page-dot ${i === currentPage ? 'active' : ''}`;
+        dot.onclick = () => { currentPage = i; renderCards(); };
+        pagination.appendChild(dot);
+    }
+    
+    if(isAdmin && !isPreview) {
+        const addPageBtn = document.createElement('div');
+        addPageBtn.className = 'page-dot';
+        addPageBtn.style.background = 'transparent';
+        addPageBtn.style.border = '1px solid #cbd5e1';
+        addPageBtn.innerText = '+';
+        addPageBtn.style.textAlign = 'center';
+        addPageBtn.style.lineHeight = '10px';
+        addPageBtn.onclick = () => {
+            for(let k=0; k<itemsPerPage; k++) globalData.categories.push(null);
+            currentPage = Math.ceil(globalData.categories.length / itemsPerPage);
+            renderCards();
+        };
+        pagination.appendChild(addPageBtn);
     }
   }
 
   function handleDragStart(e, idx) { dragSrcIndex = idx; e.target.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
   function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; return false; }
-  function handleDrop(e, targetIdx) { e.stopPropagation(); if(dragSrcIndex !== null && dragSrcIndex !== targetIdx) { const srcItem = globalData.categories[dragSrcIndex]; const targetItem = globalData.categories[targetIdx]; globalData.categories[targetIdx] = srcItem; globalData.categories[dragSrcIndex] = targetItem; renderCards(false); } return false; }
+  function handleDrop(e, targetIdx) { e.stopPropagation(); if(dragSrcIndex !== null && dragSrcIndex !== targetIdx) { const srcItem = globalData.categories[dragSrcIndex]; const targetItem = globalData.categories[targetIdx]; globalData.categories[targetIdx] = srcItem; globalData.categories[dragSrcIndex] = targetItem; renderCards(); } return false; }
   function handleDragEnd(e) { document.querySelectorAll('.card').forEach(c => c.classList.remove('dragging')); }
 
   function buildSearchIndex() {
@@ -930,218 +590,8 @@
     localStorage.setItem('kac_preview_active', isPreview ? '1' : '0');
     document.body.classList.toggle('preview-active', isPreview);
     document.getElementById('settingsModal').style.display='none';
-    renderCards(false);
+    renderCards();
   }
-
-  /* 종합 관리자 (Tree Editor) 로직 - 접기/펼치기 적용 */
-  function openIntegratedAdmin() {
-    document.getElementById('settingsModal').style.display='none';
-    document.getElementById('integratedAdminModal').style.display='flex';
-    renderTree();
-    document.getElementById('treeDetail').innerHTML = '<div style="display:flex; height:100%; align-items:center; justify-content:center; color:var(--text-sub);">항목을 선택해주세요.</div>';
-    currentTreeSelection = null;
-  }
-
-  function renderTree() {
-      const root = document.getElementById('treeRoot');
-      root.innerHTML = '';
-      
-      globalData.categories.forEach((cat, cIdx) => {
-          if(!cat) return;
-          // Category
-          const cDiv = createTreeNode(`📂 ${cat.name}`, 'cat', cIdx, null, null, true);
-          root.appendChild(cDiv);
-
-          // Menu Container
-          const cChildren = document.createElement('div');
-          cChildren.className = 't-children'; // 기본 display: none
-          cChildren.id = `child-cat-${cIdx}`;
-          root.appendChild(cChildren);
-
-          if(cat.menus) {
-              cat.menus.forEach((menu, mIdx) => {
-                  // Menu
-                  const mDiv = createTreeNode(`📁 ${menu.label}`, 'menu', cIdx, mIdx, null, true);
-                  cChildren.appendChild(mDiv);
-
-                  // Subject Container
-                  const mChildren = document.createElement('div');
-                  mChildren.className = 't-children';
-                  mChildren.id = `child-menu-${cIdx}-${mIdx}`;
-                  cChildren.appendChild(mChildren);
-
-                  // Subjects
-                  if(menu.subjects) {
-                      menu.subjects.forEach((subj, sIdx) => {
-                          const sDiv = createTreeNode(`📄 ${subj.name}`, 'subj', cIdx, mIdx, sIdx, false);
-                          mChildren.appendChild(sDiv);
-                      });
-                  }
-              });
-          }
-      });
-  }
-
-  function createTreeNode(label, type, cIdx, mIdx, sIdx, hasChildren) {
-      const row = document.createElement('div');
-      row.className = 't-node-row';
-      
-      // 토글 버튼 (화살표)
-      const toggleBtn = document.createElement('div');
-      toggleBtn.className = hasChildren ? 't-toggle-btn' : 't-toggle-btn empty';
-      toggleBtn.textContent = hasChildren ? '▶' : '';
-      
-      if(hasChildren) {
-          toggleBtn.onclick = (e) => {
-              e.stopPropagation();
-              toggleNode(toggleBtn, type, cIdx, mIdx);
-          };
-      }
-      
-      // 라벨 (선택)
-      const labelDiv = document.createElement('div');
-      labelDiv.className = 't-label';
-      labelDiv.textContent = label;
-      labelDiv.onclick = (e) => {
-          e.stopPropagation();
-          selectTreeNode(type, cIdx, mIdx, sIdx, labelDiv);
-      };
-
-      row.appendChild(toggleBtn);
-      row.appendChild(labelDiv);
-      return row;
-  }
-
-  function toggleNode(btn, type, cIdx, mIdx) {
-      let targetId = '';
-      if(type === 'cat') targetId = `child-cat-${cIdx}`;
-      else if(type === 'menu') targetId = `child-menu-${cIdx}-${mIdx}`;
-      
-      const target = document.getElementById(targetId);
-      if(target) {
-          if(target.classList.contains('open')) {
-              target.classList.remove('open');
-              btn.textContent = '▶';
-          } else {
-              target.classList.add('open');
-              btn.textContent = '▼';
-          }
-      }
-  }
-
-  function selectTreeNode(type, cIdx, mIdx, sIdx, element) {
-      document.querySelectorAll('.t-label').forEach(n => n.classList.remove('selected'));
-      element.classList.add('selected');
-      
-      currentTreeSelection = { type, cIdx, mIdx, sIdx };
-      const content = document.getElementById('treeDetail');
-      const cat = globalData.categories[cIdx];
-
-      if(type === 'cat') {
-          content.innerHTML = `
-            <h3>🗂️ 카테고리 수정</h3>
-            <div class="setting-group"><label class="setting-label">명칭</label><input type="text" id="tName" class="setting-input" value="${cat.name}"></div>
-            <div class="setting-group"><label class="setting-label">코드 (영문 1자)</label><input type="text" id="tCode" class="setting-input" value="${cat.code}"></div>
-            <div class="setting-group"><label class="setting-label">색상</label><input type="color" id="tColor" style="width:100%;height:40px;" value="${cat.color}"></div>
-            <button class="btn-modal btn-success" onclick="addChildMenu()">+ 하위 메뉴(Menu) 추가</button>
-          `;
-      } else if (type === 'menu') {
-          const menu = cat.menus[mIdx];
-          content.innerHTML = `
-            <h3>📁 시설(메뉴) 수정</h3>
-            <div class="setting-group"><label class="setting-label">시설 명칭</label><input type="text" id="tLabel" class="setting-input" value="${menu.label}"></div>
-            <div class="setting-group"><label class="setting-label">아이콘 1줄</label><input type="text" id="tLine1" class="setting-input" value="${menu.line1||''}"></div>
-            <div class="setting-group"><label class="setting-label">아이콘 2줄</label><input type="text" id="tLine2" class="setting-input" value="${menu.line2||''}"></div>
-            <div class="setting-group"><label class="setting-label">외부 링크</label><input type="text" id="tLink" class="setting-input" value="${menu.link||''}"></div>
-            <div style="display:flex; gap:10px;">
-                <button class="btn-modal btn-success" onclick="addChildSubject()">+ 하위 과목(Subject) 추가</button>
-                <button class="btn-modal btn-danger" onclick="deleteTreeNode()">삭제</button>
-            </div>
-          `;
-      } else if (type === 'subj') {
-          const subj = cat.menus[mIdx].subjects[sIdx];
-          content.innerHTML = `
-            <h3>📄 과목(Subject) 수정</h3>
-            <div class="setting-group"><label class="setting-label">과목명</label><input type="text" id="sName" class="setting-input" value="${subj.name}"></div>
-            <div class="setting-group"><label class="setting-label">활성 상태</label>
-                <select id="sActive" class="setting-input">
-                    <option value="true" ${subj.active !== false ? 'selected':''}>활성</option>
-                    <option value="false" ${subj.active === false ? 'selected':''}>비활성 (개발중)</option>
-                </select>
-            </div>
-            <div class="setting-group"><label class="setting-label">PDF 경로</label><input type="text" id="sPdf" class="setting-input" value="${subj.pdfName||''}"></div>
-            <div class="setting-group"><label class="setting-label">링크 주소</label><input type="text" id="sLink" class="setting-input" value="${subj.link||''}"></div>
-            <div class="setting-group"><label class="setting-label">오디오 경로</label><input type="text" id="sAudio" class="setting-input" value="${subj.audioName||''}"></div>
-            <button class="btn-modal btn-danger" onclick="deleteTreeNode()">삭제</button>
-          `;
-      }
-  }
-  
-  // 하위 추가/삭제 함수
-  function addChildMenu() {
-      if(!currentTreeSelection || currentTreeSelection.type !== 'cat') return;
-      const cat = globalData.categories[currentTreeSelection.cIdx];
-      const newMenu = { id: 'id_'+Date.now(), label: '새 메뉴', line1: '', line2: '', link: '', subjects: [] };
-      if(!cat.menus) cat.menus = [];
-      cat.menus.push(newMenu);
-      renderTree();
-      alert("메뉴가 추가되었습니다. (새로고침 없이 반영)");
-  }
-  
-  function addChildSubject() {
-      if(!currentTreeSelection || currentTreeSelection.type !== 'menu') return;
-      const menu = globalData.categories[currentTreeSelection.cIdx].menus[currentTreeSelection.mIdx];
-      const newSubj = { id: Date.now().toString(), name: '새 과목', active: true, pdfName: '', link: '', audioName: '' };
-      if(!menu.subjects) menu.subjects = [];
-      menu.subjects.push(newSubj);
-      renderTree();
-      alert("과목이 추가되었습니다.");
-  }
-  
-  function deleteTreeNode() {
-      if(!confirm("정말 삭제하시겠습니까?")) return;
-      const { type, cIdx, mIdx, sIdx } = currentTreeSelection;
-      if(type === 'menu') {
-          globalData.categories[cIdx].menus.splice(mIdx, 1);
-      } else if (type === 'subj') {
-          globalData.categories[cIdx].menus[mIdx].subjects.splice(sIdx, 1);
-      }
-      renderTree();
-      document.getElementById('treeDetail').innerHTML = '<div style="display:flex; height:100%; align-items:center; justify-content:center; color:var(--text-sub);">삭제되었습니다.</div>';
-      currentTreeSelection = null;
-  }
-
-  function saveIntegratedData() {
-      if(!currentTreeSelection) return alert("수정할 항목이 없거나 저장되었습니다.");
-      const { type, cIdx, mIdx, sIdx } = currentTreeSelection;
-      
-      if(type === 'cat') {
-          const cat = globalData.categories[cIdx];
-          cat.name = document.getElementById('tName').value;
-          cat.code = document.getElementById('tCode').value;
-          cat.color = document.getElementById('tColor').value;
-      } else if (type === 'menu') {
-          const menu = globalData.categories[cIdx].menus[mIdx];
-          menu.label = document.getElementById('tLabel').value;
-          menu.line1 = document.getElementById('tLine1').value;
-          menu.line2 = document.getElementById('tLine2').value;
-          menu.link = document.getElementById('tLink').value;
-      } else if (type === 'subj') {
-          const subj = globalData.categories[cIdx].menus[mIdx].subjects[sIdx];
-          subj.name = document.getElementById('sName').value;
-          subj.active = document.getElementById('sActive').value === 'true';
-          subj.pdfName = document.getElementById('sPdf').value;
-          subj.link = document.getElementById('sLink').value;
-          subj.audioName = document.getElementById('sAudio').value;
-      }
-      
-      syncToLocalStorage(globalData);
-      renderCards(false);
-      renderSidebar();
-      renderTree(); // 트리 명칭 업데이트
-      alert("✅ 저장 및 적용되었습니다.");
-  }
-
 
   async function sha256(message) {
       const msgBuffer = new TextEncoder().encode(message);
@@ -1308,7 +758,7 @@
       if(t) { t.name = name; t.code = code; t.color = color; }
     }
     syncToLocalStorage(globalData);
-    renderCards(false);
+    renderCards();
     document.getElementById('cardEditModal').style.display='none';
   }
 
@@ -1350,7 +800,7 @@
         else { alert("해당 페이지에 빈 공간이 없습니다."); globalData.categories[moveSrcIndex] = item; return; }
     }
     document.getElementById('movePageModal').style.display='none';
-    renderCards(false);
+    renderCards();
     syncToLocalStorage(globalData);
   }
 
@@ -1358,7 +808,7 @@
     if(confirm("정말 삭제하시겠습니까? (하위 메뉴도 모두 삭제됩니다)")) {
       globalData.categories[idx] = null; 
       syncToLocalStorage(globalData);
-      renderCards(false);
+      renderCards();
     }
   }
 
