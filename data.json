@@ -753,13 +753,7 @@
         }
       ]
     },
-    {
-      "id": "M_1767154448046",
-      "name": "전력시설",
-      "code": "U",
-      "color": "#e60000",
-      "menus": []
-    },
+    null,
     null,
     null,
     null
