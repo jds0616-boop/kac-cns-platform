@@ -37,7 +37,6 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
   
-  /* [중요] 가로 스크롤 방지 & 높이 고정 */
   html, body { width: 100%; height: 100%; overflow: hidden; }
   
   body { 
@@ -45,7 +44,6 @@
     color: var(--text-main); transition: background 0.3s, color 0.3s; 
   }
 
-  /* 모달 스타일 최상단 배치 및 강제 숨김 처리 */
   .modal-overlay { 
       position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
       z-index: 9999; display: none !important; 
@@ -60,8 +58,7 @@
     height: var(--header-h); background: var(--navy); 
     display: flex; align-items: center; justify-content: space-between; 
     padding: 0 20px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.15); 
-    z-index: 5000; 
-    position: fixed; top: 0; left: 0; width: 100%;
+    z-index: 5000; position: fixed; top: 0; left: 0; width: 100%;
   }
   
   .header-left { display: flex; align-items: center; gap: 15px; z-index: 10; min-width: 0; flex-shrink: 1; }
@@ -69,31 +66,20 @@
   .hamburger-btn:hover { background: rgba(255,255,255,0.1); }
   .hamburger-btn svg { width: 24px; height: 24px; fill: #fff; }
 
-  .logo-text { 
-    font-size: 20px; font-weight: 800; letter-spacing: -0.5px; 
-    cursor: pointer; white-space: nowrap; 
-    overflow: hidden; text-overflow: ellipsis;
-  }
+  .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   
-  /* 헤더 중앙 페이지 제목 */
   .header-center-title {
       position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
       display: flex; align-items: center; justify-content: center; gap: 10px;
       z-index: 5; white-space: nowrap;
   }
-  .page-headline {
-      font-size: 24px; font-weight: 800; color: #fff; letter-spacing: -0.5px;
-      cursor: default;
-  }
-  /* 관리자 모드일 때만 포인터 */
+  .page-headline { font-size: 24px; font-weight: 800; color: #fff; letter-spacing: -0.5px; cursor: default; }
   body.admin-mode .page-headline { cursor: pointer; opacity: 0.9; }
   body.admin-mode .page-headline:hover { color: #bfdbfe; }
 
-  /* 페이지 표시 뱃지 */
   .page-badge {
       font-size: 12px; font-weight: 800; color: #0f172a;
-      background: #38bdf8; 
-      padding: 4px 10px; border-radius: 20px;
+      background: #38bdf8; padding: 4px 10px; border-radius: 20px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   }
 
@@ -111,19 +97,11 @@
   /* 사이드바 */
   .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 6000; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(2px); }
   .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
-  
-  .sidebar { 
-    position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; 
-    background: var(--bg-card); z-index: 6001; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-    box-shadow: 5px 0 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; 
-    border-right: 1px solid var(--btn-border);
-  }
+  .sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background: var(--bg-card); z-index: 6001; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; border-right: 1px solid var(--btn-border); }
   .sidebar.active { left: 0; }
-  
   .sidebar-header { height: var(--header-h); display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--btn-border); font-weight: 800; font-size: 18px; justify-content: space-between; color: var(--text-main); }
   .sidebar-close { cursor: pointer; padding: 8px; border-radius: 50%; transition: 0.2s; }
   .sidebar-close:hover { background: var(--btn-bg); }
-  
   .sidebar-content { flex: 1; overflow-y: auto; padding: 10px; }
   .sb-item { padding: 12px 15px; cursor: pointer; border-radius: 10px; color: var(--text-main); font-weight: 600; transition: 0.2s; display: flex; align-items: center; justify-content: space-between; font-size: 14px; }
   .sb-item:hover { background: var(--btn-bg); color: #2563eb; }
@@ -136,29 +114,16 @@
   .content-wrapper { 
       width: 100%; height: 100%;
       padding-top: var(--header-h); 
-      padding-bottom: 120px; /* 푸터 높이 고려 */
+      padding-bottom: 120px; 
       overflow: hidden; 
       position: relative; 
-      display: flex; 
-      flex-direction: column; 
-      justify-content: center; 
-      align-items: center;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
   }
   
-  .center-content-box {
-      width: 100%; max-width: 1700px;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-  }
+  .center-content-box { width: 100%; max-width: 1700px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
   /* 검색창 */
-  .search-wrapper-outer { 
-      width: 100%; display: flex; justify-content: center; 
-      margin-bottom: 40px; 
-      flex-shrink: 0; 
-      z-index: 2000; 
-      position: relative; padding: 0 20px; 
-      pointer-events: none; 
-  }
+  .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 40px; flex-shrink: 0; z-index: 2000; position: relative; padding: 0 20px; pointer-events: none; }
   .search-container { position: relative; width: 600px; max-width: 100%; pointer-events: auto; }
   
   .search-bar { 
@@ -215,45 +180,35 @@
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     z-index: 1000;
   }
-  
-  /* 하단바 내용 컨테이너 */
   .footer-content p { margin: 0; word-break: keep-all; }
-  
-  /* 마지막 줄 (Copyright 등) 강조 */
   .footer-content p:last-child { font-weight: 700; margin-top: 8px; color: rgba(255,255,255,0.9); }
   
-  /* 텍스트 수정 버튼 */
   .footer-edit-btn { margin-top: 10px; font-size: 11px; cursor: pointer; opacity: 0.5; color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 4px; display: none; }
   .footer-edit-btn:hover { opacity: 1; background: rgba(255,255,255,0.1); }
   body.admin-mode .footer-edit-btn { display: inline-block; }
 
   /* ========================================= */
-  /* [모바일 전용 최적화 스타일] */
+  /* [모바일 전용 최적화] */
   /* ========================================= */
   @media (max-width: 768px) {
-    /* 전체 스크롤 허용 */
     body { display: block; height: auto; overflow-y: auto; overflow-x: hidden; }
     
     header { position: fixed; top: 0; padding: 0 10px; z-index: 5000; }
 
-    /* [수정] 모바일 상단 여백 축소 (85px) */
     .content-wrapper { 
         height: auto; overflow: visible; 
         padding-top: 85px; padding-bottom: 0; 
         display: block; 
     }
     
-    /* 중앙 정렬 박스 해제 */
     .center-content-box { display: block; width: 100%; }
 
-    /* [수정] 검색창 z-index 낮춤 (헤더 아래로 스크롤되게) */
+    /* [수정] 검색창 스크롤 시 헤더 아래로 숨겨짐 */
     .search-wrapper-outer { margin-bottom: 30px; z-index: 10; }
 
     .header-left { gap: 5px; flex: 1; }
     .logo-text { font-size: 13px; max-width: none; white-space: nowrap; }
     .kac-logo-img { display: none; }
-    
-    /* 모바일에서는 헤더 중앙 제목 숨김 */
     .header-center-title { display: none; }
     
     .header-right { gap: 8px; }
@@ -274,7 +229,7 @@
     .card-ctrl { top: 50%; right: 10px; transform: translateY(-50%); width: auto; flex-direction: row; }
     .btn-sm { padding: 6px 10px; }
 
-    /* 모바일 하단바 (Flow) */
+    /* 모바일 하단바 */
     .main-footer { padding: 25px 15px; margin-top: 30px; position: static; height: auto; }
     .main-footer p { font-size: 11px; white-space: normal; }
   }
@@ -291,6 +246,14 @@
   .tree-sidebar { width: 35%; background: var(--bg-main); border-right: 1px solid var(--btn-border); overflow-y: auto; padding: 10px; }
   .tree-content { width: 65%; padding: 20px; overflow-y: auto; background: var(--bg-card); }
   
+  .t-node { padding: 8px; cursor: pointer; border-radius: 6px; font-size: 13px; color: var(--text-main); display: flex; align-items: center; gap: 5px; margin-bottom: 2px; }
+  .t-node:hover { background: rgba(37,99,235,0.1); }
+  .t-node.selected { background: #2563eb; color: #fff; }
+  .t-depth-0 { font-weight: 800; }
+  .t-depth-1 { padding-left: 20px; font-weight: 600; }
+  .t-depth-2 { padding-left: 40px; color: var(--text-sub); }
+  
+  /* 트리 화살표/라벨 분리 */
   .t-node-row { display: flex; align-items: center; padding: 4px 0; }
   .t-toggle-btn { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 10px; color: var(--text-sub); flex-shrink: 0; transition: transform 0.2s; }
   .t-toggle-btn:hover { color: #2563eb; }
@@ -302,17 +265,16 @@
   .t-children.open { display: block; }
 
   /* 공통 모달 */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none; align-items: center; justify-content: center; }
   .modal-card { background: var(--bg-card); padding: 35px; border-radius: 25px; width: 450px; color: var(--text-main); box-shadow: 0 20px 50px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
   .modal-card.large { width: 1000px; max-width: 95%; height: 85vh; }
   .setting-group { margin-bottom: 20px; }
   .setting-label { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; display: block; }
   .setting-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--text-main); font-size: 14px; outline: none; }
   
-  /* 하단 텍스트 수정용 Textarea */
-  .setting-textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--text-main); font-size: 14px; outline: none; resize: vertical; min-height: 120px; line-height: 1.5; }
+  /* [수정] 하단 텍스트 수정용 팝업 (넓게) */
+  #footerEditModal .modal-card { width: 800px; max-width: 90%; }
+  .setting-textarea { width: 100%; padding: 15px; border-radius: 10px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--text-main); font-size: 14px; outline: none; resize: vertical; min-height: 200px; line-height: 1.6; }
 
-  /* 야간 모드 입력창 시인성 */
   body.dark-mode .setting-input, body.dark-mode select.setting-input, body.dark-mode .setting-textarea { background-color: #334155; color: #fff; border-color: rgba(255,255,255,0.2); }
 
   .btn-modal { width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; margin-top: 5px; }
@@ -632,7 +594,14 @@
   
   /* [수정] 하단 텍스트 로딩 (줄바꿈 자동 변환) */
   function loadFooterText() {
-      const savedHtml = localStorage.getItem('kac_full_footer');
+      // 1. JSON에서 먼저 확인 (모바일/초기 로딩용)
+      let savedHtml = globalData.config.footerText;
+      
+      // 2. 로컬 스토리지 확인 (수정 중인 내용)
+      if (!savedHtml) {
+          savedHtml = localStorage.getItem('kac_full_footer');
+      }
+
       const defaultHtml = "<p>본 웹사이트는 한국공항공사 항공기술훈련원의 항행안전시설 분야 교육 관련 플랫폼입니다.</p><p>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)</p><p>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)</p><p>© 2026 Korea Airports Corporation. All rights reserved.</p>";
       document.querySelector('.footer-content').innerHTML = savedHtml || defaultHtml;
   }
@@ -661,10 +630,16 @@
           }
       });
       
+      // 로컬 스토리지에 저장
       localStorage.setItem('kac_full_footer', htmlOutput);
+      
+      // 글로벌 데이터 객체에도 저장 (JSON 내보내기용)
+      globalData.config.footerText = htmlOutput;
+      syncToLocalStorage(globalData); // 전체 동기화
+
       loadFooterText();
       document.getElementById('footerEditModal').style.display = 'none';
-      alert("하단 문구가 저장되었습니다.");
+      alert("하단 문구가 저장되었습니다. (JSON 저장 시 함께 포함됩니다)");
   }
   
   function reconstructGlobalDataFromLocal() {
@@ -683,9 +658,10 @@
     globalData.config.iconSize = parseInt(localStorage.getItem('kac_idx_icon_size') || 60);
     globalData.config.labelSize = parseInt(localStorage.getItem('kac_idx_label_size') || 24);
     
-    // 페이지 타이틀 복원
+    // 페이지 타이틀 & 푸터 텍스트 복원
     const savedTitles = localStorage.getItem('kac_page_titles');
     globalData.config.pageTitles = savedTitles ? JSON.parse(savedTitles) : {};
+    globalData.config.footerText = localStorage.getItem('kac_full_footer');
 
     applyConfig(globalData.config);
 
@@ -756,6 +732,9 @@
         localStorage.setItem('kac_idx_label_size', data.config.labelSize);
         if(data.config.pageTitles) {
             localStorage.setItem('kac_page_titles', JSON.stringify(data.config.pageTitles));
+        }
+        if(data.config.footerText) {
+            localStorage.setItem('kac_full_footer', data.config.footerText);
         }
     }
   }
@@ -1049,7 +1028,10 @@
       root.innerHTML = '';
       
       globalData.categories.forEach((cat, cIdx) => {
-          if(!cat) return;
+          if(!cat) {
+              // null 항목도 저장되어야 하므로 건너뛰지 않음 (단, 트리에선 표시 X)
+              return;
+          }
           // Category
           const cDiv = createTreeNode(`📂 ${cat.name}`, 'cat', cIdx, null, null, true);
           root.appendChild(cDiv);
