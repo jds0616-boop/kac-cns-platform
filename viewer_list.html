@@ -61,8 +61,22 @@
 
   .sb-sub-list { display: none; padding-left: 20px; margin-bottom: 5px; animation: slideDown 0.2s ease-out; }
   .sb-sub-list.open { display: block; }
-  .sb-sub-item { padding: 10px 15px; font-size: 13px; color: var(--text-sub); cursor: pointer; border-left: 2px solid var(--btn-border); transition: 0.2s; }
+  .sb-sub-item { padding: 10px 15px; font-size: 13px; color: var(--text-sub); cursor: pointer; border-left: 2px solid var(--btn-border); transition: 0.2s; margin-top: 2px; }
   .sb-sub-item:hover { border-left-color: #2563eb; color: #2563eb; background: rgba(37,99,235,0.05); }
+  
+  /* [수정] 사이드바 서브메뉴 활성화 스타일 (라운딩 박스) */
+  .sb-sub-item.active {
+      background: rgba(37, 99, 235, 0.1);
+      color: #2563eb;
+      font-weight: 700;
+      border-left-color: transparent; /* 기존 선 제거 */
+      border-radius: 8px; /* 라운딩 처리 */
+  }
+  body.dark-mode .sb-sub-item.active {
+      background: rgba(37, 99, 235, 0.2);
+      color: #60a5fa;
+  }
+
   .sb-toggle { font-size: 10px; color: #94a3b8; transition: 0.2s; }
 
   @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
@@ -178,7 +192,8 @@
 
   /* 상단 시설 명칭 카드 */
   .fac-top-card {
-      background: var(--bg-card);
+      /* [수정] 배경에 연한 테마 색상 채우기 (opacity 0.08) */
+      background: rgba(var(--theme-rgb), 0.08); 
       width: 100%; max-width: 900px;
       padding: 20px 30px; border-radius: 20px;
       box-shadow: var(--shadow);
@@ -192,9 +207,14 @@
   }
   .fac-top-card:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(var(--theme-rgb), 0.15); }
   
+  /* 다크모드에서는 조금 더 진하게 */
+  body.dark-mode .fac-top-card {
+      background: rgba(var(--theme-rgb), 0.15); 
+  }
+  
   .fac-left-group { display: flex; align-items: center; gap: 20px; flex: 1; }
   
-  /* [수정] 태그 필 스타일 (테마 컬러 적용) */
+  /* 태그 필 스타일 */
   .fac-tag-pill {
       background: var(--theme-color);
       color: #fff;
@@ -394,7 +414,7 @@
   .mobile-close-btn { display: none; }
 
   /* ========================================= */
-  /* [수정] 모바일 디자인 (깔끔함 우선, 아이콘 제거) */
+  /* [수정] 모바일 디자인 */
   /* ========================================= */
   @media (max-width: 768px) {
     .v-title-box, .v-icon-btn, .close-v { display: none !important; }
@@ -467,7 +487,7 @@
         margin-bottom: 0;
     }
 
-    /* [수정] 모바일 Last Viewed (트리 라인에 체크 아이콘으로 표시) */
+    /* 모바일 Last Viewed (트리 라인에 체크 아이콘으로 표시) */
     .subject-card.last-viewed {
         border-color: #10b981;
     }
@@ -503,9 +523,7 @@
     /* 텍스트 표시 */
     .status-text { display: inline-block !important; white-space: normal; }
     
-    /* PDF/Audio 접두사 처리를 위해 가상요소 활용 */
     .status-pill:has(.status-text:contains('PDF')) .status-text::before { content: 'PDF '; font-weight: 800; opacity: 0.7; }
-    /* 이미 텍스트에 PDF가 포함된 경우 중복 방지 로직 필요하면 JS나 CSS 세부조정 */
     
     .mobile-close-btn {
       display: flex; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
@@ -516,15 +534,18 @@
     }
     .mobile-close-btn.visible { opacity: 1; pointer-events: auto; }
 
+    /* [수정] 모바일 하단 메뉴 두께 축소 */
     .bottom-nav { 
-        width: 90%; bottom: 15px; padding: 10px 0; 
-        gap: 20px; border-radius: 15px; justify-content: center;
+        width: 90%; 
+        bottom: 10px; /* 더 아래로 */
+        padding: 6px 0; /* 패딩 축소 */
+        gap: 25px; border-radius: 50px; justify-content: center;
         background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
     }
     body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.95); }
 
-    .nav-item { font-size: 13px; gap: 5px; }
-    .nav-icon { width: 18px; height: 18px; }
+    .nav-item { font-size: 12px; gap: 4px; } /* 폰트 축소 */
+    .nav-icon { width: 16px; height: 16px; }
 
     .viewer-body { padding: 0; align-items: flex-start; overflow-y: auto; }
     .header-search { font-size: 14px; padding: 10px 20px 10px 45px; background-size: 18px; background-position: 15px center; }
@@ -895,7 +916,10 @@
           if(menus.length > 0) {
               subHtml = `<div class="sb-sub-list" id="sb-sub-${tid}">`;
               menus.forEach(m => {
-                  subHtml += `<div class="sb-sub-item" onclick="location.href='viewer_list.html?type=${tid}&menu=${encodeURIComponent(m.label)}&id=${m.dataId}'">${m.label}</div>`;
+                  // [수정] 사이드바 서브메뉴 활성화 여부 체크
+                  const isSubActive = (tid === type && m.dataId === menuId);
+                  const subClass = isSubActive ? 'sb-sub-item active' : 'sb-sub-item';
+                  subHtml += `<div class="${subClass}" onclick="location.href='viewer_list.html?type=${tid}&menu=${encodeURIComponent(m.label)}&id=${m.dataId}'">${m.label}</div>`;
               });
               subHtml += '</div>';
           }
@@ -1142,7 +1166,7 @@
 
       card.innerHTML = `
         <div class="last-viewed-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
             <span>Last Viewed</span>
         </div>
         <div>
