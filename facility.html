@@ -39,12 +39,12 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
   
-  /* [중요] 가로 스크롤 방지 */
-  html, body { width: 100%; overflow-x: hidden; }
+  /* [중요] PC 화면 스크롤 제거 및 높이 고정 */
+  html, body { width: 100%; height: 100%; overflow: hidden; }
 
   body { 
-    background: var(--bg-main); height: 100vh; display: flex; flex-direction: column; 
-    overflow: hidden; color: var(--text-main); transition: background 0.3s, color 0.3s; 
+    background: var(--bg-main); display: flex; flex-direction: column; 
+    color: var(--text-main); transition: background 0.3s, color 0.3s; 
   }
 
   /* 모달 스타일 최상단 배치 및 강제 숨김 처리 */
@@ -121,21 +121,17 @@
   .sb-item.active { background: #eff6ff; border-left: 4px solid #2563eb; color: #2563eb; }
   body.dark-mode .sb-item.active { background: rgba(37,99,235,0.1); }
 
-  /* 컨텐츠 영역 */
+  /* [수정] 컨텐츠 영역 Flex Layout (겹침 방지) */
   .content-wrapper { 
-      flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; 
-      width: 100%; 
-      /* [수정] 스크롤바 숨기기 */
-      overflow-y: scroll;
-      scrollbar-width: none; /* Firefox */
-      -ms-overflow-style: none;  /* IE/Edge */
-      
-      /* [수정] 상단 여백 넉넉히 (헤더 겹침 방지) */
-      padding-top: 110px; 
-      padding-bottom: 60px; /* 푸터 높이만큼 공간 확보 */
+      flex: 1; display: flex; flex-direction: column; align-items: center; 
+      width: 100%; height: 100%;
+      padding-top: 100px; /* 헤더 여백 */
+      padding-bottom: 0; 
+      overflow-y: scroll; /* 스크롤 허용하되 숨김 */
+      scrollbar-width: none; 
+      -ms-overflow-style: none;
       position: relative; 
   }
-  /* Webkit 스크롤바 숨김 */
   .content-wrapper::-webkit-scrollbar { display: none; }
   
   .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 20px; flex-shrink: 0; z-index: 2000; position: relative; padding: 0 20px; }
@@ -158,8 +154,13 @@
   .res-path { font-size: 11px; color: var(--text-sub); opacity: 0.6; margin-top: 4px; }
   .res-tag { font-size: 12px; font-weight: 900; padding: 4px 10px; border-radius: 6px; color: #fff; min-width: 50px; text-align: center; }
 
-  /* 메인 그리드 */
-  #gridWrapper { width: 100%; max-width: 1400px; padding: 0 20px; flex: 1; display: flex; align-items: flex-start; justify-content: center; position: relative; }
+  /* 메인 그리드 (Flex: 1로 공간 채움) */
+  #gridWrapper { 
+      width: 100%; max-width: 1400px; padding: 0 20px; 
+      flex: 1; /* 남는 공간 차지 */
+      display: flex; align-items: center; justify-content: center; 
+      position: relative; 
+  }
   
   #trainGrid { 
     gap: 30px; width: 100%; max-width: 1250px; margin: 0 auto; 
@@ -167,10 +168,10 @@
     transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s;
   }
   
-  /* [수정] PC 카드 높이 축소 (200px) */
+  /* 카드 스타일 */
   .menu-card { 
     background: var(--bg-card); width: 280px; 
-    min-height: 200px; 
+    min-height: 200px; /* 카드 높이 축소 */
     height: auto; padding: 25px 20px; 
     border-radius: 20px; box-shadow: var(--shadow); border: 2px solid transparent; 
     cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; 
@@ -210,7 +211,13 @@
   .arrow-nav.hidden { opacity: 0; pointer-events: none; }
   .arrow-nav svg { width: 24px; height: 24px; fill: currentColor; }
 
-  .pagination { display: flex; gap: 10px; margin-top: 20px; justify-content: center; align-items: center; padding-bottom: 20px; flex-shrink: 0; }
+  /* [수정] 페이지네이션 (겹침 방지: Flex Flow 내 배치) */
+  .pagination { 
+      display: flex; gap: 10px; 
+      margin-top: 10px; margin-bottom: 10px;
+      justify-content: center; align-items: center; 
+      flex-shrink: 0; 
+  }
   .page-dot { width: 12px; height: 12px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--btn-border); color: transparent; cursor: pointer; transition: 0.3s; font-size: 0; }
   .page-dot.active { background: var(--theme-color); transform: scale(1.3); }
   
@@ -218,10 +225,11 @@
   #loadingSpinner { position: fixed; inset: 0; background: var(--bg-main); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
   .spinner { width: 50px; height: 50px; border: 5px solid #cbd5e1; border-top-color: #2563eb; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
 
-  /* [수정] PC 하단 버튼 (정적 배치: 카드 목록 아래, 푸터 위) */
+  /* [수정] PC 하단 버튼 (정적 배치: 페이지네이션 아래) */
   .bottom-nav { 
     display: flex; justify-content: center; gap: 30px; 
-    margin: 10px auto; padding: 10px;
+    margin-bottom: 20px; padding: 10px;
+    flex-shrink: 0; /* 크기 축소 방지 */
   }
   .nav-item { 
     color: var(--text-main); cursor: pointer; font-size: 16px; font-weight: 700; 
@@ -233,13 +241,13 @@
   body.dark-mode .nav-item { background: rgba(30,41,59,0.5); color: #e2e8f0; }
   body.dark-mode .nav-item:hover { background: #1e293b; }
 
-  /* [수정] 하단바 (PC: 절대 고정) */
+  /* [수정] 하단바 (Flow 배치) */
   .main-footer {
     width: 100%; background: var(--navy); padding: 25px 20px;
     text-align: center; color: rgba(255,255,255,0.7);
     font-size: 13px; line-height: 1.6;
     border-top: 1px solid rgba(255,255,255,0.1); box-sizing: border-box;
-    position: absolute; bottom: 0; left: 0;
+    flex-shrink: 0; /* 크기 축소 방지 */
   }
   .main-footer p { margin: 0; word-break: keep-all; }
   .main-footer .copyright { font-weight: 700; margin-top: 8px; color: rgba(255,255,255,0.9); }
@@ -255,7 +263,7 @@
     /* 헤더 중앙 제목 모바일에서 숨김 */
     .header-center-title { display: none; }
 
-    /* 모바일에서는 Flow 방식 (absolute footer 해제) */
+    /* 모바일에서는 Flow 방식 */
     .content-wrapper { 
         height: auto; overflow: visible; 
         padding-top: 90px; padding-bottom: 0; display: block; 
@@ -409,7 +417,7 @@
   
   <div id="pagination" class="pagination"></div>
 
-  <!-- [수정] PC: 흐름 배치, 모바일: 하단 정렬 -->
+  <!-- [수정] PC: 하단바 위 흐름 배치 -->
   <div class="bottom-nav">
     <div class="nav-item" onclick="history.back()"><svg style="width:22px;height:22px;fill:currentColor" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>뒤로가기</div>
     <div class="nav-item" onclick="location.href='index.html'"><svg style="width:22px;height:22px;fill:currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>홈으로</div>
