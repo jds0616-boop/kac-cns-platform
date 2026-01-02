@@ -9,7 +9,7 @@
     "pageTitles": {
       "1": "항행안전시설 표준교보재 "
     },
-    "footerText": "<p>본 웹사이트는 KAC 항공기술훈련원 CNS 교육 관련 플랫폼입니다.</p><p>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)</p><p>© 2026 Korea Airports Corporation. All rights reserved.</p>",
+    "footerText": "<p>본 웹사이트는 KAC 항공기술훈련원 항행안전시설 교육 관련 플랫폼입니다.</p><p>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)</p><p>© 2026 Korea Airports Corporation. All rights reserved.</p>",
     "contentTop": "30"
   },
   "categories": [
@@ -712,13 +712,6 @@
     },
     null,
     {
-      "id": "M_1767154448046",
-      "name": "전력시설",
-      "code": "U",
-      "color": "#e60000",
-      "menus": []
-    },
-    {
       "id": "M_1767154255680",
       "name": "관제 및 SWIM",
       "code": "A",
@@ -759,6 +752,13 @@
           ]
         }
       ]
+    },
+    {
+      "id": "M_1767154448046",
+      "name": "전력시설",
+      "code": "U",
+      "color": "#e60000",
+      "menus": []
     },
     null,
     null,
