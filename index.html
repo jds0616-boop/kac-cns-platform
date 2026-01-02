@@ -21,6 +21,7 @@
     --shadow: 0 10px 25px rgba(0,0,0,0.05);
     --btn-bg: #f8fafc; --btn-border: #e2e8f0; --btn-text: #64748b;
     --header-h: 75px;
+    --footer-h: 120px; /* 푸터 높이 확보 */
     --search-border: #cbd5e1;
     --search-shadow: 0 8px 30px rgba(15, 23, 42, 0.12);
   }
@@ -37,7 +38,7 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
   
-  /* [중요] 가로 스크롤 방지 & 높이 고정 */
+  /* 가로 스크롤 방지 & 높이 고정 */
   html, body { width: 100%; height: 100%; overflow: hidden; }
   
   body { 
@@ -45,7 +46,7 @@
     color: var(--text-main); transition: background 0.3s, color 0.3s; 
   }
 
-  /* 모달 스타일 최상단 배치 및 강제 숨김 처리 */
+  /* 모달 스타일 */
   .modal-overlay { 
       position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
       z-index: 9999; display: none !important; 
@@ -55,12 +56,12 @@
 
   body.preview-active .card-ctrl, body.preview-active .add-slot { display: none !important; }
   
-  /* 헤더 스타일 (PC/모바일 공통 고정) */
+  /* 헤더 스타일 */
   header { 
     height: var(--header-h); background: var(--navy); 
     display: flex; align-items: center; justify-content: space-between; 
     padding: 0 20px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.15); 
-    z-index: 1000; flex-shrink: 0; 
+    z-index: 5000; /* [수정] 모바일에서 검색창보다 높게 설정 */
     position: fixed; top: 0; left: 0; width: 100%;
   }
   
@@ -75,17 +76,27 @@
     overflow: hidden; text-overflow: ellipsis;
   }
   
-  /* 헤더 중앙 페이지 제목 (연필 아이콘 제거됨) */
+  /* [수정] 헤더 중앙 페이지 제목 (밑줄 제거, 뱃지 추가) */
   .header-center-title {
       position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-      font-size: 24px; font-weight: 800; color: #fff; letter-spacing: -0.5px;
-      display: flex; align-items: center; justify-content: center;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
       z-index: 5; white-space: nowrap;
-      cursor: default; /* 기본 커서 */
   }
-  /* 관리자 모드일 때만 포인터 커서 */
-  body.admin-mode .header-center-title { cursor: pointer; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: rgba(255,255,255,0.3); }
-  body.admin-mode .header-center-title:hover { color: #93c5fd; }
+  .page-headline {
+      font-size: 24px; font-weight: 800; color: #fff; letter-spacing: -0.5px;
+      cursor: default;
+  }
+  /* 관리자 모드일 때만 포인터 */
+  body.admin-mode .page-headline { cursor: pointer; opacity: 0.9; }
+  body.admin-mode .page-headline:hover { color: #bfdbfe; }
+
+  /* 페이지 표시 뱃지 */
+  .page-badge {
+      font-size: 12px; font-weight: 800; color: #0f172a;
+      background: #38bdf8; /* 산뜻한 Cyan Blue */
+      padding: 4px 10px; border-radius: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
 
   .header-right { display: flex; align-items: center; gap: 15px; z-index: 10; flex-shrink: 0; }
   
@@ -98,13 +109,13 @@
   .settings-btn { display: flex; padding: 8px; width: 34px; height: 34px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.3s; color: #cbd5e1; }
   .settings-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
 
-  /* [수정] 사이드바 z-index 최상위 (검색창 2000보다 높게 3000) */
-  .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 3000; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(2px); }
+  /* 사이드바 */
+  .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 6000; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(2px); }
   .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
   
   .sidebar { 
     position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; 
-    background: var(--bg-card); z-index: 3001; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+    background: var(--bg-card); z-index: 6001; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
     box-shadow: 5px 0 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; 
     border-right: 1px solid var(--btn-border);
   }
@@ -122,26 +133,33 @@
   .sb-sub-item { padding: 8px 15px; font-size: 13px; color: var(--text-sub); cursor: pointer; border-left: 2px solid var(--btn-border); transition: 0.2s; }
   .sb-sub-item:hover { border-left-color: #2563eb; color: #2563eb; background: rgba(37,99,235,0.05); }
 
-  /* 컨텐츠 영역 (PC: 수직 중앙 정렬) */
+  /* [수정] 컨텐츠 영역 (PC: 수직 중앙 정렬) */
   .content-wrapper { 
-      flex: 1; display: flex; flex-direction: column; 
-      /* [수정] 수직 중앙 정렬 */
-      justify-content: center; align-items: center; 
       width: 100%; height: 100%;
-      padding-top: 75px; /* 헤더 높이 */
-      padding-bottom: 100px; /* 푸터 높이 등 고려 */
-      overflow-y: scroll; /* 스크롤바 숨김 */
-      scrollbar-width: none; -ms-overflow-style: none;
+      padding-top: var(--header-h); /* 헤더 공간 */
+      padding-bottom: var(--footer-h); /* 푸터 공간 */
+      overflow: hidden; /* PC는 스크롤 없음 (Fit screen) */
       position: relative; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: center; /* 수직 중앙 정렬 */
+      align-items: center;
   }
-  .content-wrapper::-webkit-scrollbar { display: none; }
   
-  /* [수정] 검색창 여백 및 z-index */
+  /* [수정] 중앙 정렬된 컨텐츠 박스 */
+  .center-content-box {
+      width: 100%; max-width: 1700px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+
+  /* 검색창 */
   .search-wrapper-outer { 
       width: 100%; display: flex; justify-content: center; 
       margin-bottom: 40px; /* 카드와 간격 */
-      flex-shrink: 0; z-index: 2000; position: relative; padding: 0 20px; 
-      pointer-events: none; /* 빈공간 클릭 투과 */
+      flex-shrink: 0; 
+      z-index: 2000; /* PC에서는 오버레이 위 */
+      position: relative; padding: 0 20px; 
+      pointer-events: none; 
   }
   .search-container { position: relative; width: 600px; max-width: 100%; pointer-events: auto; }
   
@@ -161,11 +179,8 @@
   #searchOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1500; display: none; backdrop-filter: blur(2px); animation: fadeIn 0.3s; }
   #searchOverlay.active { display: block; }
 
-  /* 메인 카드 영역 & 애니메이션 */
-  #cardContainerWrapper { 
-      width: 100%; max-width: 1700px; overflow: hidden; padding: 0 20px; 
-      flex-shrink: 0; /* 크기 유지 */
-  }
+  /* 메인 카드 영역 */
+  #cardContainerWrapper { width: 100%; overflow: hidden; padding: 0 20px; flex-shrink: 0; }
   #cardContainer { 
     display: flex; flex-wrap: wrap; gap: 30px; width: 100%; justify-content: center; padding: 20px; 
     transform-style: preserve-3d; min-height: auto; 
@@ -191,18 +206,22 @@
   .page-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--btn-border); cursor: pointer; transition: 0.3s; }
   .page-dot.active { background: var(--navy); transform: scale(1.3); }
 
-  /* 하단바 (Footer) - PC 절대 고정 */
+  /* [수정] 하단바 (Footer) - PC 절대 고정 */
   .main-footer {
-    width: 100%; background: var(--navy); padding: 25px 20px;
+    width: 100%; height: var(--footer-h);
+    background: var(--navy); padding: 20px;
     text-align: center; color: rgba(255,255,255,0.7);
     font-size: 13px; line-height: 1.6;
     border-top: 1px solid rgba(255,255,255,0.1); box-sizing: border-box;
-    position: absolute; bottom: 0; left: 0; flex-shrink: 0;
-    display: flex; flex-direction: column; align-items: center;
+    position: absolute; bottom: 0; left: 0; 
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 1000;
   }
-  .main-footer p { margin: 0; word-break: keep-all; }
-  .main-footer .copyright { font-weight: 700; margin-top: 8px; color: rgba(255,255,255,0.9); }
   
+  /* 하단바 내용 컨테이너 */
+  .footer-content p { margin: 0; word-break: keep-all; }
+  
+  /* 텍스트 수정 버튼 */
   .footer-edit-btn { margin-top: 10px; font-size: 11px; cursor: pointer; opacity: 0.5; color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 4px; display: none; }
   .footer-edit-btn:hover { opacity: 1; background: rgba(255,255,255,0.1); }
   body.admin-mode .footer-edit-btn { display: inline-block; }
@@ -211,18 +230,24 @@
   /* [모바일 전용 최적화 스타일] */
   /* ========================================= */
   @media (max-width: 768px) {
-    /* 네이티브 스크롤 허용 */
+    /* 전체 스크롤 허용 */
     body { display: block; height: auto; overflow-y: auto; overflow-x: hidden; }
     
-    header { position: fixed; top: 0; padding: 0 10px; }
+    header { position: fixed; top: 0; padding: 0 10px; z-index: 5000; }
 
-    /* [수정] 모바일 상단 여백 축소 (85px) 및 상단 정렬 */
+    /* [수정] 모바일 상단 여백 축소 (85px) */
     .content-wrapper { 
         height: auto; overflow: visible; 
-        padding-top: 85px; padding-bottom: 0; display: block; 
-        overflow-y: visible;
+        padding-top: 85px; padding-bottom: 0; 
+        display: block; 
     }
     
+    /* 중앙 정렬 박스 해제 */
+    .center-content-box { display: block; width: 100%; }
+
+    /* [수정] 검색창 z-index 낮춤 (헤더 아래로 스크롤되게) */
+    .search-wrapper-outer { margin-bottom: 30px; z-index: 10; }
+
     .header-left { gap: 5px; flex: 1; }
     .logo-text { font-size: 13px; max-width: none; white-space: nowrap; }
     .kac-logo-img { display: none; }
@@ -249,12 +274,11 @@
     .btn-sm { padding: 6px 10px; }
 
     /* 모바일 하단바 (Flow) */
-    .main-footer { padding: 25px 15px; margin-top: 30px; position: static; }
+    .main-footer { padding: 25px 15px; margin-top: 30px; position: static; height: auto; }
     .main-footer p { font-size: 11px; white-space: normal; }
-    .main-footer .copyright { font-size: 11px; }
   }
 
-  #loadingSpinner { position: fixed; inset: 0; background: var(--bg-main); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
+  #loadingSpinner { position: fixed; inset: 0; background: var(--bg-main); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
   .spinner { width: 50px; height: 50px; border: 5px solid #cbd5e1; border-top-color: #2563eb; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
 
   .btn-sm { padding: 5px 10px; font-size: 11px; border-radius: 6px; border: 1px solid var(--btn-border); background: var(--btn-bg); font-weight: 700; cursor: pointer; color: var(--btn-text); }
@@ -266,18 +290,10 @@
   .tree-sidebar { width: 35%; background: var(--bg-main); border-right: 1px solid var(--btn-border); overflow-y: auto; padding: 10px; }
   .tree-content { width: 65%; padding: 20px; overflow-y: auto; background: var(--bg-card); }
   
-  .t-node { padding: 8px; cursor: pointer; border-radius: 6px; font-size: 13px; color: var(--text-main); display: flex; align-items: center; gap: 5px; margin-bottom: 2px; }
-  .t-node:hover { background: rgba(37,99,235,0.1); }
-  .t-node.selected { background: #2563eb; color: #fff; }
-  .t-depth-0 { font-weight: 800; }
-  .t-depth-1 { padding-left: 20px; font-weight: 600; }
-  .t-depth-2 { padding-left: 40px; color: var(--text-sub); }
-  
-  /* 트리 화살표/라벨 분리 */
   .t-node-row { display: flex; align-items: center; padding: 4px 0; }
   .t-toggle-btn { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 10px; color: var(--text-sub); flex-shrink: 0; transition: transform 0.2s; }
   .t-toggle-btn:hover { color: #2563eb; }
-  .t-toggle-btn.empty { cursor: default; opacity: 0; }
+  .t-toggle-btn.empty { cursor: default; opacity: 0; } 
   .t-label { padding: 6px 10px; cursor: pointer; border-radius: 6px; font-size: 13px; color: var(--text-main); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .t-label:hover { background: rgba(37,99,235,0.1); }
   .t-label.selected { background: #2563eb; color: #fff; }
@@ -345,9 +361,10 @@
     <div class="logo-text" onclick="location.reload()">KAC CNS Training Platform</div>
   </div>
   
-  <!-- 헤더 중앙: 페이지 제목 -->
-  <div class="header-center-title" onclick="editPageTitle()">
-      <span id="pageHeadline"></span>
+  <!-- [수정] 헤더 중앙: 페이지 제목 + 뱃지 -->
+  <div class="header-center-title">
+      <span id="pageHeadline" class="page-headline" onclick="editPageTitle()"></span>
+      <span id="pageBadge" class="page-badge">Page 1</span>
   </div>
 
   <div class="header-right">
@@ -361,23 +378,27 @@
 </header>
 
 <div class="content-wrapper">
-  <div class="search-wrapper-outer">
-    <div class="search-container">
-      <input type="text" id="mainSearch" class="search-bar" placeholder="시설명 또는 교육 주제를 검색하세요..." autocomplete="off">
-      <div id="searchResults" class="search-results"></div>
-    </div>
-  </div>
   
-  <div id="cardContainerWrapper">
-    <main id="cardContainer"></main>
+  <!-- [수정] 수직 중앙 정렬 컨테이너 -->
+  <div class="center-content-box">
+    <div class="search-wrapper-outer">
+      <div class="search-container">
+        <input type="text" id="mainSearch" class="search-bar" placeholder="시설명 또는 교육 주제를 검색하세요..." autocomplete="off">
+        <div id="searchResults" class="search-results"></div>
+      </div>
+    </div>
+    
+    <div id="cardContainerWrapper">
+      <main id="cardContainer"></main>
+    </div>
+    <div id="pagination" class="pagination"></div>
   </div>
-  <div id="pagination" class="pagination"></div>
 
   <!-- 하단바 (Footer) -->
   <footer class="main-footer">
-    <p>본 웹사이트는 한국공항공사 항공기술훈련원의 항행안전시설 분야 교육 관련 플랫폼입니다.</p>
-    <p>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)</p>
-    <p class="copyright">© 2026 Korea Airports Corporation. All rights reserved.</p>
+    <div class="footer-content">
+        <!-- JS로 로드됨 -->
+    </div>
     <span class="footer-edit-btn" onclick="openFooterEditModal()">텍스트 수정</span>
   </footer>
 </div>
@@ -507,7 +528,7 @@
   <div class="modal-card">
     <div class="modal-title">📝 하단바 문구 수정</div>
     <div class="setting-group">
-      <label class="setting-label">내용 입력 (줄바꿈 가능)</label>
+      <label class="setting-label">내용 입력 (HTML 태그 사용 가능)</label>
       <textarea id="footerTextInput" class="setting-textarea"></textarea>
     </div>
     <div class="btn-row">
@@ -556,7 +577,7 @@
   let dragSrcIndex = null;
   
   // 종합 관리용 변수
-  let currentTreeSelection = null; // { type: 'cat'|'menu'|'subj', cIdx, mIdx, sIdx }
+  let currentTreeSelection = null; 
 
   async function init() {
     setTheme(localStorage.getItem('kac_theme') || 'light');
@@ -606,22 +627,23 @@
   }
   
   function loadFooterText() {
-      const savedText = localStorage.getItem('kac_footer_text');
-      const defaultText = "본 웹사이트는 한국공항공사 항공기술훈련원의 항행안전시설 분야 교육 관련 플랫폼입니다.<br>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)";
+      const savedText = localStorage.getItem('kac_full_footer');
+      const defaultText = "<p>본 웹사이트는 한국공항공사 항공기술훈련원의 항행안전시설 분야 교육 관련 플랫폼입니다.</p><p>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)</p><p class='copyright'>© 2026 Korea Airports Corporation. All rights reserved.</p>";
       const finalText = savedText || defaultText;
-      document.querySelector('.main-footer p:first-child').innerHTML = finalText;
+      document.querySelector('.footer-content').innerHTML = finalText;
   }
 
   function openFooterEditModal() {
-      const current = document.querySelector('.main-footer p:first-child').innerHTML;
-      document.getElementById('footerTextInput').value = current.replace(/<br>/g, "\n");
+      const current = document.querySelector('.footer-content').innerHTML;
+      // <br> 태그를 줄바꿈으로 변환하여 textarea에 표시
+      const formatted = current.replace(/<br\s*\/?>/gi, "\n").replace(/<\/p><p>/g, "\n\n").replace(/<\/?p[^>]*>/g, ""); 
+      document.getElementById('footerTextInput').value = current; // HTML 그대로 수정하도록 함 (고급 사용자용)
       document.getElementById('footerEditModal').style.display = 'flex';
   }
 
   function saveFooterText() {
       const val = document.getElementById('footerTextInput').value;
-      const formatted = val.replace(/\n/g, "<br>");
-      localStorage.setItem('kac_footer_text', formatted);
+      localStorage.setItem('kac_full_footer', val);
       loadFooterText();
       document.getElementById('footerEditModal').style.display = 'none';
       alert("하단 문구가 저장되었습니다.");
@@ -792,14 +814,14 @@
       const t = titles[currentPage] || "";
       el.textContent = t;
       
+      // 페이지 뱃지 업데이트
+      document.getElementById('pageBadge').textContent = `Page ${currentPage}`;
+
       if(isAdmin && t === "") {
          el.textContent = "제목 없음 (클릭 수정)";
          el.style.opacity = "0.5";
-         el.style.cursor = "pointer";
       } else {
          el.style.opacity = "1";
-         if(isAdmin) el.style.cursor = "pointer";
-         else el.style.cursor = "default";
       }
   }
 
@@ -995,7 +1017,7 @@
     renderCards(false);
   }
 
-  /* 종합 관리자 (Tree Editor) 로직 - 접기/펼치기 적용 */
+  /* 종합 관리자 (Tree Editor) 로직 - 3단계 + 접기/펼치기 */
   function openIntegratedAdmin() {
     document.getElementById('settingsModal').style.display='none';
     document.getElementById('integratedAdminModal').style.display='flex';
@@ -1169,7 +1191,7 @@
           globalData.categories[cIdx].menus[mIdx].subjects.splice(sIdx, 1);
       }
       renderTree();
-      document.getElementById('treeDetail').innerHTML = '<div style="display:flex; height:100%; align-items:center; justify-content:center; color:var(--text-sub);">삭제되었습니다.</div>';
+      document.getElementById('treeDetail').innerHTML = '';
       currentTreeSelection = null;
   }
 
