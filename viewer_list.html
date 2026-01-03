@@ -614,23 +614,20 @@
     </div>
   </div>
 
-  <!-- [수정] ontouchmove 추가: 터치 시 페이지 넘김 방지 -->
-  <div id="audioPanel" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()" ontouchstart="event.stopPropagation()" ontouchmove="event.stopPropagation()">
+  <div id="viewerBody" class="viewer-body">
+    <div id="pageContainer"></div>
+  </div>
+
+  <!-- [수정] ontouchmove 추가: 터치 이동 시 페이지 넘김 방지 -->
+  <div id="audioPanel" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()" ontouchstart="event.stopPropagation()" ontouchend="event.stopPropagation()" ontouchmove="event.stopPropagation()">
     <div class="audio-ctrl-row">
       <button id="playBtn" class="audio-btn">▶</button>
-      <input type="range" id="audioProgress" value="0" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" ontouchmove="event.stopPropagation()">
+      <input type="range" id="audioProgress" value="0" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" ontouchend="event.stopPropagation()" ontouchmove="event.stopPropagation()">
       <span id="audioTime" style="font-size:11px; font-weight:800; color:var(--navy); width:40px; text-align:center;">00:00</span>
     </div>
     <div class="volume-row">
       🔊 <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="1" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
     </div>
-  </div>
-
-  <button id="btnPrev" class="side-nav nav-L" onmousedown="event.stopPropagation(); prevPage()"><svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
-  <button id="btnNext" class="side-nav nav-R" onmousedown="event.stopPropagation(); nextPage()"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></button>
-
-  <div id="viewerBody" class="viewer-body">
-    <div id="pageContainer"></div>
   </div>
 
   <div id="progressHitArea" class="progress-hit-area" onmousedown="event.stopPropagation()">
@@ -1026,7 +1023,7 @@
 
       card.innerHTML = `
         <div class="last-viewed-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
             <span>Last Viewed</span>
         </div>
         <div>
@@ -1497,15 +1494,43 @@
   }
 
   if(hitArea) {
-      hitArea.addEventListener('mousedown', (e) => { e.preventDefault(); e.stopPropagation(); isDragging = true; hitArea.classList.add('dragging'); updateProgress(e); });
-      window.addEventListener('mousemove', (e) => { if(!isDragging || !pdfDoc) return; updateProgress(e); });
+      // Mouse Events
+      hitArea.addEventListener('mousedown', (e) => { e.preventDefault(); e.stopPropagation(); isDragging = true; hitArea.classList.add('dragging'); updateProgress(e.clientX); });
+      window.addEventListener('mousemove', (e) => { if(!isDragging || !pdfDoc) return; updateProgress(e.clientX); });
       window.addEventListener('mouseup', () => { if(isDragging) { isDragging = false; hitArea.classList.remove('dragging'); renderPage('none'); } });
+
+      // [추가] Touch Events for Page Scrubbing
+      hitArea.addEventListener('touchstart', (e) => {
+          e.preventDefault(); e.stopPropagation();
+          isDragging = true; hitArea.classList.add('dragging');
+          updateProgress(e.touches[0].clientX);
+      }, {passive: false});
+
+      hitArea.addEventListener('touchmove', (e) => {
+          if (!isDragging) return;
+          e.preventDefault(); e.stopPropagation();
+          updateProgress(e.touches[0].clientX);
+      }, {passive: false});
+
+      hitArea.addEventListener('touchend', (e) => {
+          if (isDragging) {
+              isDragging = false; hitArea.classList.remove('dragging');
+              renderPage('none');
+          }
+      });
   }
 
-  function updateProgress(e) {
-    const rect = hitArea.getBoundingClientRect(); const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+  function updateProgress(clientX) {
+    const rect = hitArea.getBoundingClientRect(); 
+    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
     const newPage = Math.max(1, Math.min(Math.round((x/rect.width) * (pdfDoc.numPages - 1)) + 1, pdfDoc.numPages));
-    if(newPage !== pageNum) { pageNum = newPage; document.getElementById('pageFill').style.width = `${((pageNum-1)/(pdfDoc.numPages-1))*100}%`; document.getElementById('progressFlag').textContent = `${pageNum} / ${pdfDoc.numPages}`; renderPage('none'); }
+    
+    if(newPage !== pageNum) { 
+        pageNum = newPage; 
+        document.getElementById('pageFill').style.width = `${((pageNum-1)/(pdfDoc.numPages-1))*100}%`; 
+        document.getElementById('progressFlag').textContent = `${pageNum} / ${pdfDoc.numPages}`; 
+        if(!isDragging) renderPage('none'); // Dragging 중에는 페이지 렌더링 생략 (성능 최적화)
+    }
   }
 
   document.getElementById('playBtn').onclick = (e) => { 
