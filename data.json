@@ -8,7 +8,7 @@
     "labelSize": 28,
     "pageTitles": {
       "1": "항행안전시설(CNS) 교육 플랫폼",
-      "2": "항행안전시설 정기교육 플랫폼"
+      "2": "항공기술훈련원(CATC) 교육 준비 관련철"
     },
     "footerText": "<p>본 웹사이트는 KAC 항공기술훈련원 항행안전시설 교육 관련 플랫폼입니다.</p><p>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)</p><p>© 2026 Korea Airports Corporation. All rights reserved.</p>",
     "contentTop": "0"
@@ -854,8 +854,37 @@
         }
       ]
     },
-    null,
-    null,
+    {
+      "id": "CAT_1767432141016",
+      "name": "휴식시간",
+      "code": "M",
+      "color": "#0f1bbd",
+      "menus": []
+    },
+    {
+      "id": "CAT_1767432499200",
+      "name": "국제과정",
+      "code": "I",
+      "color": "#ce2222",
+      "menus": [
+        {
+          "id": "id_1767432526008",
+          "label": "ICAO Fellowship",
+          "line1": "DATALINK",
+          "line2": "",
+          "link": "",
+          "subjects": []
+        },
+        {
+          "id": "id_1767432592069",
+          "label": "중남미 파견교육",
+          "line1": "DATALINK",
+          "line2": "",
+          "link": "",
+          "subjects": []
+        }
+      ]
+    },
     null,
     null
   ],
