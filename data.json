@@ -843,7 +843,7 @@
       "code": "Q",
       "color": "#3b82f6",
       "access": {
-        "visible": false,
+        "visible": true,
         "adminOnly": true,
         "showSidebar": false
       },
