@@ -843,9 +843,9 @@
       "code": "Q",
       "color": "#3b82f6",
       "access": {
-        "visible": true,
-        "adminOnly": false,
-        "showSidebar": false
+        "visible": false,
+        "adminOnly": true,
+        "showSidebar": true
       },
       "menus": [
         {
@@ -890,7 +890,7 @@
       "code": "M",
       "color": "#0f1bbd",
       "access": {
-        "visible": true,
+        "visible": false,
         "adminOnly": true,
         "showSidebar": false
       },
