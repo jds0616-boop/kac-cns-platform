@@ -300,7 +300,8 @@
               "name": "항공통신용 데이터링크 (PART #1)",
               "active": true,
               "pdfName": "/COMM/통신이론_CH14",
-              "audioName": ""
+              "audioName": "/COMM/통신이론_CH14",
+              "link": ""
             },
             {
               "id": "1766848142038",
