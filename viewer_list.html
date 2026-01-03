@@ -233,22 +233,32 @@
   .btn-del { color: #ef4444; border-color: #fee2e2; }
   .btn-del:hover { background: #fee2e2; }
 
-  #pdfOverlay { position: fixed; inset: 0; background: #000; display: none; z-index: 7000; overflow: hidden; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); touch-action: none; }
+  /* ================================================================= */
+  /* [수정] 오버레이 구조를 Flexbox로 변경하여 겹침 문제 해결 */
+  /* ================================================================= */
+  #pdfOverlay { 
+      position: fixed; inset: 0; background: #000; 
+      display: none; z-index: 7000; overflow: hidden; 
+      transition: 0.3s; touch-action: none;
+      /* Flex Layout */
+      flex-direction: column; 
+  }
   
-  .v-header { position: absolute; top: 0; left: 0; right: 0; height: 80px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 8000; color: #fff; background: transparent; }
+  /* PC 기본 헤더 */
+  .v-header { height: 80px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 8000; color: #fff; background: transparent; flex-shrink: 0; }
   .v-header-left { display: flex; align-items: center; gap: 25px; }
-  .close-v { font-size: 32px; cursor: pointer; transition: 0.3s; z-index: 8100; opacity: 0.8; }
+  .close-v { font-size: 32px; cursor: pointer; transition: 0.3s; opacity: 0.8; }
   .close-v:hover { color: #ef4444; opacity: 1; }
   .v-title-box { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); padding: 10px 25px; border-radius: 100px; backdrop-filter: blur(5px); font-weight: 800; font-size: 16px; letter-spacing: -0.5px; }
   .v-header-right { display: flex; align-items: center; gap: 20px; }
   
-  .v-icon-btn { cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; z-index: 8100; opacity: 0.8; padding: 5px; position: relative; }
+  .v-icon-btn { cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; opacity: 0.8; padding: 5px; }
   .v-icon-btn:hover { opacity: 1; transform: scale(1.05); }
   .v-icon-btn.active { color: #facc15; opacity: 1; transform: scale(1.1); }
   .v-icon-btn.disabled { opacity: 0.2; pointer-events: none; cursor: default; }
-  .v-icon-btn svg { width: 26px; height: 26px; fill: currentColor; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+  .v-icon-btn svg { width: 26px; height: 26px; fill: currentColor; }
   
-  /* [수정] 오디오 패널 스타일 (PC: 우측 상단) */
+  /* PC 오디오 패널 (우측 상단) */
   #audioPanel { 
       position: absolute; 
       top: 85px; right: 40px; left: auto;
@@ -267,7 +277,8 @@
   .volume-row { display: flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 800; color: #666; margin-left: 45px; }
   #volumeControl { width: 80px; accent-color: #64748b; height: 4px; }
   
-  .progress-hit-area { position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; z-index: 9000; cursor: pointer; display: flex; align-items: flex-end; }
+  /* 하단 페이지 진행바 (빨간선) */
+  .progress-hit-area { height: 40px; width: 100%; z-index: 9000; cursor: pointer; display: flex; align-items: flex-end; flex-shrink: 0; }
   .progress-track { width: 100%; height: 6px; background: rgba(255,255,255,0.3); position: relative; transition: height 0.2s, background 0.2s; }
   .progress-hit-area:hover .progress-track { background: rgba(255,255,255,0.5); height: 8px; }
   .progress-fill { height: 100%; width: 0%; background: #ef4444; position: relative; }
@@ -281,7 +292,7 @@
   .side-nav:hover svg { opacity: 0.7; }
   .nav-L { left: 0; } .nav-R { right: 0; }
   
-  .viewer-body { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; cursor: default; overflow: hidden; }
+  .viewer-body { flex: 1; width: 100%; display: flex; justify-content: center; align-items: center; cursor: default; overflow: hidden; position: relative; }
   
   canvas { box-shadow: 0 0 50px rgba(0,0,0,0.8); pointer-events: none; max-width: 100%; height: auto; object-fit: contain; opacity: 1; transition: none; }
 
@@ -291,7 +302,7 @@
       .slide-active { opacity: 1; }
   }
 
-  #pageContainer { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; min-height: 100%; }
+  #pageContainer { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; }
 
   .bottom-nav { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); background: var(--navy); padding: 15px 45px; border-radius: 100px; display: flex; gap: 40px; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000; border: 1px solid rgba(255,255,255,0.1); }
   .nav-item { color: #fff; cursor: pointer; font-size: 18px; font-weight: 700; transition: 0.3s; opacity: 0.8; display: flex; align-items: center; gap: 10px; }
@@ -301,19 +312,33 @@
   body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(255, 255, 255, 0.3); }
   body.dark-mode .nav-item { color: #e2e8f0; opacity: 1; }
   
-  .mobile-close-btn { display: none !important; }
-  
-  .mobile-top-exit-btn {
-      display: none; position: absolute; top: 20px; left: 20px; z-index: 9999;
-      background: rgba(239, 68, 68, 0.9); color: #fff; padding: 10px 20px;
-      border-radius: 50px; font-weight: 800; font-size: 14px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer; align-items: center; gap: 6px;
+  /* 모바일 상단 바 (Flex Layout 전용) */
+  .mobile-top-bar {
+      display: none; height: 60px; background: #000; 
+      align-items: center; justify-content: space-between; 
+      padding: 0 20px; flex-shrink: 0; z-index: 8000;
   }
+  .mobile-exit-btn {
+      background: #ef4444; color: #fff; padding: 8px 16px; border-radius: 50px; 
+      font-weight: 800; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px;
+  }
+  .mobile-audio-icon {
+      color: #fff; cursor: pointer; display: flex; align-items: center; gap: 6px; 
+      opacity: 0.5; transition: 0.3s;
+  }
+  .mobile-audio-icon.active { opacity: 1; color: #facc15; }
+  .mobile-audio-icon.disabled { display: none; }
 
-  /* 모바일 디자인 */
+  /* ========================================= */
+  /* [수정] 모바일 디자인 (Stacked Layout) */
+  /* ========================================= */
   @media (max-width: 768px) {
-    .v-title-box, .v-icon-btn, .close-v { display: none !important; }
-    .mobile-top-exit-btn { display: flex !important; }
+    /* PC 헤더 및 부유 요소 숨김 */
+    .v-header, .mobile-top-exit-btn { display: none !important; }
+    
+    /* 모바일 상단 바 활성화 */
+    .mobile-top-bar { display: flex !important; }
+
     main { padding: 20px 15px; padding-bottom: 100px; }
     .tree-container { align-items: flex-start; }
     .tree-spine { display: block !important; left: 24px; top: 85px; bottom: 30px; width: 3px; background: rgba(var(--theme-rgb), 0.3); }
@@ -339,43 +364,37 @@
     body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.98); }
     .nav-item { font-size: 14px; gap: 6px; font-weight: 800; }
     .nav-icon { width: 20px; height: 20px; }
-    
-    /* [중요] 모바일에서 PDF 하단 여백 추가 (오디오 바 공간 확보) */
-    .viewer-body { 
-        padding: 0; 
-        align-items: flex-start; 
-        overflow-y: auto; 
-        padding-bottom: 120px !important; /* 하단 공간 확보 */
-    }
     .header-search { font-size: 14px; padding: 10px 20px 10px 45px; background-size: 18px; background-position: 15px center; }
 
-    /* [수정] 모바일 전용 오디오 패널 위치: 화면 하단 중앙 (페이지 바 위쪽) */
-    .v-title-box, .close-v, #fsBtn { display: none !important; } 
-    #audioBtn { display: flex !important; } 
-
+    /* [핵심] 모바일 오디오 패널 (하단 고정 Block) */
     #audioPanel {
-        top: auto !important;
-        bottom: 45px !important; /* 빨간색 페이지 바(약 40px) 바로 위에 배치 */
-        left: 50% !important;
-        transform: translateX(-50%) !important; /* 가로 중앙 정렬 */
-        right: auto !important;
-        
-        width: 90% !important;
-        max-width: 350px !important;
-        height: 50px !important;
-        
+        position: static !important; /* Float 제거 */
+        display: none; /* JS로 flex 변경 */
+        width: 100% !important;
+        max-width: none !important;
+        height: 60px !important;
         padding: 0 20px !important;
-        border-radius: 50px !important;
+        border-radius: 0 !important; /* 사각형 */
+        background: #1e293b !important;
+        color: #fff !important;
         flex-direction: row !important;
         align-items: center !important;
+        justify-content: center;
         gap: 0 !important;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.3) !important;
-        border: 1px solid rgba(0,0,0,0.1) !important;
+        box-shadow: none !important;
+        border-top: 1px solid rgba(255,255,255,0.1) !important;
+        flex-shrink: 0; /* 크기 고정 */
     }
+    #audioPanel.open { display: flex !important; }
+    
     .volume-row { display: none !important; }
-    .audio-ctrl-row { gap: 10px; margin: 0; }
-    .audio-btn { width: 32px; height: 32px; font-size: 11px; }
-    #audioTime { font-size: 11px !important; margin-left: 2px; }
+    .audio-ctrl-row { gap: 15px; margin: 0; width: 100%; }
+    .audio-btn { width: 36px; height: 36px; font-size: 12px; background: #fff; color: #000; }
+    #audioTime { font-size: 12px !important; margin-left: 5px; color: #fff !important; }
+    #audioProgress { accent-color: #fff !important; }
+    
+    /* 뷰어 바디는 Flex Grow로 남은 공간 차지 */
+    .viewer-body { padding: 0; background: #000; align-items: center; }
   }
 
   .creator-info { position: fixed; bottom: 5px; width: 100%; text-align: center; font-size: 11px; color: var(--text-sub); opacity: 0.5; font-weight: 500; z-index: 500; pointer-events: none; }
@@ -465,7 +484,7 @@
     <label class="setting-label">🔗 외부 링크 주소 (선택)</label>
     <input type="text" id="inputLinkUrl" class="setting-input" placeholder="예: https://..." style="margin-bottom:10px;">
 
-    <!-- [수정] 오디오 입력 부분: 경로 입력 + 확장자 선택 -->
+    <!-- 오디오 입력 부분 -->
     <label class="setting-label">🎵 오디오 파일 경로 (확장자 제외)</label>
     <div style="display: flex; gap: 10px; margin-bottom: 20px;">
         <input type="text" id="inputAudioName" class="setting-input" placeholder="예: COMM/audio" style="flex: 1;">
@@ -559,13 +578,22 @@
   </div>
 </div>
 
+<!-- [수정] PDF 오버레이 구조 변경: Flexbox Stacked Layout -->
 <div id="pdfOverlay" onmousedown="handleMouseNav(event)">
-  <!-- [추가] 모바일 전용 상단 나가기 버튼 -->
-  <div id="mobileTopClose" class="mobile-top-exit-btn" onclick="event.stopPropagation(); closeViewer();">
-      <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" /></svg>
-      나가기
+  
+  <!-- 모바일 상단 바 (나가기 + 오디오 버튼) -->
+  <div class="mobile-top-bar">
+      <div class="mobile-exit-btn" onclick="event.stopPropagation(); closeViewer();">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" /></svg>
+          나가기
+      </div>
+      <div id="mobileAudioIcon" class="mobile-audio-icon" onclick="toggleAudioPanel(event)">
+          <svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:currentColor;"><path d="M12,2A3,3 0 0,0 9,5V11A3,3 0 0,0 12,14A3,3 0 0,0 15,11V5A3,3 0 0,0 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,1 12,16A5,5 0 0,1 17,11H19Z"/></svg>
+          <span>(Audio)</span>
+      </div>
   </div>
 
+  <!-- PC 헤더 -->
   <div class="v-header" onmousedown="event.stopPropagation()">
     <div class="v-header-left">
       <div class="close-v" onclick="closeViewer()">✕</div>
@@ -586,7 +614,7 @@
     </div>
   </div>
 
-  <!-- [수정] ontouchmove="event.stopPropagation()" 추가: 터치 이동 시 페이지 넘김 방지 -->
+  <!-- [수정] ontouchmove 추가: 터치 시 페이지 넘김 방지 -->
   <div id="audioPanel" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()" ontouchstart="event.stopPropagation()" ontouchmove="event.stopPropagation()">
     <div class="audio-ctrl-row">
       <button id="playBtn" class="audio-btn">▶</button>
@@ -603,10 +631,6 @@
 
   <div id="viewerBody" class="viewer-body">
     <div id="pageContainer"></div>
-  </div>
-
-  <div class="mobile-close-btn" onclick="closeViewer()" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
-    ✕ 닫기
   </div>
 
   <div id="progressHitArea" class="progress-hit-area" onmousedown="event.stopPropagation()">
@@ -1002,7 +1026,7 @@
 
       card.innerHTML = `
         <div class="last-viewed-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
             <span>Last Viewed</span>
         </div>
         <div>
@@ -1043,7 +1067,6 @@
     }
   }
 
-  // [수정] 저장 함수: 입력된 경로 + 선택된 확장자를 합쳐서 저장
   function saveFiles() {
     const idx = currentEditIdx;
     const name = document.getElementById('editSubjectName').value;
@@ -1056,7 +1079,6 @@
     subjects[idx].pdfName = document.getElementById('inputPdfName').value.trim();
     subjects[idx].link = document.getElementById('inputLinkUrl').value.trim();
 
-    // 오디오 경로 처리
     let aPath = document.getElementById('inputAudioName').value.trim();
     const aExt = document.getElementById('inputAudioExt').value;
     
@@ -1075,7 +1097,6 @@
     document.getElementById('uploadModal').style.display = 'none';
   }
 
-  // [수정] 수정창 열기 함수: 저장된 파일명에서 확장자를 분리해서 보여줌
   function openUploadMenu(idx) { 
     currentEditIdx = idx; 
     const sub = subjects[idx];
@@ -1084,7 +1105,6 @@
     document.getElementById('inputPdfName').value = sub.pdfName || '';
     document.getElementById('inputLinkUrl').value = sub.link || '';
 
-    // 오디오 분리 로직
     let aFull = sub.audioName || '';
     let aPath = aFull;
     let aExt = '.mp3';
@@ -1325,7 +1345,7 @@
         audioUrl = `files/${aName}`;
     }
 
-    overlay.style.display = 'block';
+    overlay.style.display = 'flex'; // Changed to flex for overlay layout
     
     try {
       if (overlay.requestFullscreen) await overlay.requestFullscreen();
@@ -1346,17 +1366,22 @@
     }
     
     const audioBtn = document.getElementById('audioBtn');
+    const mobileAudioIcon = document.getElementById('mobileAudioIcon');
+    
     if(audioUrl) {
         audioPlayer.src = audioUrl;
         audioPlayer.load();
         audioBtn.classList.remove('disabled');
+        mobileAudioIcon.classList.remove('disabled');
         // 모바일 자동 패널 열기
         if(window.innerWidth <= 768) {
              document.getElementById('audioPanel').classList.add('open');
+             mobileAudioIcon.classList.add('active');
         }
     } else {
         audioPlayer.src = "";
         audioBtn.classList.add('disabled');
+        mobileAudioIcon.classList.add('disabled');
         document.getElementById('audioPanel').classList.remove('open');
     }
     updateIconState(); 
@@ -1404,9 +1429,19 @@
   }
   
   function toggleAudioPanel(e) { 
-    if(document.getElementById('audioBtn').classList.contains('disabled')) return;
     e.stopPropagation(); 
-    document.getElementById('audioPanel').classList.toggle('open'); 
+    if(document.getElementById('audioBtn').classList.contains('disabled')) return;
+    
+    const panel = document.getElementById('audioPanel');
+    const icon = document.getElementById('mobileAudioIcon');
+    
+    if (panel.classList.contains('open')) {
+        panel.classList.remove('open');
+        icon.classList.remove('active');
+    } else {
+        panel.classList.add('open');
+        icon.classList.add('active');
+    }
   }
 
   async function renderPage(dir) {
@@ -1498,7 +1533,7 @@
   document.getElementById('volumeControl').oninput = (e) => { audioPlayer.volume = e.target.value; };
   
   window.onkeydown = (e) => { 
-    if(overlay.style.display === 'block') { 
+    if(overlay.style.display === 'flex') { 
         if(e.key === "ArrowRight") nextPage(); 
         if(e.key === "ArrowLeft") prevPage(); 
         if(e.key === "Escape") closeViewer();
