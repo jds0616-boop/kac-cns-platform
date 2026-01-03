@@ -844,7 +844,7 @@
       "color": "#3b82f6",
       "access": {
         "visible": true,
-        "adminOnly": true,
+        "adminOnly": false,
         "showSidebar": false
       },
       "menus": [
