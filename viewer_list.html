@@ -212,6 +212,11 @@
   .subject-card.last-viewed .last-viewed-icon { display: flex; }
   .last-viewed-icon svg { width: 24px; height: 24px; fill: currentColor; }
 
+/* ▼▼▼ [여기]에 복사해서 붙여넣으세요 ▼▼▼ */
+.icon-mobile { display: none; } /* PC에선 모바일(체크) 숨김 */
+.icon-pc { display: block; }    /* PC에선 PC(눈) 보임 */
+/* ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ */
+
   .subj-title { font-size: 20px; font-weight: 800; color: var(--title-color); transition: 0.3s; }
   body.dark-mode .subj-title { text-shadow: 0 0 15px rgba(255,255,255,0.15); }
 
@@ -460,6 +465,118 @@
   .batch-table th, .batch-table td { padding: 8px; border: 1px solid var(--btn-border); text-align: center; }
   .batch-table th { background: var(--btn-bg); font-weight: 700; color: var(--text-sub); }
   .batch-input { width: 100%; border: none; background: transparent; color: var(--text-main); }
+
+/* [1] PC 기본 아이콘 설정 */
+  .icon-mobile { display: none; }
+  .icon-pc { display: block; }
+
+  /* [2] 모바일 전용 설정 (세련된 디자인 + 흔들림 방지 + 아이콘 변경) */
+  @media (max-width: 768px) {
+    /* PC 요소 숨김 */
+    .v-header, #audioPanel, .mobile-top-exit-btn { display: none !important; }
+
+    /* --- [A] 상단바 디자인 (글래스모피즘) --- */
+    .mobile-top-bar {
+        display: flex !important;
+        height: 60px !important;
+        
+        /* 반투명 유리 효과 배경 */
+        background: rgba(20, 20, 25, 0.85) !important;
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        
+        align-items: center; padding: 0 15px; gap: 15px;
+        position: absolute; top: 0; left: 0; right: 0;
+        z-index: 8000;
+    }
+
+    /* 나가기 버튼 (심플한 사각형) */
+    .mobile-exit-btn {
+        width: 36px; height: 36px;
+        background: rgba(255,255,255,0.1); color: #fff;
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; flex-shrink: 0; padding: 0;
+    }
+    .mobile-exit-btn svg { width: 20px; height: 20px; fill: #ef4444; }
+
+    /* 오디오 컨트롤 그룹 (캡슐 모양) */
+    .mobile-audio-group {
+        flex: 1; display: flex; align-items: center; gap: 12px;
+        min-width: 0;
+        background: rgba(0,0,0,0.3); /* 어두운 내부 */
+        padding: 6px 12px; border-radius: 50px;
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    /* 재생 버튼 */
+    .audio-btn-sm {
+        width: 32px; height: 32px; border-radius: 50%; border: none;
+        background: #fff; color: #000; flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center; 
+        font-size: 14px; padding-left: 2px;
+    }
+
+    /* 재생바 (파란색 채움 효과) */
+    .audio-slider-sm {
+        flex: 1; height: 6px; border-radius: 10px;
+        appearance: none; -webkit-appearance: none;
+        background: rgba(255,255,255,0.2); cursor: pointer; overflow: hidden;
+    }
+    .audio-slider-sm::-webkit-slider-thumb {
+        -webkit-appearance: none; width: 0; height: 10px;
+        box-shadow: -100vw 0 0 100vw #2563eb; background: #2563eb;
+    }
+
+    /* 시간 텍스트 */
+    .audio-time-sm { 
+        font-size: 11px; font-family: monospace; font-weight: 700;
+        color: rgba(255,255,255,0.8); width: 35px; text-align: right; 
+    }
+
+    /* 우측 아이콘 */
+    .mobile-audio-icon-right {
+        width: 36px; height: 36px;
+        display: flex; align-items: center; justify-content: center;
+        background: rgba(250, 204, 21, 0.1); border-radius: 12px;
+        color: #facc15; flex-shrink: 0;
+    }
+    .mobile-audio-icon-right svg { width: 20px; height: 20px; fill: currentColor; }
+
+    /* --- [B] 뷰어 흔들림 방지 고정 --- */
+    .viewer-body { 
+        position: absolute !important;
+        top: 60px !important; bottom: 10px !important; /* 상단바~하단바 사이 고정 */
+        left: 0 !important; right: 0 !important;
+        width: 100% !important; height: auto !important; 
+        padding: 0 !important; background: #000; 
+        display: block !important; 
+        overflow-y: scroll !important; -webkit-overflow-scrolling: touch;
+    }
+    canvas { display: block !important; width: 100% !important; height: auto !important; }
+    #pageContainer { min-height: 100% !important; height: auto !important; display: block !important; padding-bottom: 100px !important; }
+
+    /* --- [C] Last Viewed 아이콘 (모바일 전용) --- */
+    .subject-card.last-viewed .last-viewed-icon { 
+        display: flex; position: absolute; 
+        left: -35px; top: 50%; transform: translateY(-50%); 
+        width: 24px; height: 24px; border-radius: 50%; background: #10b981; 
+        border: 2px solid var(--bg-main); padding: 0; justify-content: center; align-items: center; 
+        z-index: 10; 
+    }
+    .icon-pc { display: none !important; }      /* 눈 숨김 */
+    .icon-mobile { display: block !important; } /* 체크 보임 */
+    .last-viewed-icon span { display: none !important; } /* 글자 숨김 */
+    .last-viewed-icon svg { width: 14px; height: 14px; fill: #fff; margin: 0; }
+
+    /* 하단 진행바 */
+    .progress-hit-area {
+        position: absolute !important; bottom: 0 !important; left: 0 !important; right: 0 !important;
+        height: 10px !important; background: #1e293b; z-index: 9000;
+    }
+  }
 </style>
 </head>
 <body oncontextmenu="return false;">
@@ -1066,20 +1183,28 @@
         ? `<span class="status-pill on"><span class="pill-icon">🎧</span> <span class="status-text">Audio ${sub.audioName}</span></span>` 
         : `<span class="status-pill"><span class="pill-icon">🎧</span> <span class="status-text">Audio 미등록</span></span>`;
 
-      card.innerHTML = `
-        <div class="last-viewed-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-            <span>Last Viewed</span>
-        </div>
-        <div>
-            <div class="subj-title">${statusTag} ${sub.name}</div>
-            <div class="status-group">
-                ${pdfLabel}
-                ${audioLabel}
-                ${hasLink ? `<span class="status-pill link">🔗 <span class="status-text">Link 연결됨</span></span>` : ''}
-            </div>
-        </div>
-        <div class="ctrl-btns">${(isAdmin && !isPreview) ? `${moveBtn}<button class="btn-action" onclick="event.stopPropagation(); openUploadMenu(${i})">수정</button><button class="btn-action btn-del" onclick="event.stopPropagation(); deleteSubject(${i})">삭제</button>` : `<button class="btn-action" style="visibility:hidden">.</button>`}</div>`;
+/* render() 함수 내부 (약 535번째 줄 근처) */
+
+card.innerHTML = `
+  <div class="last-viewed-icon">
+      <!-- 1. PC용 눈 아이콘 (class="icon-pc") -->
+      <svg class="icon-pc" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+      
+      <!-- 2. 모바일용 체크 아이콘 (class="icon-mobile") -->
+      <svg class="icon-mobile" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+
+      <!-- 3. 텍스트 (CSS 덕분에 모바일에서는 자동으로 숨겨짐) -->
+      <span>Last Viewed</span>
+  </div>
+  <div>
+      <div class="subj-title">${statusTag} ${sub.name}</div>
+      <div class="status-group">
+          ${pdfLabel}
+          ${audioLabel}
+          ${hasLink ? `<span class="status-pill link">🔗 <span class="status-text">Link 연결됨</span></span>` : ''}
+      </div>
+  </div>
+  <div class="ctrl-btns">${(isAdmin && !isPreview) ? `${moveBtn}<button class="btn-action" onclick="event.stopPropagation(); openUploadMenu(${i})">수정</button><button class="btn-action btn-del" onclick="event.stopPropagation(); deleteSubject(${i})">삭제</button>` : `<button class="btn-action" style="visibility:hidden">.</button>`}</div>`;
       
       wrapper.appendChild(card);
       treeContainer.appendChild(wrapper);
