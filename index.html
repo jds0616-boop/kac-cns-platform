@@ -1,9 +1,8 @@
+<!-- START OF FILE index.html -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8" />
-<!-- 스마트폰 화면 배율 정상화를 위한 뷰포트 태그 추가 (권장) -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>KAC CNS Training Platform</title>
 <script>
   // [보안] 로그인 세션 체크
@@ -36,8 +35,6 @@
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
-  
-  /* 기본 PC 설정: 스크롤 잠금 유지 */
   body { background: var(--bg-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: var(--text-main); transition: 0.3s; }
 
   /* 관리자/미리보기 제어 */
@@ -104,7 +101,7 @@
   .btn-move { color: #3b82f6; border-color: #dbeafe; }
 
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none; align-items: center; justify-content: center; }
-  .modal-card { background: var(--bg-card); padding: 35px; border-radius: 25px; width: 450px; max-width: 90%; color: var(--text-main); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+  .modal-card { background: var(--bg-card); padding: 35px; border-radius: 25px; width: 450px; color: var(--text-main); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
   .setting-group { margin-bottom: 20px; }
   .setting-label { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; display: block; }
   .setting-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--text-main); font-size: 14px; outline: none; }
@@ -129,13 +126,6 @@
 
   @keyframes spin { 100% { transform: rotate(360deg); } }
   @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
-  /* [수정] 스마트폰 모바일 화면 스크롤 잠금 해제 및 최적화 */
-  @media (max-width: 768px) {
-    body { overflow: auto; height: auto; }
-    .content-wrapper { overflow: visible; height: auto; padding-bottom: 100px; }
-    header { padding: 0 20px; }
-  }
 </style>
 </head>
 <body>
@@ -188,6 +178,7 @@
         </div>
         <button class="btn-modal btn-success" onclick="exportJsonData()">변경사항 저장 (data.json 다운로드)</button>
         
+        <!-- GitHub 업로드 버튼 추가 -->
         <button class="btn-modal btn-primary" style="background:#24292f; margin-top:10px;" onclick="openGithubModal()">
           <svg style="width:16px;height:16px;vertical-align:middle;margin-right:5px;fill:white;" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
           GitHub에 바로 업로드
@@ -195,6 +186,7 @@
 
         <p style="font-size:11px; color:red; margin-top:5px;">* 중요: 비밀번호 변경 또는 데이터 수정 후 반드시 [변경사항 저장] 또는 [GitHub 업로드]를 해야 적용됩니다.</p>
         
+        <!-- 초기화 버튼 -->
         <button class="btn-modal btn-danger" style="margin-top:15px; background:#ef4444; opacity:0.8;" onclick="resetToDataJson()">⚠️ 서버 원본으로 초기화 (수정취소)</button>
       </div>
       <div class="setting-group" style="background: rgba(0,0,0,0.02); padding: 15px; border-radius: 15px; border: 1px solid var(--btn-border);">
@@ -210,6 +202,7 @@
   </div>
 </div>
 
+<!-- GitHub 업로드 설정 모달 -->
 <div id="githubModal" class="modal-overlay">
   <div class="modal-card">
     <div class="modal-title">🐙 GitHub 연동 설정</div>
@@ -236,6 +229,7 @@
   </div>
 </div>
 
+<!-- 비밀번호 변경 모달 -->
 <div id="pwChangeModal" class="modal-overlay">
   <div class="modal-card">
     <div class="modal-title">🔐 비밀번호 변경</div>
@@ -257,6 +251,7 @@
   </div>
 </div>
 
+<!-- 카드 수정 모달 -->
 <div id="cardEditModal" class="modal-overlay">
   <div class="modal-card">
     <div class="modal-title">카테고리 수정</div>
@@ -270,6 +265,7 @@
   </div>
 </div>
 
+<!-- 이동 모달 -->
 <div id="movePageModal" class="modal-overlay">
   <div class="modal-card">
     <div class="modal-title">📂 페이지 이동</div>
@@ -292,37 +288,48 @@
   let editingCardId = null;
   let moveSrcIndex = -1;
 
+  // 페이지네이션
   const itemsPerPage = 5;
   let currentPage = 1;
 
+  // 드래그앤드롭
   let dragSrcIndex = null;
 
   async function init() {
     setTheme(localStorage.getItem('kac_theme') || 'light');
     if(isPreview) document.body.classList.add('preview-active');
 
-    const isAdminSession = localStorage.getItem('kac_admin_mode') === '1';
+    // 1. 현재 관리자 모드인지 확인 (세션 기준: 브라우저 끄면 풀리게 하려면 sessionStorage 권장, 
+    // 기존 코드와의 호환성을 위해 localStorage 유지 중이라면 localStorage 사용)
+    // * 문제 해결을 위해 관리자 여부 판단 변수를 명확히 합니다.
+    const isAdminSession = localStorage.getItem('kac_admin_mode') === '1'; // 혹은 sessionStorage
 
+    // 2. 서버 데이터 가져오기 (무조건)
     let serverData = null;
     try {
         const res = await fetch('data.json?v=' + Date.now());
         if(res.ok) serverData = await res.json();
     } catch(e) { console.log("data.json 로드 실패"); }
 
+    // 3. 로컬 데이터 확인
     const hasLocalData = localStorage.getItem('kac_index_order');
 
+    // [핵심 로직 변경]
+    // 관리자(수정 권한 있음)이고 + 수정 중인 데이터가 있으면 -> 로컬 데이터 사용
     if (isAdminSession && hasLocalData) {
         console.log("🛠️ 관리자 모드: 로컬 편집 데이터를 복원합니다.");
         reconstructGlobalDataFromLocal();
         
+        // 보안 설정은 서버 최신본으로 갱신 (비밀번호 동기화)
         if(serverData && serverData.security) {
             globalData.security = serverData.security;
         }
     } 
+    // 일반 사용자이거나 + 로컬 데이터가 없으면 -> 서버 데이터로 강제 덮어쓰기
     else if (serverData) {
         console.log("🔄 일반 사용자: 서버 데이터로 강제 업데이트합니다.");
         globalData = serverData;
-        syncToLocalStorage(globalData);
+        syncToLocalStorage(globalData); // 로컬에 남은 찌꺼기 데이터를 최신 서버 데이터로 덮어씀
         applyConfig(globalData.config);
     }
 
@@ -338,6 +345,7 @@
     if(isAdmin) document.body.classList.add('admin-mode');
   }
   
+  // 로컬스토리지 내용을 globalData로 역조립하는 함수 (비밀번호 보존)
   function reconstructGlobalDataFromLocal() {
     const currentSecurity = globalData.security || {
         entry_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c",
@@ -373,6 +381,7 @@
     }
   }
 
+  // 로컬 데이터 초기화 및 서버 원본 복구
   function resetToDataJson() {
     if(confirm("현재까지 수정한 모든 내용이 사라지고 서버의 원본 파일(data.json) 상태로 되돌아갑니다.\n계속하시겠습니까?")) {
         localStorage.clear();
@@ -391,10 +400,16 @@
       if (e.key === 'kac_admin_mode' || e.key === 'kac_preview_active') location.reload();
   });
 
-  // [수정] 강제로 데이터를 5개로 만드는 로직 제거
   function ensurePageSlots() {
     const cleanList = globalData.categories.filter(c => c !== null);
     globalData.categories = cleanList;
+    if (globalData.categories.length % itemsPerPage !== 0) {
+        const needed = itemsPerPage - (globalData.categories.length % itemsPerPage);
+        for(let i=0; i<needed; i++) globalData.categories.push(null);
+    }
+    if(globalData.categories.length === 0) {
+        for(let i=0; i<itemsPerPage; i++) globalData.categories.push(null);
+    }
   }
 
   function syncToLocalStorage(data) {
@@ -423,7 +438,6 @@
     document.documentElement.style.setProperty('--label-size-idx', (cfg.labelSize||24)+'px');
   }
 
-  // [수정] 렌더링 시 무조건 5칸 반복, 빈 칸은 '메뉴 추가' 텍스트로 표시
   function renderCards() {
     const container = document.getElementById('cardContainer');
     const pagination = document.getElementById('pagination');
@@ -433,49 +447,49 @@
     const totalPages = Math.ceil(globalData.categories.length / itemsPerPage) || 1;
     if(currentPage > totalPages) currentPage = totalPages;
     const startIdx = (currentPage - 1) * itemsPerPage;
+    const pageItems = globalData.categories.slice(startIdx, startIdx + itemsPerPage);
 
-    for (let i = 0; i < itemsPerPage; i++) {
-        const globalIdx = startIdx + i;
-        const cat = globalData.categories[globalIdx];
+    pageItems.forEach((cat, i) => {
+      const globalIdx = startIdx + i;
+      
+      if(cat) { 
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.setProperty('--card-color', cat.color);
+        card.onclick = () => location.href = `facility.html?type=${cat.id}`;
         
-        if(cat) { 
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.style.setProperty('--card-color', cat.color);
-            card.onclick = () => location.href = `facility.html?type=${cat.id}`;
-            
-            if(isAdmin && !isPreview) {
-            card.setAttribute('draggable', 'true');
-            card.ondragstart = (e) => handleDragStart(e, globalIdx);
-            card.ondragover = (e) => handleDragOver(e);
-            card.ondrop = (e) => handleDrop(e, globalIdx);
-            card.ondragend = (e) => handleDragEnd(e);
-            
-            card.innerHTML = `
-                <div class="card-ctrl" onclick="event.stopPropagation()">
-                <button class="btn-sm" onclick="openEdit('${cat.id}')">수정</button>
-                <button class="btn-sm btn-move" onclick="openMovePageModal(${globalIdx})">이동</button>
-                <button class="btn-sm btn-del" onclick="deleteCard('${globalIdx}')">삭제</button>
-                </div>
-                <div class="icon-box">${cat.code}</div>
-                <h2>${cat.name}</h2>
-            `;
-            } else {
-                card.innerHTML = `<div class="icon-box">${cat.code}</div><h2>${cat.name}</h2>`;
-            }
-            container.appendChild(card);
-        } else { 
-            const empty = document.createElement('div');
-            empty.className = 'card add-slot';
-            if(isAdmin && !isPreview) {
-                empty.innerHTML = '<div>+ 메뉴 추가</div>';
-                empty.onclick = () => openEdit('NEW', globalIdx);
-                empty.ondragover = (e) => handleDragOver(e);
-                empty.ondrop = (e) => handleDrop(e, globalIdx);
-            }
-            container.appendChild(empty);
+        if(isAdmin && !isPreview) {
+          card.setAttribute('draggable', 'true');
+          card.ondragstart = (e) => handleDragStart(e, globalIdx);
+          card.ondragover = (e) => handleDragOver(e);
+          card.ondrop = (e) => handleDrop(e, globalIdx);
+          card.ondragend = (e) => handleDragEnd(e);
+          
+          card.innerHTML = `
+            <div class="card-ctrl" onclick="event.stopPropagation()">
+              <button class="btn-sm" onclick="openEdit('${cat.id}')">수정</button>
+              <button class="btn-sm btn-move" onclick="openMovePageModal(${globalIdx})">이동</button>
+              <button class="btn-sm btn-del" onclick="deleteCard('${globalIdx}')">삭제</button>
+            </div>
+            <div class="icon-box">${cat.code}</div>
+            <h2>${cat.name}</h2>
+          `;
+        } else {
+            card.innerHTML = `<div class="icon-box">${cat.code}</div><h2>${cat.name}</h2>`;
         }
-    }
+        container.appendChild(card);
+      } else { 
+        const empty = document.createElement('div');
+        empty.className = 'card add-slot';
+        if(isAdmin && !isPreview) {
+           empty.innerHTML = '<div style="font-size:40px;">+</div><div>카테고리 추가</div>';
+           empty.onclick = () => openEdit('NEW', globalIdx);
+           empty.ondragover = (e) => handleDragOver(e);
+           empty.ondrop = (e) => handleDrop(e, globalIdx);
+        }
+        container.appendChild(empty);
+      }
+    });
 
     for(let i=1; i<=totalPages; i++) {
         const dot = document.createElement('div');
@@ -493,7 +507,7 @@
         addPageBtn.style.textAlign = 'center';
         addPageBtn.style.lineHeight = '10px';
         addPageBtn.onclick = () => {
-            globalData.categories.push(null);
+            for(let k=0; k<itemsPerPage; k++) globalData.categories.push(null);
             currentPage = Math.ceil(globalData.categories.length / itemsPerPage);
             renderCards();
         };
@@ -503,21 +517,7 @@
 
   function handleDragStart(e, idx) { dragSrcIndex = idx; e.target.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
   function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; return false; }
-  
-  // [수정] 드래그 완료 시 로컬스토리지 저장 코드 추가
-  function handleDrop(e, targetIdx) { 
-      e.stopPropagation(); 
-      if(dragSrcIndex !== null && dragSrcIndex !== targetIdx) { 
-          const srcItem = globalData.categories[dragSrcIndex]; 
-          const targetItem = globalData.categories[targetIdx]; 
-          globalData.categories[targetIdx] = srcItem; 
-          globalData.categories[dragSrcIndex] = targetItem; 
-          renderCards(); 
-          syncToLocalStorage(globalData);
-      } 
-      return false; 
-  }
-  
+  function handleDrop(e, targetIdx) { e.stopPropagation(); if(dragSrcIndex !== null && dragSrcIndex !== targetIdx) { const srcItem = globalData.categories[dragSrcIndex]; const targetItem = globalData.categories[targetIdx]; globalData.categories[targetIdx] = srcItem; globalData.categories[dragSrcIndex] = targetItem; renderCards(); } return false; }
   function handleDragEnd(e) { document.querySelectorAll('.card').forEach(c => c.classList.remove('dragging')); }
 
   function buildSearchIndex() {
@@ -579,6 +579,7 @@
     globalData.config.iconSize = parseInt(is);
     globalData.config.labelSize = parseInt(ls);
     applyConfig(globalData.config);
+    // 설정 변경사항 로컬 저장
     localStorage.setItem('kac_idx_icon_size', globalData.config.iconSize);
     localStorage.setItem('kac_idx_label_size', globalData.config.labelSize);
     document.getElementById('settingsModal').style.display='none';
@@ -619,6 +620,7 @@
     }
   }
 
+  // --- GitHub 업로드 기능 ---
   function openGithubModal() {
     document.getElementById('ghOwner').value = localStorage.getItem('kac_gh_owner') || '';
     document.getElementById('ghRepo').value = localStorage.getItem('kac_gh_repo') || '';
@@ -697,6 +699,7 @@
     }
   }
 
+  // --- 비밀번호 변경 로직 ---
   function openPwChangeModal() {
       document.getElementById('settingsModal').style.display='none';
       document.getElementById('pwChangeModal').style.display='flex';
