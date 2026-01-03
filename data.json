@@ -5,7 +5,13 @@
   },
   "config": {
     "iconSize": 110,
-    "labelSize": 28
+    "labelSize": 28,
+    "pageTitles": {
+      "1": "항행안전시설(CNS) 표준 교보재 플랫폼",
+      "2": "항행안전시설 정기교육 플랫폼"
+    },
+    "footerText": "<p>본 웹사이트는 KAC 항공기술훈련원 항행안전시설 교육 관련 플랫폼입니다.</p><p>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)</p><p>© 2026 Korea Airports Corporation. All rights reserved.</p>",
+    "contentTop": "0"
   },
   "categories": [
     {
@@ -149,7 +155,7 @@
         {
           "id": "id_1767393816140",
           "label": "항공정보통신시설 개요 및 분류",
-          "line1": "정의 및 분류",
+          "line1": "개요 및 분류",
           "line2": "",
           "link": "",
           "subjects": [
@@ -724,11 +730,10 @@
         }
       ]
     },
-    null,
     {
       "id": "M_1767154255680",
-      "name": "관제 및 SWIM",
-      "code": "A",
+      "name": "기타 교육 자료",
+      "code": "Q",
       "color": "#3b82f6",
       "menus": [
         {
