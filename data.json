@@ -108,6 +108,23 @@
           ]
         },
         {
+          "id": "id_1767431035702",
+          "label": "RF 송수신기 이론",
+          "line1": "RF ",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1767153632746kp546",
+              "name": "RF 무선시스템 구성 (저자 : 서종석 부장 , RFDH House)",
+              "active": true,
+              "pdfName": "/BASIC/무선기초_CH9",
+              "link": "",
+              "audioName": ""
+            }
+          ]
+        },
+        {
           "id": "id_1767153141755",
           "label": "안테나",
           "line1": "ANTENNA",
@@ -136,23 +153,6 @@
               "name": "변/복조 이론",
               "active": true,
               "pdfName": "/BASIC/무선기초_CH11",
-              "link": "",
-              "audioName": ""
-            }
-          ]
-        },
-        {
-          "id": "id_1767431035702",
-          "label": "RF 송수신기 이론",
-          "line1": "RF ",
-          "line2": "",
-          "link": "",
-          "subjects": [
-            {
-              "id": "1767153632746kp546",
-              "name": "RF 무선시스템 구성 (저자 : 서종석 부장 , RFDH House)",
-              "active": true,
-              "pdfName": "/BASIC/무선기초_CH9",
               "link": "",
               "audioName": ""
             }
@@ -829,8 +829,8 @@
         },
         {
           "id": "id_1767430782892",
-          "label": "초기교육 관리자 페이지 ",
-          "line1": "교수 전용",
+          "label": "Q&A 확인용 페이지",
+          "line1": "강사 전용",
           "line2": "",
           "link": "https://jds0616-boop.github.io/CATC/admin.html",
           "subjects": []
