@@ -1,5 +1,4 @@
---- START OF FILE facility.html ---
-
+<!-- START OF FILE facility.html -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -173,7 +172,6 @@
       height: fit-content;
   }
   
-  /* [수정] 대제목 카드 일체형 디자인 */
   .root-card-integrated {
       background: var(--bg-card);
       border: 3px solid var(--theme-color);
@@ -183,12 +181,11 @@
       position: relative;
       z-index: 2;
       display: flex; flex-direction: column;
-      overflow: hidden; /* 내부 버튼 radius 처리용 */
+      overflow: hidden; 
       transition: transform 0.2s;
   }
   .root-card-integrated:hover { transform: scale(1.03); }
 
-  /* 카드 상단 내용 영역 */
   .card-content {
       padding: 30px 20px;
       display: flex; flex-direction: column; align-items: center; gap: 15px;
@@ -196,10 +193,9 @@
       background: var(--bg-card);
   }
   
-  /* 카드 하단 홈 버튼 영역 (일체형) */
   .card-home-btn {
       padding: 15px 0;
-      background: var(--bg-card); /* 기본 배경 */
+      background: var(--bg-card);
       border-top: 1px solid rgba(var(--theme-rgb), 0.2);
       color: var(--theme-color);
       font-weight: 800; font-size: 14px;
@@ -207,7 +203,6 @@
       display: flex; align-items: center; justify-content: center; gap: 8px;
       transition: 0.2s;
   }
-  /* [수정 1] 카드 전체 호버 시 하단 버튼 색상 채우기 */
   .root-card-integrated:hover .card-home-btn {
       background: var(--theme-color);
       color: #fff;
@@ -217,25 +212,22 @@
       width: 80px; height: 80px; border-radius: 25px;
       background: var(--icon-bg); border: 2px solid var(--icon-border);
       display: flex; align-items: center; justify-content: center;
-      /* [수정 2] 글자 크기 대폭 확대 (32px -> 56px) */
       font-size: 56px; 
       font-weight: 900; color: var(--theme-color);
   }
   .root-title { font-size: 20px; font-weight: 800; word-break: keep-all; line-height: 1.3; text-align: center; }
 
-  /* [수정] 우측 삼각형 포인터 */
   .triangle-pointer {
       position: absolute;
-      right: -24px; /* 카드 우측으로 뺌 */
+      right: -24px; 
       top: 50%; transform: translateY(-50%);
       width: 0; height: 0;
-      border-left: 24px solid var(--theme-color); /* 왼쪽이 넓고 오른쪽이 뾰족 */
+      border-left: 24px solid var(--theme-color); 
       border-top: 14px solid transparent;
       border-bottom: 14px solid transparent;
       z-index: 5;
   }
   
-  /* 중앙 세로 줄 (Branch Bus) */
   .branch-bus {
       width: 8px; 
       background: rgba(var(--theme-rgb), 0.2);
@@ -247,7 +239,6 @@
       margin-bottom: 50px;
   }
   
-  /* [우측] 리스트 섹션 */
   .list-section {
       display: flex; flex-direction: column; gap: 20px;
       width: 600px; padding-bottom: 50px;
@@ -273,11 +264,14 @@
       box-shadow: 0 8px 25px rgba(var(--theme-rgb), 0.15);
       z-index: 20; 
   }
-  /* [추가] 드래그 앤 드롭 시각 효과 */
+  
+  /* [추가] 비공개 아이템 스타일 (관리자용) */
+  .menu-bar.hidden-item { opacity: 0.6; border: 2px dashed #cbd5e1; }
+  .menu-bar.hidden-item:hover { opacity: 1; border-style: solid; }
+
   .menu-bar.dragging { opacity: 0.4; border: 2px dashed var(--theme-color); background: #f8fafc; }
   .menu-bar.drag-over { border-top: 3px solid var(--theme-color); transform: translateY(-2px); }
   
-  /* Last Viewed 뱃지 */
   .last-viewed-icon {
     position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
     display: none; 
@@ -297,7 +291,6 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   }
 
-  /* 미리보기 팝업 (너비 확장 유지) */
   .preview-popup {
       position: absolute;
       left: 100%; top: 50%; 
@@ -307,24 +300,15 @@
       box-shadow: 0 10px 40px rgba(0,0,0,0.25);
       border-radius: 15px;
       padding: 20px;
-      
-      min-width: 500px; 
-      max-width: 600px;
-      
+      min-width: 500px; max-width: 600px;
       z-index: 100;
       opacity: 0; pointer-events: none;
       transition: opacity 0.2s;
       display: none; 
   }
-  
-  .preview-popup.align-top {
-      top: 0; 
-      transform: translate(15px, 0); 
-  }
+  .preview-popup.align-top { top: 0; transform: translate(15px, 0); }
 
-  .menu-bar:hover .preview-popup {
-      display: block; opacity: 1; pointer-events: none;
-  }
+  .menu-bar:hover .preview-popup { display: block; opacity: 1; pointer-events: none; }
   
   .pp-title { font-size: 14px; font-weight: 800; color: var(--text-sub); margin-bottom: 12px; border-bottom: 1px solid var(--btn-border); padding-bottom: 8px; }
   .pp-list { display: flex; flex-direction: column; gap: 8px; }
@@ -333,7 +317,6 @@
   .pp-status-dot.active { background: #10b981; }
   .pp-more { font-size: 12px; color: var(--text-sub); margin-top: 10px; text-align: center; font-weight: 700; background: var(--btn-bg); padding: 6px; border-radius: 6px; }
 
-  /* 좌측 연결선 */
   .menu-bar::before {
       content: ''; position: absolute; left: -44px; top: 50%;
       width: 44px; height: 2px; background: rgba(var(--theme-rgb), 0.3);
@@ -366,7 +349,6 @@
   .btn-xs { padding: 4px 8px; font-size: 11px; border-radius: 6px; border: 1px solid #e2e8f0; background: #fff; cursor: pointer; color: #64748b; }
   .btn-xs:hover { background: #f1f5f9; color: #0f172a; }
 
-  /* 추가 버튼 */
   .add-menu-btn {
       border: 2px dashed #cbd5e1; background: transparent;
       justify-content: center; color: #94a3b8; font-weight: 700;
@@ -377,7 +359,6 @@
 
   .btn-preview-active { background: #10b981 !important; color: #fff !important; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
 
-  /* === [하단 네비게이션 스타일 (from viewer_list.html)] === */
   .bottom-nav { 
     position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); 
     background: var(--navy); padding: 15px 45px; border-radius: 100px; 
@@ -391,20 +372,10 @@
   .nav-item:hover { opacity: 1; transform: translateY(-3px); }
   .nav-icon { width: 24px; height: 24px; fill: currentColor; }
 
-  body.dark-mode .bottom-nav {
-    background: rgba(30, 41, 59, 0.95); 
-    border: 1px solid rgba(255, 255, 255, 0.3); 
-  }
-  body.dark-mode .nav-item {
-    color: #e2e8f0; 
-    opacity: 1;
-  }
+  body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(255, 255, 255, 0.3); }
+  body.dark-mode .nav-item { color: #e2e8f0; opacity: 1; }
 
-/* [2] 모바일 전용 설정 (반응형 레이아웃 + 검색창 + 디자인) */
   @media (max-width: 768px) {
-    /* ----------------------------------------------------
-       1. 기본 레이아웃 (마인드맵 세로 정렬)
-    ---------------------------------------------------- */
     .mindmap-container { 
         flex-direction: column; overflow-y: auto; padding-top: var(--header-h); 
         display: block; 
@@ -414,49 +385,32 @@
         width: 100%; padding-bottom: 20px;
     }
 
-    /* ----------------------------------------------------
-       2. 헤더 검색창 활성화 (Viewer 페이지 스타일)
-    ---------------------------------------------------- */
-    /* 중앙 검색창 영역 활성화 */
     .header-center { 
-        display: block !important; 
-        position: static !important;
-        transform: none !important;
-        width: auto !important;
-        max-width: none !important;
-        flex: 1; /* 남은 공간 꽉 채우기 */
-        margin: 0 10px;
+        display: block !important; position: static !important;
+        transform: none !important; width: auto !important;
+        max-width: none !important; flex: 1; margin: 0 10px;
     }
 
-/* [수정] 2. 공간 확보를 위해 불필요한 요소 모두 숨김 */
-    .logo-text { display: none !important; }   /* 텍스트 로고 숨김 */
-    .breadcrumb { display: none !important; }  /* 경로 텍스트 숨김 */
-    
-    /* [핵심] 오른쪽 영역(설정, 테마, 이미지 로고) 통째로 숨김 */
+    .logo-text { display: none !important; }
+    .breadcrumb { display: none !important; }
     .header-right { display: none !important; }
 
-    /* 검색 입력창 스타일 */
-    .header-search {
-        width: 100% !important;
-        font-size: 14px;
-        padding: 10px 15px 10px 40px;
-        height: 40px;
-        background-position: 12px center;
-    }
+    .header-search { width: 100% !important; font-size: 14px; padding: 10px 15px 10px 40px; height: 40px; background-position: 12px center; }
 
-    /* 헤더 패딩 조정 */
     header { padding: 0 15px; gap: 5px; }
 
-    /* ----------------------------------------------------
-       3. 루트 카드 및 리스트 스타일
-    ---------------------------------------------------- */
     .preview-popup { display: none !important; }
 
+    /* [수정] 모바일 Root Section 스타일 개선 (Z-index 상향 및 위치 조정) */
     .root-section { 
-        width: 100%; height: auto; padding: 20px 20px 0 20px; 
-        justify-content: center; position: sticky; top: 0; 
-        background: var(--bg-main); z-index: 20; 
+        width: 100%; height: auto; 
+        padding: 10px 20px; /* 위아래 패딩 축소 */
+        justify-content: center; 
+        position: sticky; top: 0; 
+        background: var(--bg-main); 
+        z-index: 500 !important; /* 리스트보다 높은 z-index */
         margin-top: 0; flex-direction: row; gap: 10px; flex-wrap: wrap;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05); /* 경계선 강조 */
     }
     
     .root-card-integrated { 
@@ -464,13 +418,8 @@
         flex-direction: row; border-width: 2px; margin: 0;
         align-items: center;
     }
-    .card-content {
-        flex: 1; padding: 15px; flex-direction: row; gap: 15px;
-    }
-    .card-home-btn {
-        width: auto; padding: 0 20px; border-top: none; border-left: 1px solid rgba(var(--theme-rgb), 0.2);
-        height: 100%;
-    }
+    .card-content { flex: 1; padding: 15px; flex-direction: row; gap: 15px; }
+    .card-home-btn { width: auto; padding: 0 20px; border-top: none; border-left: 1px solid rgba(var(--theme-rgb), 0.2); height: 100%; }
     
     .root-icon { margin-bottom: 0; font-size: 24px; width: 50px; height: 50px; border-radius: 15px; }
     .root-title { font-size: 16px; flex: 1; text-align: left; }
@@ -493,63 +442,30 @@
     
     .admin-btns { flex-direction: row; gap: 4px; }
 
-    /* ----------------------------------------------------
-       4. 아이콘 분기 처리 (모바일: 체크 / PC: 눈)
-    ---------------------------------------------------- */
     .icon-pc { display: none !important; }
     .last-viewed-icon span { display: none !important; }
     .icon-mobile { display: block !important; }
 
-    /* Last Viewed 뱃지 디자인 */
     .menu-bar.last-viewed .last-viewed-icon {
-        right: 15px !important;
-        top: 50% !important;
-        transform: translateY(-50%) !important;
-        
-        width: 24px; height: 24px; 
-        border-radius: 50%; padding: 0;
-        background: #10b981; 
-        border: 2px solid #fff; 
-        color: #fff;
-        
+        right: 15px !important; top: 50% !important; transform: translateY(-50%) !important;
+        width: 24px; height: 24px; border-radius: 50%; padding: 0;
+        background: #10b981; border: 2px solid #fff; color: #fff;
         display: flex; justify-content: center; align-items: center;
     }
     .last-viewed-icon svg { width: 14px; height: 14px; margin: 0; }
 
-    /* ----------------------------------------------------
-       5. 하단 네비게이션 스타일 (Viewer 페이지와 통일)
-    ---------------------------------------------------- */
     .bottom-nav {
-        width: 90% !important;
-        bottom: 20px !important;
-        padding: 16px 0 !important;
-        gap: 30px !important;
-        border-radius: 50px !important; 
-        justify-content: center !important;
-        
-        background: rgba(15, 23, 42, 0.98) !important;
-        backdrop-filter: blur(10px) !important;
+        width: 90% !important; bottom: 20px !important; padding: 16px 0 !important;
+        gap: 30px !important; border-radius: 50px !important; justify-content: center !important;
+        background: rgba(15, 23, 42, 0.98) !important; backdrop-filter: blur(10px) !important;
         box-shadow: 0 8px 25px rgba(0,0,0,0.4) !important;
     }
 
-    body.dark-mode .bottom-nav { 
-        background: rgba(30, 41, 59, 0.98) !important; 
-    }
+    body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.98) !important; }
+    .nav-item { font-size: 14px !important; gap: 6px !important; font-weight: 800 !important; }
+    .nav-icon { width: 20px !important; height: 20px !important; }
+  } 
 
-    .nav-item { 
-        font-size: 14px !important; 
-        gap: 6px !important; 
-        font-weight: 800 !important; 
-    }
-
-    .nav-icon { 
-        width: 20px !important; 
-        height: 20px !important; 
-    }
-
-  } /* <--- [중요] 모든 모바일 설정이 끝난 여기서 닫혀야 합니다 */
-
-  /* 모달 등 나머지 스타일 */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none !important; align-items: center; justify-content: center; }
   .modal-overlay[style*="display: flex"] { display: flex !important; }
   .modal-card { background: var(--bg-card); padding: 30px; border-radius: 20px; width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); color: var(--text-main); }
@@ -566,43 +482,8 @@
   @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* [1] 아이콘 표시 기본 설정 (PC: 눈 보임 / 모바일: 체크 숨김) */
   .icon-mobile { display: none; }
   .icon-pc { display: block; }
-
-  /* [2] 모바일 전용 설정 (체크 아이콘만 표시) */
-  @media (max-width: 768px) {
-      /* 모바일에서는 PC아이콘과 글자를 숨김 */
-      .icon-pc { display: none !important; }
-      .last-viewed-icon span { display: none !important; }
-      
-      /* 모바일 아이콘(체크) 표시 */
-      .icon-mobile { display: block !important; }
-
-      /* 라스트 뷰 뱃지 디자인 (녹색 동그라미) */
-      .menu-bar.last-viewed .last-viewed-icon {
-          right: 15px !important;
-          top: 50% !important;
-          transform: translateY(-50%) !important;
-          
-          width: 24px; 
-          height: 24px; 
-          border-radius: 50%; 
-          padding: 0;
-          
-          background: #10b981; /* 녹색 배경 */
-          border: 2px solid #fff; /* 흰색 테두리 */
-          color: #fff; /* 아이콘 색상 */
-          
-          display: flex; 
-          justify-content: center; 
-          align-items: center;
-      }
-      
-      /* 체크 아이콘 크기 */
-      .last-viewed-icon svg { width: 14px; height: 14px; margin: 0; }
-  }
-
 </style>
 </head>
 <body>
@@ -649,11 +530,8 @@
 </header>
 
 <div class="mindmap-container">
-  
   <div class="mindmap-wrapper">
-      <!-- [좌측] 루트 노드 (Sticky) -->
       <div class="root-section">
-        <!-- 일체형 카드 -->
         <div class="root-card-integrated">
             <div class="card-content" onclick="location.href='index.html'">
                 <div id="rootIcon" class="root-icon">?</div>
@@ -663,23 +541,16 @@
                 <svg style="width:16px;height:16px;fill:currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
                 홈으로 이동
             </div>
-            <!-- 삼각형 포인터 -->
             <div class="triangle-pointer"></div>
         </div>
       </div>
-
-      <!-- [중앙] 연결 버스 라인 -->
       <div class="branch-bus"></div>
-
-      <!-- [우측] 메뉴 리스트 -->
       <div id="menuListSection" class="list-section">
         <div id="menuListContainer" style="display:flex; flex-direction:column; gap:20px;"></div>
       </div>
   </div>
-
 </div>
 
-<!-- [추가] 메뉴 이동 모달 -->
 <div id="moveMenuModal" class="modal-overlay" style="display:none;">
   <div class="modal-card">
     <h3>📂 메뉴 이동</h3>
@@ -695,22 +566,18 @@
   </div>
 </div>
 
-<!-- 설정 모달 -->
 <div id="settingsModal" class="modal-overlay" style="display:none;">
   <div class="modal-card">
     <h3>⚙️ 시스템 설정</h3>
-    
     <div id="guestSettings" style="display:none;">
       <p style="margin-bottom:20px; font-size:14px; color:var(--text-sub);">관리자 권한이 필요합니다.</p>
       <button class="btn-modal btn-primary" onclick="toggleAdmin()">관리자 로그인</button>
     </div>
-
     <div id="adminSettings" style="display:none;">
         <div class="setting-group">
             <button class="btn-modal btn-danger" onclick="toggleAdmin()">로그아웃</button>
             <button id="modalPreviewBtn" class="btn-modal" onclick="togglePreview()">미리보기 모드</button>
         </div>
-        
         <div class="setting-group" style="background:rgba(0,0,0,0.03); padding:15px; border-radius:10px; margin-top:15px;">
             <label class="setting-label">🎨 화면 레이아웃 & UI</label>
             <div style="display:flex; gap:10px; margin-bottom:10px;">
@@ -723,25 +590,20 @@
                     <input type="number" id="setFacLabelSize" class="setting-input">
                 </div>
             </div>
-            
             <label class="setting-label">↔️ 컨텐츠 전체 가로 이동 (px)</label>
             <div style="display:flex; gap:10px; align-items:center;">
                 <input type="range" id="rangeLayoutX" min="-300" max="300" step="10" style="flex:1" oninput="updateLayoutPreview(this.value)">
                 <input type="number" id="setLayoutX" class="setting-input" style="width:70px; margin-bottom:0;" oninput="updateLayoutPreview(this.value)">
             </div>
-            <p style="font-size:11px; color:#64748b; margin-top:5px;">* 음수: 왼쪽, 양수: 오른쪽 이동</p>
-
             <button class="btn-modal btn-primary" onclick="saveUISettings()" style="margin-top:10px;">설정 저장 및 적용</button>
         </div>
-
         <button class="btn-modal btn-primary" style="margin-top:10px;" onclick="openBulkEdit()">📋 메뉴 일괄 수정</button>
     </div>
-
     <button class="btn-modal" style="margin-top:10px;" onclick="closeModal('settingsModal')">닫기</button>
   </div>
 </div>
 
-<!-- 개별 수정 모달 -->
+<!-- 개별 수정 모달 (수정됨: 공개여부 체크박스 추가) -->
 <div id="itemEditModal" class="modal-overlay" style="display:none;">
   <div class="modal-card">
     <h3>📦 메뉴 수정/추가</h3>
@@ -749,12 +611,20 @@
     <input type="text" id="editItemLine2" class="setting-input" placeholder="아이콘 하단 (선택)">
     <input type="text" id="editItemLabel" class="setting-input" placeholder="시설 명칭">
     <input type="text" id="editItemLink" class="setting-input" placeholder="연동 링크 (선택)">
+    
+    <!-- [추가] 공개 여부 체크박스 -->
+    <div class="checkbox-group" style="margin-top:10px; margin-bottom:20px;">
+        <label class="checkbox-item" style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer;">
+            <input type="checkbox" id="editItemVisible" checked style="width:16px;height:16px;cursor:pointer;">
+            <span>공개 (체크 해제 시 비공개)</span>
+        </label>
+    </div>
+
     <button class="btn-modal btn-primary" onclick="saveIndividualEdit()">저장</button>
     <button class="btn-modal" style="background:#e2e8f0; color:#333" onclick="closeModal('itemEditModal')">취소</button>
   </div>
 </div>
 
-<!-- 일괄 수정 모달 -->
 <div id="bulkEditModal" class="modal-overlay" style="display:none;">
   <div class="modal-card modal-card large">
     <h3>📋 메뉴 일괄 수정</h3>
@@ -788,7 +658,7 @@
   let isPreview = localStorage.getItem('kac_preview_active') === '1';
   let menus = [];
   let currentEditIdx = -1;
-  let dragSrcIndex = null; // [추가] 드래그 소스 인덱스
+  let dragSrcIndex = null;
   const storedHash = "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c";
 
   async function init() {
@@ -824,8 +694,14 @@
               const serverData = await res.json();
               const cat = serverData.categories.find(c => c.id === type);
               if(cat && !localStorage.getItem(`kac_menu_${type}`)) {
+                   // 서버 데이터 로드 시 visible 속성도 고려 (기본값 true)
                    localStorage.setItem(`kac_menu_${type}`, JSON.stringify(cat.menus.map(m=>({
-                       dataId: m.id, label: m.label, line1: m.line1, line2: m.line2, link: m.link
+                       dataId: m.id, 
+                       label: m.label, 
+                       line1: m.line1, 
+                       line2: m.line2, 
+                       link: m.link,
+                       visible: m.visible !== false // undefined면 true
                    }))));
                    localStorage.setItem(`kac_style_${type}`, JSON.stringify({name: cat.name, code: cat.code, color: cat.color}));
                    
@@ -881,11 +757,21 @@
       menus.forEach((menu, idx) => {
           if(!menu) return;
 
+          // [수정] 공개 여부 체크
+          const isVisible = (menu.visible !== false); // 기본값 true
+          
+          // 게스트는 비공개 메뉴 숨김
+          if(!isAdmin && !isVisible) return;
+
           const bar = document.createElement('div');
           bar.className = 'menu-bar';
           bar.id = `menu-${menu.dataId}`;
           
-          // [추가] 관리자 모드일 때 드래그 앤 드롭 이벤트 연결
+          // [추가] 관리자 모드에서 비공개 메뉴 시각적 표시
+          if(isAdmin && !isVisible) {
+              bar.classList.add('hidden-item');
+          }
+          
           if(isAdmin && !isPreview) {
               bar.setAttribute('draggable', 'true');
               bar.ondragstart = (e) => {
@@ -973,7 +859,6 @@
 
           let adminHtml = '';
           if(isAdmin && !isPreview) {
-              // [수정] '이동' 버튼 추가
               adminHtml = `
                 <div class="admin-btns admin-only" onclick="event.stopPropagation()">
                    <button class="btn-xs" style="color:#2563eb; border-color:#bfdbfe;" onclick="openMoveMenu(${idx})">이동</button>
@@ -986,21 +871,25 @@
           const linkIconHtml = menu.link ? 
             `<svg class="ext-link-icon" viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z" /></svg>` 
             : '';
+          
+          // [추가] 관리자 모드에서 비공개 뱃지 표시
+          let badgeHtml = '';
+          if(isAdmin && !isVisible) {
+              badgeHtml = `<span style="font-size:10px; color:white; background:#ef4444; padding:2px 6px; border-radius:4px; font-weight:700; margin-left:5px;">비공개</span>`;
+          }
 
-bar.innerHTML = `
+          bar.innerHTML = `
               <div class="last-viewed-icon">
-                <!-- 1. PC용 눈 아이콘 (class="icon-pc") -->
-                <svg class="icon-pc" viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-                
-                <!-- 2. 모바일용 체크 아이콘 (class="icon-mobile") -->
+                <svg class="icon-pc" viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
                 <svg class="icon-mobile" viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                
-                <!-- 3. 텍스트 (CSS가 모바일에서 자동으로 숨겨줌) -->
                 <span>Last Viewed</span>
               </div>
               <div class="menu-pill-icon">${iconInner}</div>
               <div class="menu-info">
-                  <div class="menu-title">${menu.label}</div>
+                  <div class="menu-title">
+                      ${menu.label}
+                      ${badgeHtml}
+                  </div>
                   ${linkIconHtml}
               </div>
               ${adminHtml}
@@ -1017,7 +906,6 @@ bar.innerHTML = `
       }
   }
   
-  // [추가] 메뉴 이동 모달 열기
   function openMoveMenu(idx) {
       currentEditIdx = idx;
       const select = document.getElementById('moveTargetSelect');
@@ -1043,7 +931,6 @@ bar.innerHTML = `
       document.getElementById('moveMenuModal').style.display = 'flex';
   }
 
-  // [추가] 메뉴 이동 실행
   function executeMoveMenu() {
       const targetType = document.getElementById('moveTargetSelect').value;
       if(!targetType) return;
@@ -1078,12 +965,14 @@ bar.innerHTML = `
           document.getElementById('editItemLine2').value = '';
           document.getElementById('editItemLabel').value = '';
           document.getElementById('editItemLink').value = '';
+          document.getElementById('editItemVisible').checked = true; // 기본값 공개
       } else {
           const m = menus[idx];
           document.getElementById('editItemLine1').value = m.line1 || '';
           document.getElementById('editItemLine2').value = m.line2 || '';
           document.getElementById('editItemLabel').value = m.label || '';
           document.getElementById('editItemLink').value = m.link || '';
+          document.getElementById('editItemVisible').checked = (m.visible !== false);
       }
       document.getElementById('itemEditModal').style.display = 'flex';
   }
@@ -1094,7 +983,8 @@ bar.innerHTML = `
           line1: document.getElementById('editItemLine1').value,
           line2: document.getElementById('editItemLine2').value,
           label: document.getElementById('editItemLabel').value,
-          link: document.getElementById('editItemLink').value
+          link: document.getElementById('editItemLink').value,
+          visible: document.getElementById('editItemVisible').checked // [추가] 공개 여부 저장
       };
 
       if(!newItem.label) return alert("메뉴 명칭을 입력하세요.");
@@ -1142,12 +1032,14 @@ bar.innerHTML = `
           const l1 = row.querySelector('.b-l1').value;
           const label = row.querySelector('.b-nm').value;
           if(l1 || label) {
+              const original = menus[idx] || {};
               newMenus.push({
-                  dataId: menus[idx] ? menus[idx].dataId : 'id_'+Date.now()+'_'+idx,
+                  dataId: original.dataId || 'id_'+Date.now()+'_'+idx,
                   line1: l1,
                   line2: row.querySelector('.b-l2').value,
                   label: label,
-                  link: row.querySelector('.b-lk').value
+                  link: row.querySelector('.b-lk').value,
+                  visible: original.visible !== false // 일괄 수정 시 기존 visibility 유지
               });
           }
       });
@@ -1280,7 +1172,6 @@ bar.innerHTML = `
       if(el) el.classList.toggle('open');
   }
 
-  // 검색 로직
   let searchIndex = [];
   function buildSearchIndex() {
       searchIndex = [];
