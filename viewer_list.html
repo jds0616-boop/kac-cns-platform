@@ -246,13 +246,13 @@
   
   /* PC 기본 헤더: PDF 위로 겹치게 설정 */
   .v-header { 
-      position: absolute; /* [수정] Overlay 방식 */
+      position: absolute; 
       top: 0; left: 0; right: 0;
       height: 80px; 
       display: flex; align-items: center; justify-content: space-between; 
       padding: 0 40px; z-index: 8000; 
       color: #fff; 
-      background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); /* [수정] 그라데이션 */
+      background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); 
       flex-shrink: 0; 
   }
   .v-header-left { display: flex; align-items: center; gap: 25px; }
@@ -312,7 +312,13 @@
   }
 
   @media (max-width: 768px) {
-      canvas { transition: opacity 0.3s ease-out; }
+      canvas { 
+          transition: opacity 0.3s ease-out; 
+          width: 100% !important; /* 가로 꽉 채우기 */
+          height: auto !important; /* 비율 자동 */
+          max-height: none !important; /* 세로 제한 해제 */
+          object-fit: fill !important;
+      }
       .slide-enter { opacity: 0; }
       .slide-active { opacity: 1; }
   }
@@ -408,8 +414,17 @@
     #audioTime { font-size: 12px !important; margin-left: 5px; color: #fff !important; }
     #audioProgress { accent-color: #fff !important; }
     
-    /* 뷰어 바디는 Flex Grow로 남은 공간 차지 */
-    .viewer-body { padding: 0; background: #000; align-items: center; height: 100%; padding-bottom: 120px !important; }
+    /* [수정] 뷰어 바디: Flex Start 정렬 + 상하 패딩으로 여백 확보 */
+    .viewer-body { 
+        padding: 0; 
+        background: #000; 
+        align-items: flex-start !important; /* 위에서부터 시작 */
+        height: auto !important; 
+        min-height: 100vh;
+        padding-top: 60px !important; /* 상단바 높이만큼 띄움 */
+        padding-bottom: 100px !important; /* 하단바 높이만큼 띄움 */
+        overflow-y: scroll !important; /* 스크롤 허용 */
+    }
   }
 
   .creator-info { position: fixed; bottom: 5px; width: 100%; text-align: center; font-size: 11px; color: var(--text-sub); opacity: 0.5; font-weight: 500; z-index: 500; pointer-events: none; }
@@ -1038,7 +1053,7 @@
 
       card.innerHTML = `
         <div class="last-viewed-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
             <span>Last Viewed</span>
         </div>
         <div>
@@ -1123,7 +1138,7 @@
     // 오디오 분리 로직
     let aFull = sub.audioName || '';
     let aPath = aFull;
-    let aExt = '.mp3'; // 기본값
+    let aExt = '.mp3';
 
     if (aFull.toLowerCase().endsWith('.wav')) {
         aExt = '.wav';
@@ -1478,8 +1493,9 @@
     let viewport;
     
     if (isMobile) {
+        // [수정] 모바일: 가로 꽉 채우기 (Fit Width)
         const unscaledViewport = page.getViewport({ scale: 1 });
-        const scale = (window.innerWidth / unscaledViewport.width) * 1.5; 
+        const scale = window.innerWidth / unscaledViewport.width; 
         viewport = page.getViewport({ scale: scale });
     } else {
         const unscaledViewport = page.getViewport({ scale: 1 });
