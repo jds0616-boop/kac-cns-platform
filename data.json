@@ -18,7 +18,7 @@
       "id": "M_1767153081051",
       "name": "RF 무선기초",
       "code": "B",
-      "color": "#0547b3",
+      "color": "#01c7fc",
       "access": {
         "visible": true,
         "adminOnly": false,
@@ -494,7 +494,7 @@
         },
         {
           "id": "id_1767155221980",
-          "label": "전용회선 이해 (인천ACC)",
+          "label": "전용회선 통신망 이해 (인천ACC)",
           "line1": "전용 회선",
           "line2": "",
           "link": "",
