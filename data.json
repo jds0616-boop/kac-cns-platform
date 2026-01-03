@@ -227,6 +227,38 @@
           ]
         },
         {
+          "id": "id_1767444859880",
+          "label": "부속서 및 관련문서 (통신)",
+          "line1": "ICAO",
+          "line2": "",
+          "link": "",
+          "visible": false,
+          "subjects": [
+            {
+              "id": "1767444939015",
+              "name": "ICAO ANNEX_10 (Volume 5)",
+              "active": true,
+              "pdfName": "",
+              "link": "",
+              "audioName": ""
+            },
+            {
+              "id": "1767444946870",
+              "name": "ICAO ANNEX_10 (Volume 3)",
+              "active": true
+            }
+          ]
+        },
+        {
+          "id": "id_1767445012973",
+          "label": "국제전기통신연합 전파규칙",
+          "line1": "ITU",
+          "line2": "",
+          "link": "",
+          "visible": false,
+          "subjects": []
+        },
+        {
           "id": "id_1766923156620",
           "label": "전파 및 항공주파수",
           "line1": "Frequency",
