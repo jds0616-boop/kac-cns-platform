@@ -240,11 +240,12 @@
     .center-content-box { display: block; width: 100%; }
 
     .header-left { flex: 0 0 auto; }
+    /* [수정 2] 모바일 헤더 타이틀 크기 확대 (18px -> 22px) */
     .logo-text { 
         position: absolute; 
         left: 50%; 
         transform: translateX(-50%); 
-        font-size: 18px !important; 
+        font-size: 22px !important; /* 확대됨 */
         font-weight: 800;
         max-width: 60%; 
         text-align: center;
@@ -257,23 +258,56 @@
 
     .theme-toggle { display: none !important; }
     
-    .settings-btn { width: 30px; height: 30px; font-size: 16px; padding: 0; }
+    /* [수정 3] 상단 헤더의 설정 버튼 숨김 (하단으로 이동) */
+    .settings-btn { display: none; }
 
     #cardContainerWrapper { padding: 0 15px; }
     #cardContainer { gap: 15px; padding: 10px 0; min-height: auto; flex-direction: column; flex-wrap: nowrap; }
     
     .card.empty-placeholder { display: none !important; }
 
+    /* [수정 1] 카드(버튼) 높이 축소 (약 2/3 수준) */
     .card { 
-      width: 100%; height: auto; min-height: 90px; 
+      width: 100%; 
+      height: auto; 
+      min-height: 60px; /* 90px -> 60px 축소 */
       flex-direction: row; justify-content: flex-start; 
-      padding: 15px 25px; gap: 20px; border-radius: 20px;
+      padding: 12px 15px; /* 패딩 축소 */
+      gap: 15px; 
+      border-radius: 15px;
     }
     .card:hover { transform: translateY(-3px); }
-    .icon-box { width: 50px; height: 50px; border-radius: 15px; margin-bottom: 0; font-size: 24px; flex-shrink: 0; }
-    .card h2 { font-size: 18px; text-align: left; word-break: keep-all; flex: 1; }
+    /* 아이콘 박스 크기 축소 */
+    .icon-box { 
+        width: 40px; height: 40px; 
+        border-radius: 10px; margin-bottom: 0; 
+        font-size: 20px; flex-shrink: 0; 
+    }
+    .card h2 { font-size: 16px; text-align: left; word-break: keep-all; flex: 1; }
     .card-ctrl { top: 50%; right: 10px; transform: translateY(-50%); width: auto; flex-direction: row; }
     .btn-sm { padding: 6px 10px; }
+
+    /* [수정 3, 4] 페이지네이션 영역을 하단 컨트롤 바처럼 활용 */
+    .pagination { 
+        justify-content: space-between !important; /* 양끝 정렬 */
+        padding: 0 20px 0 20px;
+        width: 100%;
+    }
+    .pagination-dots-wrapper { display: flex; gap: 8px; align-items: center; }
+    
+    /* 모바일 하단 아이콘 버튼 스타일 */
+    .mobile-bottom-btn {
+        display: flex; align-items: center; justify-content: center;
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        background: var(--bg-card);
+        border: 1px solid var(--btn-border);
+        color: var(--text-sub);
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        font-size: 18px;
+    }
+    .mobile-bottom-btn svg { width: 18px; height: 18px; fill: currentColor; }
 
     .main-footer { 
         padding: 25px 15px; 
@@ -1032,6 +1066,22 @@ function renderSidebar() {
           }
         });
 
+        // [수정] 모바일 하단 제어 (설정(좌) - 점점(중) - 테마(우))
+        const isMobile = window.innerWidth <= 768;
+
+        // 1. 설정 버튼 (모바일 좌측)
+        if(isMobile) {
+            const setBtn = document.createElement('div');
+            setBtn.className = 'mobile-bottom-btn';
+            setBtn.innerHTML = '⚙️';
+            setBtn.onclick = openSettings;
+            pagination.appendChild(setBtn);
+        }
+
+        // 2. 페이지네이션 점들 (중앙)
+        const dotsWrapper = document.createElement('div');
+        dotsWrapper.className = 'pagination-dots-wrapper';
+        
         for(let i=1; i<=totalPages; i++) {
             const dot = document.createElement('div');
             dot.className = `page-dot ${i === currentPage ? 'active' : ''}`;
@@ -1040,9 +1090,9 @@ function renderSidebar() {
                 currentPage = i; 
                 renderCards(true); 
             };
-            pagination.appendChild(dot);
+            dotsWrapper.appendChild(dot);
         }
-        
+
         if(isAdmin && !isPreview) {
             const addPageBtn = document.createElement('div');
             addPageBtn.className = 'page-dot';
@@ -1056,10 +1106,28 @@ function renderSidebar() {
                 currentPage = Math.ceil(globalData.categories.length / itemsPerPage);
                 renderCards(true);
             };
-            pagination.appendChild(addPageBtn);
+            dotsWrapper.appendChild(addPageBtn);
         }
+        pagination.appendChild(dotsWrapper);
+
+        // 3. 테마 버튼 (모바일 우측)
+        if(isMobile) {
+            const themeBtn = document.createElement('div');
+            themeBtn.className = 'mobile-bottom-btn';
+            // viewer_list.html과 동일한 아이콘
+            themeBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg>';
+            themeBtn.onclick = toggleThemeMobile;
+            pagination.appendChild(themeBtn);
+        }
+
         updateHeadline();
     }
+  }
+
+  // [추가] 모바일용 테마 토글 함수
+  function toggleThemeMobile() {
+      const current = localStorage.getItem('kac_theme') || 'light';
+      setTheme(current === 'light' ? 'dark' : 'light');
   }
 
   function handleDragStart(e, idx) { dragSrcIndex = idx; e.target.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
