@@ -741,24 +741,21 @@
 <audio id="mainAudio"></audio>
 
 <div class="bottom-nav">
-  <!-- 1. 뒤로가기 버튼 -->
-  <div class="nav-item" onclick="history.back()">
-    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-    뒤로가기
-  </div>
-
-  <!-- 2. 홈으로 버튼 -->
-  <div class="nav-item" onclick="location.href='index.html'">
-    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-    홈으로
+  <div class="nav-left-group">
+      <div class="nav-item" onclick="history.back()">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        뒤로가기
+      </div>
+      <div class="nav-item" onclick="location.href='index.html'">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        홈으로
+      </div>
   </div>
   
-  <!-- 3. 모바일용 테마 버튼 (PC에서는 CSS에 의해 자동으로 숨겨집니다) -->
-  <div class="mobile-theme-btn" onclick="toggleThemeMobile()">
+  <div class="mobile-theme-btn" onclick="toggleMobileTheme()">
       <svg id="mThemeIcon" viewBox="0 0 24 24"></svg>
   </div>
 </div>
- 
 
 <div class="creator-info">Developed by <b>DooSeok, JANG</b> (jds0616@airport.co.kr)</div>
 
@@ -903,49 +900,57 @@ function renderSidebar() {
           if(!tid) return;
           const style = JSON.parse(localStorage.getItem(`kac_style_${tid}`) || '{}');
           
-          // [추가] 접근 권한 및 사이드바 노출 여부 체크 (인덱스 설정 연동)
+          // 1. [보안] 카테고리 접근 권한 체크
           const acc = style.access || { visible: true, adminOnly: false, showSidebar: true };
-
-          // 일반 사용자: 비공개거나, 관리자 전용이거나, 사이드바 미노출이면 아예 건너뜀
           if (!isAdmin) {
               if (!acc.visible || acc.adminOnly || !acc.showSidebar) return;
           }
-
-          // 관리자: 숨겨진 메뉴는 흐리게 표시 + (숨김) 텍스트 추가
           const hiddenStyle = (isAdmin && (!acc.visible || acc.adminOnly || !acc.showSidebar)) ? 'opacity: 0.5;' : '';
           const hiddenLabel = (isAdmin && (!acc.visible || acc.adminOnly || !acc.showSidebar)) ? '<span style="font-size:10px; margin-left:5px;">(숨김)</span>' : '';
 
+          // 2. [UI] 현재 보고 있는 카테고리인지 확인 (자동 펼침 및 강조)
+          const isActive = tid === type; // URL의 type과 일치하면 활성화
+          const itemClass = isActive ? 'sb-item active' : 'sb-item';
+          
           const ms = JSON.parse(localStorage.getItem(`kac_menu_${tid}`) || '[]');
+          
+          // 화살표 방향 설정 (활성화된 메뉴면 아래로, 아니면 옆으로)
+          const arrow = ms.length > 0 ? `<span class="sb-toggle">${isActive ? '▼' : '▶'}</span>` : '';
           
           let subHtml = '';
           if(ms.length > 0) {
-              subHtml = `<div class="sb-sub-list" id="sb-${tid}">`;
+              // 활성화된 카테고리면 목록을 미리 펼쳐둠 (open 클래스 추가)
+              const listClass = isActive ? 'sb-sub-list open' : 'sb-sub-list';
+              
+              subHtml = `<div class="${listClass}" id="sb-sub-${tid}">`;
               ms.forEach(m => {
-                  // [추가] 메뉴별 비공개 체크
+                  // 3. [보안] 개별 메뉴 비공개 체크
                   const isMenuVisible = (m.visible !== undefined) ? m.visible : true;
                   
-                  // 관리자이거나, 공개된 메뉴일 때만 표시
                   if(isAdmin || isMenuVisible) {
-                      // 관리자일 경우 비공개 메뉴에 (비공개) 표시
+                      // 4. [UI] 현재 보고 있는 메뉴인지 확인 (색상 강조)
+                      // URL의 type과 메뉴ID가 모두 일치해야 함
+                      const isSubActive = (tid === type && m.dataId === menuId);
+                      const subClass = isSubActive ? 'sb-sub-item active' : 'sb-sub-item';
+                      
                       const privateLabel = (!isMenuVisible && isAdmin) ? '<span style="color:red;font-size:10px;margin-left:3px;">(비공개)</span>' : '';
                       
-                      subHtml += `<div class="sb-sub-item" onclick="location.href='viewer_list.html?type=${tid}&menu=${encodeURIComponent(m.label)}&id=${m.dataId}'">
+                      subHtml += `<div class="${subClass}" onclick="location.href='viewer_list.html?type=${tid}&menu=${encodeURIComponent(m.label)}&id=${m.dataId}'">
                           ${m.label} ${privateLabel}
                       </div>`;
                   }
               });
-              subHtml += `</div>`;
+              subHtml += '</div>';
           }
 
           const item = document.createElement('div');
-          // style="${hiddenStyle}" 적용
           item.innerHTML = `
-            <div class="sb-item ${tid===type?'active':''}" onclick="toggleSub('${tid}')" style="${hiddenStyle}">
+            <div class="${itemClass}" onclick="toggleSubMenu('${tid}', this)" style="${hiddenStyle}">
                 <span style="display:flex;align-items:center;gap:10px;">
-                    <span style="width:10px;height:10px;border-radius:50%;background:${style.color}"></span>
-                    ${style.name} ${hiddenLabel}
+                    <span style="width:10px;height:10px;border-radius:50%;background:${style.color || '#2563eb'}"></span>
+                    ${style.name || tid} ${hiddenLabel}
                 </span>
-                <span>${ms.length>0 ? '▼' : ''}</span>
+                ${arrow}
             </div>
             ${subHtml}
           `;
