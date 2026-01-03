@@ -375,6 +375,8 @@
   body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(255, 255, 255, 0.3); }
   body.dark-mode .nav-item { color: #e2e8f0; opacity: 1; }
 
+  .mobile-only-nav { display: none; }
+
   .icon-mobile { display: none; }
   .icon-pc { display: block; }
 
@@ -472,6 +474,8 @@
     body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.98) !important; }
     .nav-item { font-size: 14px !important; gap: 6px !important; font-weight: 800 !important; }
     .nav-icon { width: 20px !important; height: 20px !important; }
+
+    .mobile-only-nav { display: flex !important; }
   } 
 
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none !important; align-items: center; justify-content: center; }
@@ -652,6 +656,10 @@
   <div class="nav-item" onclick="location.href='index.html'">
     <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
     홈으로
+  </div>
+  <div class="nav-item mobile-only-nav" onclick="toggleThemeMobile()">
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg>
+    테마
   </div>
 </div>
 
@@ -880,7 +888,7 @@
 
           bar.innerHTML = `
               <div class="last-viewed-icon">
-                <svg class="icon-pc" viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                <svg class="icon-pc" viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
                 <svg class="icon-mobile" viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
                 <span>Last Viewed</span>
               </div>
@@ -1126,6 +1134,12 @@
       localStorage.setItem('kac_theme', m);
       document.getElementById('btnDay').classList.toggle('active', m==='light'); 
       document.getElementById('btnNight').classList.toggle('active', m==='dark'); 
+  }
+
+  // [추가] 모바일 전용 토글 함수
+  function toggleThemeMobile() {
+      const current = localStorage.getItem('kac_theme') || 'light';
+      setTheme(current === 'light' ? 'dark' : 'light');
   }
   
   function toggleSidebar() {
