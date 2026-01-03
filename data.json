@@ -35,7 +35,7 @@
           "subjects": [
             {
               "id": "1767153322891eajzk",
-              "name": "기초 정리",
+              "name": "직류회로 기초 (A)",
               "active": true,
               "pdfName": "/BASIC/무선기초_CH1",
               "link": "",
@@ -43,7 +43,7 @@
             },
             {
               "id": "1767153322891f7qa0",
-              "name": "직류 회로",
+              "name": "직류 직/병렬회로 (B)",
               "active": true,
               "pdfName": "/BASIC/무선기초_CH2",
               "link": "",
@@ -51,7 +51,7 @@
             },
             {
               "id": "1767153487875",
-              "name": "직류회로 (통합본)",
+              "name": "직류회로 (A,B 통합본)",
               "active": true,
               "pdfName": "/BASIC/무선기초_CH3",
               "link": "",
@@ -874,7 +874,7 @@
       "access": {
         "visible": false,
         "adminOnly": true,
-        "showSidebar": true
+        "showSidebar": false
       },
       "menus": [
         {
