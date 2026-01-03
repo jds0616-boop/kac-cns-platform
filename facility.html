@@ -452,30 +452,11 @@
     ---------------------------------------------------- */
     .preview-popup { display: none !important; }
 
-/* [수정] 명함 카드(루트 섹션) 영역: z-index를 높여서 가림막 역할 수행 */
     .root-section { 
-        width: 100%; 
-        height: auto; 
-        padding: 20px 20px 10px 20px; /* 하단 패딩 살짝 조정 */
-        justify-content: center; 
-        
-        /* [핵심 1] 화면 상단에 고정 */
-        position: sticky; 
-        top: 0; 
-        
-        /* [핵심 2] 불투명한 배경색 (뒤로 지나가는 메뉴 가리기용) */
-        background: var(--bg-main); 
-        
-        /* [핵심 3] 메뉴 리스트(z-index:20)보다 훨씬 높게 설정 */
-        z-index: 100 !important; 
-        
-        /* 구분선 그림자 추가 (선택사항: 상단 영역과 리스트 구분) */
-        box-shadow: 0 10px 20px -10px rgba(0,0,0,0.1);
-        
-        margin-top: 0; 
-        flex-direction: row; 
-        gap: 10px; 
-        flex-wrap: wrap;
+        width: 100%; height: auto; padding: 20px 20px 0 20px; 
+        justify-content: center; position: sticky; top: 0; 
+        background: var(--bg-main); z-index: 20; 
+        margin-top: 0; flex-direction: row; gap: 10px; flex-wrap: wrap;
     }
     
     .root-card-integrated { 
