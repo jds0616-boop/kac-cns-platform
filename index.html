@@ -829,17 +829,21 @@
       ov.classList.toggle('active');
   }
 
-  function renderSidebar() {
+function renderSidebar() {
       const content = document.getElementById('sidebarContent');
       content.innerHTML = '';
       
       const cats = globalData.categories.filter(c => {
           if (c === null) return false;
           const acc = c.access || { visible: true, adminOnly: false, showSidebar: true };
-          if (!isAdmin) {
-              if (!acc.visible || acc.adminOnly) return false;
-          }
-          if (!acc.showSidebar && !isAdmin) return false; 
+          
+          // [수정 1] 카테고리 필터링
+          // 비공개(visible:false)거나 사이드바 미노출(showSidebar:false)이면 관리자 여부 상관없이 제외
+          if (!acc.visible || !acc.showSidebar) return false;
+          
+          // 관리자 전용(adminOnly)인데 관리자가 아니면 제외
+          if (acc.adminOnly && !isAdmin) return false;
+          
           return true;
       });
 
@@ -850,9 +854,10 @@
 
       cats.forEach((cat, cIdx) => {
           const acc = cat.access || { visible: true, adminOnly: false, showSidebar: true };
+          
+          // 관리자 전용일 때만 표시할 접두어 (비공개는 위에서 걸러지므로 로직 삭제)
           let namePrefix = "";
-          if (isAdmin && !acc.visible) namePrefix = "(비공개) ";
-          else if (isAdmin && acc.adminOnly) namePrefix = "(관리자) ";
+          if (isAdmin && acc.adminOnly) namePrefix = "(관리자) ";
           
           const item = document.createElement('div');
           
@@ -860,19 +865,23 @@
           if(cat.menus && cat.menus.length > 0) {
               subHtml = `<div class="sb-sub-list" id="sb-sub-${cat.id}">`;
               cat.menus.forEach(m => {
-                  // [수정] 사이드바 서브메뉴 렌더링 시 비공개 메뉴 처리
+                  // [수정 2] 하위 메뉴 필터링
+                  // 메뉴가 공개(visible:true)인 경우에만 렌더링 (관리자도 비공개 메뉴는 안 보임)
                   const isMenuVisible = (m.visible !== undefined) ? m.visible : true;
-                  if(isAdmin || isMenuVisible) {
+                  
+                  if(isMenuVisible) {
                       subHtml += `<div class="sb-sub-item" onclick="location.href='viewer_list.html?type=${cat.id}&menu=${encodeURIComponent(m.label)}&id=${m.id}'">
-                          ${m.label} ${(!isMenuVisible && isAdmin) ? '<span style="color:red;font-size:10px;">(비공개)</span>' : ''}
+                          ${m.label}
                       </div>`;
                   }
               });
               subHtml += `</div>`;
           }
 
+          // 하위 메뉴가 모두 비공개라 subHtml이 비어있어도 카테고리는 표시 (필요시 이 부분도 제어 가능)
+
           item.innerHTML = `
-            <div class="sb-item" onclick="toggleSubMenu('${cat.id}', this)" style="${(!acc.showSidebar && isAdmin) ? 'opacity:0.5;' : ''}">
+            <div class="sb-item" onclick="toggleSubMenu('${cat.id}', this)">
                 <span style="display:flex;align-items:center;gap:10px;">
                     <span style="width:10px;height:10px;border-radius:50%;background:${cat.color}"></span>
                     ${namePrefix}${cat.name}
