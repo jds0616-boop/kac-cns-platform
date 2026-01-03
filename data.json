@@ -304,14 +304,6 @@
           "link": "",
           "subjects": [
             {
-              "id": "1767154985939",
-              "name": "VDL 실무 (사내강사 : 임석용)",
-              "active": true,
-              "pdfName": "/COMM/통신이론_CH23",
-              "link": "",
-              "audioName": ""
-            },
-            {
               "id": "1766848136942",
               "name": "항공통신용 데이터링크 (PART #1)",
               "active": true,
@@ -335,6 +327,14 @@
               "id": "1766848150926",
               "name": "항공통신용 데이터링크 (PART #4)",
               "pdfName": "/COMM/통신이론_CH17",
+              "audioName": ""
+            },
+            {
+              "id": "1767154985939",
+              "name": "VDL 실무 (사내강사 : 임석용)",
+              "active": true,
+              "pdfName": "/COMM/통신이론_CH23",
+              "link": "",
               "audioName": ""
             },
             {
