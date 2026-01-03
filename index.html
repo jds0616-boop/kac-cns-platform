@@ -159,8 +159,8 @@
   .card { background: var(--bg-card); width: 280px; height: 280px; padding: 30px 20px; border-radius: 25px; box-shadow: var(--shadow); border: var(--border-card); cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; border-left: 10px solid transparent; color: var(--text-main); --card-color: #64748b; border-left-color: var(--card-color); z-index: 1; }
   .card:hover { transform: translateY(-10px); border-color: var(--card-color); box-shadow: 0 15px 30px -5px var(--card-color); z-index: 2; }
   
-  /* [추가] 관리자 모드에서 비공개/권한 카드 스타일 */
-  .card.restricted-view { opacity: 0.6; border: 2px dashed #94a3b8; }
+  /* 관리자 모드에서 비공개/권한 카드 스타일 */
+  .card.restricted-view { opacity: 0.7; border: 2px dashed #94a3b8; }
   .card.restricted-view:hover { opacity: 1; border-style: solid; }
 
   /* 빈칸 슬롯 스타일 (안보이게) */
@@ -313,7 +313,7 @@
   .setting-label { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; display: block; }
   .setting-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--text-main); font-size: 14px; outline: none; }
   
-  /* [추가] 체크박스 그룹 스타일 */
+  /* 체크박스 그룹 스타일 */
   .checkbox-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; background: var(--btn-bg); padding: 15px; border-radius: 10px; border: 1px solid var(--btn-border); }
   .checkbox-item { display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer; }
   .checkbox-item input { width: 16px; height: 16px; cursor: pointer; }
@@ -564,7 +564,7 @@
     <div class="setting-group"><label class="setting-label">아이콘 코드 (영문 1자)</label><input type="text" id="editCode" class="setting-input"></div>
     <div class="setting-group"><label class="setting-label">테마 색상</label><input type="color" id="editColor" style="width:100%; height:40px; cursor:pointer;"></div>
     
-    <!-- [추가] 공개/관리자/사이드바 설정 -->
+    <!-- 공개/관리자/사이드바 설정 -->
     <div class="checkbox-group">
         <label class="setting-label">노출 및 권한 설정</label>
         <label class="checkbox-item"><input type="checkbox" id="chkVisible" checked> <span>공개 여부 (체크 시 사용자에게 보임)</span></label>
@@ -729,7 +729,7 @@
             const s = JSON.parse(localStorage.getItem(`kac_style_${id}`) || '{}');
             const ms = JSON.parse(localStorage.getItem(`kac_menu_${id}`) || '[]');
             
-            // [추가] access 정보 복원
+            // access 정보 복원
             const access = s.access || { visible: true, adminOnly: false, showSidebar: true };
 
             const menuList = ms.map(m => {
@@ -761,11 +761,6 @@
   });
 
   function ensurePageSlots() {
-    // 렌더링 시 필터링을 하기 때문에 데이터 자체는 null 슬롯을 유지하되, 
-    // 실제 페이지 계산에서는 보이는 아이템 기준으로 하지 않고 '슬롯' 기준으로 함.
-    // 다만 권한에 따라 안보이는 카드는 '슬롯'을 차지하되 빈 공간처럼 보일 수 있음.
-    // 여기서는 기존 로직 유지 (슬롯 = 데이터 상의 위치)
-    
     const cleanList = globalData.categories.filter(c => c !== null);
     globalData.categories = cleanList;
     if (globalData.categories.length % itemsPerPage !== 0) {
@@ -782,7 +777,6 @@
     data.categories.forEach(cat => {
       if(cat) {
         order.push(cat.id);
-        // [수정] access 정보 함께 저장
         const access = cat.access || { visible: true, adminOnly: false, showSidebar: true };
         localStorage.setItem(`kac_style_${cat.id}`, JSON.stringify({ name: cat.name, code: cat.code, color: cat.color, access: access }));
         
@@ -830,18 +824,13 @@
       
       const cats = globalData.categories.filter(c => {
           if (c === null) return false;
-          // [수정] 사이드바 노출 권한 체크
           const acc = c.access || { visible: true, adminOnly: false, showSidebar: true };
           if (!isAdmin) {
-              if (!acc.visible) return false;
-              if (acc.adminOnly) return false;
+              // 게스트: 비공개 또는 관리자전용이면 숨김
+              if (!acc.visible || acc.adminOnly) return false;
           }
           if (!acc.showSidebar && !isAdmin) return false; 
-          // 관리자는 showSidebar가 꺼져있어도 보이게 할지 선택 가능하나, 보통은 설정대로 안보이는게 맞음.
-          // 다만 관리자 편의를 위해 설정값과 무관하게 다 보여주거나, 혹은 반투명으로 보여줄 수 있음.
-          // 여기서는 관리자라도 'ShowSidebar'가 false면 안보이게 처리하되, 'AdminOnly'인 것은 관리자에게만 보이게 함.
-          if (!acc.showSidebar && isAdmin) return true; // 관리자는 목록 확인 필요하므로 일단 표시 (원하면 조건 변경 가능)
-          
+          // 관리자는 목록에서 다 보여주되 시각적으로 구분
           return true;
       });
 
@@ -854,7 +843,8 @@
           const acc = cat.access || { visible: true, adminOnly: false, showSidebar: true };
           // 사이드바에서 숨겨진 항목 시각적 표시 (관리자)
           let namePrefix = "";
-          if (isAdmin && !acc.showSidebar) namePrefix = "(숨김) ";
+          if (isAdmin && !acc.visible) namePrefix = "(비공개) ";
+          else if (isAdmin && acc.adminOnly) namePrefix = "(관리자) ";
           
           const item = document.createElement('div');
           
@@ -924,7 +914,7 @@
       }
   }
 
-  /* 메인 카드 렌더링 */
+  /* 메인 카드 렌더링 (핵심 수정 부분) */
   function renderCards(animate = true) {
     const containerWrapper = document.getElementById('cardContainer');
     const pagination = document.getElementById('pagination');
@@ -945,40 +935,47 @@
         containerWrapper.innerHTML = ''; 
         pagination.innerHTML = '';
 
-        const totalPages = Math.ceil(globalData.categories.length / itemsPerPage) || 1;
-        if(currentPage > totalPages) currentPage = totalPages;
-        const startIdx = (currentPage - 1) * itemsPerPage;
-        const pageItems = globalData.categories.slice(startIdx, startIdx + itemsPerPage);
+        // [수정] 렌더링 대상 리스트 결정
+        let renderList = [];
+        
+        if (isAdmin) {
+            // 관리자는 모든 슬롯(빈칸 포함)을 그대로 보여줌
+            renderList = globalData.categories;
+        } else {
+            // 게스트는 비공개/관리자전용 제외하고, 빈칸(null)도 제외하여 순수 리스트만 생성
+            renderList = globalData.categories.filter(cat => {
+                if(!cat) return false;
+                const acc = cat.access || { visible: true, adminOnly: false, showSidebar: true };
+                // 공개 여부가 false이거나, 관리자 전용이면 제외
+                if(!acc.visible || acc.adminOnly) return false;
+                return true;
+            });
+        }
 
+        const totalPages = Math.ceil(renderList.length / itemsPerPage) || 1;
+        if(currentPage > totalPages) currentPage = 1; // 페이지 범위 초과 시 1페이지로 리셋
+        const startIdx = (currentPage - 1) * itemsPerPage;
+        const pageItems = renderList.slice(startIdx, startIdx + itemsPerPage);
+
+        // 페이지 아이템 렌더링
         pageItems.forEach((cat, i) => {
-          const globalIdx = startIdx + i;
-          
+          // 원래 globalData에서의 인덱스를 찾아야 수정/이동 기능이 작동함 (관리자용)
+          let globalIdx = -1;
+          if(isAdmin) {
+             globalIdx = startIdx + i;
+          }
+
           if(cat) { 
-            // [수정] 접근 권한 체크 로직
             const acc = cat.access || { visible: true, adminOnly: false, showSidebar: true };
             const isHidden = !acc.visible;
             const isAdminOnly = acc.adminOnly;
             
-            // 일반 사용자는 비공개 or 관리자전용 숨김
-            if (!isAdmin && (isHidden || isAdminOnly)) {
-                 // 자리는 차지하지 않거나, 빈칸으로 처리? 
-                 // -> 슬롯 시스템이므로 '빈칸' 처럼 보여야 페이지가 밀리지 않음.
-                 // -> 하지만 그냥 안보이면 됨. 여기서는 display: none 처리는 레이아웃 깨짐.
-                 // -> 아예 렌더링을 안하면 페이지네이션 갯수가 안맞음.
-                 // -> 따라서 '빈 슬롯'으로 렌더링하거나 아예 제외. 
-                 // -> 여기서는 아예 빈 div로 대체하여 공간 확보 (레이아웃 유지)
-                 const spacer = document.createElement('div');
-                 spacer.className = 'card empty-placeholder'; // 안보임
-                 containerWrapper.appendChild(spacer);
-                 return;
-            }
-
             const card = document.createElement('div');
             card.className = 'card';
             card.style.setProperty('--card-color', cat.color);
             card.onclick = () => location.href = `facility.html?type=${cat.id}`;
             
-            // 관리자 뷰에서 비공개/권한제한 표시
+            // 관리자 뷰에서 비공개/권한제한 시각적 표시
             if (isAdmin && (isHidden || isAdminOnly)) {
                 card.classList.add('restricted-view');
             }
@@ -992,7 +989,7 @@
               
               let statusBadges = "";
               if(isHidden) statusBadges += "🚫비공개 ";
-              if(isAdminOnly) statusBadges += "🔒관리자용 ";
+              if(isAdminOnly) statusBadges += "🔒관리자전용 ";
 
               card.innerHTML = `
                 <div class="card-ctrl" onclick="event.stopPropagation()">
@@ -1002,13 +999,14 @@
                 </div>
                 <div class="icon-box">${cat.code}</div>
                 <h2>${cat.name}</h2>
-                ${statusBadges ? `<div style="position:absolute; bottom:10px; font-size:11px; color:red; font-weight:700;">${statusBadges}</div>` : ''}
+                ${statusBadges ? `<div style="position:absolute; bottom:15px; font-size:12px; color:red; font-weight:800; background:rgba(255,255,255,0.8); padding:2px 8px; border-radius:10px;">${statusBadges}</div>` : ''}
               `;
             } else {
                 card.innerHTML = `<div class="icon-box">${cat.code}</div><h2>${cat.name}</h2>`;
             }
             containerWrapper.appendChild(card);
           } else { 
+            // 빈칸 (관리자 모드에서만 렌더링됨)
             const empty = document.createElement('div');
             empty.className = 'card add-slot';
             if(isAdmin && !isPreview) {
@@ -1032,6 +1030,7 @@
             pagination.appendChild(dot);
         }
         
+        // 관리자용 페이지 추가 버튼
         if(isAdmin && !isPreview) {
             const addPageBtn = document.createElement('div');
             addPageBtn.className = 'page-dot';
@@ -1060,7 +1059,7 @@
     searchIndex = [];
     globalData.categories.forEach(cat => {
       if(!cat) return;
-      // [수정] 검색 인덱스 생성 시 권한 체크
+      // 검색 인덱스 생성 시 권한 체크
       const acc = cat.access || { visible: true, adminOnly: false, showSidebar: true };
       if (!isAdmin) {
           if (!acc.visible || acc.adminOnly) return;
@@ -1470,7 +1469,7 @@
       document.getElementById('editName').value = '';
       document.getElementById('editCode').value = '';
       document.getElementById('editColor').value = '#2563eb';
-      // [추가] 신규 생성 시 기본값
+      // 신규 생성 시 기본값
       document.getElementById('chkVisible').checked = true;
       document.getElementById('chkAdminOnly').checked = false;
       document.getElementById('chkSidebar').checked = true;
@@ -1480,7 +1479,6 @@
       document.getElementById('editCode').value = t.code;
       document.getElementById('editColor').value = t.color;
       
-      // [추가] 저장된 값 불러오기
       const acc = t.access || { visible: true, adminOnly: false, showSidebar: true };
       document.getElementById('chkVisible').checked = acc.visible;
       document.getElementById('chkAdminOnly').checked = acc.adminOnly;
@@ -1494,7 +1492,7 @@
     const code = document.getElementById('editCode').value;
     const color = document.getElementById('editColor').value;
     
-    // [추가] 체크박스 값 읽기
+    // 체크박스 값 읽기
     const access = {
         visible: document.getElementById('chkVisible').checked,
         adminOnly: document.getElementById('chkAdminOnly').checked,
@@ -1513,7 +1511,7 @@
       const t = globalData.categories.find(c => c && c.id === editingCardId);
       if(t) { 
           t.name = name; t.code = code; t.color = color; 
-          t.access = access; // [수정] access 업데이트
+          t.access = access; // access 업데이트
       }
     }
     syncToLocalStorage(globalData);
