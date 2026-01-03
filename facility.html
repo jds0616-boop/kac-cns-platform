@@ -428,9 +428,12 @@
         margin: 0 10px;
     }
 
-    /* 공간 확보를 위해 로고와 테마 버튼 숨김 */
-    .logo-text { display: none !important; }
-    .theme-toggle { display: none !important; }
+/* [수정] 2. 공간 확보를 위해 불필요한 요소 모두 숨김 */
+    .logo-text { display: none !important; }   /* 텍스트 로고 숨김 */
+    .breadcrumb { display: none !important; }  /* 경로 텍스트 숨김 */
+    
+    /* [핵심] 오른쪽 영역(설정, 테마, 이미지 로고) 통째로 숨김 */
+    .header-right { display: none !important; }
 
     /* 검색 입력창 스타일 */
     .header-search {
