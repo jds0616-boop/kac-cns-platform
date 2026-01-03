@@ -200,6 +200,9 @@
   .footer-edit-btn:hover { opacity: 1; background: rgba(255,255,255,0.1); }
   body.admin-mode .footer-edit-btn { display: inline-block; }
 
+  /* 모바일용 떠있는 테마 버튼 */
+  .mobile-theme-float { display: none; }
+
   /* ========================================= */
   /* [모바일 전용 최적화] */
   /* ========================================= */
@@ -233,89 +236,96 @@
         height: auto !important; 
         overflow: visible; 
         padding-top: 155px !important; 
-        padding-bottom: 0; 
+        padding-bottom: 120px; /* 푸터 높이만큼 여백 확보 */
         display: block; 
     }
     
     .center-content-box { display: block; width: 100%; }
 
     .header-left { flex: 0 0 auto; }
-    /* [수정 2] 모바일 헤더 타이틀 크기 확대 (18px -> 22px) */
+    
+    /* [수정 1] 모바일 헤더 타이틀 크기 축소 및 잘림 방지 */
     .logo-text { 
         position: absolute; 
         left: 50%; 
         transform: translateX(-50%); 
-        font-size: 22px !important; /* 확대됨 */
+        font-size: 16px !important; /* 축소 */
         font-weight: 800;
-        max-width: 60%; 
+        max-width: 90%; /* 늘림 */
         text-align: center;
         white-space: nowrap; 
     }
+    
     .kac-logo-img { display: none; }
     .header-center-title { display: none; }
     
     .header-right { gap: 8px; }
 
     .theme-toggle { display: none !important; }
-    
-    /* [수정 3] 상단 헤더의 설정 버튼 숨김 (하단으로 이동) */
     .settings-btn { display: none; }
 
     #cardContainerWrapper { padding: 0 15px; }
+    /* [수정 5] 리스트 연속 출력을 위한 flex column */
     #cardContainer { gap: 15px; padding: 10px 0; min-height: auto; flex-direction: column; flex-wrap: nowrap; }
     
     .card.empty-placeholder { display: none !important; }
 
-    /* [수정 1] 카드(버튼) 높이 축소 (약 2/3 수준) */
+    /* [수정 2] 카드(버튼) 높이 더 축소 (50px) */
     .card { 
       width: 100%; 
       height: auto; 
-      min-height: 60px; /* 90px -> 60px 축소 */
+      min-height: 50px; /* 50px로 축소 */
       flex-direction: row; justify-content: flex-start; 
-      padding: 12px 15px; /* 패딩 축소 */
+      padding: 10px 12px; /* 패딩 축소 */
       gap: 15px; 
       border-radius: 15px;
     }
     .card:hover { transform: translateY(-3px); }
     /* 아이콘 박스 크기 축소 */
     .icon-box { 
-        width: 40px; height: 40px; 
-        border-radius: 10px; margin-bottom: 0; 
-        font-size: 20px; flex-shrink: 0; 
+        width: 36px; height: 36px; 
+        border-radius: 8px; margin-bottom: 0; 
+        font-size: 18px; flex-shrink: 0; 
     }
-    .card h2 { font-size: 16px; text-align: left; word-break: keep-all; flex: 1; }
+    .card h2 { font-size: 15px; text-align: left; word-break: keep-all; flex: 1; }
     .card-ctrl { top: 50%; right: 10px; transform: translateY(-50%); width: auto; flex-direction: row; }
     .btn-sm { padding: 6px 10px; }
 
-    /* [수정 3, 4] 페이지네이션 영역을 하단 컨트롤 바처럼 활용 */
-    .pagination { 
-        justify-content: space-between !important; /* 양끝 정렬 */
-        padding: 0 20px 0 20px;
-        width: 100%;
+    /* [수정 4] 페이지네이션(회색박스) 제거 */
+    #pagination { display: none !important; }
+
+    /* [수정 3] 하단바 고정 */
+    .main-footer { 
+        padding: 20px 15px; 
+        margin-top: 0; 
+        position: fixed !important; 
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        height: auto; 
+        z-index: 5500;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
     }
-    .pagination-dots-wrapper { display: flex; gap: 8px; align-items: center; }
-    
-    /* 모바일 하단 아이콘 버튼 스타일 */
-    .mobile-bottom-btn {
-        display: flex; align-items: center; justify-content: center;
+    .main-footer p { font-size: 11px; white-space: normal; }
+
+    /* [수정 7] 주/야간 아이콘 플로팅 (하단바 좌측 위) */
+    .mobile-theme-float {
+        display: flex !important;
+        position: fixed;
+        bottom: 25px; /* 하단바 위에 살짝 걸치거나 위로 */
+        left: 15px;
+        z-index: 6000;
         width: 36px; height: 36px;
         border-radius: 50%;
         background: var(--bg-card);
         border: 1px solid var(--btn-border);
         color: var(--text-sub);
+        align-items: center; justify-content: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         cursor: pointer;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        font-size: 18px;
     }
-    .mobile-bottom-btn svg { width: 18px; height: 18px; fill: currentColor; }
-
-    .main-footer { 
-        padding: 25px 15px; 
-        margin-top: 30px; 
-        position: static !important; 
-        height: auto; 
-    }
-    .main-footer p { font-size: 11px; white-space: normal; }
+    .mobile-theme-float svg { width: 18px; height: 18px; fill: currentColor; }
   }
 
   #loadingSpinner { position: fixed; inset: 0; background: var(--bg-main); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
@@ -434,6 +444,11 @@
       <main id="cardContainer"></main>
     </div>
     <div id="pagination" class="pagination"></div>
+  </div>
+
+  <!-- 모바일용 플로팅 테마 버튼 -->
+  <div class="mobile-theme-float" onclick="toggleThemeMobile()">
+      <svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg>
   </div>
 
   <!-- 하단바 (Footer) -->
@@ -883,49 +898,58 @@ function renderSidebar() {
 
       if(cats.length === 0) {
           content.innerHTML = '<div style="padding:20px; text-align:center; color:#94a3b8;">메뉴가 없습니다.</div>';
-          return;
+      } else {
+          cats.forEach((cat, cIdx) => {
+              const acc = cat.access || { visible: true, adminOnly: false, showSidebar: true };
+              
+              // 관리자 전용일 때만 표시할 접두어 (비공개는 위에서 걸러지므로 로직 삭제)
+              let namePrefix = "";
+              if (isAdmin && acc.adminOnly) namePrefix = "(관리자) ";
+              
+              const item = document.createElement('div');
+              
+              let subHtml = '';
+              if(cat.menus && cat.menus.length > 0) {
+                  subHtml = `<div class="sb-sub-list" id="sb-sub-${cat.id}">`;
+                  cat.menus.forEach(m => {
+                      // [수정 2] 하위 메뉴 필터링
+                      // 메뉴가 공개(visible:true)인 경우에만 렌더링 (관리자도 비공개 메뉴는 안 보임)
+                      const isMenuVisible = (m.visible !== undefined) ? m.visible : true;
+                      
+                      if(isMenuVisible) {
+                          subHtml += `<div class="sb-sub-item" onclick="location.href='viewer_list.html?type=${cat.id}&menu=${encodeURIComponent(m.label)}&id=${m.id}'">
+                              ${m.label}
+                          </div>`;
+                      }
+                  });
+                  subHtml += `</div>`;
+              }
+
+              item.innerHTML = `
+                <div class="sb-item" onclick="toggleSubMenu('${cat.id}', this)">
+                    <span style="display:flex;align-items:center;gap:10px;">
+                        <span style="width:10px;height:10px;border-radius:50%;background:${cat.color}"></span>
+                        ${namePrefix}${cat.name}
+                    </span>
+                    <span class="sb-toggle">▶</span>
+                </div>
+                ${subHtml}
+              `;
+              content.appendChild(item);
+          });
       }
 
-      cats.forEach((cat, cIdx) => {
-          const acc = cat.access || { visible: true, adminOnly: false, showSidebar: true };
-          
-          // 관리자 전용일 때만 표시할 접두어 (비공개는 위에서 걸러지므로 로직 삭제)
-          let namePrefix = "";
-          if (isAdmin && acc.adminOnly) namePrefix = "(관리자) ";
-          
-          const item = document.createElement('div');
-          
-          let subHtml = '';
-          if(cat.menus && cat.menus.length > 0) {
-              subHtml = `<div class="sb-sub-list" id="sb-sub-${cat.id}">`;
-              cat.menus.forEach(m => {
-                  // [수정 2] 하위 메뉴 필터링
-                  // 메뉴가 공개(visible:true)인 경우에만 렌더링 (관리자도 비공개 메뉴는 안 보임)
-                  const isMenuVisible = (m.visible !== undefined) ? m.visible : true;
-                  
-                  if(isMenuVisible) {
-                      subHtml += `<div class="sb-sub-item" onclick="location.href='viewer_list.html?type=${cat.id}&menu=${encodeURIComponent(m.label)}&id=${m.id}'">
-                          ${m.label}
-                      </div>`;
-                  }
-              });
-              subHtml += `</div>`;
-          }
-
-          // 하위 메뉴가 모두 비공개라 subHtml이 비어있어도 카테고리는 표시 (필요시 이 부분도 제어 가능)
-
-          item.innerHTML = `
-            <div class="sb-item" onclick="toggleSubMenu('${cat.id}', this)">
-                <span style="display:flex;align-items:center;gap:10px;">
-                    <span style="width:10px;height:10px;border-radius:50%;background:${cat.color}"></span>
-                    ${namePrefix}${cat.name}
-                </span>
-                <span class="sb-toggle">▶</span>
-            </div>
-            ${subHtml}
-          `;
-          content.appendChild(item);
-      });
+      // [수정 6] 모바일 사이드바 맨 아래에 '설정' 버튼 추가
+      const settingsItem = document.createElement('div');
+      settingsItem.className = 'sb-item';
+      settingsItem.style.marginTop = '20px';
+      settingsItem.style.borderTop = '1px solid var(--btn-border)';
+      settingsItem.innerHTML = `
+        <span style="display:flex;align-items:center;gap:10px;" onclick="openSettings(); toggleSidebar();">
+            ⚙️ 시스템 설정
+        </span>
+      `;
+      content.appendChild(settingsItem);
   }
 
   function toggleSubMenu(id, element) {
@@ -974,19 +998,22 @@ function renderSidebar() {
     const containerWrapper = document.getElementById('cardContainer');
     const pagination = document.getElementById('pagination');
     
+    // [수정 5] 모바일인지 체크 (768px 이하)
+    const isMobile = window.innerWidth <= 768;
+
     if(animate) {
         containerWrapper.style.opacity = '0';
         containerWrapper.style.transform = 'translateY(10px)';
         setTimeout(() => {
-            performRender();
+            performRender(isMobile);
             containerWrapper.style.opacity = '1';
             containerWrapper.style.transform = 'translateY(0)';
         }, 300);
     } else {
-        performRender();
+        performRender(isMobile);
     }
 
-    function performRender() {
+    function performRender(isMobileMode) {
         containerWrapper.innerHTML = ''; 
         pagination.innerHTML = '';
 
@@ -1003,6 +1030,19 @@ function renderSidebar() {
             });
         }
 
+        // [수정 5] 모바일일 경우 전체 목록을 필터링하여 출력 (페이지네이션 무시)
+        if(isMobileMode) {
+            const mobileList = renderList.filter(item => item !== null); // 빈칸 제외
+            mobileList.forEach((cat, i) => {
+                // 원래 globalData에서의 인덱스를 찾아야 수정/삭제가 정확함
+                const originalIdx = globalData.categories.indexOf(cat);
+                createAndAppendCard(cat, originalIdx, true); 
+            });
+            // 모바일에서는 페이지네이션 점을 생성하지 않음
+            return; 
+        }
+
+        // PC 모드: 기존 페이지네이션 로직 유지
         const totalPages = Math.ceil(renderList.length / itemsPerPage) || 1;
         if(currentPage > totalPages) currentPage = 1; 
         const startIdx = (currentPage - 1) * itemsPerPage;
@@ -1013,75 +1053,10 @@ function renderSidebar() {
           if(isAdmin) {
              globalIdx = startIdx + i;
           }
-
-          if(cat) { 
-            const acc = cat.access || { visible: true, adminOnly: false, showSidebar: true };
-            const isHidden = !acc.visible;
-            const isAdminOnly = acc.adminOnly;
-            
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.style.setProperty('--card-color', cat.color);
-            card.onclick = () => location.href = `facility.html?type=${cat.id}`;
-            
-            if (isAdmin && (isHidden || isAdminOnly)) {
-                card.classList.add('restricted-view');
-            }
-
-            if(isAdmin && !isPreview) {
-              card.setAttribute('draggable', 'true');
-              card.ondragstart = (e) => handleDragStart(e, globalIdx);
-              card.ondragover = (e) => handleDragOver(e);
-              card.ondrop = (e) => handleDrop(e, globalIdx);
-              card.ondragend = (e) => handleDragEnd(e);
-              
-              let statusBadges = "";
-              if(isHidden) statusBadges += "🚫비공개 ";
-              if(isAdminOnly) statusBadges += "🔒관리자전용 ";
-
-              card.innerHTML = `
-                <div class="card-ctrl" onclick="event.stopPropagation()">
-                  <button class="btn-sm" onclick="openEdit('${cat.id}')">수정</button>
-                  <button class="btn-sm btn-move" onclick="openMovePageModal(${globalIdx})">이동</button>
-                  <button class="btn-sm btn-del" onclick="deleteCard('${globalIdx}')">삭제</button>
-                </div>
-                <div class="icon-box">${cat.code}</div>
-                <h2>${cat.name}</h2>
-                ${statusBadges ? `<div style="position:absolute; bottom:15px; font-size:12px; color:red; font-weight:800; background:rgba(255,255,255,0.8); padding:2px 8px; border-radius:10px;">${statusBadges}</div>` : ''}
-              `;
-            } else {
-                card.innerHTML = `<div class="icon-box">${cat.code}</div><h2>${cat.name}</h2>`;
-            }
-            containerWrapper.appendChild(card);
-          } else { 
-            const empty = document.createElement('div');
-            empty.className = 'card add-slot';
-            if(isAdmin && !isPreview) {
-               empty.innerHTML = '<div style="font-size:40px;">+</div><div>카테고리 추가</div>';
-               empty.onclick = () => openEdit('NEW', globalIdx);
-               empty.ondragover = (e) => handleDragOver(e);
-               empty.ondrop = (e) => handleDrop(e, globalIdx);
-            }
-            containerWrapper.appendChild(empty);
-          }
+          createAndAppendCard(cat, globalIdx, false);
         });
 
-        // [수정] 모바일 하단 제어 (설정(좌) - 점점(중) - 테마(우))
-        const isMobile = window.innerWidth <= 768;
-
-        // 1. 설정 버튼 (모바일 좌측)
-        if(isMobile) {
-            const setBtn = document.createElement('div');
-            setBtn.className = 'mobile-bottom-btn';
-            setBtn.innerHTML = '⚙️';
-            setBtn.onclick = openSettings;
-            pagination.appendChild(setBtn);
-        }
-
-        // 2. 페이지네이션 점들 (중앙)
-        const dotsWrapper = document.createElement('div');
-        dotsWrapper.className = 'pagination-dots-wrapper';
-        
+        // 페이지네이션 점 생성 (PC만)
         for(let i=1; i<=totalPages; i++) {
             const dot = document.createElement('div');
             dot.className = `page-dot ${i === currentPage ? 'active' : ''}`;
@@ -1090,9 +1065,9 @@ function renderSidebar() {
                 currentPage = i; 
                 renderCards(true); 
             };
-            dotsWrapper.appendChild(dot);
+            pagination.appendChild(dot);
         }
-
+        
         if(isAdmin && !isPreview) {
             const addPageBtn = document.createElement('div');
             addPageBtn.className = 'page-dot';
@@ -1106,21 +1081,65 @@ function renderSidebar() {
                 currentPage = Math.ceil(globalData.categories.length / itemsPerPage);
                 renderCards(true);
             };
-            dotsWrapper.appendChild(addPageBtn);
+            pagination.appendChild(addPageBtn);
         }
-        pagination.appendChild(dotsWrapper);
-
-        // 3. 테마 버튼 (모바일 우측)
-        if(isMobile) {
-            const themeBtn = document.createElement('div');
-            themeBtn.className = 'mobile-bottom-btn';
-            // viewer_list.html과 동일한 아이콘
-            themeBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg>';
-            themeBtn.onclick = toggleThemeMobile;
-            pagination.appendChild(themeBtn);
-        }
-
         updateHeadline();
+    }
+
+    // 카드 생성 헬퍼 함수
+    function createAndAppendCard(cat, idx, isMobileRender) {
+        if(cat) { 
+            const acc = cat.access || { visible: true, adminOnly: false, showSidebar: true };
+            const isHidden = !acc.visible;
+            const isAdminOnly = acc.adminOnly;
+            
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.style.setProperty('--card-color', cat.color);
+            card.onclick = () => location.href = `facility.html?type=${cat.id}`;
+            
+            if (isAdmin && (isHidden || isAdminOnly)) {
+                card.classList.add('restricted-view');
+            }
+
+            if(isAdmin && !isPreview && !isMobileRender) { // 모바일에서는 드래그 앤 드롭 등 복잡한거 제외하거나 단순화
+              card.setAttribute('draggable', 'true');
+              card.ondragstart = (e) => handleDragStart(e, idx);
+              card.ondragover = (e) => handleDragOver(e);
+              card.ondrop = (e) => handleDrop(e, idx);
+              card.ondragend = (e) => handleDragEnd(e);
+              
+              let statusBadges = "";
+              if(isHidden) statusBadges += "🚫비공개 ";
+              if(isAdminOnly) statusBadges += "🔒관리자전용 ";
+
+              card.innerHTML = `
+                <div class="card-ctrl" onclick="event.stopPropagation()">
+                  <button class="btn-sm" onclick="openEdit('${cat.id}')">수정</button>
+                  <button class="btn-sm btn-move" onclick="openMovePageModal(${idx})">이동</button>
+                  <button class="btn-sm btn-del" onclick="deleteCard('${idx}')">삭제</button>
+                </div>
+                <div class="icon-box">${cat.code}</div>
+                <h2>${cat.name}</h2>
+                ${statusBadges ? `<div style="position:absolute; bottom:15px; font-size:12px; color:red; font-weight:800; background:rgba(255,255,255,0.8); padding:2px 8px; border-radius:10px;">${statusBadges}</div>` : ''}
+              `;
+            } else {
+                // 일반 모드 또는 모바일 뷰
+                card.innerHTML = `<div class="icon-box">${cat.code}</div><h2>${cat.name}</h2>`;
+            }
+            containerWrapper.appendChild(card);
+        } else { 
+            // 빈 슬롯 (모바일에서는 안보임, CSS로 제어됨)
+            const empty = document.createElement('div');
+            empty.className = 'card add-slot';
+            if(isAdmin && !isPreview && !isMobileRender) {
+               empty.innerHTML = '<div style="font-size:40px;">+</div><div>카테고리 추가</div>';
+               empty.onclick = () => openEdit('NEW', idx);
+               empty.ondragover = (e) => handleDragOver(e);
+               empty.ondrop = (e) => handleDrop(e, idx);
+            }
+            containerWrapper.appendChild(empty);
+        }
     }
   }
 
@@ -1322,7 +1341,7 @@ function renderSidebar() {
             <button class="btn-modal btn-success" onclick="addChildMenu()">+ 하위 메뉴(Menu) 추가</button>
           `;
       } else if (type === 'menu') {
-          const menu = cat.menus[mIdx];
+          const menu = globalData.categories[cIdx].menus[mIdx];
           content.innerHTML = `
             <h3>📁 시설(메뉴) 수정</h3>
             <div class="setting-group"><label class="setting-label">시설 명칭</label><input type="text" id="tLabel" class="setting-input" value="${menu.label}"></div>
@@ -1335,7 +1354,7 @@ function renderSidebar() {
             </div>
           `;
       } else if (type === 'subj') {
-          const subj = cat.menus[mIdx].subjects[sIdx];
+          const subj = globalData.categories[cIdx].menus[mIdx].subjects[sIdx];
           content.innerHTML = `
             <h3>📄 과목(Subject) 수정</h3>
             <div class="setting-group"><label class="setting-label">과목명</label><input type="text" id="sName" class="setting-input" value="${subj.name}"></div>
