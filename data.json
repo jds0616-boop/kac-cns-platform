@@ -756,6 +756,54 @@
       ]
     },
     {
+      "id": "CAT_1767430475699",
+      "name": "Q&A  ",
+      "code": "Q",
+      "color": "#2563eb",
+      "menus": [
+        {
+          "id": "id_1767430522722",
+          "label": "항공정보통신시설 초기",
+          "line1": "초기 교육",
+          "line2": "",
+          "link": "https://jds0616-boop.github.io/CATC/",
+          "subjects": []
+        },
+        {
+          "id": "id_1767430574744",
+          "label": "항행감시시설 초기",
+          "line1": "초기 교육",
+          "line2": "",
+          "link": "",
+          "subjects": []
+        },
+        {
+          "id": "id_1767430588952",
+          "label": "계기착륙시설",
+          "line1": "초기 교육",
+          "line2": "",
+          "link": "",
+          "subjects": []
+        },
+        {
+          "id": "id_1767430603504",
+          "label": "VOR/DME/TACAN",
+          "line1": "초기 교육",
+          "line2": "",
+          "link": "",
+          "subjects": []
+        },
+        {
+          "id": "id_1767430782892",
+          "label": "초기교육 관리자 페이지 ",
+          "line1": "교수 전용",
+          "line2": "",
+          "link": "https://jds0616-boop.github.io/CATC/admin.html",
+          "subjects": []
+        }
+      ]
+    },
+    {
       "id": "M_1767154255680",
       "name": "기타 교육 자료",
       "code": "Q",
@@ -796,7 +844,11 @@
           ]
         }
       ]
-    }
+    },
+    null,
+    null,
+    null,
+    null
   ],
   "security": {
     "entry_pw": "489a97f30f7aabd25773bf71342c8373537bc3a355be07161b7ab9280e09bb6f",
