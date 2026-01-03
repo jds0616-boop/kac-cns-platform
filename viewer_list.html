@@ -344,49 +344,59 @@
   @media (max-width: 768px) {
     .v-header, #audioPanel, .mobile-top-exit-btn { display: none !important; }
 
-    main { padding: 20px 15px; padding-bottom: 100px; }
+    /* [수정] 하단 여백 확보 (150px) */
+    main { padding: 20px 15px; padding-bottom: 150px !important; }
 
     .tree-container { align-items: flex-start; }
     .tree-spine { display: block !important; left: 24px; top: 85px; bottom: 30px; width: 3px; background: rgba(var(--theme-rgb), 0.3); }
     
-    /* [수정 1] 최상단 카드 스타일 (facility.html과 통일) */
-    .fac-top-card { 
-        width: 100%; border-radius: 15px; 
-        margin-bottom: 25px; padding: 15px 15px; 
-        flex-direction: row !important; align-items: center; justify-content: flex-start; 
-        gap: 15px; position: relative; 
-        z-index: 5; margin-left: 0; 
+    /* [수정] 상단 명함 카드 영역 (Sticky + 회색 배경 마스크) */
+    .tree-container > .fac-top-card { 
+        position: sticky;
+        top: 0;
+        z-index: 600 !important;
+        
+        background: var(--bg-main) !important; /* 마스크 역할의 회색 배경 */
+        
+        width: calc(100% + 30px); /* 좌우 여백 상쇄 */
+        max-width: none;
+        margin: -20px -15px 25px -15px; /* main 패딩 상쇄 */
+        padding: 10px 15px 15px 15px; /* 내부 여백 조정 */
+        
+        border: none; /* 컨테이너 자체 테두리 제거 */
+        border-radius: 0;
+        box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+        
+        flex-direction: column !important;
+        align-items: stretch !important;
     }
     
-    .fac-left-group { width: 100%; flex-direction: row !important; align-items: center; gap: 12px; }
+    /* [수정] 실제 명함 카드 모양 (내부에 흰색 박스 생성) */
+    .fac-top-card::after {
+        content: '';
+        display: block;
+        position: absolute;
+        inset: 10px 15px 15px 15px; /* 회색 배경 안쪽으로 배치 */
+        background: var(--bg-card);
+        border: 3px solid var(--theme-color);
+        border-radius: 20px;
+        z-index: -1;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    /* 내부 요소 재배치 */
+    .fac-left-group { 
+        width: 100%; 
+        flex-direction: row !important; 
+        align-items: center; 
+        gap: 12px; 
+        padding: 15px; /* 카드 내부 패딩 */
+        z-index: 1;
+    }
+    
     .fac-tag-pill { font-size: 13px; padding: 6px 12px; min-width: auto; align-self: center; margin: 0; }
     .fac-title { font-size: 18px; line-height: 1.3; flex: 1; text-align: left; }
     
-    /* [수정 2] 회색 배경 영역 확장 (facility.html과 통일) */
-    /* .root-section 대신 .fac-top-card가 있는 상단 영역을 감싸는 컨테이너라고 보면 됨 */
-    /* 여기서는 .fac-top-card 자체가 최상단 요소임. Sticky 효과 등을 위해 스타일 보정 */
-    
-    /* [중요] facility.html의 root-section 역할을 하는 것이 여기선 .fac-top-card임.
-       하지만 .fac-top-card는 Sticky가 아님. Sticky가 되려면 별도 래퍼가 필요하거나 
-       이 요소 자체를 Sticky로 만들어야 함. facility.html 처럼 하려면 Sticky가 맞음. */
-       
-    .fac-top-card {
-        position: sticky; 
-        top: 0; 
-        background: var(--bg-main); /* 회색 배경 */
-        z-index: 500 !important; 
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        margin-top: -20px; /* main padding 상쇄 */
-        padding-top: 25px; /* 상단 여백 확보 */
-        margin-left: -15px; /* main padding 상쇄 */
-        margin-right: -15px;
-        width: calc(100% + 30px);
-        max-width: none;
-        border-radius: 0 0 15px 15px;
-        border: none;
-        border-bottom: 2px solid var(--theme-color);
-    }
-
     .card-wrapper { display: block; margin-bottom: 10px; padding-left: 55px; width: 100%; }
     .card-wrapper::before { display: block !important; left: 26px; width: 34px; top: 50%; height: 3px; background: rgba(var(--theme-rgb), 0.3); }
     .card-wrapper::after { content: ''; position: absolute; left: 22px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; border-radius: 50%; background: var(--theme-color); border: 2px solid var(--bg-main); z-index: 2; }
@@ -395,12 +405,6 @@
     .status-group { flex-wrap: wrap; gap: 4px; margin-top: 0; }
     .status-pill { padding: 2px 6px; font-size: 10px; height: auto; display: inline-block; border-radius: 4px; line-height: 1.3; }
     
-    /* [수정 3] 하단 여백 150px 추가 (facility.html과 통일) */
-    /* main 태그에 적용 */
-    main { 
-        padding-bottom: 150px !important; 
-    }
-
     .bottom-nav { width: 90%; bottom: 20px; padding: 16px 0; gap: 30px; border-radius: 50px; justify-content: center; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(10px); box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
     .nav-item { font-size: 14px; gap: 6px; font-weight: 800; }
     .header-search { font-size: 14px; padding: 10px 20px 10px 45px; background-size: 18px; background-position: 15px center; }
@@ -477,11 +481,12 @@
     
     #pageContainer { min-height: 100% !important; height: auto !important; display: block !important; padding-bottom: 50px !important; }
 
+    /* [수정] Last Viewed 아이콘 위치 이동 (우측 끝) */
     .subject-card.last-viewed .last-viewed-icon { 
         display: flex; position: absolute; 
-        left: -35px; top: 50%; transform: translateY(-50%); 
+        left: auto !important; right: 15px !important; top: 50%; transform: translateY(-50%); 
         width: 24px; height: 24px; border-radius: 50%; background: #10b981; 
-        border: 2px solid var(--bg-main); padding: 0; justify-content: center; align-items: center; 
+        border: 2px solid #fff; padding: 0; justify-content: center; align-items: center; 
         z-index: 10; 
     }
     .icon-pc { display: none !important; }
@@ -1027,11 +1032,17 @@ function openSettings() {
     const treeContainer = document.createElement('div');
     treeContainer.className = 'tree-container';
     
+    // 이 부분에서 HTML 구조에 클래스 적용
     const facCard = document.createElement('div');
-    facCard.className = 'fac-top-card';
-    facCard.onclick = () => location.href = `facility.html?type=${type}`;
-    facCard.style.cursor = 'pointer';
-    facCard.title = "목록으로 이동";
+    // .root-section 대신 fac-top-card라는 이름의 요소를 사용 중.
+    // 하지만 CSS에서는 .tree-container > .fac-top-card 로 타겟팅됨.
+    // CSS 적용을 위해 클래스명 유지
+    facCard.className = 'fac-top-card'; 
+    
+    // ★★★ 중요: 여기서 내부 구조를 CSS의 .root-card-integrated 스타일이 먹히도록 
+    // 가상의 wrapper나 after pseudo-element로 처리하고 있음.
+    // 하지만 더 깔끔하게 하려면 HTML 구조 자체를 변경하는 게 맞음.
+    // 여기서는 기존 로직 유지하되 CSS의 ::after 가 작동하도록 함.
 
     const leftGroup = document.createElement('div');
     leftGroup.className = 'fac-left-group';
@@ -1123,8 +1134,12 @@ function openSettings() {
 
       card.innerHTML = `
         <div class="last-viewed-icon">
-            <svg class="icon-pc" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <!-- PC용 눈 아이콘 -->
+            <svg class="icon-pc" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            
+            <!-- 모바일용 체크 아이콘 -->
             <svg class="icon-mobile" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+
             <span>Last Viewed</span>
         </div>
         <div>
