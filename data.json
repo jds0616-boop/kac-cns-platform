@@ -99,14 +99,6 @@
               "pdfName": "/BASIC/무선기초_CH8",
               "link": "",
               "audioName": ""
-            },
-            {
-              "id": "1767153632746kp546",
-              "name": "RF 무선시스템의 구성",
-              "active": true,
-              "pdfName": "/BASIC/무선기초_CH9",
-              "link": "",
-              "audioName": ""
             }
           ]
         },
@@ -139,6 +131,23 @@
               "name": "변/복조 이론",
               "active": true,
               "pdfName": "/BASIC/무선기초_CH11",
+              "link": "",
+              "audioName": ""
+            }
+          ]
+        },
+        {
+          "id": "id_1767431035702",
+          "label": "RF 송수신기 이론",
+          "line1": "RF ",
+          "line2": "",
+          "link": "",
+          "subjects": [
+            {
+              "id": "1767153632746kp546",
+              "name": "RF 무선시스템의 구성",
+              "active": true,
+              "pdfName": "/BASIC/무선기초_CH9",
               "link": "",
               "audioName": ""
             }
