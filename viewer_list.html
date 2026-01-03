@@ -84,7 +84,14 @@
   
   .header-left { display: flex; align-items: center; min-width: 250px; z-index: 10; white-space: nowrap; transition: opacity 0.2s; gap: 15px; } 
   .header-center { position: absolute; left: 50%; transform: translateX(-50%); width: 400px; max-width: 100%; z-index: 20; transition: width 0.3s; }
-  .header-right { display: flex; align-items: center; gap: 15px; min-width: 250px; justify-content: flex-end; z-index: 10; }
+.header-right { 
+    display: flex; 
+    align-items: center; 
+    gap: 15px; 
+    min-width: 250px; 
+    justify-content: flex-end; 
+    z-index: 30; /* <--- 30으로 변경 (검색창 위로 올림) */
+}
 
   .hamburger-btn { cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; flex-shrink: 0; }
   .hamburger-btn:hover { background: rgba(255,255,255,0.1); }
@@ -351,71 +358,49 @@
   .icon-pc { display: block; }
   .mobile-top-bar { display: none; }
 
-/* [2] 모바일 전용 설정 (세련된 디자인 + 꿀렁임 완벽 제거 + 상단바 메뉴 아이콘 추가) */
+  /* [2] 모바일 전용 설정 (세련된 디자인 + 꿀렁임 완벽 제거) */
   @media (max-width: 768px) {
     /* PC 요소 숨김 */
     .v-header, #audioPanel, .mobile-top-exit-btn { display: none !important; }
 
-    /* ----------------------------------------------------
-       [A] 상단 헤더 (검색창 + 메뉴 아이콘) 
-    ---------------------------------------------------- */
-    /* 1. 헤더 레이아웃 조정 */
-    header { 
-        padding: 0 15px !important; 
-        gap: 10px !important; 
-        justify-content: flex-start !important;
-    }
+    main { padding: 20px 15px; padding-bottom: 100px; }
 
-    /* 2. 왼쪽 영역(메뉴 아이콘) 다시 보이게 설정 */
-    .header-left { 
-        display: flex !important; 
-        opacity: 1 !important; 
-        pointer-events: auto !important;
-        width: auto !important; 
-        min-width: auto !important;
-        flex-shrink: 0;
-    }
+    /* 리스트 스타일 모바일 최적화 */
+    .tree-container { align-items: flex-start; }
+    .tree-spine { display: block !important; left: 24px; top: 85px; bottom: 30px; width: 3px; background: rgba(var(--theme-rgb), 0.3); }
+    .fac-top-card { width: 100%; border-radius: 15px; margin-bottom: 25px; padding: 15px 15px; flex-direction: row !important; align-items: center; justify-content: flex-start; gap: 15px; position: relative; z-index: 5; margin-left: 0; }
+    .fac-left-group { width: 100%; flex-direction: row !important; align-items: center; gap: 12px; }
+    .fac-tag-pill { font-size: 13px; padding: 6px 12px; min-width: auto; align-self: center; margin: 0; }
+    .fac-title { font-size: 18px; line-height: 1.3; flex: 1; text-align: left; }
+    .card-wrapper { display: block; margin-bottom: 10px; padding-left: 55px; width: 100%; }
+    .card-wrapper::before { display: block !important; left: 26px; width: 34px; top: 50%; height: 3px; background: rgba(var(--theme-rgb), 0.3); }
+    .card-wrapper::after { content: ''; position: absolute; left: 22px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; border-radius: 50%; background: var(--theme-color); border: 2px solid var(--bg-main); z-index: 2; }
+    .subject-card { padding: 12px 12px 8px 12px; border-radius: 10px; min-height: auto; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+    .subj-title { font-size: 14px; padding-right: 0; word-break: keep-all; line-height: 1.3; margin-bottom: 2px; }
+    .status-group { flex-wrap: wrap; gap: 4px; margin-top: 0; }
+    .status-pill { padding: 2px 6px; font-size: 10px; height: auto; display: inline-block; border-radius: 4px; line-height: 1.3; }
+    .bottom-nav { width: 90%; bottom: 20px; padding: 16px 0; gap: 30px; border-radius: 50px; justify-content: center; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(10px); box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
+    .nav-item { font-size: 14px; gap: 6px; font-weight: 800; }
+    .header-search { font-size: 14px; padding: 10px 20px 10px 45px; background-size: 18px; background-position: 15px center; }
 
-    /* 3. 공간 확보를 위해 로고 글자와 경로(Breadcrumb)는 숨김 */
-    .logo-text, .breadcrumb { display: none !important; }
-
-    /* 4. 오른쪽 영역(설정 등) 숨김 */
-    .header-right { display: none !important; }
-
-    /* 5. 중앙 검색창이 남은 공간 꽉 채우기 */
-    .header-center { 
-        display: block !important; 
-        position: relative !important; 
-        left: auto !important; 
-        transform: none !important;
-        width: auto !important;
-        max-width: none !important;
-        flex: 1 !important; /* 남은 공간 차지 */
-    }
-
-    .header-search { 
-        width: 100% !important; 
-        font-size: 14px;
-        padding: 10px 15px 10px 40px;
-        background-position: 15px center;
-    }
-
-    /* ----------------------------------------------------
-       [B] 모바일 상단바 디자인 (Glassmorphism) 
-    ---------------------------------------------------- */
+    /* --- [A] 상단바 디자인 (Glassmorphism) --- */
     .mobile-top-bar {
         display: flex !important;
         height: 60px !important;
+        
+        /* 반투명 유리 효과 배경 */
         background: rgba(20, 20, 25, 0.85) !important;
         backdrop-filter: blur(15px);
         -webkit-backdrop-filter: blur(15px);
         border-bottom: 1px solid rgba(255,255,255,0.08);
         box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        
         align-items: center; padding: 0 15px; gap: 15px;
         position: absolute; top: 0; left: 0; right: 0;
         z-index: 8000;
     }
 
+    /* 나가기 버튼 */
     .mobile-exit-btn {
         width: 36px; height: 36px;
         background: rgba(255,255,255,0.1); color: #fff;
@@ -425,6 +410,7 @@
     }
     .mobile-exit-btn svg { width: 20px; height: 20px; fill: #ef4444; }
 
+    /* 오디오 컨트롤 그룹 */
     .mobile-audio-group {
         flex: 1; display: flex; align-items: center; gap: 12px;
         min-width: 0;
@@ -433,6 +419,7 @@
         border: 1px solid rgba(255,255,255,0.05);
     }
 
+    /* 재생 버튼 */
     .audio-btn-sm {
         width: 32px; height: 32px; border-radius: 50%; border: none;
         background: #fff; color: #000; flex-shrink: 0;
@@ -440,6 +427,7 @@
         font-size: 14px; padding-left: 2px;
     }
 
+    /* 재생바 */
     .audio-slider-sm {
         flex: 1; height: 6px; border-radius: 10px;
         appearance: none; -webkit-appearance: none;
@@ -450,11 +438,13 @@
         box-shadow: -100vw 0 0 100vw #2563eb; background: #2563eb;
     }
 
+    /* 시간 텍스트 */
     .audio-time-sm { 
         font-size: 11px; font-family: monospace; font-weight: 700;
         color: rgba(255,255,255,0.8); width: 35px; text-align: right; 
     }
 
+    /* 우측 아이콘 */
     .mobile-audio-icon-right {
         width: 36px; height: 36px;
         display: flex; align-items: center; justify-content: center;
@@ -463,20 +453,23 @@
     }
     .mobile-audio-icon-right svg { width: 20px; height: 20px; fill: currentColor; }
 
-    /* ----------------------------------------------------
-       [C] 뷰어 흔들림 방지 (핵심: Block 고정) 
-    ---------------------------------------------------- */
+    /* --- [B] 뷰어 흔들림 방지 (핵심: Block 고정) --- */
     .viewer-body { 
         position: absolute !important;
         top: 60px !important;    /* 상단바 아래 */
         bottom: 10px !important; /* 하단바 위 */
         left: 0 !important; 
         right: 0 !important;
+        
         width: 100% !important; 
         height: auto !important; 
+        
         padding: 0 !important; 
         background: #000; 
-        display: block !important; /* 중요 */
+        
+        /* [중요] flex를 block으로 변경하여 꿀렁임 원천 차단 */
+        display: block !important; 
+        
         overflow-y: scroll !important; 
         -webkit-overflow-scrolling: touch;
     }
@@ -494,28 +487,7 @@
         padding-bottom: 50px !important; 
     }
 
-    /* ----------------------------------------------------
-       [D] 기타 모바일 스타일 (리스트, 아이콘 등) 
-    ---------------------------------------------------- */
-    main { padding: 20px 15px; padding-bottom: 100px; }
-    .tree-container { align-items: flex-start; }
-    .tree-spine { display: block !important; left: 24px; top: 85px; bottom: 30px; width: 3px; background: rgba(var(--theme-rgb), 0.3); }
-    .fac-top-card { width: 100%; border-radius: 15px; margin-bottom: 25px; padding: 15px 15px; flex-direction: row !important; align-items: center; justify-content: flex-start; gap: 15px; position: relative; z-index: 5; margin-left: 0; }
-    .fac-left-group { width: 100%; flex-direction: row !important; align-items: center; gap: 12px; }
-    .fac-tag-pill { font-size: 13px; padding: 6px 12px; min-width: auto; align-self: center; margin: 0; }
-    .fac-title { font-size: 18px; line-height: 1.3; flex: 1; text-align: left; }
-    .card-wrapper { display: block; margin-bottom: 10px; padding-left: 55px; width: 100%; }
-    .card-wrapper::before { display: block !important; left: 26px; width: 34px; top: 50%; height: 3px; background: rgba(var(--theme-rgb), 0.3); }
-    .card-wrapper::after { content: ''; position: absolute; left: 22px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; border-radius: 50%; background: var(--theme-color); border: 2px solid var(--bg-main); z-index: 2; }
-    .subject-card { padding: 12px 12px 8px 12px; border-radius: 10px; min-height: auto; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
-    .subj-title { font-size: 14px; padding-right: 0; word-break: keep-all; line-height: 1.3; margin-bottom: 2px; }
-    .status-group { flex-wrap: wrap; gap: 4px; margin-top: 0; }
-    .status-pill { padding: 2px 6px; font-size: 10px; height: auto; display: inline-block; border-radius: 4px; line-height: 1.3; }
-    
-    .bottom-nav { width: 90%; bottom: 20px; padding: 16px 0; gap: 30px; border-radius: 50px; justify-content: center; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(10px); box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
-    .nav-item { font-size: 14px; gap: 6px; font-weight: 800; }
-
-    /* Last Viewed 아이콘 (모바일 전용) */
+    /* --- [C] Last Viewed 아이콘 (모바일 전용) --- */
     .subject-card.last-viewed .last-viewed-icon { 
         display: flex; position: absolute; 
         left: -35px; top: 50%; transform: translateY(-50%); 
@@ -523,11 +495,12 @@
         border: 2px solid var(--bg-main); padding: 0; justify-content: center; align-items: center; 
         z-index: 10; 
     }
-    .icon-pc { display: none !important; }      
-    .icon-mobile { display: block !important; } 
-    .last-viewed-icon span { display: none !important; } 
+    .icon-pc { display: none !important; }      /* 눈 숨김 */
+    .icon-mobile { display: block !important; } /* 체크 보임 */
+    .last-viewed-icon span { display: none !important; } /* 글자 숨김 */
     .last-viewed-icon svg { width: 14px; height: 14px; fill: #fff; margin: 0; }
 
+    /* 하단 진행바 */
     .progress-hit-area {
         position: absolute !important; bottom: 0 !important; left: 0 !important; right: 0 !important;
         height: 10px !important; background: #1e293b; z-index: 9000;
@@ -804,7 +777,48 @@
 
   // 검색 인덱스 변수 선언
   let allSubjectsIndex = [];
+/* ▼▼▼▼▼ [여기] 이 코드를 복사해서 init() 함수 위에 넣으세요 ▼▼▼▼▼ */
 
+function openSettings() {
+    const modal = document.getElementById('settingsModal');
+    
+    // 버튼과 메뉴 요소 가져오기
+    const adminBtn = document.getElementById('modalAdminBtn');
+    const batchGroup = document.getElementById('batchAdminGroup');
+    const previewBtn = document.getElementById('modalPreviewBtn');
+    
+    // 관리자 상태에 따라 모달 내용 변경
+    if(isAdmin) {
+        // 관리자일 때
+        if(adminBtn) adminBtn.textContent = "로그아웃";
+        if(batchGroup) batchGroup.style.display = 'block'; // 일괄등록 메뉴 보임
+        if(previewBtn) {
+            previewBtn.style.display = 'block'; // 미리보기 버튼 보임
+            previewBtn.textContent = isPreview ? "👁️ 미리보기 종료" : "👁️ 미리보기 시작";
+            previewBtn.className = isPreview ? "btn-modal btn-preview-active" : "btn-modal btn-secondary";
+        }
+    } else {
+        // 일반 사용자일 때
+        if(adminBtn) adminBtn.textContent = "관리자 로그인";
+        if(batchGroup) batchGroup.style.display = 'none'; // 일괄등록 숨김
+        if(previewBtn) previewBtn.style.display = 'none'; // 미리보기 숨김
+    }
+
+    // 트리 위치 조정 슬라이더 값 불러오기
+    const currentPos = localStorage.getItem('kac_tree_pos') || 0;
+    const range = document.getElementById('treePosRange');
+    const valDisplay = document.getElementById('treePosVal');
+    
+    if(range) range.value = currentPos;
+    if(valDisplay) valDisplay.textContent = currentPos;
+
+    // 모달창 띄우기
+    modal.style.display = 'flex';
+}
+
+/* ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ */
+
+// 원래 있던 init 함수
   async function init() {
     try {
         setTheme(localStorage.getItem('kac_theme') || 'light');
