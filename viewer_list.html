@@ -1,3 +1,4 @@
+<!-- START OF FILE viewer_list.html -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -84,14 +85,7 @@
   
   .header-left { display: flex; align-items: center; min-width: 250px; z-index: 10; white-space: nowrap; transition: opacity 0.2s; gap: 15px; } 
   .header-center { position: absolute; left: 50%; transform: translateX(-50%); width: 400px; max-width: 100%; z-index: 20; transition: width 0.3s; }
-.header-right { 
-    display: flex; 
-    align-items: center; 
-    gap: 15px; 
-    min-width: 250px; 
-    justify-content: flex-end; 
-    z-index: 30; /* <--- 30으로 변경 (검색창 위로 올림) */
-}
+  .header-right { display: flex; align-items: center; gap: 15px; min-width: 250px; justify-content: flex-end; z-index: 30; }
 
   .hamburger-btn { cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; flex-shrink: 0; }
   .hamburger-btn:hover { background: rgba(255,255,255,0.1); }
@@ -240,27 +234,19 @@
   .btn-del { color: #ef4444; border-color: #fee2e2; }
   .btn-del:hover { background: #fee2e2; }
 
-  /* ================================================================= */
-  /* [수정] 오버레이 구조를 Flexbox로 변경 (Flex Layout) */
-  /* ================================================================= */
+  /* 오버레이 */
   #pdfOverlay { 
       position: fixed; inset: 0; background: #000; 
       display: none; z-index: 7000; overflow: hidden; 
-      transition: 0.3s; touch-action: none;
-      /* Flex Layout */
-      flex-direction: column; 
+      transition: 0.3s; touch-action: none; flex-direction: column; 
   }
   
   /* PC 기본 헤더 */
   .v-header { 
-      position: absolute; 
-      top: 0; left: 0; right: 0;
-      height: 80px; 
+      position: absolute; top: 0; left: 0; right: 0; height: 80px; 
       display: flex; align-items: center; justify-content: space-between; 
-      padding: 0 40px; z-index: 8000; 
-      color: #fff; 
-      background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); 
-      flex-shrink: 0; 
+      padding: 0 40px; z-index: 8000; color: #fff; 
+      background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); flex-shrink: 0; 
   }
   .v-header-left { display: flex; align-items: center; gap: 25px; }
   .close-v { font-size: 32px; cursor: pointer; transition: 0.3s; opacity: 0.8; }
@@ -274,13 +260,11 @@
   .v-icon-btn.disabled { opacity: 0.2; pointer-events: none; cursor: default; }
   .v-icon-btn svg { width: 26px; height: 26px; fill: currentColor; }
   
-  /* PC 오디오 패널 (우측 상단) */
+  /* PC 오디오 패널 */
   #audioPanel { 
-      position: absolute; 
-      top: 85px; right: 40px; left: auto;
-      width: 340px; height: auto; 
-      background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 15px; 
-      display: none; flex-direction: column; justify-content: center; gap: 10px; 
+      position: absolute; top: 85px; right: 40px; left: auto;
+      width: 340px; height: auto; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); 
+      border-radius: 15px; display: none; flex-direction: column; justify-content: center; gap: 10px; 
       padding: 15px 20px; transition: opacity 0.2s; z-index: 8500; 
       box-shadow: 0 10px 30px rgba(0,0,0,0.5); color: #000; border: 1px solid rgba(0,0,0,0.1);
   }
@@ -293,7 +277,7 @@
   .volume-row { display: flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 800; color: #666; margin-left: 45px; }
   #volumeControl { width: 80px; accent-color: #64748b; height: 4px; }
   
-  /* 하단 페이지 진행바 (빨간선) */
+  /* 하단 페이지 진행바 */
   .progress-hit-area { position: absolute; bottom: 0; left: 0; height: 40px; width: 100%; z-index: 9000; cursor: pointer; display: flex; align-items: flex-end; flex-shrink: 0; }
   .progress-track { width: 100%; height: 6px; background: rgba(255,255,255,0.3); position: relative; transition: height 0.2s, background 0.2s; }
   .progress-hit-area:hover .progress-track { background: rgba(255,255,255,0.5); height: 8px; }
@@ -303,10 +287,8 @@
   .progress-flag::after { content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); border-width: 5px 5px 0; border-style: solid; border-color: #1e293b transparent transparent transparent; }
   .progress-hit-area:hover .progress-flag, .progress-hit-area.dragging .progress-flag { opacity: 1; transform: translateY(0); }
   
-  /* 뷰어 바디 */
   .viewer-body { width: 100%; height: 100vh; display: flex; justify-content: center; align-items: center; cursor: default; overflow: hidden; position: relative; background: #000; }
   
-  /* 캔버스 */
   canvas { 
       box-shadow: 0 0 50px rgba(0,0,0,0.8); pointer-events: none; 
       max-width: 100%; max-height: 100%; width: auto; height: auto; 
@@ -323,7 +305,6 @@
   body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(255, 255, 255, 0.3); }
   body.dark-mode .nav-item { color: #e2e8f0; opacity: 1; }
   
-  /* 모바일 상단 바 (기본 숨김) */
   .mobile-top-bar { display: none; }
 
   .creator-info { position: fixed; bottom: 5px; width: 100%; text-align: center; font-size: 11px; color: var(--text-sub); opacity: 0.5; font-weight: 500; z-index: 500; pointer-events: none; }
@@ -353,25 +334,59 @@
   .batch-table th { background: var(--btn-bg); font-weight: 700; color: var(--text-sub); }
   .batch-input { width: 100%; border: none; background: transparent; color: var(--text-main); }
 
-  /* [1] PC 기본 설정 (모바일 상단바 숨김 + 아이콘 구분) */
   .icon-mobile { display: none; }
   .icon-pc { display: block; }
   .mobile-top-bar { display: none; }
 
-  /* [2] 모바일 전용 설정 (세련된 디자인 + 꿀렁임 완벽 제거) */
+  /* ========================================= */
+  /* [모바일 전용 최적화] */
+  /* ========================================= */
   @media (max-width: 768px) {
-    /* PC 요소 숨김 */
     .v-header, #audioPanel, .mobile-top-exit-btn { display: none !important; }
 
     main { padding: 20px 15px; padding-bottom: 100px; }
 
-    /* 리스트 스타일 모바일 최적화 */
     .tree-container { align-items: flex-start; }
     .tree-spine { display: block !important; left: 24px; top: 85px; bottom: 30px; width: 3px; background: rgba(var(--theme-rgb), 0.3); }
-    .fac-top-card { width: 100%; border-radius: 15px; margin-bottom: 25px; padding: 15px 15px; flex-direction: row !important; align-items: center; justify-content: flex-start; gap: 15px; position: relative; z-index: 5; margin-left: 0; }
+    
+    /* [수정 1] 최상단 카드 스타일 (facility.html과 통일) */
+    .fac-top-card { 
+        width: 100%; border-radius: 15px; 
+        margin-bottom: 25px; padding: 15px 15px; 
+        flex-direction: row !important; align-items: center; justify-content: flex-start; 
+        gap: 15px; position: relative; 
+        z-index: 5; margin-left: 0; 
+    }
+    
     .fac-left-group { width: 100%; flex-direction: row !important; align-items: center; gap: 12px; }
     .fac-tag-pill { font-size: 13px; padding: 6px 12px; min-width: auto; align-self: center; margin: 0; }
     .fac-title { font-size: 18px; line-height: 1.3; flex: 1; text-align: left; }
+    
+    /* [수정 2] 회색 배경 영역 확장 (facility.html과 통일) */
+    /* .root-section 대신 .fac-top-card가 있는 상단 영역을 감싸는 컨테이너라고 보면 됨 */
+    /* 여기서는 .fac-top-card 자체가 최상단 요소임. Sticky 효과 등을 위해 스타일 보정 */
+    
+    /* [중요] facility.html의 root-section 역할을 하는 것이 여기선 .fac-top-card임.
+       하지만 .fac-top-card는 Sticky가 아님. Sticky가 되려면 별도 래퍼가 필요하거나 
+       이 요소 자체를 Sticky로 만들어야 함. facility.html 처럼 하려면 Sticky가 맞음. */
+       
+    .fac-top-card {
+        position: sticky; 
+        top: 0; 
+        background: var(--bg-main); /* 회색 배경 */
+        z-index: 500 !important; 
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        margin-top: -20px; /* main padding 상쇄 */
+        padding-top: 25px; /* 상단 여백 확보 */
+        margin-left: -15px; /* main padding 상쇄 */
+        margin-right: -15px;
+        width: calc(100% + 30px);
+        max-width: none;
+        border-radius: 0 0 15px 15px;
+        border: none;
+        border-bottom: 2px solid var(--theme-color);
+    }
+
     .card-wrapper { display: block; margin-bottom: 10px; padding-left: 55px; width: 100%; }
     .card-wrapper::before { display: block !important; left: 26px; width: 34px; top: 50%; height: 3px; background: rgba(var(--theme-rgb), 0.3); }
     .card-wrapper::after { content: ''; position: absolute; left: 22px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; border-radius: 50%; background: var(--theme-color); border: 2px solid var(--bg-main); z-index: 2; }
@@ -379,28 +394,30 @@
     .subj-title { font-size: 14px; padding-right: 0; word-break: keep-all; line-height: 1.3; margin-bottom: 2px; }
     .status-group { flex-wrap: wrap; gap: 4px; margin-top: 0; }
     .status-pill { padding: 2px 6px; font-size: 10px; height: auto; display: inline-block; border-radius: 4px; line-height: 1.3; }
+    
+    /* [수정 3] 하단 여백 150px 추가 (facility.html과 통일) */
+    /* main 태그에 적용 */
+    main { 
+        padding-bottom: 150px !important; 
+    }
+
     .bottom-nav { width: 90%; bottom: 20px; padding: 16px 0; gap: 30px; border-radius: 50px; justify-content: center; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(10px); box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
     .nav-item { font-size: 14px; gap: 6px; font-weight: 800; }
     .header-search { font-size: 14px; padding: 10px 20px 10px 45px; background-size: 18px; background-position: 15px center; }
 
-    /* --- [A] 상단바 디자인 (Glassmorphism) --- */
     .mobile-top-bar {
         display: flex !important;
         height: 60px !important;
-        
-        /* 반투명 유리 효과 배경 */
         background: rgba(20, 20, 25, 0.85) !important;
         backdrop-filter: blur(15px);
         -webkit-backdrop-filter: blur(15px);
         border-bottom: 1px solid rgba(255,255,255,0.08);
         box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-        
         align-items: center; padding: 0 15px; gap: 15px;
         position: absolute; top: 0; left: 0; right: 0;
         z-index: 8000;
     }
 
-    /* 나가기 버튼 */
     .mobile-exit-btn {
         width: 36px; height: 36px;
         background: rgba(255,255,255,0.1); color: #fff;
@@ -410,7 +427,6 @@
     }
     .mobile-exit-btn svg { width: 20px; height: 20px; fill: #ef4444; }
 
-    /* 오디오 컨트롤 그룹 */
     .mobile-audio-group {
         flex: 1; display: flex; align-items: center; gap: 12px;
         min-width: 0;
@@ -419,7 +435,6 @@
         border: 1px solid rgba(255,255,255,0.05);
     }
 
-    /* 재생 버튼 */
     .audio-btn-sm {
         width: 32px; height: 32px; border-radius: 50%; border: none;
         background: #fff; color: #000; flex-shrink: 0;
@@ -427,7 +442,6 @@
         font-size: 14px; padding-left: 2px;
     }
 
-    /* 재생바 */
     .audio-slider-sm {
         flex: 1; height: 6px; border-radius: 10px;
         appearance: none; -webkit-appearance: none;
@@ -438,13 +452,11 @@
         box-shadow: -100vw 0 0 100vw #2563eb; background: #2563eb;
     }
 
-    /* 시간 텍스트 */
     .audio-time-sm { 
         font-size: 11px; font-family: monospace; font-weight: 700;
         color: rgba(255,255,255,0.8); width: 35px; text-align: right; 
     }
 
-    /* 우측 아이콘 */
     .mobile-audio-icon-right {
         width: 36px; height: 36px;
         display: flex; align-items: center; justify-content: center;
@@ -453,41 +465,18 @@
     }
     .mobile-audio-icon-right svg { width: 20px; height: 20px; fill: currentColor; }
 
-    /* --- [B] 뷰어 흔들림 방지 (핵심: Block 고정) --- */
     .viewer-body { 
         position: absolute !important;
-        top: 60px !important;    /* 상단바 아래 */
-        bottom: 10px !important; /* 하단바 위 */
-        left: 0 !important; 
-        right: 0 !important;
-        
-        width: 100% !important; 
-        height: auto !important; 
-        
-        padding: 0 !important; 
-        background: #000; 
-        
-        /* [중요] flex를 block으로 변경하여 꿀렁임 원천 차단 */
-        display: block !important; 
-        
-        overflow-y: scroll !important; 
-        -webkit-overflow-scrolling: touch;
+        top: 60px !important; bottom: 10px !important; left: 0 !important; right: 0 !important;
+        width: 100% !important; height: auto !important; 
+        padding: 0 !important; background: #000; display: block !important; 
+        overflow-y: scroll !important; -webkit-overflow-scrolling: touch;
     }
     
-    canvas { 
-        display: block !important; 
-        width: 100% !important; 
-        height: auto !important; 
-    }
+    canvas { display: block !important; width: 100% !important; height: auto !important; }
     
-    #pageContainer { 
-        min-height: 100% !important; 
-        height: auto !important; 
-        display: block !important; 
-        padding-bottom: 50px !important; 
-    }
+    #pageContainer { min-height: 100% !important; height: auto !important; display: block !important; padding-bottom: 50px !important; }
 
-    /* --- [C] Last Viewed 아이콘 (모바일 전용) --- */
     .subject-card.last-viewed .last-viewed-icon { 
         display: flex; position: absolute; 
         left: -35px; top: 50%; transform: translateY(-50%); 
@@ -495,12 +484,11 @@
         border: 2px solid var(--bg-main); padding: 0; justify-content: center; align-items: center; 
         z-index: 10; 
     }
-    .icon-pc { display: none !important; }      /* 눈 숨김 */
-    .icon-mobile { display: block !important; } /* 체크 보임 */
-    .last-viewed-icon span { display: none !important; } /* 글자 숨김 */
+    .icon-pc { display: none !important; }
+    .icon-mobile { display: block !important; }
+    .last-viewed-icon span { display: none !important; }
     .last-viewed-icon svg { width: 14px; height: 14px; fill: #fff; margin: 0; }
 
-    /* 하단 진행바 */
     .progress-hit-area {
         position: absolute !important; bottom: 0 !important; left: 0 !important; right: 0 !important;
         height: 10px !important; background: #1e293b; z-index: 9000;
@@ -548,7 +536,7 @@
   </div>
 </header>
 
-<main id="subjectList" style="padding-top: 40px;"></main>
+<main id="subjectList"></main>
 
 <!-- 개별 업로드 모달 -->
 <div id="uploadModal" class="modal-overlay">
@@ -663,28 +651,20 @@
 
 <div id="pdfOverlay" onmousedown="handleMouseNav(event)">
   
-  <!-- [수정] 통합된 모바일 상단바 (나가기 + 재생바 + 아이콘) -->
   <div class="mobile-top-bar" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()">
-      
-      <!-- 1. 좌측: 나가기 버튼 (빨간 원) -->
       <div class="mobile-exit-btn" onclick="closeViewer()">
           <svg viewBox="0 0 24 24"><path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" /></svg>
       </div>
-
-      <!-- 2. 중앙: 오디오 컨트롤 (오디오 있을 때만 보임) -->
       <div id="mobileAudioGroup" class="mobile-audio-group" style="display:none;">
           <button id="mobilePlayBtn" class="audio-btn-sm">▶</button>
           <input type="range" id="mobileAudioProgress" class="audio-slider-sm" value="0">
           <span id="mobileAudioTime" class="audio-time-sm">00:00</span>
       </div>
-
-      <!-- 3. 우측: 오디오 아이콘 (오디오 있을 때만 보임) -->
       <div id="mobileAudioIconRight" class="mobile-audio-icon-right" style="display:none;">
           <svg viewBox="0 0 24 24"><path d="M12,2A3,3 0 0,0 9,5V11A3,3 0 0,0 12,14A3,3 0 0,0 15,11V5A3,3 0 0,0 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,1 12,16A5,5 0 0,1 17,11H19Z"/></svg>
       </div>
   </div>
 
-  <!-- PC 헤더 (PC에서만 보임) -->
   <div class="v-header" onmousedown="event.stopPropagation()">
     <div class="v-header-left">
       <div class="close-v" onclick="closeViewer()">✕</div>
@@ -705,7 +685,6 @@
     </div>
   </div>
   
-  <!-- PC용 오디오 패널 (모바일은 상단바에 통합) -->
   <div id="audioPanel" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()">
     <div class="audio-ctrl-row">
       <button id="playBtn" class="audio-btn">▶</button>
@@ -775,36 +754,29 @@
   const searchDropdown = document.getElementById('searchDropdown');
   const sOverlay = document.getElementById('searchOverlay');
 
-  // 검색 인덱스 변수 선언
   let allSubjectsIndex = [];
-/* ▼▼▼▼▼ [여기] 이 코드를 복사해서 init() 함수 위에 넣으세요 ▼▼▼▼▼ */
 
 function openSettings() {
     const modal = document.getElementById('settingsModal');
     
-    // 버튼과 메뉴 요소 가져오기
     const adminBtn = document.getElementById('modalAdminBtn');
     const batchGroup = document.getElementById('batchAdminGroup');
     const previewBtn = document.getElementById('modalPreviewBtn');
     
-    // 관리자 상태에 따라 모달 내용 변경
     if(isAdmin) {
-        // 관리자일 때
         if(adminBtn) adminBtn.textContent = "로그아웃";
-        if(batchGroup) batchGroup.style.display = 'block'; // 일괄등록 메뉴 보임
+        if(batchGroup) batchGroup.style.display = 'block'; 
         if(previewBtn) {
-            previewBtn.style.display = 'block'; // 미리보기 버튼 보임
+            previewBtn.style.display = 'block'; 
             previewBtn.textContent = isPreview ? "👁️ 미리보기 종료" : "👁️ 미리보기 시작";
             previewBtn.className = isPreview ? "btn-modal btn-preview-active" : "btn-modal btn-secondary";
         }
     } else {
-        // 일반 사용자일 때
         if(adminBtn) adminBtn.textContent = "관리자 로그인";
-        if(batchGroup) batchGroup.style.display = 'none'; // 일괄등록 숨김
-        if(previewBtn) previewBtn.style.display = 'none'; // 미리보기 숨김
+        if(batchGroup) batchGroup.style.display = 'none'; 
+        if(previewBtn) previewBtn.style.display = 'none'; 
     }
 
-    // 트리 위치 조정 슬라이더 값 불러오기
     const currentPos = localStorage.getItem('kac_tree_pos') || 0;
     const range = document.getElementById('treePosRange');
     const valDisplay = document.getElementById('treePosVal');
@@ -812,13 +784,9 @@ function openSettings() {
     if(range) range.value = currentPos;
     if(valDisplay) valDisplay.textContent = currentPos;
 
-    // 모달창 띄우기
     modal.style.display = 'flex';
 }
 
-/* ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ */
-
-// 원래 있던 init 함수
   async function init() {
     try {
         setTheme(localStorage.getItem('kac_theme') || 'light');
@@ -1155,12 +1123,8 @@ function openSettings() {
 
       card.innerHTML = `
         <div class="last-viewed-icon">
-            <!-- PC용 눈 아이콘 -->
-            <svg class="icon-pc" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-            
-            <!-- 모바일용 체크 아이콘 -->
+            <svg class="icon-pc" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
             <svg class="icon-mobile" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-
             <span>Last Viewed</span>
         </div>
         <div>
@@ -1213,7 +1177,6 @@ function openSettings() {
     subjects[idx].pdfName = document.getElementById('inputPdfName').value.trim();
     subjects[idx].link = document.getElementById('inputLinkUrl').value.trim();
 
-    // 오디오 경로 처리
     let aPath = document.getElementById('inputAudioName').value.trim();
     const aExt = document.getElementById('inputAudioExt').value;
     
@@ -1240,7 +1203,6 @@ function openSettings() {
     document.getElementById('inputPdfName').value = sub.pdfName || '';
     document.getElementById('inputLinkUrl').value = sub.link || '';
 
-    // 오디오 분리 로직
     let aFull = sub.audioName || '';
     let aPath = aFull;
     let aExt = '.mp3';
@@ -1462,21 +1424,18 @@ function openSettings() {
   function handleDragEnd(e) { document.querySelectorAll('.subject-card').forEach(card => { card.classList.remove('dragging'); card.classList.remove('drag-over'); }); }
 
 async function openViewer(idx) {
-    // 1. 기존에 보고 있던 카드 표시 해제 및 현재 인덱스 저장
     document.querySelectorAll('.subject-card').forEach(c => c.classList.remove('last-viewed'));
     viewingIndex = idx; 
 
     const sub = subjects[idx];
     let pdfName = sub.pdfName;
     
-    // PDF 경로 처리
     if(!pdfName) return alert("등록된 PDF 파일이 없습니다.");
     if (pdfName.startsWith('/')) pdfName = pdfName.substring(1);
     if (!pdfName.toLowerCase().endsWith('.pdf')) pdfName += '.pdf';
 
     const pdfUrl = `files/${pdfName}`;
     
-    // 오디오 경로 처리
     let audioUrl = null;
     if(sub.audioName) {
         let aName = sub.audioName.trim();
@@ -1484,19 +1443,15 @@ async function openViewer(idx) {
         audioUrl = `files/${aName}`;
     }
 
-    // 뷰어 오버레이 열기
     overlay.style.display = 'flex'; 
     
-    // 전체화면 시도
     try {
       if (overlay.requestFullscreen) await overlay.requestFullscreen();
       else if (overlay.webkitRequestFullscreen) await overlay.webkitRequestFullscreen();
     } catch(e) { console.log(e); }
 
-    // 제목 설정
     document.getElementById('vTitle').textContent = sub.name;
     
-    // PDF 로드
     try {
         const task = pdfjsLib.getDocument(pdfUrl);
         pdfDoc = await task.promise;
@@ -1508,41 +1463,31 @@ async function openViewer(idx) {
         return;
     }
     
-    // ============================================================
-    // [수정됨] 오디오 처리 로직 (PC/모바일 공통)
-    // ============================================================
     const grp = document.getElementById('mobileAudioGroup');
     const iconR = document.getElementById('mobileAudioIconRight');
     const pcBtn = document.getElementById('audioBtn');
     const pcPanel = document.getElementById('audioPanel');
     
     if(audioUrl) {
-        // 1. 오디오 파일이 있을 때
         audioPlayer.src = audioUrl;
         audioPlayer.load();
         
-        // [모바일] 상단바에 컨트롤 표시 (화면 작을 때만)
         if(window.innerWidth <= 768) {
             grp.style.display = 'flex';
             iconR.style.display = 'flex';
         }
         
-        // [PC] 오디오 버튼 보이기 & 활성화
-        pcBtn.style.display = 'flex';       /* PC 아이콘 보임 */
+        pcBtn.style.display = 'flex';       
         pcBtn.classList.remove('disabled');
         
     } else {
-        // 2. 오디오 파일이 없을 때
         audioPlayer.src = "";
         
-        // [모바일] 상단바 컨트롤 숨김
         grp.style.display = 'none';
         iconR.style.display = 'none';
         
-        // [PC] 오디오 패널(메뉴) 강제로 닫기 (이게 빠져서 계속 떠있었음)
         pcPanel.classList.remove('open');
         
-        // [PC] 오디오 버튼 아예 숨기기
         pcBtn.style.display = 'none'; 
         pcBtn.classList.add('disabled');
     }
@@ -1591,7 +1536,6 @@ async function openViewer(idx) {
   }
   
   function toggleAudioPanel(e) { 
-    // PC에서만 사용 (모바일은 상단바에 통합됨)
     e.stopPropagation(); 
     if(document.getElementById('audioBtn').classList.contains('disabled')) return;
     const panel = document.getElementById('audioPanel');
@@ -1602,18 +1546,15 @@ async function openViewer(idx) {
   async function renderPage(dir) {
     if(isRendering) return; isRendering = true;
 
-    // 1. 텍스트 갱신
     if(pdfDoc) { 
         document.getElementById('pageFill').style.width = `${((pageNum-1)/(pdfDoc.numPages-1))*100}%`; 
         document.getElementById('progressFlag').textContent = `${pageNum} / ${pdfDoc.numPages}`; 
     }
     
-    // 2. 가상 캔버스 생성
     const newCanvas = document.createElement('canvas'); 
     const ctx = newCanvas.getContext('2d');
     const page = await pdfDoc.getPage(pageNum);
     
-    // 3. 뷰포트 계산
     const isMobile = window.innerWidth <= 768;
     let viewport;
     
@@ -1633,17 +1574,14 @@ async function openViewer(idx) {
     newCanvas.width = viewport.width; 
     newCanvas.height = viewport.height;
     
-    // 모바일 설정 (가변폭 방지)
     if(isMobile) {
         newCanvas.style.display = 'block';
         newCanvas.style.width = '100%'; 
         newCanvas.style.height = 'auto'; 
     }
 
-    // 4. 그리기
     await page.render({ canvasContext: ctx, viewport }).promise;
     
-    // 5. [중요] 교체하기 (빈 화면 0초)
     const oldCanvas = canvasContainer.querySelector('canvas');
     if (oldCanvas) {
         oldCanvas.replaceWith(newCanvas);
@@ -1669,12 +1607,10 @@ async function openViewer(idx) {
   }
 
   if(hitArea) {
-      // Mouse Events
       hitArea.addEventListener('mousedown', (e) => { e.preventDefault(); e.stopPropagation(); isDragging = true; hitArea.classList.add('dragging'); updateProgress(e.clientX); });
       window.addEventListener('mousemove', (e) => { if(!isDragging || !pdfDoc) return; updateProgress(e.clientX); });
       window.addEventListener('mouseup', () => { if(isDragging) { isDragging = false; hitArea.classList.remove('dragging'); renderPage('none'); } });
 
-      // Touch Events for Page Scrubbing
       hitArea.addEventListener('touchstart', (e) => {
           e.preventDefault(); e.stopPropagation();
           isDragging = true; hitArea.classList.add('dragging');
@@ -1708,7 +1644,6 @@ async function openViewer(idx) {
     }
   }
 
-  // PC 플레이 버튼
   document.getElementById('playBtn').onclick = (e) => { 
       e.stopPropagation(); 
       if(!audioPlayer.src || audioPlayer.src === window.location.href) { alert("재생할 오디오 파일이 없습니다."); return; }
@@ -1719,7 +1654,6 @@ async function openViewer(idx) {
       } 
   };
   
-  // 모바일 플레이 버튼
   document.getElementById('mobilePlayBtn').onclick = (e) => {
       e.stopPropagation();
       if(audioPlayer.paused) { 
@@ -1731,7 +1665,6 @@ async function openViewer(idx) {
       }
   };
 
-  // 모바일 슬라이더
   const mProg = document.getElementById('mobileAudioProgress');
   mProg.onclick = (e) => e.stopPropagation();
   mProg.oninput = (e) => { 
@@ -1741,18 +1674,15 @@ async function openViewer(idx) {
       }
   };
 
-  // 오디오 시간 업데이트
   audioPlayer.ontimeupdate = () => { 
       const pct = (audioPlayer.currentTime / audioPlayer.duration) * 100 || 0;
       const m = Math.floor(audioPlayer.currentTime/60);
       const s = Math.floor(audioPlayer.currentTime%60);
       const timeStr = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 
-      // PC
       document.getElementById('audioProgress').value = pct; 
       document.getElementById('audioTime').textContent = timeStr;
       
-      // Mobile
       document.getElementById('mobileAudioProgress').value = pct;
       document.getElementById('mobileAudioTime').innerText = timeStr;
   };
