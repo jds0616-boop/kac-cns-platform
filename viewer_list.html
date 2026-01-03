@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>과목 리스트 - KAC CNS Training Platform</title>
 <script>
+  // [보안] 로그인 세션 체크
   if(sessionStorage.getItem('kac_access_token') !== 'granted') {
     location.replace('login.html'); 
   }
@@ -84,9 +85,14 @@
   header { height: var(--header-h); background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 1000; flex-shrink: 0; gap: 20px; position: relative; transition: 0.3s; }
   
   .header-left { display: flex; align-items: center; min-width: 250px; z-index: 10; white-space: nowrap; transition: opacity 0.2s; gap: 15px; } 
-  .header-center { position: absolute; left: 50%; transform: translateX(-50%); width: 400px; max-width: 100%; z-index: 20; transition: width 0.3s; }
+  .header-center { 
+      position: absolute; left: 50%; transform: translateX(-50%); 
+      width: 400px; max-width: 100%; z-index: 20; transition: width 0.3s; 
+      display: flex; align-items: center; gap: 15px; 
+  }
   .header-right { display: flex; align-items: center; gap: 15px; min-width: 250px; justify-content: flex-end; z-index: 30; }
 
+  /* 햄버거 버튼 */
   .hamburger-btn { cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; flex-shrink: 0; }
   .hamburger-btn:hover { background: rgba(255,255,255,0.1); }
   .hamburger-btn svg { width: 24px; height: 24px; fill: #fff; }
@@ -175,6 +181,7 @@
       z-index: 5; margin-bottom: 25px;
       position: relative;
       transition: 0.2s;
+      cursor: pointer; /* 클릭 가능 */
   }
   .fac-top-card:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(var(--theme-rgb), 0.15); }
   body.dark-mode .fac-top-card { background: rgba(var(--theme-rgb), 0.15); }
@@ -297,7 +304,14 @@
 
   #pageContainer { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; }
 
-  .bottom-nav { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); background: var(--navy); padding: 15px 45px; border-radius: 100px; display: flex; gap: 40px; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000; border: 1px solid rgba(255,255,255,0.1); }
+  /* [PC] 하단 네비게이션: Facility와 동일하게 */
+  .bottom-nav { 
+    position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); 
+    background: var(--navy); padding: 15px 45px; border-radius: 100px; 
+    display: flex; gap: 40px; align-items: center; 
+    justify-content: center; /* PC는 중앙 정렬 */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000; border: 1px solid rgba(255,255,255,0.1); 
+  }
   .nav-item { color: #fff; cursor: pointer; font-size: 18px; font-weight: 700; transition: 0.3s; opacity: 0.8; display: flex; align-items: center; gap: 10px; }
   .nav-item:hover { opacity: 1; transform: translateY(-3px); }
   .nav-icon { width: 24px; height: 24px; fill: currentColor; }
@@ -337,6 +351,7 @@
   .icon-mobile { display: none; }
   .icon-pc { display: block; }
   .mobile-top-bar { display: none; }
+  .mobile-theme-btn { display: none; } /* PC에선 숨김 */
 
   /* ========================================= */
   /* [모바일 전용 최적화] */
@@ -344,57 +359,40 @@
   @media (max-width: 768px) {
     .v-header, #audioPanel, .mobile-top-exit-btn { display: none !important; }
 
-    /* [수정] 하단 여백 확보 (150px) + 상단 여백 최소화 (5px) */
     main { padding: 5px 15px 150px 15px !important; }
 
     .tree-container { align-items: flex-start; }
-    /* [수정] 트리 라인 시작점(top) 조정 (60px) */
     .tree-spine { display: block !important; left: 24px; top: 60px; bottom: 30px; width: 3px; background: rgba(var(--theme-rgb), 0.3); }
     
-    /* [수정] 상단 명함 카드 영역 (Sticky + 회색 배경 마스크) */
     .tree-container > .fac-top-card { 
         position: sticky;
         top: 0;
         z-index: 600 !important;
-        
-        background: var(--bg-main) !important; /* 마스크 역할의 회색 배경 */
-        
-        width: calc(100% + 30px); /* 좌우 여백 상쇄 */
+        background: var(--bg-main) !important; 
+        width: calc(100% + 30px);
         max-width: none;
-        margin: -5px -15px 25px -15px; /* main 패딩 상쇄 */
-        padding: 10px 15px 15px 15px; /* 내부 여백 조정 (1cm Gap 효과) */
-        
-        border: none; /* 컨테이너 자체 테두리 제거 */
+        margin: -13px -15px 25px -15px !important; 
+        padding: 10px 15px 15px 15px; 
+        border: none;
         border-radius: 0;
-        box-shadow: none; /* 컨테이너 그림자 제거 (내부 카드에만 적용) */
-        
+        box-shadow: none; 
         flex-direction: column !important;
         align-items: stretch !important;
     }
     
-    /* [수정] 실제 명함 카드 모양 (내부에 흰색 박스 생성) */
     .fac-top-card::after {
         content: '';
         display: block;
         position: absolute;
-        inset: 10px 15px 15px 15px; /* 회색 배경 안쪽 10px(상단) 띄움 */
-        background: var(--bg-card); /* 흰색 */
-        border: 3px solid var(--theme-color); /* 테두리 복원 */
-        border-radius: 20px; /* 둥근 모서리 복원 */
+        inset: 10px 15px 15px 15px;
+        background: var(--bg-card);
+        border: 3px solid var(--theme-color);
+        border-radius: 20px;
         z-index: -1;
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
 
-    /* 내부 요소 재배치 */
-    .fac-left-group { 
-        width: 100%; 
-        flex-direction: row !important; 
-        align-items: center; 
-        gap: 12px; 
-        padding: 15px; /* 카드 내부 패딩 */
-        z-index: 1;
-    }
-    
+    .fac-left-group { width: 100%; flex-direction: row !important; align-items: center; gap: 12px; padding: 15px; z-index: 1; }
     .fac-tag-pill { font-size: 13px; padding: 6px 12px; min-width: auto; align-self: center; margin: 0; }
     .fac-title { font-size: 18px; line-height: 1.3; flex: 1; text-align: left; }
     
@@ -406,26 +404,22 @@
     .status-group { flex-wrap: wrap; gap: 4px; margin-top: 0; }
     .status-pill { padding: 2px 6px; font-size: 10px; height: auto; display: inline-block; border-radius: 4px; line-height: 1.3; }
     
-    /* [수정] 하단 네비게이션 개선 */
+    /* [모바일] 하단 네비게이션: 양쪽 정렬 + 테마 버튼 */
     .bottom-nav { 
         width: 90%; bottom: 20px; 
-        padding: 16px 25px; /* 좌우 패딩 추가 */
-        gap: 0; /* gap 제거하고 space-between 사용 */
+        padding: 16px 25px; 
+        gap: 0;
         border-radius: 50px; 
         justify-content: space-between; /* 양쪽 배분 */
         background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(10px); 
         box-shadow: 0 8px 25px rgba(0,0,0,0.4); 
     }
     
-    /* 좌측 그룹 (뒤로가기/홈으로) */
-    .nav-left-group {
-        display: flex; gap: 25px; /* 버튼 사이 간격 */
-        margin-left: 20px; /* 좌측 여백 추가 (중앙으로 살짝 이동) */
-    }
-
+    .nav-left-group { display: flex; gap: 25px; margin-left: 20px; }
     .nav-item { font-size: 14px; gap: 6px; font-weight: 800; }
+    .nav-icon { width: 20px !important; height: 20px !important; }
     
-    /* 우측 테마 토글 버튼 */
+    /* 모바일에서만 테마 버튼 보임 */
     .mobile-theme-btn {
         display: flex; align-items: center; justify-content: center;
         width: 32px; height: 32px;
@@ -437,11 +431,6 @@
     .mobile-theme-btn.active { background: #fff; color: var(--navy); }
     .mobile-theme-btn svg { width: 18px; height: 18px; fill: currentColor; }
 
-    /* 헤더 수정 (햄버거 보이기) */
-    /* [수정] PC에서 옮겨진 햄버거 버튼을 모바일에서도 잘 보이게 처리 */
-    .header-left { display: flex !important; min-width: auto !important; }
-    .logo-text, .breadcrumb { display: none !important; }
-    
     .header-search { font-size: 14px; padding: 10px 20px 10px 45px; background-size: 18px; background-position: 15px center; }
 
     .mobile-top-bar {
@@ -516,7 +505,6 @@
     
     #pageContainer { min-height: 100% !important; height: auto !important; display: block !important; padding-bottom: 50px !important; }
 
-    /* [수정] Last Viewed 아이콘 위치 이동 (우측 끝) */
     .subject-card.last-viewed .last-viewed-icon { 
         display: flex; position: absolute; 
         left: auto !important; right: 15px !important; top: 50%; transform: translateY(-50%); 
@@ -553,7 +541,6 @@
 
 <header>
   <div class="header-left" id="headerLeft">
-    <!-- [수정] 햄버거 버튼을 다시 왼쪽(로고 옆)으로 이동 -->
     <div class="hamburger-btn" onclick="toggleSidebar()">
       <svg viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
     </div>
@@ -913,17 +900,6 @@ function openSettings() {
           if(!tid) return;
           const style = JSON.parse(localStorage.getItem(`kac_style_${tid}`) || '{}');
           
-          // 접근 권한 및 사이드바 노출 여부 체크
-          const acc = style.access || { visible: true, adminOnly: false, showSidebar: true };
-          
-          // 일반 사용자: 비공개거나, 관리자 전용이거나, 사이드바 미노출이면 건너뜀
-          if (!isAdmin) {
-              if (!acc.visible || acc.adminOnly || !acc.showSidebar) return;
-          }
-
-          // 관리자: 숨겨진 메뉴는 흐리게 표시
-          const hiddenStyle = (isAdmin && (!acc.visible || acc.adminOnly || !acc.showSidebar)) ? 'opacity: 0.5;' : '';
-          
           const isActive = tid === type; 
           const itemClass = isActive ? 'sb-item active' : 'sb-item';
           const menus = JSON.parse(localStorage.getItem(`kac_menu_${tid}`) || '[]');
@@ -935,25 +911,19 @@ function openSettings() {
               const listClass = isActive ? 'sb-sub-list open' : 'sb-sub-list';
               subHtml = `<div class="${listClass}" id="sb-sub-${tid}">`;
               menus.forEach(m => {
-                  const isMenuVisible = (m.visible !== undefined) ? m.visible : true;
-                  if(isAdmin || isMenuVisible) {
-                      const isSubActive = (tid === type && m.dataId === menuId);
-                      const subClass = isSubActive ? 'sb-sub-item active' : 'sb-sub-item';
-                      subHtml += `<div class="${subClass}" onclick="location.href='viewer_list.html?type=${tid}&menu=${encodeURIComponent(m.label)}&id=${m.dataId}'">
-                          ${m.label} ${(!isMenuVisible && isAdmin) ? '<span style="color:red;font-size:10px;">(비공개)</span>' : ''}
-                      </div>`;
-                  }
+                  const isSubActive = (tid === type && m.dataId === menuId);
+                  const subClass = isSubActive ? 'sb-sub-item active' : 'sb-sub-item';
+                  subHtml += `<div class="${subClass}" onclick="location.href='viewer_list.html?type=${tid}&menu=${encodeURIComponent(m.label)}&id=${m.dataId}'">${m.label}</div>`;
               });
               subHtml += '</div>';
           }
 
           const item = document.createElement('div');
-          // style="${hiddenStyle}" 추가 및 숨김 텍스트 표시
           item.innerHTML = `
-            <div class="${itemClass}" onclick="toggleSubMenu('${tid}', this)" style="${hiddenStyle}">
+            <div class="${itemClass}" onclick="toggleSubMenu('${tid}', this)">
                 <span style="display:flex;align-items:center;gap:10px;">
                     <span style="width:10px;height:10px;border-radius:50%;background:${style.color || '#2563eb'}"></span>
-                    ${style.name || tid} ${hiddenStyle ? '<span style="font-size:10px;">(숨김)</span>' : ''}
+                    ${style.name || tid}
                 </span>
                 ${arrow}
             </div>
@@ -1060,10 +1030,10 @@ function openSettings() {
     }
   }
   
-  function toggleMobileTheme() {
+  // [추가] 모바일 전용 토글 함수
+  function toggleThemeMobile() {
       const current = localStorage.getItem('kac_theme') || 'light';
-      const next = current === 'light' ? 'dark' : 'light';
-      setTheme(next);
+      setTheme(current === 'light' ? 'dark' : 'light');
   }
 
   async function sha256(message) {
@@ -1203,7 +1173,7 @@ function openSettings() {
       card.innerHTML = `
         <div class="last-viewed-icon">
             <!-- PC용 눈 아이콘 -->
-            <svg class="icon-pc" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <svg class="icon-pc" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
             
             <!-- 모바일용 체크 아이콘 -->
             <svg class="icon-mobile" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
