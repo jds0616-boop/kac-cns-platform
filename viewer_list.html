@@ -234,7 +234,7 @@
   .btn-del:hover { background: #fee2e2; }
 
   /* ================================================================= */
-  /* [수정] 오버레이 구조를 Flexbox로 변경하여 겹침 문제 해결 */
+  /* [수정] 오버레이 구조를 Flexbox로 변경 (겹침 방지 Stack Layout) */
   /* ================================================================= */
   #pdfOverlay { 
       position: fixed; inset: 0; background: #000; 
@@ -358,7 +358,7 @@
     .v-header, .mobile-top-exit-btn { display: none !important; }
     
     /* 모바일 상단 바 활성화 */
-    .mobile-top-bar { display: flex !important; }
+    .mobile-top-bar { display: flex !important; order: 1; }
 
     main { padding: 20px 15px; padding-bottom: 100px; }
     .tree-container { align-items: flex-start; }
@@ -387,7 +387,7 @@
     .nav-icon { width: 20px; height: 20px; }
     .header-search { font-size: 14px; padding: 10px 20px 10px 45px; background-size: 18px; background-position: 15px center; }
 
-    /* [핵심] 모바일 오디오 패널 (하단 고정 Block) */
+    /* [핵심] 모바일 오디오 패널 (블록 쌓기 - Order 3) */
     #audioPanel {
         position: static !important; /* Float 제거 */
         display: none; /* JS로 flex 변경 */
@@ -405,6 +405,7 @@
         box-shadow: none !important;
         border-top: 1px solid rgba(255,255,255,0.1) !important;
         flex-shrink: 0; /* 크기 고정 */
+        order: 3; /* 3번째 위치 */
     }
     #audioPanel.open { display: flex !important; }
     
@@ -414,16 +415,23 @@
     #audioTime { font-size: 12px !important; margin-left: 5px; color: #fff !important; }
     #audioProgress { accent-color: #fff !important; }
     
-    /* [수정] 뷰어 바디: Flex Start 정렬 + 상하 패딩으로 여백 확보 */
+    /* [수정] 뷰어 바디: 남은 공간 꽉 채우기 (Order 2) */
     .viewer-body { 
         padding: 0; 
         background: #000; 
         align-items: flex-start !important; /* 위에서부터 시작 */
         height: auto !important; 
-        min-height: 100vh;
-        padding-top: 60px !important; /* 상단바 높이만큼 띄움 */
-        padding-bottom: 100px !important; /* 하단바 높이만큼 띄움 */
+        flex: 1; /* 남은 공간 차지 */
         overflow-y: scroll !important; /* 스크롤 허용 */
+        order: 2; /* 2번째 위치 */
+    }
+    
+    /* [수정] 진행바: 맨 아래 고정 (Order 4) */
+    .progress-hit-area {
+        position: static !important;
+        height: 15px !important;
+        background: #000;
+        order: 4; /* 4번째 위치 */
     }
   }
 
@@ -608,7 +616,7 @@
   </div>
 </div>
 
-<!-- [수정] PDF 오버레이 구조 변경: Flexbox Stacked Layout -->
+<!-- [수정] PDF 오버레이 구조 변경: Flexbox Stacked Layout (모바일 최적화) -->
 <div id="pdfOverlay" onmousedown="handleMouseNav(event)">
   
   <!-- 모바일 상단 바 (나가기 + 오디오 버튼) -->
@@ -644,6 +652,10 @@
     </div>
   </div>
 
+  <div id="viewerBody" class="viewer-body">
+    <div id="pageContainer"></div>
+  </div>
+
   <!-- [수정] ontouchmove 추가: 터치 이동 시 페이지 넘김 방지 -->
   <div id="audioPanel" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()" ontouchstart="event.stopPropagation()" ontouchend="event.stopPropagation()" ontouchmove="event.stopPropagation()">
     <div class="audio-ctrl-row">
@@ -654,10 +666,6 @@
     <div class="volume-row">
       🔊 <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="1" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
     </div>
-  </div>
-
-  <div id="viewerBody" class="viewer-body">
-    <div id="pageContainer"></div>
   </div>
 
   <div id="progressHitArea" class="progress-hit-area" onmousedown="event.stopPropagation()">
@@ -1053,7 +1061,7 @@
 
       card.innerHTML = `
         <div class="last-viewed-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
             <span>Last Viewed</span>
         </div>
         <div>
@@ -1094,7 +1102,6 @@
     }
   }
 
-  // [수정] 저장 함수: 입력된 경로 + 선택된 확장자를 합쳐서 저장
   function saveFiles() {
     const idx = currentEditIdx;
     const name = document.getElementById('editSubjectName').value;
@@ -1126,7 +1133,6 @@
     document.getElementById('uploadModal').style.display = 'none';
   }
 
-  // [수정] 수정창 열기 함수: 저장된 파일명에서 확장자를 분리해서 보여줌
   function openUploadMenu(idx) { 
     currentEditIdx = idx; 
     const sub = subjects[idx];
@@ -1493,9 +1499,8 @@
     let viewport;
     
     if (isMobile) {
-        // [수정] 모바일: 가로 꽉 채우기 (Fit Width)
         const unscaledViewport = page.getViewport({ scale: 1 });
-        const scale = window.innerWidth / unscaledViewport.width; 
+        const scale = (window.innerWidth / unscaledViewport.width) * 1.5; 
         viewport = page.getViewport({ scale: scale });
     } else {
         const unscaledViewport = page.getViewport({ scale: 1 });
