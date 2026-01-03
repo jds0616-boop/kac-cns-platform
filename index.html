@@ -734,7 +734,9 @@
 
             const menuList = ms.map(m => {
                 const subs = JSON.parse(localStorage.getItem(`kac_subs_${id}_${m.dataId}`) || '[]');
-                return { id: m.dataId, label: m.label, line1: m.line1, line2: m.line2, link: m.link, subjects: subs };
+                // [수정] 메뉴의 visible 속성도 복원 (없으면 true)
+                const isVisible = (m.visible !== undefined) ? m.visible : true;
+                return { id: m.dataId, label: m.label, line1: m.line1, line2: m.line2, link: m.link, visible: isVisible, subjects: subs };
             });
 
             return { id: id, name: s.name, code: s.code, color: s.color, access: access, menus: menuList };
@@ -780,8 +782,17 @@
         const access = cat.access || { visible: true, adminOnly: false, showSidebar: true };
         localStorage.setItem(`kac_style_${cat.id}`, JSON.stringify({ name: cat.name, code: cat.code, color: cat.color, access: access }));
         
-        const menus = cat.menus.map(m => ({ dataId: m.id, label: m.label, line1: m.line1, line2: m.line2, link: m.link }));
+        // [수정] 서버에서 가져온 메뉴 데이터 저장 시 visible 속성 포함
+        const menus = cat.menus.map(m => ({ 
+            dataId: m.id, 
+            label: m.label, 
+            line1: m.line1, 
+            line2: m.line2, 
+            link: m.link,
+            visible: (m.visible !== undefined) ? m.visible : true // 기본값 true
+        }));
         localStorage.setItem(`kac_menu_${cat.id}`, JSON.stringify(menus));
+        
         cat.menus.forEach(m => { localStorage.setItem(`kac_subs_${cat.id}_${m.id}`, JSON.stringify(m.subjects)); });
       } else {
         order.push(null);
@@ -826,11 +837,9 @@
           if (c === null) return false;
           const acc = c.access || { visible: true, adminOnly: false, showSidebar: true };
           if (!isAdmin) {
-              // 게스트: 비공개 또는 관리자전용이면 숨김
               if (!acc.visible || acc.adminOnly) return false;
           }
           if (!acc.showSidebar && !isAdmin) return false; 
-          // 관리자는 목록에서 다 보여주되 시각적으로 구분
           return true;
       });
 
@@ -841,7 +850,6 @@
 
       cats.forEach((cat, cIdx) => {
           const acc = cat.access || { visible: true, adminOnly: false, showSidebar: true };
-          // 사이드바에서 숨겨진 항목 시각적 표시 (관리자)
           let namePrefix = "";
           if (isAdmin && !acc.visible) namePrefix = "(비공개) ";
           else if (isAdmin && acc.adminOnly) namePrefix = "(관리자) ";
@@ -852,9 +860,13 @@
           if(cat.menus && cat.menus.length > 0) {
               subHtml = `<div class="sb-sub-list" id="sb-sub-${cat.id}">`;
               cat.menus.forEach(m => {
-                  subHtml += `<div class="sb-sub-item" onclick="location.href='viewer_list.html?type=${cat.id}&menu=${encodeURIComponent(m.label)}&id=${m.id}'">
-                      ${m.label}
-                  </div>`;
+                  // [수정] 사이드바 서브메뉴 렌더링 시 비공개 메뉴 처리
+                  const isMenuVisible = (m.visible !== undefined) ? m.visible : true;
+                  if(isAdmin || isMenuVisible) {
+                      subHtml += `<div class="sb-sub-item" onclick="location.href='viewer_list.html?type=${cat.id}&menu=${encodeURIComponent(m.label)}&id=${m.id}'">
+                          ${m.label} ${(!isMenuVisible && isAdmin) ? '<span style="color:red;font-size:10px;">(비공개)</span>' : ''}
+                      </div>`;
+                  }
               });
               subHtml += `</div>`;
           }
@@ -914,7 +926,7 @@
       }
   }
 
-  /* 메인 카드 렌더링 (핵심 수정 부분) */
+  /* 메인 카드 렌더링 */
   function renderCards(animate = true) {
     const containerWrapper = document.getElementById('cardContainer');
     const pagination = document.getElementById('pagination');
@@ -935,31 +947,25 @@
         containerWrapper.innerHTML = ''; 
         pagination.innerHTML = '';
 
-        // [수정] 렌더링 대상 리스트 결정
         let renderList = [];
         
         if (isAdmin) {
-            // 관리자는 모든 슬롯(빈칸 포함)을 그대로 보여줌
             renderList = globalData.categories;
         } else {
-            // 게스트는 비공개/관리자전용 제외하고, 빈칸(null)도 제외하여 순수 리스트만 생성
             renderList = globalData.categories.filter(cat => {
                 if(!cat) return false;
                 const acc = cat.access || { visible: true, adminOnly: false, showSidebar: true };
-                // 공개 여부가 false이거나, 관리자 전용이면 제외
                 if(!acc.visible || acc.adminOnly) return false;
                 return true;
             });
         }
 
         const totalPages = Math.ceil(renderList.length / itemsPerPage) || 1;
-        if(currentPage > totalPages) currentPage = 1; // 페이지 범위 초과 시 1페이지로 리셋
+        if(currentPage > totalPages) currentPage = 1; 
         const startIdx = (currentPage - 1) * itemsPerPage;
         const pageItems = renderList.slice(startIdx, startIdx + itemsPerPage);
 
-        // 페이지 아이템 렌더링
         pageItems.forEach((cat, i) => {
-          // 원래 globalData에서의 인덱스를 찾아야 수정/이동 기능이 작동함 (관리자용)
           let globalIdx = -1;
           if(isAdmin) {
              globalIdx = startIdx + i;
@@ -975,7 +981,6 @@
             card.style.setProperty('--card-color', cat.color);
             card.onclick = () => location.href = `facility.html?type=${cat.id}`;
             
-            // 관리자 뷰에서 비공개/권한제한 시각적 표시
             if (isAdmin && (isHidden || isAdminOnly)) {
                 card.classList.add('restricted-view');
             }
@@ -1006,7 +1011,6 @@
             }
             containerWrapper.appendChild(card);
           } else { 
-            // 빈칸 (관리자 모드에서만 렌더링됨)
             const empty = document.createElement('div');
             empty.className = 'card add-slot';
             if(isAdmin && !isPreview) {
@@ -1030,7 +1034,6 @@
             pagination.appendChild(dot);
         }
         
-        // 관리자용 페이지 추가 버튼
         if(isAdmin && !isPreview) {
             const addPageBtn = document.createElement('div');
             addPageBtn.className = 'page-dot';
@@ -1059,13 +1062,16 @@
     searchIndex = [];
     globalData.categories.forEach(cat => {
       if(!cat) return;
-      // 검색 인덱스 생성 시 권한 체크
       const acc = cat.access || { visible: true, adminOnly: false, showSidebar: true };
       if (!isAdmin) {
           if (!acc.visible || acc.adminOnly) return;
       }
 
       cat.menus.forEach(menu => {
+        // [수정] 검색 인덱스 생성 시에도 메뉴의 visible 속성 체크
+        const isMenuVisible = (menu.visible !== undefined) ? menu.visible : true;
+        if(!isAdmin && !isMenuVisible) return;
+
         menu.subjects.forEach(sub => {
           searchIndex.push({
             name: sub.name, type: cat.id, code: cat.code, typeName: cat.name,
