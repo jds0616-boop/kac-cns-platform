@@ -620,6 +620,14 @@
           ]
         },
         {
+          "id": "id_1767390862251_5",
+          "label": "계기착륙시설 시물레이션",
+          "line1": "ILS",
+          "line2": "",
+          "link": "http://sonwooram.github.io/ILS-SIM/",
+          "subjects": []
+        },
+        {
           "id": "id_1766848178131_1",
           "label": "전방향표지시설",
           "line1": "VOR",
@@ -667,14 +675,6 @@
               "audioName": ""
             }
           ]
-        },
-        {
-          "id": "id_1767390862251_5",
-          "label": "계기착륙시설 시물레이션",
-          "line1": "ILS",
-          "line2": "",
-          "link": "http://sonwooram.github.io/ILS-SIM/",
-          "subjects": []
         }
       ]
     },
