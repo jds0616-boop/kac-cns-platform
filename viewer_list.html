@@ -416,23 +416,14 @@
     #audioProgress { accent-color: #fff !important; }
     
     /* [수정] 뷰어 바디: 남은 공간 꽉 채우기 (Order 2) */
-.viewer-body { 
+    .viewer-body { 
         padding: 0; 
         background: #000; 
-        
-        /* [수정] 상자 크기 고정 (절대 줄어들지 않음) */
-        flex: 1 !important; 
-        min-height: 0 !important; 
-        height: 100% !important; /* 남은 공간 꽉 채우기 */
-        
-        /* 내용물 정렬: 위쪽부터 시작 */
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important; 
-        justify-content: flex-start !important;
-        
-        overflow-y: scroll !important; 
-        order: 2; 
+        align-items: flex-start !important; /* 위에서부터 시작 */
+        height: auto !important; 
+        flex: 1; /* 남은 공간 차지 */
+        overflow-y: scroll !important; /* 스크롤 허용 */
+        order: 2; /* 2번째 위치 */
     }
     
     /* [수정] 진행바: 맨 아래 고정 (Order 4) */
@@ -1490,22 +1481,20 @@
     }
   }
 
-async function renderPage(dir) {
-    if(isRendering) return; 
-    isRendering = true;
-
-    // 1. 페이지 번호 등 텍스트 먼저 갱신
-    if(pdfDoc) { 
-        document.getElementById('pageFill').style.width = `${((pageNum-1)/(pdfDoc.numPages-1))*100}%`; 
-        document.getElementById('progressFlag').textContent = `${pageNum} / ${pdfDoc.numPages}`; 
-    }
+  async function renderPage(dir) {
+    if(isRendering) return; isRendering = true;
+    if(pdfDoc) { document.getElementById('pageFill').style.width = `${((pageNum-1)/(pdfDoc.numPages-1))*100}%`; document.getElementById('progressFlag').textContent = `${pageNum} / ${pdfDoc.numPages}`; }
     
-    // 2. [핵심] 메모리에 가상의 캔버스를 만듦 (화면에는 아직 안 보여줌)
+    if(canvasContainer.firstChild) {
+        canvasContainer.firstChild.classList.remove('slide-active');
+    }
+
     const newCanvas = document.createElement('canvas'); 
+    newCanvas.className = 'slide-enter';
+    
     const ctx = newCanvas.getContext('2d');
     const page = await pdfDoc.getPage(pageNum);
     
-    // 3. 화면 크기 계산 (기존 로직 유지)
     const isMobile = window.innerWidth <= 768;
     let viewport;
     
@@ -1515,6 +1504,7 @@ async function renderPage(dir) {
         viewport = page.getViewport({ scale: scale });
     } else {
         const unscaledViewport = page.getViewport({ scale: 1 });
+        // [수정] PC에서 전체화면 높이(window.innerHeight) 기준 - 헤더 없음
         const availableHeight = window.innerHeight; 
         const scaleY = availableHeight / unscaledViewport.height;
         const scaleX = window.innerWidth / unscaledViewport.width;
@@ -1522,27 +1512,16 @@ async function renderPage(dir) {
         viewport = page.getViewport({ scale: baseScale }); 
     }
     
-    newCanvas.width = viewport.width; 
-    newCanvas.height = viewport.height;
+    newCanvas.width = viewport.width; newCanvas.height = viewport.height;
     
-    // 모바일 스타일 강제 적용 (깜빡임 방지용)
-    if(isMobile) {
-        newCanvas.style.display = 'block';
-        newCanvas.style.width = '100%';
-        newCanvas.style.height = 'auto';
-    }
-
-    // 4. 가상 캔버스에 그림을 다 그림 (이 동안 화면은 멈춰있음 = 흔들림 없음)
     await page.render({ canvasContext: ctx, viewport }).promise;
     
-    // 5. [교체] 그림 완성 후, 0.001초 만에 바꿔치기 (깜빡임 없음)
     canvasContainer.innerHTML = ''; 
     canvasContainer.appendChild(newCanvas);
     
-    // 모바일이면 스크롤 맨 위로 (페이지 넘겼으니)
-    if(isMobile) {
-        viewerBody.scrollTop = 0;
-    }
+    requestAnimationFrame(() => {
+        newCanvas.classList.add('slide-active');
+    });
 
     isRendering = false;
   }
