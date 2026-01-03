@@ -83,7 +83,7 @@
   header { height: var(--header-h); background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 1000; flex-shrink: 0; gap: 20px; position: relative; transition: 0.3s; }
   
   .header-left { display: flex; align-items: center; min-width: 250px; z-index: 10; white-space: nowrap; transition: opacity 0.2s; gap: 15px; } 
-  .header-center { position: absolute; left: 50%; transform: translateX(-50%); width: 600px; max-width: 100%; z-index: 20; transition: width 0.3s; }
+  .header-center { position: absolute; left: 50%; transform: translateX(-50%); width: 400px; max-width: 100%; z-index: 20; transition: width 0.3s; }
   .header-right { display: flex; align-items: center; gap: 15px; min-width: 250px; justify-content: flex-end; z-index: 10; }
 
   .hamburger-btn { cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; flex-shrink: 0; }
@@ -234,7 +234,7 @@
   .btn-del:hover { background: #fee2e2; }
 
   /* ================================================================= */
-  /* [수정] 오버레이 구조를 Flexbox로 변경 (겹침 방지 Stack Layout) */
+  /* [수정] 오버레이 구조를 Flexbox로 변경 (Flex Layout) */
   /* ================================================================= */
   #pdfOverlay { 
       position: fixed; inset: 0; background: #000; 
@@ -244,7 +244,7 @@
       flex-direction: column; 
   }
   
-  /* PC 기본 헤더: PDF 위로 겹치게 설정 */
+  /* PC 기본 헤더 */
   .v-header { 
       position: absolute; 
       top: 0; left: 0; right: 0;
@@ -296,31 +296,14 @@
   .progress-flag::after { content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); border-width: 5px 5px 0; border-style: solid; border-color: #1e293b transparent transparent transparent; }
   .progress-hit-area:hover .progress-flag, .progress-hit-area.dragging .progress-flag { opacity: 1; transform: translateY(0); }
   
-  .side-nav { position: absolute; top: 0; bottom: 0; width: 12%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 7500; background: transparent; border: none; transition: 0.3s; }
-  .side-nav svg { width: 50px; height: 50px; fill: #fff; opacity: 0.15; transition: 0.3s; }
-  .side-nav:hover svg { opacity: 0.7; }
-  .nav-L { left: 0; } .nav-R { right: 0; }
-  
-  /* [수정] 뷰어 바디: 전체화면 꽉 차게 */
+  /* 뷰어 바디 */
   .viewer-body { width: 100%; height: 100vh; display: flex; justify-content: center; align-items: center; cursor: default; overflow: hidden; position: relative; background: #000; }
   
-  /* [수정] 캔버스: PC에서 꽉 차게 보이도록 설정 */
+  /* 캔버스 */
   canvas { 
       box-shadow: 0 0 50px rgba(0,0,0,0.8); pointer-events: none; 
       max-width: 100%; max-height: 100%; width: auto; height: auto; 
       object-fit: contain; opacity: 1; transition: none; 
-  }
-
-  @media (max-width: 768px) {
-      canvas { 
-          transition: opacity 0.3s ease-out; 
-          width: 100% !important; /* 가로 꽉 채우기 */
-          height: auto !important; /* 비율 자동 */
-          max-height: none !important; /* 세로 제한 해제 */
-          object-fit: fill !important;
-      }
-      .slide-enter { opacity: 0; }
-      .slide-active { opacity: 1; }
   }
 
   #pageContainer { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; }
@@ -333,107 +316,8 @@
   body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(255, 255, 255, 0.3); }
   body.dark-mode .nav-item { color: #e2e8f0; opacity: 1; }
   
-  /* 모바일 상단 바 (Flex Layout 전용) */
-  .mobile-top-bar {
-      display: none; height: 60px; background: #000; 
-      align-items: center; justify-content: space-between; 
-      padding: 0 20px; flex-shrink: 0; z-index: 8000;
-  }
-  .mobile-exit-btn {
-      background: #ef4444; color: #fff; padding: 8px 16px; border-radius: 50px; 
-      font-weight: 800; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px;
-  }
-  .mobile-audio-icon {
-      color: #fff; cursor: pointer; display: flex; align-items: center; gap: 6px; 
-      opacity: 0.5; transition: 0.3s;
-  }
-  .mobile-audio-icon.active { opacity: 1; color: #facc15; }
-  .mobile-audio-icon.disabled { display: none; }
-
-  /* ========================================= */
-  /* [수정] 모바일 디자인 (Stacked Layout) */
-  /* ========================================= */
-  @media (max-width: 768px) {
-    /* PC 헤더 및 부유 요소 숨김 */
-    .v-header, .mobile-top-exit-btn { display: none !important; }
-    
-    /* 모바일 상단 바 활성화 */
-    .mobile-top-bar { display: flex !important; order: 1; }
-
-    main { padding: 20px 15px; padding-bottom: 100px; }
-    .tree-container { align-items: flex-start; }
-    .tree-spine { display: block !important; left: 24px; top: 85px; bottom: 30px; width: 3px; background: rgba(var(--theme-rgb), 0.3); }
-    .fac-top-card { width: 100%; border-radius: 15px; margin-bottom: 25px; padding: 15px 15px; flex-direction: row !important; align-items: center; justify-content: flex-start; gap: 15px; position: relative; z-index: 5; margin-left: 0; }
-    .fac-left-group { width: 100%; flex-direction: row !important; align-items: center; gap: 12px; }
-    .fac-tag-pill { font-size: 13px; padding: 6px 12px; min-width: auto; align-self: center; margin: 0; }
-    .fac-title { font-size: 18px; line-height: 1.3; flex: 1; text-align: left; }
-    .card-wrapper { display: block; margin-bottom: 10px; padding-left: 55px; width: 100%; }
-    .card-wrapper::before { display: block !important; left: 26px; width: 34px; top: 50%; height: 3px; background: rgba(var(--theme-rgb), 0.3); }
-    .card-wrapper::after { content: ''; position: absolute; left: 22px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; border-radius: 50%; background: var(--theme-color); border: 2px solid var(--bg-main); z-index: 2; }
-    .subject-card { padding: 12px 12px 8px 12px; border-radius: 10px; min-height: auto; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
-    .subj-title { font-size: 14px; padding-right: 0; word-break: keep-all; line-height: 1.3; margin-bottom: 2px; }
-    .subject-card.last-viewed { border-color: #10b981; }
-    .subject-card.last-viewed .last-viewed-icon { display: flex; position: absolute; left: -35px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; border-radius: 50%; background: #10b981; padding: 0; justify-content: center; align-items: center; border: 2px solid var(--bg-main); z-index: 10; right: auto; }
-    .last-viewed-icon span { display: none; }
-    .last-viewed-icon svg { width: 12px; height: 12px; fill: #fff; }
-    .status-group { flex-wrap: wrap; gap: 4px; margin-top: 0; }
-    .status-pill { padding: 2px 6px; font-size: 10px; height: auto; display: inline-block; border-radius: 4px; line-height: 1.3; }
-    .pill-icon { display: none !important; }
-    .status-text { display: inline-block !important; white-space: normal; }
-    .status-pill:has(.status-text:contains('PDF')) .status-text::before { content: 'PDF '; font-weight: 800; opacity: 0.7; }
-    .bottom-nav { width: 90%; bottom: 20px; padding: 16px 0; gap: 30px; border-radius: 50px; justify-content: center; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(10px); box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
-    body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.98); }
-    .nav-item { font-size: 14px; gap: 6px; font-weight: 800; }
-    .nav-icon { width: 20px; height: 20px; }
-    .header-search { font-size: 14px; padding: 10px 20px 10px 45px; background-size: 18px; background-position: 15px center; }
-
-    /* [핵심] 모바일 오디오 패널 (블록 쌓기 - Order 3) */
-    #audioPanel {
-        position: static !important; /* Float 제거 */
-        display: none; /* JS로 flex 변경 */
-        width: 100% !important;
-        max-width: none !important;
-        height: 60px !important;
-        padding: 0 20px !important;
-        border-radius: 0 !important; /* 사각형 */
-        background: #1e293b !important;
-        color: #fff !important;
-        flex-direction: row !important;
-        align-items: center !important;
-        justify-content: center;
-        gap: 0 !important;
-        box-shadow: none !important;
-        border-top: 1px solid rgba(255,255,255,0.1) !important;
-        flex-shrink: 0; /* 크기 고정 */
-        order: 3; /* 3번째 위치 */
-    }
-    #audioPanel.open { display: flex !important; }
-    
-    .volume-row { display: none !important; }
-    .audio-ctrl-row { gap: 15px; margin: 0; width: 100%; }
-    .audio-btn { width: 36px; height: 36px; font-size: 12px; background: #fff; color: #000; }
-    #audioTime { font-size: 12px !important; margin-left: 5px; color: #fff !important; }
-    #audioProgress { accent-color: #fff !important; }
-    
-    /* [수정] 뷰어 바디: 남은 공간 꽉 채우기 (Order 2) */
-    .viewer-body { 
-        padding: 0; 
-        background: #000; 
-        align-items: flex-start !important; /* 위에서부터 시작 */
-        height: auto !important; 
-        flex: 1; /* 남은 공간 차지 */
-        overflow-y: scroll !important; /* 스크롤 허용 */
-        order: 2; /* 2번째 위치 */
-    }
-    
-    /* [수정] 진행바: 맨 아래 고정 (Order 4) */
-    .progress-hit-area {
-        position: static !important;
-        height: 15px !important;
-        background: #000;
-        order: 4; /* 4번째 위치 */
-    }
-  }
+  /* 모바일 상단 바 (기본 숨김) */
+  .mobile-top-bar { display: none; }
 
   .creator-info { position: fixed; bottom: 5px; width: 100%; text-align: center; font-size: 11px; color: var(--text-sub); opacity: 0.5; font-weight: 500; z-index: 500; pointer-events: none; }
   .creator-info b { font-weight: 700; }
@@ -461,6 +345,160 @@
   .batch-table th, .batch-table td { padding: 8px; border: 1px solid var(--btn-border); text-align: center; }
   .batch-table th { background: var(--btn-bg); font-weight: 700; color: var(--text-sub); }
   .batch-input { width: 100%; border: none; background: transparent; color: var(--text-main); }
+
+  /* [1] PC 기본 설정 (모바일 상단바 숨김 + 아이콘 구분) */
+  .icon-mobile { display: none; }
+  .icon-pc { display: block; }
+  .mobile-top-bar { display: none; }
+
+  /* [2] 모바일 전용 설정 (세련된 디자인 + 꿀렁임 완벽 제거) */
+  @media (max-width: 768px) {
+    /* PC 요소 숨김 */
+    .v-header, #audioPanel, .mobile-top-exit-btn { display: none !important; }
+
+    main { padding: 20px 15px; padding-bottom: 100px; }
+
+    /* 리스트 스타일 모바일 최적화 */
+    .tree-container { align-items: flex-start; }
+    .tree-spine { display: block !important; left: 24px; top: 85px; bottom: 30px; width: 3px; background: rgba(var(--theme-rgb), 0.3); }
+    .fac-top-card { width: 100%; border-radius: 15px; margin-bottom: 25px; padding: 15px 15px; flex-direction: row !important; align-items: center; justify-content: flex-start; gap: 15px; position: relative; z-index: 5; margin-left: 0; }
+    .fac-left-group { width: 100%; flex-direction: row !important; align-items: center; gap: 12px; }
+    .fac-tag-pill { font-size: 13px; padding: 6px 12px; min-width: auto; align-self: center; margin: 0; }
+    .fac-title { font-size: 18px; line-height: 1.3; flex: 1; text-align: left; }
+    .card-wrapper { display: block; margin-bottom: 10px; padding-left: 55px; width: 100%; }
+    .card-wrapper::before { display: block !important; left: 26px; width: 34px; top: 50%; height: 3px; background: rgba(var(--theme-rgb), 0.3); }
+    .card-wrapper::after { content: ''; position: absolute; left: 22px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; border-radius: 50%; background: var(--theme-color); border: 2px solid var(--bg-main); z-index: 2; }
+    .subject-card { padding: 12px 12px 8px 12px; border-radius: 10px; min-height: auto; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+    .subj-title { font-size: 14px; padding-right: 0; word-break: keep-all; line-height: 1.3; margin-bottom: 2px; }
+    .status-group { flex-wrap: wrap; gap: 4px; margin-top: 0; }
+    .status-pill { padding: 2px 6px; font-size: 10px; height: auto; display: inline-block; border-radius: 4px; line-height: 1.3; }
+    .bottom-nav { width: 90%; bottom: 20px; padding: 16px 0; gap: 30px; border-radius: 50px; justify-content: center; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(10px); box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
+    .nav-item { font-size: 14px; gap: 6px; font-weight: 800; }
+    .header-search { font-size: 14px; padding: 10px 20px 10px 45px; background-size: 18px; background-position: 15px center; }
+
+    /* --- [A] 상단바 디자인 (Glassmorphism) --- */
+    .mobile-top-bar {
+        display: flex !important;
+        height: 60px !important;
+        
+        /* 반투명 유리 효과 배경 */
+        background: rgba(20, 20, 25, 0.85) !important;
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        
+        align-items: center; padding: 0 15px; gap: 15px;
+        position: absolute; top: 0; left: 0; right: 0;
+        z-index: 8000;
+    }
+
+    /* 나가기 버튼 */
+    .mobile-exit-btn {
+        width: 36px; height: 36px;
+        background: rgba(255,255,255,0.1); color: #fff;
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; flex-shrink: 0; padding: 0;
+    }
+    .mobile-exit-btn svg { width: 20px; height: 20px; fill: #ef4444; }
+
+    /* 오디오 컨트롤 그룹 */
+    .mobile-audio-group {
+        flex: 1; display: flex; align-items: center; gap: 12px;
+        min-width: 0;
+        background: rgba(0,0,0,0.3);
+        padding: 6px 12px; border-radius: 50px;
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    /* 재생 버튼 */
+    .audio-btn-sm {
+        width: 32px; height: 32px; border-radius: 50%; border: none;
+        background: #fff; color: #000; flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center; 
+        font-size: 14px; padding-left: 2px;
+    }
+
+    /* 재생바 */
+    .audio-slider-sm {
+        flex: 1; height: 6px; border-radius: 10px;
+        appearance: none; -webkit-appearance: none;
+        background: rgba(255,255,255,0.2); cursor: pointer; overflow: hidden;
+    }
+    .audio-slider-sm::-webkit-slider-thumb {
+        -webkit-appearance: none; width: 0; height: 10px;
+        box-shadow: -100vw 0 0 100vw #2563eb; background: #2563eb;
+    }
+
+    /* 시간 텍스트 */
+    .audio-time-sm { 
+        font-size: 11px; font-family: monospace; font-weight: 700;
+        color: rgba(255,255,255,0.8); width: 35px; text-align: right; 
+    }
+
+    /* 우측 아이콘 */
+    .mobile-audio-icon-right {
+        width: 36px; height: 36px;
+        display: flex; align-items: center; justify-content: center;
+        background: rgba(250, 204, 21, 0.1); border-radius: 12px;
+        color: #facc15; flex-shrink: 0;
+    }
+    .mobile-audio-icon-right svg { width: 20px; height: 20px; fill: currentColor; }
+
+    /* --- [B] 뷰어 흔들림 방지 (핵심: Block 고정) --- */
+    .viewer-body { 
+        position: absolute !important;
+        top: 60px !important;    /* 상단바 아래 */
+        bottom: 10px !important; /* 하단바 위 */
+        left: 0 !important; 
+        right: 0 !important;
+        
+        width: 100% !important; 
+        height: auto !important; 
+        
+        padding: 0 !important; 
+        background: #000; 
+        
+        /* [중요] flex를 block으로 변경하여 꿀렁임 원천 차단 */
+        display: block !important; 
+        
+        overflow-y: scroll !important; 
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    canvas { 
+        display: block !important; 
+        width: 100% !important; 
+        height: auto !important; 
+    }
+    
+    #pageContainer { 
+        min-height: 100% !important; 
+        height: auto !important; 
+        display: block !important; 
+        padding-bottom: 50px !important; 
+    }
+
+    /* --- [C] Last Viewed 아이콘 (모바일 전용) --- */
+    .subject-card.last-viewed .last-viewed-icon { 
+        display: flex; position: absolute; 
+        left: -35px; top: 50%; transform: translateY(-50%); 
+        width: 24px; height: 24px; border-radius: 50%; background: #10b981; 
+        border: 2px solid var(--bg-main); padding: 0; justify-content: center; align-items: center; 
+        z-index: 10; 
+    }
+    .icon-pc { display: none !important; }      /* 눈 숨김 */
+    .icon-mobile { display: block !important; } /* 체크 보임 */
+    .last-viewed-icon span { display: none !important; } /* 글자 숨김 */
+    .last-viewed-icon svg { width: 14px; height: 14px; fill: #fff; margin: 0; }
+
+    /* 하단 진행바 */
+    .progress-hit-area {
+        position: absolute !important; bottom: 0 !important; left: 0 !important; right: 0 !important;
+        height: 10px !important; background: #1e293b; z-index: 9000;
+    }
+  }
 </style>
 </head>
 <body oncontextmenu="return false;">
@@ -616,22 +654,30 @@
   </div>
 </div>
 
-<!-- [수정] PDF 오버레이 구조 변경: Flexbox Stacked Layout (모바일 최적화) -->
 <div id="pdfOverlay" onmousedown="handleMouseNav(event)">
   
-  <!-- 모바일 상단 바 (나가기 + 오디오 버튼) -->
-  <div class="mobile-top-bar">
-      <div class="mobile-exit-btn" onclick="event.stopPropagation(); closeViewer();">
-          <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" /></svg>
-          나가기
+  <!-- [수정] 통합된 모바일 상단바 (나가기 + 재생바 + 아이콘) -->
+  <div class="mobile-top-bar" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()">
+      
+      <!-- 1. 좌측: 나가기 버튼 (빨간 원) -->
+      <div class="mobile-exit-btn" onclick="closeViewer()">
+          <svg viewBox="0 0 24 24"><path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" /></svg>
       </div>
-      <div id="mobileAudioIcon" class="mobile-audio-icon" onclick="toggleAudioPanel(event)">
-          <svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:currentColor;"><path d="M12,2A3,3 0 0,0 9,5V11A3,3 0 0,0 12,14A3,3 0 0,0 15,11V5A3,3 0 0,0 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,1 12,16A5,5 0 0,1 17,11H19Z"/></svg>
-          <span>(Audio)</span>
+
+      <!-- 2. 중앙: 오디오 컨트롤 (오디오 있을 때만 보임) -->
+      <div id="mobileAudioGroup" class="mobile-audio-group" style="display:none;">
+          <button id="mobilePlayBtn" class="audio-btn-sm">▶</button>
+          <input type="range" id="mobileAudioProgress" class="audio-slider-sm" value="0">
+          <span id="mobileAudioTime" class="audio-time-sm">00:00</span>
+      </div>
+
+      <!-- 3. 우측: 오디오 아이콘 (오디오 있을 때만 보임) -->
+      <div id="mobileAudioIconRight" class="mobile-audio-icon-right" style="display:none;">
+          <svg viewBox="0 0 24 24"><path d="M12,2A3,3 0 0,0 9,5V11A3,3 0 0,0 12,14A3,3 0 0,0 15,11V5A3,3 0 0,0 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,1 12,16A5,5 0 0,1 17,11H19Z"/></svg>
       </div>
   </div>
 
-  <!-- PC 헤더 -->
+  <!-- PC 헤더 (PC에서만 보임) -->
   <div class="v-header" onmousedown="event.stopPropagation()">
     <div class="v-header-left">
       <div class="close-v" onclick="closeViewer()">✕</div>
@@ -651,21 +697,21 @@
       </div>
     </div>
   </div>
-
-  <div id="viewerBody" class="viewer-body">
-    <div id="pageContainer"></div>
-  </div>
-
-  <!-- [수정] ontouchmove 추가: 터치 이동 시 페이지 넘김 방지 -->
-  <div id="audioPanel" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()" ontouchstart="event.stopPropagation()" ontouchend="event.stopPropagation()" ontouchmove="event.stopPropagation()">
+  
+  <!-- PC용 오디오 패널 (모바일은 상단바에 통합) -->
+  <div id="audioPanel" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()">
     <div class="audio-ctrl-row">
       <button id="playBtn" class="audio-btn">▶</button>
-      <input type="range" id="audioProgress" value="0" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" ontouchend="event.stopPropagation()" ontouchmove="event.stopPropagation()">
+      <input type="range" id="audioProgress" value="0" onmousedown="event.stopPropagation()">
       <span id="audioTime" style="font-size:11px; font-weight:800; color:var(--navy); width:40px; text-align:center;">00:00</span>
     </div>
     <div class="volume-row">
-      🔊 <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="1" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+      🔊 <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="1" onmousedown="event.stopPropagation()">
     </div>
+  </div>
+
+  <div id="viewerBody" class="viewer-body">
+    <div id="pageContainer"></div>
   </div>
 
   <div id="progressHitArea" class="progress-hit-area" onmousedown="event.stopPropagation()">
@@ -1061,7 +1107,12 @@
 
       card.innerHTML = `
         <div class="last-viewed-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <!-- PC용 눈 아이콘 -->
+            <svg class="icon-pc" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            
+            <!-- 모바일용 체크 아이콘 -->
+            <svg class="icon-mobile" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+
             <span>Last Viewed</span>
         </div>
         <div>
@@ -1362,19 +1413,22 @@
   function handleDrop(e, index) { if (e.stopPropagation) e.stopPropagation(); e.target.closest('.subject-card').classList.remove('drag-over'); if (dragSrcIndex !== null && dragSrcIndex !== index) { const movedItem = subjects.splice(dragSrcIndex, 1)[0]; subjects.splice(index, 0, movedItem); saveSubjects(); } return false; }
   function handleDragEnd(e) { document.querySelectorAll('.subject-card').forEach(card => { card.classList.remove('dragging'); card.classList.remove('drag-over'); }); }
 
-  async function openViewer(idx) {
+async function openViewer(idx) {
+    // 1. 기존에 보고 있던 카드 표시 해제 및 현재 인덱스 저장
     document.querySelectorAll('.subject-card').forEach(c => c.classList.remove('last-viewed'));
     viewingIndex = idx; 
 
     const sub = subjects[idx];
     let pdfName = sub.pdfName;
     
+    // PDF 경로 처리
     if(!pdfName) return alert("등록된 PDF 파일이 없습니다.");
     if (pdfName.startsWith('/')) pdfName = pdfName.substring(1);
     if (!pdfName.toLowerCase().endsWith('.pdf')) pdfName += '.pdf';
 
     const pdfUrl = `files/${pdfName}`;
     
+    // 오디오 경로 처리
     let audioUrl = null;
     if(sub.audioName) {
         let aName = sub.audioName.trim();
@@ -1382,15 +1436,19 @@
         audioUrl = `files/${aName}`;
     }
 
-    overlay.style.display = 'flex'; // Changed to flex for overlay layout
+    // 뷰어 오버레이 열기
+    overlay.style.display = 'flex'; 
     
+    // 전체화면 시도
     try {
       if (overlay.requestFullscreen) await overlay.requestFullscreen();
       else if (overlay.webkitRequestFullscreen) await overlay.webkitRequestFullscreen();
     } catch(e) { console.log(e); }
 
+    // 제목 설정
     document.getElementById('vTitle').textContent = sub.name;
     
+    // PDF 로드
     try {
         const task = pdfjsLib.getDocument(pdfUrl);
         pdfDoc = await task.promise;
@@ -1402,25 +1460,45 @@
         return;
     }
     
-    const audioBtn = document.getElementById('audioBtn');
-    const mobileAudioIcon = document.getElementById('mobileAudioIcon');
+    // ============================================================
+    // [수정됨] 오디오 처리 로직 (PC/모바일 공통)
+    // ============================================================
+    const grp = document.getElementById('mobileAudioGroup');
+    const iconR = document.getElementById('mobileAudioIconRight');
+    const pcBtn = document.getElementById('audioBtn');
+    const pcPanel = document.getElementById('audioPanel');
     
     if(audioUrl) {
+        // 1. 오디오 파일이 있을 때
         audioPlayer.src = audioUrl;
         audioPlayer.load();
-        audioBtn.classList.remove('disabled');
-        mobileAudioIcon.classList.remove('disabled');
-        // 모바일 자동 패널 열기
+        
+        // [모바일] 상단바에 컨트롤 표시 (화면 작을 때만)
         if(window.innerWidth <= 768) {
-             document.getElementById('audioPanel').classList.add('open');
-             mobileAudioIcon.classList.add('active');
+            grp.style.display = 'flex';
+            iconR.style.display = 'flex';
         }
+        
+        // [PC] 오디오 버튼 보이기 & 활성화
+        pcBtn.style.display = 'flex';       /* PC 아이콘 보임 */
+        pcBtn.classList.remove('disabled');
+        
     } else {
+        // 2. 오디오 파일이 없을 때
         audioPlayer.src = "";
-        audioBtn.classList.add('disabled');
-        mobileAudioIcon.classList.add('disabled');
-        document.getElementById('audioPanel').classList.remove('open');
+        
+        // [모바일] 상단바 컨트롤 숨김
+        grp.style.display = 'none';
+        iconR.style.display = 'none';
+        
+        // [PC] 오디오 패널(메뉴) 강제로 닫기 (이게 빠져서 계속 떠있었음)
+        pcPanel.classList.remove('open');
+        
+        // [PC] 오디오 버튼 아예 숨기기
+        pcBtn.style.display = 'none'; 
+        pcBtn.classList.add('disabled');
     }
+    
     updateIconState(); 
   }
 
@@ -1440,7 +1518,6 @@
   function closeViewer() { 
     if (document.fullscreenElement) document.exitFullscreen(); 
     overlay.style.display = 'none'; 
-    document.getElementById('audioPanel').classList.remove('open'); 
     audioPlayer.pause(); 
     
     if(viewingIndex !== -1) {
@@ -1466,35 +1543,29 @@
   }
   
   function toggleAudioPanel(e) { 
+    // PC에서만 사용 (모바일은 상단바에 통합됨)
     e.stopPropagation(); 
     if(document.getElementById('audioBtn').classList.contains('disabled')) return;
-    
     const panel = document.getElementById('audioPanel');
-    const icon = document.getElementById('mobileAudioIcon');
-    
-    if (panel.classList.contains('open')) {
-        panel.classList.remove('open');
-        icon.classList.remove('active');
-    } else {
-        panel.classList.add('open');
-        icon.classList.add('active');
-    }
+    if (panel.classList.contains('open')) panel.classList.remove('open');
+    else panel.classList.add('open');
   }
 
   async function renderPage(dir) {
     if(isRendering) return; isRendering = true;
-    if(pdfDoc) { document.getElementById('pageFill').style.width = `${((pageNum-1)/(pdfDoc.numPages-1))*100}%`; document.getElementById('progressFlag').textContent = `${pageNum} / ${pdfDoc.numPages}`; }
-    
-    if(canvasContainer.firstChild) {
-        canvasContainer.firstChild.classList.remove('slide-active');
-    }
 
-    const newCanvas = document.createElement('canvas'); 
-    newCanvas.className = 'slide-enter';
+    // 1. 텍스트 갱신
+    if(pdfDoc) { 
+        document.getElementById('pageFill').style.width = `${((pageNum-1)/(pdfDoc.numPages-1))*100}%`; 
+        document.getElementById('progressFlag').textContent = `${pageNum} / ${pdfDoc.numPages}`; 
+    }
     
+    // 2. 가상 캔버스 생성
+    const newCanvas = document.createElement('canvas'); 
     const ctx = newCanvas.getContext('2d');
     const page = await pdfDoc.getPage(pageNum);
     
+    // 3. 뷰포트 계산
     const isMobile = window.innerWidth <= 768;
     let viewport;
     
@@ -1504,7 +1575,6 @@
         viewport = page.getViewport({ scale: scale });
     } else {
         const unscaledViewport = page.getViewport({ scale: 1 });
-        // [수정] PC에서 전체화면 높이(window.innerHeight) 기준 - 헤더 없음
         const availableHeight = window.innerHeight; 
         const scaleY = availableHeight / unscaledViewport.height;
         const scaleX = window.innerWidth / unscaledViewport.width;
@@ -1512,16 +1582,31 @@
         viewport = page.getViewport({ scale: baseScale }); 
     }
     
-    newCanvas.width = viewport.width; newCanvas.height = viewport.height;
+    newCanvas.width = viewport.width; 
+    newCanvas.height = viewport.height;
     
+    // 모바일 설정 (가변폭 방지)
+    if(isMobile) {
+        newCanvas.style.display = 'block';
+        newCanvas.style.width = '100%'; 
+        newCanvas.style.height = 'auto'; 
+    }
+
+    // 4. 그리기
     await page.render({ canvasContext: ctx, viewport }).promise;
     
-    canvasContainer.innerHTML = ''; 
-    canvasContainer.appendChild(newCanvas);
+    // 5. [중요] 교체하기 (빈 화면 0초)
+    const oldCanvas = canvasContainer.querySelector('canvas');
+    if (oldCanvas) {
+        oldCanvas.replaceWith(newCanvas);
+    } else {
+        canvasContainer.innerHTML = '';
+        canvasContainer.appendChild(newCanvas);
+    }
     
-    requestAnimationFrame(() => {
-        newCanvas.classList.add('slide-active');
-    });
+    if(isMobile) {
+        viewerBody.scrollTop = 0;
+    }
 
     isRendering = false;
   }
@@ -1571,27 +1656,58 @@
         pageNum = newPage; 
         document.getElementById('pageFill').style.width = `${((pageNum-1)/(pdfDoc.numPages-1))*100}%`; 
         document.getElementById('progressFlag').textContent = `${pageNum} / ${pdfDoc.numPages}`; 
-        if(!isDragging) renderPage('none'); // Dragging 중에는 페이지 렌더링 생략 (성능 최적화)
+        if(!isDragging) renderPage('none'); 
     }
   }
 
+  // PC 플레이 버튼
   document.getElementById('playBtn').onclick = (e) => { 
       e.stopPropagation(); 
-      if(!audioPlayer.src || audioPlayer.src === window.location.href) {
-          alert("재생할 오디오 파일이 없습니다.");
-          return;
-      }
+      if(!audioPlayer.src || audioPlayer.src === window.location.href) { alert("재생할 오디오 파일이 없습니다."); return; }
       if(audioPlayer.paused) { 
-          audioPlayer.play()
-            .then(() => { document.getElementById('playBtn').textContent = "⏸"; })
-            .catch(err => { console.error(err); alert("오디오 재생 실패.\n파일 경로를 확인하거나 파일이 존재하는지 확인하세요.\n(.wav 확장자 필수)"); });
+          audioPlayer.play().then(() => { document.getElementById('playBtn').textContent = "⏸"; }).catch(err => { alert("오디오 재생 실패"); });
       } else { 
-          audioPlayer.pause(); 
-          document.getElementById('playBtn').textContent = "▶"; 
+          audioPlayer.pause(); document.getElementById('playBtn').textContent = "▶"; 
       } 
   };
+  
+  // 모바일 플레이 버튼
+  document.getElementById('mobilePlayBtn').onclick = (e) => {
+      e.stopPropagation();
+      if(audioPlayer.paused) { 
+          audioPlayer.play(); 
+          document.getElementById('mobilePlayBtn').innerText = "⏸";
+      } else { 
+          audioPlayer.pause(); 
+          document.getElementById('mobilePlayBtn').innerText = "▶";
+      }
+  };
 
-  audioPlayer.ontimeupdate = () => { document.getElementById('audioProgress').value = (audioPlayer.currentTime / audioPlayer.duration) * 100 || 0; const m = Math.floor(audioPlayer.currentTime/60), s = Math.floor(audioPlayer.currentTime%60); document.getElementById('audioTime').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; };
+  // 모바일 슬라이더
+  const mProg = document.getElementById('mobileAudioProgress');
+  mProg.onclick = (e) => e.stopPropagation();
+  mProg.oninput = (e) => { 
+      e.stopPropagation();
+      if(audioPlayer.duration) {
+          audioPlayer.currentTime = (e.target.value / 100) * audioPlayer.duration; 
+      }
+  };
+
+  // 오디오 시간 업데이트
+  audioPlayer.ontimeupdate = () => { 
+      const pct = (audioPlayer.currentTime / audioPlayer.duration) * 100 || 0;
+      const m = Math.floor(audioPlayer.currentTime/60);
+      const s = Math.floor(audioPlayer.currentTime%60);
+      const timeStr = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+      // PC
+      document.getElementById('audioProgress').value = pct; 
+      document.getElementById('audioTime').textContent = timeStr;
+      
+      // Mobile
+      document.getElementById('mobileAudioProgress').value = pct;
+      document.getElementById('mobileAudioTime').innerText = timeStr;
+  };
   
   const aProg = document.getElementById('audioProgress');
   aProg.oninput = (e) => { e.stopPropagation(); audioPlayer.currentTime = (e.target.value / 100) * audioPlayer.duration; };
@@ -1609,7 +1725,6 @@
 
   let touchStartY = 0;
   let touchEndY = 0;
-  let closeBtnTimeout = null;
   const minSwipeDistance = 50; 
 
   overlay.addEventListener('touchstart', e => { touchStartY = e.changedTouches[0].screenY; }, {passive: true});
