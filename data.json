@@ -300,7 +300,7 @@
               "name": "항공통신용 데이터링크 (PART #1)",
               "active": true,
               "pdfName": "/COMM/통신이론_CH14",
-              "audioName": "/COMM/통신이론_CH14",
+              "audioName": "/COMM/통신이론_CH14.wav",
               "link": ""
             },
             {
@@ -465,35 +465,40 @@
               "name": "계기착륙시설(ILS)의 개요",
               "active": true,
               "pdfName": "/NAV/ILS이론교재_CH1",
-              "audioName": ""
+              "audioName": "NAV/ILS이론교재_CH1.wav",
+              "link": ""
             },
             {
               "id": "17670152835605xs52",
               "name": "기본개념 및 용어의 정의",
               "active": true,
               "pdfName": "/NAV/ILS이론교재_CH2",
-              "audioName": ""
+              "audioName": "NAV/ILS이론교재_CH2.wav",
+              "link": ""
             },
             {
               "id": "17670152835602t4i5",
               "name": "BASIC ANTENNA PAIRS",
               "active": true,
               "pdfName": "/NAV/ILS이론교재_CH3",
-              "audioName": ""
+              "audioName": "NAV/ILS이론교재_CH3.wav",
+              "link": ""
             },
             {
               "id": "17670152835604ou1t",
               "name": "SPECIFIC ANTENNA PAIRS",
               "active": true,
               "pdfName": "/NAV/ILS이론교재_CH4",
-              "audioName": ""
+              "audioName": "NAV/ILS이론교재_CH4.wav",
+              "link": ""
             },
             {
               "id": "17670152835606v8zt",
               "name": "MULTIPLE ANTENNA PAIRS AND THE IMAGE ANTENNA",
               "active": true,
               "pdfName": "/NAV/ILS이론교재_CH5",
-              "audioName": ""
+              "audioName": "NAV/ILS이론교재_CH5.wav",
+              "link": ""
             },
             {
               "id": "17670152835602x2se",
@@ -514,21 +519,24 @@
               "name": "ILS WAVEFORMS",
               "active": true,
               "pdfName": "/NAV/ILS이론교재_CH8",
-              "audioName": ""
+              "audioName": "NAV/ILS이론교재_CH8.wav",
+              "link": ""
             },
             {
               "id": "1767015283560qhuyq",
               "name": "SPACE MODULATION",
               "active": true,
               "pdfName": "/NAV/ILS이론교재_CH9",
-              "audioName": ""
+              "audioName": "NAV/ILS이론교재_CH9.wav",
+              "link": ""
             },
             {
               "id": "1767015283560ghkv0",
               "name": "DIFFERENCE OF MODULATION",
               "active": true,
               "pdfName": "/NAV/ILS이론교재_CH10",
-              "audioName": ""
+              "audioName": "NAV/ILS이론교재_CH10.wav",
+              "link": ""
             },
             {
               "id": "1767015283560aatq5",
