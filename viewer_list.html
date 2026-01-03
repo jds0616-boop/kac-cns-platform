@@ -88,11 +88,11 @@
   .header-center { 
       position: absolute; left: 50%; transform: translateX(-50%); 
       width: 400px; max-width: 100%; z-index: 20; transition: width 0.3s; 
-      display: flex; align-items: center; gap: 15px; /* 햄버거와 검색창 간격 */
+      display: flex; align-items: center; gap: 15px; 
   }
   .header-right { display: flex; align-items: center; gap: 15px; min-width: 250px; justify-content: flex-end; z-index: 30; }
 
-  /* 햄버거 버튼 (헤더 센터로 이동됨) */
+  /* 햄버거 버튼 */
   .hamburger-btn { cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; flex-shrink: 0; }
   .hamburger-btn:hover { background: rgba(255,255,255,0.1); }
   .hamburger-btn svg { width: 24px; height: 24px; fill: #fff; }
@@ -181,7 +181,7 @@
       z-index: 5; margin-bottom: 25px;
       position: relative;
       transition: 0.2s;
-      cursor: pointer; /* 클릭 가능하도록 커서 변경 */
+      cursor: pointer; /* 클릭 가능 */
   }
   .fac-top-card:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(var(--theme-rgb), 0.15); }
   body.dark-mode .fac-top-card { background: rgba(var(--theme-rgb), 0.15); }
@@ -304,7 +304,14 @@
 
   #pageContainer { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; }
 
-  .bottom-nav { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); background: var(--navy); padding: 15px 45px; border-radius: 100px; display: flex; gap: 40px; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000; border: 1px solid rgba(255,255,255,0.1); }
+  /* [PC] 하단 네비게이션: Facility와 동일하게 */
+  .bottom-nav { 
+    position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); 
+    background: var(--navy); padding: 15px 45px; border-radius: 100px; 
+    display: flex; gap: 40px; align-items: center; 
+    justify-content: center; /* PC는 중앙 정렬 */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000; border: 1px solid rgba(255,255,255,0.1); 
+  }
   .nav-item { color: #fff; cursor: pointer; font-size: 18px; font-weight: 700; transition: 0.3s; opacity: 0.8; display: flex; align-items: center; gap: 10px; }
   .nav-item:hover { opacity: 1; transform: translateY(-3px); }
   .nav-icon { width: 24px; height: 24px; fill: currentColor; }
@@ -312,8 +319,6 @@
   body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(255, 255, 255, 0.3); }
   body.dark-mode .nav-item { color: #e2e8f0; opacity: 1; }
   
-  .mobile-only-nav { display: none; }
-
   .mobile-top-bar { display: none; }
 
   .creator-info { position: fixed; bottom: 5px; width: 100%; text-align: center; font-size: 11px; color: var(--text-sub); opacity: 0.5; font-weight: 500; z-index: 500; pointer-events: none; }
@@ -346,6 +351,7 @@
   .icon-mobile { display: none; }
   .icon-pc { display: block; }
   .mobile-top-bar { display: none; }
+  .mobile-theme-btn { display: none; } /* PC에선 숨김 */
 
   /* ========================================= */
   /* [모바일 전용 최적화] */
@@ -353,29 +359,23 @@
   @media (max-width: 768px) {
     .v-header, #audioPanel, .mobile-top-exit-btn { display: none !important; }
 
-    /* [수정] 모바일 하단 여백 + 상단 여백 13px 더 위로 (기존 0 15px -> -13px margin) */
-    main { padding: 0 15px 150px 15px !important; }
+    main { padding: 5px 15px 150px 15px !important; }
 
     .tree-container { align-items: flex-start; }
     .tree-spine { display: block !important; left: 24px; top: 60px; bottom: 30px; width: 3px; background: rgba(var(--theme-rgb), 0.3); }
     
-    /* [수정] 상단 명함 카드 영역 (Sticky + 위로 13px 올림) */
     .tree-container > .fac-top-card { 
         position: sticky;
         top: 0;
         z-index: 600 !important;
-        
         background: var(--bg-main) !important; 
-        
-        width: calc(100% + 30px); 
+        width: calc(100% + 30px);
         max-width: none;
-        margin: -13px -15px 25px -15px !important; /* 여기를 조정하여 위로 올림 */
+        margin: -13px -15px 25px -15px !important; 
         padding: 10px 15px 15px 15px; 
-        
-        border: none; 
+        border: none;
         border-radius: 0;
         box-shadow: none; 
-        
         flex-direction: column !important;
         align-items: stretch !important;
     }
@@ -392,16 +392,7 @@
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
 
-    /* 내부 요소 재배치 */
-    .fac-left-group { 
-        width: 100%; 
-        flex-direction: row !important; 
-        align-items: center; 
-        gap: 12px; 
-        padding: 15px;
-        z-index: 1;
-    }
-    
+    .fac-left-group { width: 100%; flex-direction: row !important; align-items: center; gap: 12px; padding: 15px; z-index: 1; }
     .fac-tag-pill { font-size: 13px; padding: 6px 12px; min-width: auto; align-self: center; margin: 0; }
     .fac-title { font-size: 18px; line-height: 1.3; flex: 1; text-align: left; }
     
@@ -413,9 +404,32 @@
     .status-group { flex-wrap: wrap; gap: 4px; margin-top: 0; }
     .status-pill { padding: 2px 6px; font-size: 10px; height: auto; display: inline-block; border-radius: 4px; line-height: 1.3; }
     
-    .bottom-nav { width: 90%; bottom: 20px; padding: 16px 0; gap: 30px; border-radius: 50px; justify-content: center; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(10px); box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
+    /* [모바일] 하단 네비게이션: 양쪽 정렬 + 테마 버튼 */
+    .bottom-nav { 
+        width: 90%; bottom: 20px; 
+        padding: 16px 25px; 
+        gap: 0;
+        border-radius: 50px; 
+        justify-content: space-between; /* 양쪽 배분 */
+        background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(10px); 
+        box-shadow: 0 8px 25px rgba(0,0,0,0.4); 
+    }
+    
+    .nav-left-group { display: flex; gap: 25px; margin-left: 20px; }
     .nav-item { font-size: 14px; gap: 6px; font-weight: 800; }
     .nav-icon { width: 20px !important; height: 20px !important; }
+    
+    /* 모바일에서만 테마 버튼 보임 */
+    .mobile-theme-btn {
+        display: flex; align-items: center; justify-content: center;
+        width: 32px; height: 32px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.1);
+        color: #cbd5e1;
+        cursor: pointer;
+    }
+    .mobile-theme-btn.active { background: #fff; color: var(--navy); }
+    .mobile-theme-btn svg { width: 18px; height: 18px; fill: currentColor; }
 
     .header-search { font-size: 14px; padding: 10px 20px 10px 45px; background-size: 18px; background-position: 15px center; }
 
@@ -507,9 +521,6 @@
         position: absolute !important; bottom: 0 !important; left: 0 !important; right: 0 !important;
         height: 10px !important; background: #1e293b; z-index: 9000;
     }
-
-    /* [수정] 모바일에서만 보이는 네비게이션 아이템 */
-    .mobile-only-nav { display: flex !important; }
   }
 </style>
 </head>
@@ -529,20 +540,26 @@
 </div>
 
 <header>
+  <!-- [왼쪽 영역] 로고와 햄버거 버튼 -->
   <div class="header-left" id="headerLeft">
+    <!-- 1. 햄버거 버튼을 여기(맨 앞)로 옮겼습니다 -->
+    <div class="hamburger-btn" onclick="toggleSidebar()">
+      <svg viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
+    </div>
+    
+    <!-- 2. 그 뒤에 로고 텍스트 -->
     <div class="logo-text" onclick="location.href='index.html'">KAC CNS Training Platform</div>
     <div class="breadcrumb" id="breadcrumbContainer"></div>
   </div>
 
+  <!-- [중앙 영역] 검색창만 남김 -->
   <div class="header-center" id="headerCenter">
-    <!-- [수정] 햄버거 버튼을 여기로 이동 (검색창 좌측) -->
-    <div class="hamburger-btn" onclick="toggleSidebar()">
-      <svg viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
-    </div>
+    <!-- 3. 여기 있던 햄버거 버튼은 지웠습니다 -->
     <input type="text" id="searchInput" class="header-search" placeholder="예시) 항공통신용 데이터링크, VOR, ILS..." autocomplete="off">
     <div id="searchDropdown" class="search-dropdown"></div>
   </div>
 
+  <!-- [오른쪽 영역] 기존 유지 -->
   <div class="header-right">
     <div class="theme-toggle">
       <div class="theme-btn" id="btnDay" onclick="setTheme('light')" title="주간 모드"><svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg></div>
@@ -731,18 +748,19 @@
 <audio id="mainAudio"></audio>
 
 <div class="bottom-nav">
-  <div class="nav-item" onclick="history.back()">
-    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-    뒤로가기
+  <div class="nav-left-group">
+      <div class="nav-item" onclick="history.back()">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        뒤로가기
+      </div>
+      <div class="nav-item" onclick="location.href='index.html'">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        홈으로
+      </div>
   </div>
-  <div class="nav-item" onclick="location.href='index.html'">
-    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-    홈으로
-  </div>
-  <!-- [수정] 모바일 하단 주/야간 버튼 -->
-  <div class="nav-item mobile-only-nav" onclick="toggleThemeMobile()">
-    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg>
-    테마
+  
+  <div class="mobile-theme-btn" onclick="toggleMobileTheme()">
+      <svg id="mThemeIcon" viewBox="0 0 24 24"></svg>
   </div>
 </div>
 
@@ -889,17 +907,6 @@ function openSettings() {
           if(!tid) return;
           const style = JSON.parse(localStorage.getItem(`kac_style_${tid}`) || '{}');
           
-          // 접근 권한 및 사이드바 노출 여부 체크
-          const acc = style.access || { visible: true, adminOnly: false, showSidebar: true };
-          
-          // 일반 사용자: 비공개거나, 관리자 전용이거나, 사이드바 미노출이면 건너뜀
-          if (!isAdmin) {
-              if (!acc.visible || acc.adminOnly || !acc.showSidebar) return;
-          }
-
-          // 관리자: 숨겨진 메뉴는 흐리게 표시
-          const hiddenStyle = (isAdmin && (!acc.visible || acc.adminOnly || !acc.showSidebar)) ? 'opacity: 0.5;' : '';
-          
           const isActive = tid === type; 
           const itemClass = isActive ? 'sb-item active' : 'sb-item';
           const menus = JSON.parse(localStorage.getItem(`kac_menu_${tid}`) || '[]');
@@ -911,25 +918,19 @@ function openSettings() {
               const listClass = isActive ? 'sb-sub-list open' : 'sb-sub-list';
               subHtml = `<div class="${listClass}" id="sb-sub-${tid}">`;
               menus.forEach(m => {
-                  const isMenuVisible = (m.visible !== undefined) ? m.visible : true;
-                  if(isAdmin || isMenuVisible) {
-                      const isSubActive = (tid === type && m.dataId === menuId);
-                      const subClass = isSubActive ? 'sb-sub-item active' : 'sb-sub-item';
-                      subHtml += `<div class="${subClass}" onclick="location.href='viewer_list.html?type=${tid}&menu=${encodeURIComponent(m.label)}&id=${m.dataId}'">
-                          ${m.label} ${(!isMenuVisible && isAdmin) ? '<span style="color:red;font-size:10px;">(비공개)</span>' : ''}
-                      </div>`;
-                  }
+                  const isSubActive = (tid === type && m.dataId === menuId);
+                  const subClass = isSubActive ? 'sb-sub-item active' : 'sb-sub-item';
+                  subHtml += `<div class="${subClass}" onclick="location.href='viewer_list.html?type=${tid}&menu=${encodeURIComponent(m.label)}&id=${m.dataId}'">${m.label}</div>`;
               });
               subHtml += '</div>';
           }
 
           const item = document.createElement('div');
-          // style="${hiddenStyle}" 추가 및 숨김 텍스트 표시
           item.innerHTML = `
-            <div class="${itemClass}" onclick="toggleSubMenu('${tid}', this)" style="${hiddenStyle}">
+            <div class="${itemClass}" onclick="toggleSubMenu('${tid}', this)">
                 <span style="display:flex;align-items:center;gap:10px;">
                     <span style="width:10px;height:10px;border-radius:50%;background:${style.color || '#2563eb'}"></span>
-                    ${style.name || tid} ${hiddenStyle ? '<span style="font-size:10px;">(숨김)</span>' : ''}
+                    ${style.name || tid}
                 </span>
                 ${arrow}
             </div>
@@ -1024,9 +1025,19 @@ function openSettings() {
     localStorage.setItem('kac_theme', mode);
     document.getElementById('btnDay').classList.toggle('active', mode==='light');
     document.getElementById('btnNight').classList.toggle('active', mode==='dark');
+    
+    // 모바일 버튼 아이콘 변경
+    const mIcon = document.getElementById('mThemeIcon');
+    if(mode === 'light') {
+        // 해 아이콘
+        mIcon.innerHTML = '<path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/>';
+    } else {
+        // 달 아이콘
+        mIcon.innerHTML = '<path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C6.94,10.39 9.79,16.87 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z"/>';
+    }
   }
-
-  // [추가] 모바일용 테마 토글 함수
+  
+  // [추가] 모바일 전용 토글 함수
   function toggleThemeMobile() {
       const current = localStorage.getItem('kac_theme') || 'light';
       setTheme(current === 'light' ? 'dark' : 'light');
@@ -1169,7 +1180,7 @@ function openSettings() {
       card.innerHTML = `
         <div class="last-viewed-icon">
             <!-- PC용 눈 아이콘 -->
-            <svg class="icon-pc" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <svg class="icon-pc" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
             
             <!-- 모바일용 체크 아이콘 -->
             <svg class="icon-mobile" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
