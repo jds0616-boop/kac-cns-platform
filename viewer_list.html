@@ -361,8 +361,9 @@
         
         width: calc(100% + 30px); /* 좌우 여백 상쇄 */
         max-width: none;
-        margin: -5px -15px 25px -15px; /* main 패딩 상쇄 */
-        padding: 10px 15px 15px 15px; /* 내부 여백 조정 */
+        margin: -20px -15px 25px -15px; /* main 패딩 상쇄 + 위로 더 당김(-35px로 수정 요청 반영하여 -35px 적용) */
+        margin-top: -35px;
+        padding: 45px 15px 15px 15px; /* 내부 상단 여백 늘려서 콘텐츠 아래로 밀기 */
         
         border: none; /* 컨테이너 자체 테두리 제거 */
         border-radius: 0;
@@ -378,6 +379,8 @@
         display: block;
         position: absolute;
         inset: 10px 15px 15px 15px; /* 회색 배경 안쪽으로 배치 */
+        top: 45px; /* padding-top과 맞춰서 실제 카드 위치 잡기 */
+        bottom: 15px;
         background: var(--bg-card);
         border: 3px solid var(--theme-color);
         border-radius: 20px;
@@ -406,8 +409,41 @@
     .status-group { flex-wrap: wrap; gap: 4px; margin-top: 0; }
     .status-pill { padding: 2px 6px; font-size: 10px; height: auto; display: inline-block; border-radius: 4px; line-height: 1.3; }
     
-    .bottom-nav { width: 90%; bottom: 20px; padding: 16px 0; gap: 30px; border-radius: 50px; justify-content: center; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(10px); box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
+    /* [수정] 하단 네비게이션 개선 */
+    .bottom-nav { 
+        width: 90%; bottom: 20px; 
+        padding: 16px 25px; /* 좌우 패딩 추가 */
+        gap: 0; /* gap 제거하고 space-between 사용 */
+        border-radius: 50px; 
+        justify-content: space-between; /* 양쪽 배분 */
+        background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(10px); 
+        box-shadow: 0 8px 25px rgba(0,0,0,0.4); 
+    }
+    
+    /* 좌측 그룹 (뒤로가기/홈으로) */
+    .nav-left-group {
+        display: flex; gap: 25px; /* 버튼 사이 간격 */
+        padding-left: 5px; /* 시각적 중앙 보정 */
+    }
+
     .nav-item { font-size: 14px; gap: 6px; font-weight: 800; }
+    
+    /* 우측 테마 토글 버튼 */
+    .mobile-theme-btn {
+        display: flex; align-items: center; justify-content: center;
+        width: 32px; height: 32px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.1);
+        color: #cbd5e1;
+        cursor: pointer;
+    }
+    .mobile-theme-btn.active { background: #fff; color: var(--navy); }
+    .mobile-theme-btn svg { width: 18px; height: 18px; fill: currentColor; }
+
+    /* 헤더 수정 (햄버거 보이기) */
+    .header-left { display: flex !important; min-width: auto !important; }
+    .logo-text, .breadcrumb { display: none !important; }
+    
     .header-search { font-size: 14px; padding: 10px 20px 10px 45px; background-size: 18px; background-position: 15px center; }
 
     .mobile-top-bar {
@@ -719,13 +755,20 @@
 <audio id="mainAudio"></audio>
 
 <div class="bottom-nav">
-  <div class="nav-item" onclick="history.back()">
-    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-    뒤로가기
+  <div class="nav-left-group">
+      <div class="nav-item" onclick="history.back()">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        뒤로가기
+      </div>
+      <div class="nav-item" onclick="location.href='index.html'">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        홈으로
+      </div>
   </div>
-  <div class="nav-item" onclick="location.href='index.html'">
-    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-    홈으로
+  
+  <div class="mobile-theme-btn" onclick="toggleMobileTheme()">
+      <!-- 주/야간 아이콘은 JS로 제어 -->
+      <svg id="mThemeIcon" viewBox="0 0 24 24"></svg>
   </div>
 </div>
 
@@ -990,6 +1033,22 @@ function openSettings() {
     localStorage.setItem('kac_theme', mode);
     document.getElementById('btnDay').classList.toggle('active', mode==='light');
     document.getElementById('btnNight').classList.toggle('active', mode==='dark');
+    
+    // 모바일 버튼 아이콘 변경
+    const mIcon = document.getElementById('mThemeIcon');
+    if(mode === 'light') {
+        // 해 아이콘
+        mIcon.innerHTML = '<path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/>';
+    } else {
+        // 달 아이콘
+        mIcon.innerHTML = '<path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C6.94,10.39 9.79,16.87 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z"/>';
+    }
+  }
+  
+  function toggleMobileTheme() {
+      const current = localStorage.getItem('kac_theme') || 'light';
+      const next = current === 'light' ? 'dark' : 'light';
+      setTheme(next);
   }
 
   async function sha256(message) {
@@ -1136,7 +1195,7 @@ function openSettings() {
       card.innerHTML = `
         <div class="last-viewed-icon">
             <!-- PC용 눈 아이콘 -->
-            <svg class="icon-pc" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <svg class="icon-pc" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
             
             <!-- 모바일용 체크 아이콘 -->
             <svg class="icon-mobile" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
