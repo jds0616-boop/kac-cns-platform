@@ -1,3 +1,5 @@
+--- START OF FILE viewer_list.html ---
+
 <!-- START OF FILE viewer_list.html -->
 <!DOCTYPE html>
 <html lang="ko">
@@ -343,8 +345,35 @@
   .v-icon-btn.disabled { opacity: 0.2; pointer-events: none; cursor: default; }
   .v-icon-btn svg { width: 26px; height: 26px; fill: currentColor; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
   
-  #audioPanel { position: absolute; top: -110px; left: 50%; transform: translateX(-50%); width: 480px; height: 80px; background: #fff; border-radius: 0 0 20px 20px; display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 10px 25px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 7900; box-shadow: 0 10px 30px rgba(0,0,0,0.5); color: #000; }
-  #audioPanel.open { top: 0px; }
+  /* [수정] 오디오 패널 스타일: 상단 중앙 슬라이드 제거 -> 우측 상단 아이콘 하단 배치 */
+  #audioPanel { 
+      position: absolute; 
+      top: 85px; /* 헤더 바로 아래 */
+      right: 40px; /* 우측 버튼들과 정렬 */
+      left: auto; /* 중앙 정렬 해제 */
+      transform: none; /* 중앙 정렬 해제 */
+      width: 340px; 
+      height: auto; 
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 15px; 
+      display: none; 
+      flex-direction: column; 
+      justify-content: center; 
+      gap: 10px; 
+      padding: 15px 20px; 
+      transition: opacity 0.2s; 
+      z-index: 8500; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+      color: #000; 
+      border: 1px solid rgba(0,0,0,0.1);
+  }
+  #audioPanel.open { 
+      display: flex; 
+      animation: fadeIn 0.2s ease-out;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
   .audio-ctrl-row { display: flex; align-items: center; gap: 15px; }
   .audio-btn { background: var(--navy); color: #fff; border: none; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; flex-shrink: 0; }
   #audioProgress { flex: 1; accent-color: var(--navy); cursor: pointer; }
@@ -776,14 +805,14 @@
     </div>
   </div>
 
-  <div id="audioPanel" onmousedown="event.stopPropagation()">
+  <div id="audioPanel" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()">
     <div class="audio-ctrl-row">
       <button id="playBtn" class="audio-btn">▶</button>
-      <input type="range" id="audioProgress" value="0">
+      <input type="range" id="audioProgress" value="0" onmousedown="event.stopPropagation()">
       <span id="audioTime" style="font-size:11px; font-weight:800; color:var(--navy); width:40px;">00:00</span>
     </div>
     <div class="volume-row">
-      🔊 <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="1">
+      🔊 <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="1" onmousedown="event.stopPropagation()">
     </div>
   </div>
 
@@ -1198,7 +1227,7 @@
 
       card.innerHTML = `
         <div class="last-viewed-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
             <span>Last Viewed</span>
         </div>
         <div>
