@@ -7,7 +7,7 @@
     "iconSize": 110,
     "labelSize": 28,
     "pageTitles": {
-      "1": "항행안전시설(CNS) 표준 교보재 플랫폼",
+      "1": "항행안전시설(CNS) 교육 플랫폼",
       "2": "항행안전시설 정기교육 플랫폼"
     },
     "footerText": "<p>본 웹사이트는 KAC 항공기술훈련원 항행안전시설 교육 관련 플랫폼입니다.</p><p>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)</p><p>© 2026 Korea Airports Corporation. All rights reserved.</p>",
@@ -155,7 +155,7 @@
         {
           "id": "id_1767393816140",
           "label": "항공정보통신시설 개요 및 분류",
-          "line1": "개요 및 분류",
+          "line1": "관계 법령",
           "line2": "",
           "link": "",
           "subjects": [
@@ -173,6 +173,22 @@
               "active": true,
               "pdfName": "",
               "link": "https://law.go.kr/LSW/lsLinkCommonInfo.do?lspttninfSeq=139509&chrClsCd=010202",
+              "audioName": ""
+            },
+            {
+              "id": "1767410366417",
+              "name": "(법령)항공정보통신시설 설치 및 기술기준",
+              "active": true,
+              "pdfName": "",
+              "link": "https://www.law.go.kr/admRulLsInfoP.do?admRulId=31655&efYd=0",
+              "audioName": ""
+            },
+            {
+              "id": "1767410497831",
+              "name": "(첨부파일) 항공정보통신시설 설치 및 기술기준",
+              "active": true,
+              "pdfName": "/REGULATION/관련규정_1",
+              "link": "",
               "audioName": ""
             },
             {
@@ -300,7 +316,7 @@
               "name": "항공통신용 데이터링크 (PART #1)",
               "active": true,
               "pdfName": "/COMM/통신이론_CH14",
-              "audioName": "/COMM/통신이론_CH14.wav",
+              "audioName": "COMM/통신이론_CH14.wav",
               "link": ""
             },
             {
