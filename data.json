@@ -18,7 +18,7 @@
       "id": "M_1767153081051",
       "name": "RF 무선기초",
       "code": "B",
-      "color": "#01c7fc",
+      "color": "#0547b3",
       "access": {
         "visible": true,
         "adminOnly": false,
@@ -904,8 +904,8 @@
       "code": "Q",
       "color": "#3b82f6",
       "access": {
-        "visible": false,
-        "adminOnly": true,
+        "visible": true,
+        "adminOnly": false,
         "showSidebar": false
       },
       "menus": [
@@ -953,8 +953,8 @@
       "code": "M",
       "color": "#0f1bbd",
       "access": {
-        "visible": false,
-        "adminOnly": true,
+        "visible": true,
+        "adminOnly": false,
         "showSidebar": false
       },
       "menus": []
