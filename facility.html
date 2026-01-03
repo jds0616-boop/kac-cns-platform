@@ -1147,7 +1147,7 @@
       document.getElementById('sidebarOverlay').classList.toggle('active');
   }
   
-  function renderSidebar() {
+function renderSidebar() {
       const content = document.getElementById('sidebarContent');
       content.innerHTML = '';
       const order = JSON.parse(localStorage.getItem('kac_index_order') || '[]');
@@ -1165,7 +1165,7 @@
               if (!acc.visible || acc.adminOnly || !acc.showSidebar) return;
           }
 
-          // 관리자: 숨겨진 메뉴는 흐리게 표시
+          // 관리자: 숨겨진 카테고리는 흐리게 표시 (카테고리 자체 설정 유지)
           const hiddenStyle = (isAdmin && (!acc.visible || acc.adminOnly || !acc.showSidebar)) ? 'opacity: 0.5;' : '';
 
           let subHtml = '';
@@ -1173,15 +1173,20 @@
               subHtml = `<div class="sb-sub-list" id="sb-${tid}">`;
               ms.forEach(m => {
                   const isMenuVisible = (m.visible !== undefined) ? m.visible : true;
-                  if(isAdmin || isMenuVisible) {
+                  
+                  // [수정됨] 관리자(isAdmin)여도 isMenuVisible이 false면 사이드바에 표시하지 않음
+                  if(isMenuVisible) {
                       subHtml += `<div class="sb-sub-item" onclick="location.href='viewer_list.html?type=${tid}&menu=${encodeURIComponent(m.label)}&id=${m.dataId}'">
-                          ${m.label} ${(!isMenuVisible && isAdmin) ? '<span style="color:red;font-size:10px;">(비공개)</span>' : ''}
+                          ${m.label}
                       </div>`;
                   }
               });
               subHtml += `</div>`;
           }
 
+          // 하위 메뉴가 하나도 없으면(모두 비공개면) 카테고리만 덩그러니 남을 수 있으므로 체크
+          // (원하시면 하위 메뉴 없는 카테고리도 숨기는 로직 추가 가능하지만, 일단 요청하신 '비공개 메뉴 미표시'만 적용)
+          
           const item = document.createElement('div');
           item.innerHTML = `
             <div class="sb-item ${tid===type?'active':''}" onclick="toggleSub('${tid}')" style="${hiddenStyle}">
