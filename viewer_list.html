@@ -92,19 +92,26 @@
   }
   .header-right { display: flex; align-items: center; gap: 15px; min-width: 250px; justify-content: flex-end; z-index: 30; }
 
-  /* 햄버거 버튼 (헤더 센터로 이동됨) */
+/* 햄버거 버튼 스타일 */
   .hamburger-btn { cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; flex-shrink: 0; }
   .hamburger-btn:hover { background: rgba(255,255,255,0.1); }
   .hamburger-btn svg { width: 24px; height: 24px; fill: #fff; }
 
+  /* [수정] PC에서는 'mobile-only' 클래스가 붙은(센터) 버튼을 숨김 */
+  .hamburger-btn.mobile-only { display: none; } 
+
   body.header-overlap .header-left { opacity: 0; pointer-events: none; width: 0; overflow: hidden; min-width: 0; }
   body.header-overlap .header-center { width: 80%; }
 
+  /* 모바일(1100px 이하) 설정 */
   @media (max-width: 1100px) {
     .header-left, .header-right { display: none !important; }
     .header-center { position: relative; left: auto; transform: none; width: 100%; max-width: 100%; }
     header { padding: 0 20px; }
     .header-search { width: 100% !important; }
+
+    /* [수정] 모바일에서는 센터에 있는 'mobile-only' 버튼을 다시 보이게 함 */
+    .hamburger-btn.mobile-only { display: flex; }
   }
   
   .logo-text { font-size: 20px; font-weight: 800; white-space: nowrap; cursor: pointer; transition: opacity 0.2s; }
@@ -530,13 +537,18 @@
 
 <header>
   <div class="header-left" id="headerLeft">
+    <!-- [수정 1] PC용 햄버거 버튼을 좌측 맨 앞에 추가 -->
+    <div class="hamburger-btn" onclick="toggleSidebar()">
+      <svg viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
+    </div>
+
     <div class="logo-text" onclick="location.href='index.html'">KAC CNS Training Platform</div>
     <div class="breadcrumb" id="breadcrumbContainer"></div>
   </div>
 
   <div class="header-center" id="headerCenter">
-    <!-- [수정] 햄버거 버튼을 여기로 이동 (검색창 좌측) -->
-    <div class="hamburger-btn" onclick="toggleSidebar()">
+    <!-- [수정 2] 기존 중앙 버튼에 'mobile-only' 클래스 추가 (PC에서는 숨겨짐) -->
+    <div class="hamburger-btn mobile-only" onclick="toggleSidebar()">
       <svg viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
     </div>
     <input type="text" id="searchInput" class="header-search" placeholder="예시) 항공통신용 데이터링크, VOR, ILS..." autocomplete="off">
