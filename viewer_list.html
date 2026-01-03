@@ -83,7 +83,7 @@
   header { height: var(--header-h); background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 1000; flex-shrink: 0; gap: 20px; position: relative; transition: 0.3s; }
   
   .header-left { display: flex; align-items: center; min-width: 250px; z-index: 10; white-space: nowrap; transition: opacity 0.2s; gap: 15px; } 
-  .header-center { position: absolute; left: 50%; transform: translateX(-50%); width: 600px; max-width: 100%; z-index: 20; transition: width 0.3s; }
+  .header-center { position: absolute; left: 50%; transform: translateX(-50%); width: 400px; max-width: 100%; z-index: 20; transition: width 0.3s; }
   .header-right { display: flex; align-items: center; gap: 15px; min-width: 250px; justify-content: flex-end; z-index: 10; }
 
   .hamburger-btn { cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; flex-shrink: 0; }
@@ -212,11 +212,6 @@
   .subject-card.last-viewed .last-viewed-icon { display: flex; }
   .last-viewed-icon svg { width: 24px; height: 24px; fill: currentColor; }
 
-/* ▼▼▼ [여기]에 복사해서 붙여넣으세요 ▼▼▼ */
-.icon-mobile { display: none; } /* PC에선 모바일(체크) 숨김 */
-.icon-pc { display: block; }    /* PC에선 PC(눈) 보임 */
-/* ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ */
-
   .subj-title { font-size: 20px; font-weight: 800; color: var(--title-color); transition: 0.3s; }
   body.dark-mode .subj-title { text-shadow: 0 0 15px rgba(255,255,255,0.15); }
 
@@ -239,7 +234,7 @@
   .btn-del:hover { background: #fee2e2; }
 
   /* ================================================================= */
-  /* [수정] 오버레이 구조를 Flexbox로 변경 및 PC/모바일 분기 */
+  /* [수정] 오버레이 구조를 Flexbox로 변경 (Flex Layout) */
   /* ================================================================= */
   #pdfOverlay { 
       position: fixed; inset: 0; background: #000; 
@@ -272,7 +267,7 @@
   .v-icon-btn.disabled { opacity: 0.2; pointer-events: none; cursor: default; }
   .v-icon-btn svg { width: 26px; height: 26px; fill: currentColor; }
   
-  /* PC 오디오 패널 (우측 상단) - 모바일에서는 사용 안함 */
+  /* PC 오디오 패널 (우측 상단) */
   #audioPanel { 
       position: absolute; 
       top: 85px; right: 40px; left: auto;
@@ -301,16 +296,16 @@
   .progress-flag::after { content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); border-width: 5px 5px 0; border-style: solid; border-color: #1e293b transparent transparent transparent; }
   .progress-hit-area:hover .progress-flag, .progress-hit-area.dragging .progress-flag { opacity: 1; transform: translateY(0); }
   
-  /* 뷰어 바디: PC 기본 설정 */
+  /* 뷰어 바디 */
   .viewer-body { width: 100%; height: 100vh; display: flex; justify-content: center; align-items: center; cursor: default; overflow: hidden; position: relative; background: #000; }
   
-  /* 캔버스: PC 기본 설정 */
+  /* 캔버스 */
   canvas { 
       box-shadow: 0 0 50px rgba(0,0,0,0.8); pointer-events: none; 
       max-width: 100%; max-height: 100%; width: auto; height: auto; 
       object-fit: contain; opacity: 1; transition: none; 
   }
-  
+
   #pageContainer { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; }
 
   .bottom-nav { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); background: var(--navy); padding: 15px 45px; border-radius: 100px; display: flex; gap: 40px; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000; border: 1px solid rgba(255,255,255,0.1); }
@@ -323,121 +318,6 @@
   
   /* 모바일 상단 바 (기본 숨김) */
   .mobile-top-bar { display: none; }
-
-  /* ========================================= */
-  /* [모바일] 상단바 고정 + 절대좌표 뷰어 + 흔들림 방지 */
-  /* ========================================= */
-  @media (max-width: 768px) {
-    /* PC용 헤더 및 오디오패널 숨김 */
-    .v-header, #audioPanel { display: none !important; }
-
-    main { padding: 20px 15px; padding-bottom: 100px; }
-
-    /* 리스트 스타일 모바일 최적화 */
-    .tree-container { align-items: flex-start; }
-    .tree-spine { display: block !important; left: 24px; top: 85px; bottom: 30px; width: 3px; background: rgba(var(--theme-rgb), 0.3); }
-    .fac-top-card { width: 100%; border-radius: 15px; margin-bottom: 25px; padding: 15px 15px; flex-direction: row !important; align-items: center; justify-content: flex-start; gap: 15px; position: relative; z-index: 5; margin-left: 0; }
-    .fac-left-group { width: 100%; flex-direction: row !important; align-items: center; gap: 12px; }
-    .fac-tag-pill { font-size: 13px; padding: 6px 12px; min-width: auto; align-self: center; margin: 0; }
-    .fac-title { font-size: 18px; line-height: 1.3; flex: 1; text-align: left; }
-    .card-wrapper { display: block; margin-bottom: 10px; padding-left: 55px; width: 100%; }
-    .card-wrapper::before { display: block !important; left: 26px; width: 34px; top: 50%; height: 3px; background: rgba(var(--theme-rgb), 0.3); }
-    .card-wrapper::after { content: ''; position: absolute; left: 22px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; border-radius: 50%; background: var(--theme-color); border: 2px solid var(--bg-main); z-index: 2; }
-    .subject-card { padding: 12px 12px 8px 12px; border-radius: 10px; min-height: auto; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
-    .subj-title { font-size: 14px; padding-right: 0; word-break: keep-all; line-height: 1.3; margin-bottom: 2px; }
-    .status-group { flex-wrap: wrap; gap: 4px; margin-top: 0; }
-    .status-pill { padding: 2px 6px; font-size: 10px; height: auto; display: inline-block; border-radius: 4px; line-height: 1.3; }
-    .bottom-nav { width: 90%; bottom: 20px; padding: 16px 0; gap: 30px; border-radius: 50px; justify-content: center; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(10px); box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
-    .nav-item { font-size: 14px; gap: 6px; font-weight: 800; }
-    .header-search { font-size: 14px; padding: 10px 20px 10px 45px; background-size: 18px; background-position: 15px center; }
-
-    /* 1. 상단바 레이아웃 (높이 50px 고정) */
-    .mobile-top-bar {
-        display: flex !important;
-        height: 50px !important;
-        background: #000;
-        align-items: center;
-        padding: 0 10px;
-        gap: 10px;
-        position: absolute; /* 뷰어 위에 고정 */
-        top: 0; left: 0; right: 0;
-        z-index: 8000;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-
-    /* 좌측 나가기 버튼 (빨간 원) */
-    .mobile-exit-btn {
-        width: 32px; height: 32px;
-        background: #ef4444; color: #fff;
-        border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        cursor: pointer; flex-shrink: 0;
-        padding: 0; 
-    }
-    .mobile-exit-btn svg { width: 18px; height: 18px; fill: currentColor; }
-
-    /* 중앙 오디오 그룹 */
-    .mobile-audio-group {
-        flex: 1; /* 남은 공간 차지 */
-        display: flex; align-items: center; gap: 8px;
-        min-width: 0; 
-    }
-    .audio-btn-sm {
-        width: 28px; height: 28px; border-radius: 50%; border: none;
-        background: #fff; color: #000; flex-shrink: 0;
-        display: flex; align-items: center; justify-content: center; font-size: 10px;
-    }
-    .audio-slider-sm { flex: 1; height: 3px; accent-color: #fff; }
-    .audio-time-sm { font-size: 10px; color: #fff; width: 30px; text-align: right; }
-
-    /* 우측 오디오 아이콘 */
-    .mobile-audio-icon-right {
-        color: #facc15; opacity: 0.8; flex-shrink: 0; display: flex;
-    }
-    .mobile-audio-icon-right svg { width: 20px; height: 20px; fill: currentColor; }
-
-    /* 2. PDF 뷰어 화면 (상단바 50px ~ 하단바 10px 사이 고정) */
-    .viewer-body { 
-        position: absolute !important;
-        top: 50px !important;    /* 상단바 아래 */
-        bottom: 10px !important; /* 하단바 위 */
-        left: 0 !important;
-        right: 0 !important;
-        
-        width: 100% !important;
-        height: auto !important; /* 높이는 자동으로 채움 */
-        
-        padding: 0 !important;
-        background: #000; 
-        
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: flex-start !important;
-        
-        overflow-y: scroll !important;
-        -webkit-overflow-scrolling: touch;
-    }
-    
-    /* 캔버스 설정 */
-    canvas {
-        display: block !important;
-        width: 100% !important;
-        height: auto !important;
-    }
-
-    /* 3. 하단 진행바 (높이 10px 고정) */
-    .progress-hit-area {
-        position: absolute !important;
-        bottom: 0 !important;
-        left: 0 !important; right: 0 !important;
-        height: 10px !important;
-        background: #1e293b;
-        z-index: 9000;
-        order: 99;
-    }
-    .progress-track { background: rgba(255,255,255,0.2); }
-  }
 
   .creator-info { position: fixed; bottom: 5px; width: 100%; text-align: center; font-size: 11px; color: var(--text-sub); opacity: 0.5; font-weight: 500; z-index: 500; pointer-events: none; }
   .creator-info b { font-weight: 700; }
@@ -466,16 +346,37 @@
   .batch-table th { background: var(--btn-bg); font-weight: 700; color: var(--text-sub); }
   .batch-input { width: 100%; border: none; background: transparent; color: var(--text-main); }
 
-/* [1] PC 기본 아이콘 설정 */
+  /* [1] PC 기본 설정 (모바일 상단바 숨김 + 아이콘 구분) */
   .icon-mobile { display: none; }
   .icon-pc { display: block; }
+  .mobile-top-bar { display: none; }
 
-  /* [2] 모바일 전용 설정 (세련된 디자인 + 흔들림 방지 + 아이콘 변경) */
+  /* [2] 모바일 전용 설정 (세련된 디자인 + 꿀렁임 완벽 제거) */
   @media (max-width: 768px) {
     /* PC 요소 숨김 */
     .v-header, #audioPanel, .mobile-top-exit-btn { display: none !important; }
 
-    /* --- [A] 상단바 디자인 (글래스모피즘) --- */
+    main { padding: 20px 15px; padding-bottom: 100px; }
+
+    /* 리스트 스타일 모바일 최적화 */
+    .tree-container { align-items: flex-start; }
+    .tree-spine { display: block !important; left: 24px; top: 85px; bottom: 30px; width: 3px; background: rgba(var(--theme-rgb), 0.3); }
+    .fac-top-card { width: 100%; border-radius: 15px; margin-bottom: 25px; padding: 15px 15px; flex-direction: row !important; align-items: center; justify-content: flex-start; gap: 15px; position: relative; z-index: 5; margin-left: 0; }
+    .fac-left-group { width: 100%; flex-direction: row !important; align-items: center; gap: 12px; }
+    .fac-tag-pill { font-size: 13px; padding: 6px 12px; min-width: auto; align-self: center; margin: 0; }
+    .fac-title { font-size: 18px; line-height: 1.3; flex: 1; text-align: left; }
+    .card-wrapper { display: block; margin-bottom: 10px; padding-left: 55px; width: 100%; }
+    .card-wrapper::before { display: block !important; left: 26px; width: 34px; top: 50%; height: 3px; background: rgba(var(--theme-rgb), 0.3); }
+    .card-wrapper::after { content: ''; position: absolute; left: 22px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; border-radius: 50%; background: var(--theme-color); border: 2px solid var(--bg-main); z-index: 2; }
+    .subject-card { padding: 12px 12px 8px 12px; border-radius: 10px; min-height: auto; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+    .subj-title { font-size: 14px; padding-right: 0; word-break: keep-all; line-height: 1.3; margin-bottom: 2px; }
+    .status-group { flex-wrap: wrap; gap: 4px; margin-top: 0; }
+    .status-pill { padding: 2px 6px; font-size: 10px; height: auto; display: inline-block; border-radius: 4px; line-height: 1.3; }
+    .bottom-nav { width: 90%; bottom: 20px; padding: 16px 0; gap: 30px; border-radius: 50px; justify-content: center; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(10px); box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
+    .nav-item { font-size: 14px; gap: 6px; font-weight: 800; }
+    .header-search { font-size: 14px; padding: 10px 20px 10px 45px; background-size: 18px; background-position: 15px center; }
+
+    /* --- [A] 상단바 디자인 (Glassmorphism) --- */
     .mobile-top-bar {
         display: flex !important;
         height: 60px !important;
@@ -492,7 +393,7 @@
         z-index: 8000;
     }
 
-    /* 나가기 버튼 (심플한 사각형) */
+    /* 나가기 버튼 */
     .mobile-exit-btn {
         width: 36px; height: 36px;
         background: rgba(255,255,255,0.1); color: #fff;
@@ -502,11 +403,11 @@
     }
     .mobile-exit-btn svg { width: 20px; height: 20px; fill: #ef4444; }
 
-    /* 오디오 컨트롤 그룹 (캡슐 모양) */
+    /* 오디오 컨트롤 그룹 */
     .mobile-audio-group {
         flex: 1; display: flex; align-items: center; gap: 12px;
         min-width: 0;
-        background: rgba(0,0,0,0.3); /* 어두운 내부 */
+        background: rgba(0,0,0,0.3);
         padding: 6px 12px; border-radius: 50px;
         border: 1px solid rgba(255,255,255,0.05);
     }
@@ -519,7 +420,7 @@
         font-size: 14px; padding-left: 2px;
     }
 
-    /* 재생바 (파란색 채움 효과) */
+    /* 재생바 */
     .audio-slider-sm {
         flex: 1; height: 6px; border-radius: 10px;
         appearance: none; -webkit-appearance: none;
@@ -545,18 +446,39 @@
     }
     .mobile-audio-icon-right svg { width: 20px; height: 20px; fill: currentColor; }
 
-    /* --- [B] 뷰어 흔들림 방지 고정 --- */
+    /* --- [B] 뷰어 흔들림 방지 (핵심: Block 고정) --- */
     .viewer-body { 
         position: absolute !important;
-        top: 60px !important; bottom: 10px !important; /* 상단바~하단바 사이 고정 */
-        left: 0 !important; right: 0 !important;
-        width: 100% !important; height: auto !important; 
-        padding: 0 !important; background: #000; 
+        top: 60px !important;    /* 상단바 아래 */
+        bottom: 10px !important; /* 하단바 위 */
+        left: 0 !important; 
+        right: 0 !important;
+        
+        width: 100% !important; 
+        height: auto !important; 
+        
+        padding: 0 !important; 
+        background: #000; 
+        
+        /* [중요] flex를 block으로 변경하여 꿀렁임 원천 차단 */
         display: block !important; 
-        overflow-y: scroll !important; -webkit-overflow-scrolling: touch;
+        
+        overflow-y: scroll !important; 
+        -webkit-overflow-scrolling: touch;
     }
-    canvas { display: block !important; width: 100% !important; height: auto !important; }
-    #pageContainer { min-height: 100% !important; height: auto !important; display: block !important; padding-bottom: 100px !important; }
+    
+    canvas { 
+        display: block !important; 
+        width: 100% !important; 
+        height: auto !important; 
+    }
+    
+    #pageContainer { 
+        min-height: 100% !important; 
+        height: auto !important; 
+        display: block !important; 
+        padding-bottom: 50px !important; 
+    }
 
     /* --- [C] Last Viewed 아이콘 (모바일 전용) --- */
     .subject-card.last-viewed .last-viewed-icon { 
@@ -1183,28 +1105,25 @@
         ? `<span class="status-pill on"><span class="pill-icon">🎧</span> <span class="status-text">Audio ${sub.audioName}</span></span>` 
         : `<span class="status-pill"><span class="pill-icon">🎧</span> <span class="status-text">Audio 미등록</span></span>`;
 
-/* render() 함수 내부 (약 535번째 줄 근처) */
+      card.innerHTML = `
+        <div class="last-viewed-icon">
+            <!-- PC용 눈 아이콘 -->
+            <svg class="icon-pc" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            
+            <!-- 모바일용 체크 아이콘 -->
+            <svg class="icon-mobile" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
 
-card.innerHTML = `
-  <div class="last-viewed-icon">
-      <!-- 1. PC용 눈 아이콘 (class="icon-pc") -->
-      <svg class="icon-pc" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-      
-      <!-- 2. 모바일용 체크 아이콘 (class="icon-mobile") -->
-      <svg class="icon-mobile" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-
-      <!-- 3. 텍스트 (CSS 덕분에 모바일에서는 자동으로 숨겨짐) -->
-      <span>Last Viewed</span>
-  </div>
-  <div>
-      <div class="subj-title">${statusTag} ${sub.name}</div>
-      <div class="status-group">
-          ${pdfLabel}
-          ${audioLabel}
-          ${hasLink ? `<span class="status-pill link">🔗 <span class="status-text">Link 연결됨</span></span>` : ''}
-      </div>
-  </div>
-  <div class="ctrl-btns">${(isAdmin && !isPreview) ? `${moveBtn}<button class="btn-action" onclick="event.stopPropagation(); openUploadMenu(${i})">수정</button><button class="btn-action btn-del" onclick="event.stopPropagation(); deleteSubject(${i})">삭제</button>` : `<button class="btn-action" style="visibility:hidden">.</button>`}</div>`;
+            <span>Last Viewed</span>
+        </div>
+        <div>
+            <div class="subj-title">${statusTag} ${sub.name}</div>
+            <div class="status-group">
+                ${pdfLabel}
+                ${audioLabel}
+                ${hasLink ? `<span class="status-pill link">🔗 <span class="status-text">Link 연결됨</span></span>` : ''}
+            </div>
+        </div>
+        <div class="ctrl-btns">${(isAdmin && !isPreview) ? `${moveBtn}<button class="btn-action" onclick="event.stopPropagation(); openUploadMenu(${i})">수정</button><button class="btn-action btn-del" onclick="event.stopPropagation(); deleteSubject(${i})">삭제</button>` : `<button class="btn-action" style="visibility:hidden">.</button>`}</div>`;
       
       wrapper.appendChild(card);
       treeContainer.appendChild(wrapper);
