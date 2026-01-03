@@ -244,8 +244,17 @@
       flex-direction: column; 
   }
   
-  /* PC 기본 헤더 */
-  .v-header { height: 80px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 8000; color: #fff; background: transparent; flex-shrink: 0; }
+  /* PC 기본 헤더: PDF 위로 겹치게 설정 */
+  .v-header { 
+      position: absolute; /* [수정] Overlay 방식 */
+      top: 0; left: 0; right: 0;
+      height: 80px; 
+      display: flex; align-items: center; justify-content: space-between; 
+      padding: 0 40px; z-index: 8000; 
+      color: #fff; 
+      background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); /* [수정] 그라데이션 */
+      flex-shrink: 0; 
+  }
   .v-header-left { display: flex; align-items: center; gap: 25px; }
   .close-v { font-size: 32px; cursor: pointer; transition: 0.3s; opacity: 0.8; }
   .close-v:hover { color: #ef4444; opacity: 1; }
@@ -278,7 +287,7 @@
   #volumeControl { width: 80px; accent-color: #64748b; height: 4px; }
   
   /* 하단 페이지 진행바 (빨간선) */
-  .progress-hit-area { height: 40px; width: 100%; z-index: 9000; cursor: pointer; display: flex; align-items: flex-end; flex-shrink: 0; }
+  .progress-hit-area { position: absolute; bottom: 0; left: 0; height: 40px; width: 100%; z-index: 9000; cursor: pointer; display: flex; align-items: flex-end; flex-shrink: 0; }
   .progress-track { width: 100%; height: 6px; background: rgba(255,255,255,0.3); position: relative; transition: height 0.2s, background 0.2s; }
   .progress-hit-area:hover .progress-track { background: rgba(255,255,255,0.5); height: 8px; }
   .progress-fill { height: 100%; width: 0%; background: #ef4444; position: relative; }
@@ -292,9 +301,10 @@
   .side-nav:hover svg { opacity: 0.7; }
   .nav-L { left: 0; } .nav-R { right: 0; }
   
-  .viewer-body { flex: 1; width: 100%; display: flex; justify-content: center; align-items: center; cursor: default; overflow: hidden; position: relative; }
+  /* [수정] 뷰어 바디: 전체화면 꽉 차게 */
+  .viewer-body { width: 100%; height: 100vh; display: flex; justify-content: center; align-items: center; cursor: default; overflow: hidden; position: relative; background: #000; }
   
-  /* [수정] PC에서 꽉 차게 보이도록 설정 */
+  /* [수정] 캔버스: PC에서 꽉 차게 보이도록 설정 */
   canvas { 
       box-shadow: 0 0 50px rgba(0,0,0,0.8); pointer-events: none; 
       max-width: 100%; max-height: 100%; width: auto; height: auto; 
@@ -399,7 +409,7 @@
     #audioProgress { accent-color: #fff !important; }
     
     /* 뷰어 바디는 Flex Grow로 남은 공간 차지 */
-    .viewer-body { padding: 0; background: #000; align-items: center; }
+    .viewer-body { padding: 0; background: #000; align-items: center; height: 100%; padding-bottom: 120px !important; }
   }
 
   .creator-info { position: fixed; bottom: 5px; width: 100%; text-align: center; font-size: 11px; color: var(--text-sub); opacity: 0.5; font-weight: 500; z-index: 500; pointer-events: none; }
@@ -1028,7 +1038,7 @@
 
       card.innerHTML = `
         <div class="last-viewed-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
             <span>Last Viewed</span>
         </div>
         <div>
@@ -1069,6 +1079,7 @@
     }
   }
 
+  // [수정] 저장 함수: 입력된 경로 + 선택된 확장자를 합쳐서 저장
   function saveFiles() {
     const idx = currentEditIdx;
     const name = document.getElementById('editSubjectName').value;
@@ -1081,6 +1092,7 @@
     subjects[idx].pdfName = document.getElementById('inputPdfName').value.trim();
     subjects[idx].link = document.getElementById('inputLinkUrl').value.trim();
 
+    // 오디오 경로 처리
     let aPath = document.getElementById('inputAudioName').value.trim();
     const aExt = document.getElementById('inputAudioExt').value;
     
@@ -1099,6 +1111,7 @@
     document.getElementById('uploadModal').style.display = 'none';
   }
 
+  // [수정] 수정창 열기 함수: 저장된 파일명에서 확장자를 분리해서 보여줌
   function openUploadMenu(idx) { 
     currentEditIdx = idx; 
     const sub = subjects[idx];
@@ -1107,9 +1120,10 @@
     document.getElementById('inputPdfName').value = sub.pdfName || '';
     document.getElementById('inputLinkUrl').value = sub.link || '';
 
+    // 오디오 분리 로직
     let aFull = sub.audioName || '';
     let aPath = aFull;
-    let aExt = '.mp3';
+    let aExt = '.mp3'; // 기본값
 
     if (aFull.toLowerCase().endsWith('.wav')) {
         aExt = '.wav';
@@ -1469,10 +1483,9 @@
         viewport = page.getViewport({ scale: scale });
     } else {
         const unscaledViewport = page.getViewport({ scale: 1 });
-        // PC 화면에서는 헤더 높이(80px)를 뺀 높이를 기준으로 스케일 계산
-        const availableHeight = window.innerHeight - 80; 
+        // [수정] PC에서 전체화면 높이(window.innerHeight) 기준 - 헤더 없음
+        const availableHeight = window.innerHeight; 
         const scaleY = availableHeight / unscaledViewport.height;
-        // width 기준 스케일도 계산하되, 화면 밖으로 나가지 않도록 최소값 사용 (0.95는 여유분)
         const scaleX = window.innerWidth / unscaledViewport.width;
         const baseScale = Math.min(scaleX, scaleY) * 0.98; 
         viewport = page.getViewport({ scale: baseScale }); 
@@ -1507,7 +1520,7 @@
       window.addEventListener('mousemove', (e) => { if(!isDragging || !pdfDoc) return; updateProgress(e.clientX); });
       window.addEventListener('mouseup', () => { if(isDragging) { isDragging = false; hitArea.classList.remove('dragging'); renderPage('none'); } });
 
-      // [추가] Touch Events for Page Scrubbing
+      // Touch Events for Page Scrubbing
       hitArea.addEventListener('touchstart', (e) => {
           e.preventDefault(); e.stopPropagation();
           isDragging = true; hitArea.classList.add('dragging');
