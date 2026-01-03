@@ -1,16 +1,11 @@
 {
   "meta": {
     "version": "2.0",
-    "lastUpdated": "2026-01-02"
+    "lastUpdated": "2026-01-03"
   },
   "config": {
     "iconSize": 110,
-    "labelSize": 28,
-    "pageTitles": {
-      "1": "항행안전시설 표준교보재 "
-    },
-    "footerText": "<p>본 웹사이트는 KAC 항공기술훈련원 항행안전시설 교육 관련 플랫폼입니다.</p><p>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)</p><p>© 2026 Korea Airports Corporation. All rights reserved.</p>",
-    "contentTop": "0"
+    "labelSize": 28
   },
   "categories": [
     {
@@ -771,11 +766,7 @@
           ]
         }
       ]
-    },
-    null,
-    null,
-    null,
-    null
+    }
   ],
   "security": {
     "entry_pw": "489a97f30f7aabd25773bf71342c8373537bc3a355be07161b7ab9280e09bb6f",
