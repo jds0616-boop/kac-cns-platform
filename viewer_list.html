@@ -529,16 +529,18 @@
 </div>
 
 <header>
+  <!-- [수정] 햄버거 버튼을 최상단 좌측(header의 첫번째 자식)으로 이동 -->
+  <div class="hamburger-btn" onclick="toggleSidebar()">
+    <svg viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
+  </div>
+
   <div class="header-left" id="headerLeft">
     <div class="logo-text" onclick="location.href='index.html'">KAC CNS Training Platform</div>
     <div class="breadcrumb" id="breadcrumbContainer"></div>
   </div>
 
   <div class="header-center" id="headerCenter">
-    <!-- [수정] 햄버거 버튼을 여기로 이동 (검색창 좌측) -->
-    <div class="hamburger-btn" onclick="toggleSidebar()">
-      <svg viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
-    </div>
+    <!-- [수정] 여기서 햄버거 버튼 제거됨 -->
     <input type="text" id="searchInput" class="header-search" placeholder="예시) 항공통신용 데이터링크, VOR, ILS..." autocomplete="off">
     <div id="searchDropdown" class="search-dropdown"></div>
   </div>
