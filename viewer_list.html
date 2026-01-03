@@ -339,7 +339,14 @@
     body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.98); }
     .nav-item { font-size: 14px; gap: 6px; font-weight: 800; }
     .nav-icon { width: 20px; height: 20px; }
-    .viewer-body { padding: 0; align-items: flex-start; overflow-y: auto; }
+    
+    /* [중요] 모바일에서 PDF 하단 여백 추가 (오디오 바 공간 확보) */
+    .viewer-body { 
+        padding: 0; 
+        align-items: flex-start; 
+        overflow-y: auto; 
+        padding-bottom: 120px !important; /* 하단 공간 확보 */
+    }
     .header-search { font-size: 14px; padding: 10px 20px 10px 45px; background-size: 18px; background-position: 15px center; }
 
     /* [수정] 모바일 전용 오디오 패널 위치: 화면 하단 중앙 (페이지 바 위쪽) */
@@ -348,7 +355,7 @@
 
     #audioPanel {
         top: auto !important;
-        bottom: 80px !important; /* 하단 80px 위에 배치 (페이지바 간섭 방지) */
+        bottom: 45px !important; /* 빨간색 페이지 바(약 40px) 바로 위에 배치 */
         left: 50% !important;
         transform: translateX(-50%) !important; /* 가로 중앙 정렬 */
         right: auto !important;
@@ -579,11 +586,11 @@
     </div>
   </div>
 
-  <!-- ontouchstart 추가: 터치 시 페이지 넘김 방지 -->
-  <div id="audioPanel" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+  <!-- [수정] ontouchmove="event.stopPropagation()" 추가: 터치 이동 시 페이지 넘김 방지 -->
+  <div id="audioPanel" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()" ontouchstart="event.stopPropagation()" ontouchmove="event.stopPropagation()">
     <div class="audio-ctrl-row">
       <button id="playBtn" class="audio-btn">▶</button>
-      <input type="range" id="audioProgress" value="0" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+      <input type="range" id="audioProgress" value="0" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" ontouchmove="event.stopPropagation()">
       <span id="audioTime" style="font-size:11px; font-weight:800; color:var(--navy); width:40px; text-align:center;">00:00</span>
     </div>
     <div class="volume-row">
@@ -995,7 +1002,7 @@
 
       card.innerHTML = `
         <div class="last-viewed-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
             <span>Last Viewed</span>
         </div>
         <div>
@@ -1036,6 +1043,7 @@
     }
   }
 
+  // [수정] 저장 함수: 입력된 경로 + 선택된 확장자를 합쳐서 저장
   function saveFiles() {
     const idx = currentEditIdx;
     const name = document.getElementById('editSubjectName').value;
@@ -1048,6 +1056,7 @@
     subjects[idx].pdfName = document.getElementById('inputPdfName').value.trim();
     subjects[idx].link = document.getElementById('inputLinkUrl').value.trim();
 
+    // 오디오 경로 처리
     let aPath = document.getElementById('inputAudioName').value.trim();
     const aExt = document.getElementById('inputAudioExt').value;
     
@@ -1066,6 +1075,7 @@
     document.getElementById('uploadModal').style.display = 'none';
   }
 
+  // [수정] 수정창 열기 함수: 저장된 파일명에서 확장자를 분리해서 보여줌
   function openUploadMenu(idx) { 
     currentEditIdx = idx; 
     const sub = subjects[idx];
@@ -1074,6 +1084,7 @@
     document.getElementById('inputPdfName').value = sub.pdfName || '';
     document.getElementById('inputLinkUrl').value = sub.link || '';
 
+    // 오디오 분리 로직
     let aFull = sub.audioName || '';
     let aPath = aFull;
     let aExt = '.mp3';
@@ -1339,6 +1350,7 @@
         audioPlayer.src = audioUrl;
         audioPlayer.load();
         audioBtn.classList.remove('disabled');
+        // 모바일 자동 패널 열기
         if(window.innerWidth <= 768) {
              document.getElementById('audioPanel').classList.add('open');
         }
