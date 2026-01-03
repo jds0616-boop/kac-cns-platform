@@ -1,6 +1,3 @@
---- START OF FILE viewer_list.html ---
-
-<!-- START OF FILE viewer_list.html -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -345,13 +342,13 @@
   .v-icon-btn.disabled { opacity: 0.2; pointer-events: none; cursor: default; }
   .v-icon-btn svg { width: 26px; height: 26px; fill: currentColor; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
   
-  /* [수정] 오디오 패널 스타일: 상단 중앙 슬라이드 제거 -> 우측 상단 아이콘 하단 배치 */
+  /* [수정] 오디오 패널 스타일 (PC: 우측 상단 / 모바일: 나가기 버튼 옆) */
   #audioPanel { 
       position: absolute; 
-      top: 85px; /* 헤더 바로 아래 */
-      right: 40px; /* 우측 버튼들과 정렬 */
-      left: auto; /* 중앙 정렬 해제 */
-      transform: none; /* 중앙 정렬 해제 */
+      /* PC 기본 위치 */
+      top: 85px; 
+      right: 40px; 
+      left: auto;
       width: 340px; 
       height: auto; 
       background: rgba(255,255,255,0.95);
@@ -372,11 +369,11 @@
       display: flex; 
       animation: fadeIn 0.2s ease-out;
   }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
-  .audio-ctrl-row { display: flex; align-items: center; gap: 15px; }
-  .audio-btn { background: var(--navy); color: #fff; border: none; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; flex-shrink: 0; }
-  #audioProgress { flex: 1; accent-color: var(--navy); cursor: pointer; }
+  .audio-ctrl-row { display: flex; align-items: center; gap: 15px; width: 100%; }
+  .audio-btn { background: var(--navy); color: #fff; border: none; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; flex-shrink: 0; display:flex; align-items:center; justify-content:center; }
+  #audioProgress { flex: 1; accent-color: var(--navy); cursor: pointer; height: 4px; }
   .volume-row { display: flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 800; color: #666; margin-left: 45px; }
   #volumeControl { width: 80px; accent-color: #64748b; height: 4px; }
   
@@ -600,6 +597,29 @@
 
     .viewer-body { padding: 0; align-items: flex-start; overflow-y: auto; }
     .header-search { font-size: 14px; padding: 10px 20px 10px 45px; background-size: 18px; background-position: 15px center; }
+
+    /* 모바일 전용 오디오 패널 위치 */
+    .v-title-box, .close-v, #fsBtn { display: none !important; } 
+    #audioBtn { display: flex !important; } /* 상단 오디오 아이콘 보이기 */
+
+    #audioPanel {
+        top: 20px !important;
+        left: 125px !important;     /* 나가기 버튼 너비만큼 띄움 */
+        right: auto !important;
+        width: calc(100% - 145px) !important; 
+        max-width: none !important;
+        height: 42px !important;
+        padding: 0 15px !important;
+        border-radius: 50px !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 0 !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
+    }
+    .volume-row { display: none !important; }
+    .audio-ctrl-row { gap: 8px; margin: 0; }
+    .audio-btn { width: 28px; height: 28px; font-size: 10px; }
+    #audioTime { font-size: 10px !important; margin-left: 2px; }
   }
 
   .creator-info { position: fixed; bottom: 5px; width: 100%; text-align: center; font-size: 11px; color: var(--text-sub); opacity: 0.5; font-weight: 500; z-index: 500; pointer-events: none; }
@@ -691,8 +711,15 @@
     <label class="setting-label">🔗 외부 링크 주소 (선택)</label>
     <input type="text" id="inputLinkUrl" class="setting-input" placeholder="예: https://..." style="margin-bottom:10px;">
 
-    <label class="setting-label">🎵 오디오 파일 경로 (예: COMM/audio.mp3)</label>
-    <input type="text" id="inputAudioName" class="setting-input" placeholder="예: COMM/audio.mp3" style="margin-bottom:20px;">
+    <!-- [수정] 오디오 입력 부분: 경로 입력 + 확장자 선택 -->
+    <label class="setting-label">🎵 오디오 파일 경로 (확장자 제외)</label>
+    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+        <input type="text" id="inputAudioName" class="setting-input" placeholder="예: COMM/audio" style="flex: 1;">
+        <select id="inputAudioExt" class="setting-input" style="width: 100px;">
+            <option value=".mp3">MP3</option>
+            <option value=".wav">WAV</option>
+        </select>
+    </div>
     
     <div class="btn-row">
       <button onclick="saveFiles()" class="btn-modal btn-primary">저장</button>
@@ -805,14 +832,15 @@
     </div>
   </div>
 
-  <div id="audioPanel" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()">
+  <!-- ontouchstart 추가: 터치 시 페이지 넘김 방지 -->
+  <div id="audioPanel" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()" ontouchstart="event.stopPropagation()">
     <div class="audio-ctrl-row">
       <button id="playBtn" class="audio-btn">▶</button>
-      <input type="range" id="audioProgress" value="0" onmousedown="event.stopPropagation()">
-      <span id="audioTime" style="font-size:11px; font-weight:800; color:var(--navy); width:40px;">00:00</span>
+      <input type="range" id="audioProgress" value="0" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+      <span id="audioTime" style="font-size:11px; font-weight:800; color:var(--navy); width:40px; text-align:center;">00:00</span>
     </div>
     <div class="volume-row">
-      🔊 <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="1" onmousedown="event.stopPropagation()">
+      🔊 <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="1" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
     </div>
   </div>
 
@@ -1227,7 +1255,7 @@
 
       card.innerHTML = `
         <div class="last-viewed-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
             <span>Last Viewed</span>
         </div>
         <div>
@@ -1268,201 +1296,7 @@
     }
   }
 
-  function openSettings() {
-    const adminBtn = document.getElementById('modalAdminBtn');
-    const batchGroup = document.getElementById('batchAdminGroup');
-    const previewBtn = document.getElementById('modalPreviewBtn');
-
-    if(isAdmin) {
-        adminBtn.textContent = "관리자 로그아웃";
-        adminBtn.className = "btn-modal btn-danger";
-        previewBtn.style.display = 'block';
-        batchGroup.style.display = 'block';
-    } else {
-        adminBtn.textContent = "관리자 로그인";
-        adminBtn.className = "btn-modal btn-primary";
-        previewBtn.style.display = 'none';
-        batchGroup.style.display = 'none';
-    }
-
-    if(isPreview) {
-        previewBtn.textContent = "미리보기 종료";
-        previewBtn.style.background = "#10b981";
-        previewBtn.style.color = "#fff";
-    } else {
-        previewBtn.textContent = "미리보기 시작";
-        previewBtn.style.background = "";
-        previewBtn.style.color = "";
-    }
-
-    const currentPos = localStorage.getItem('kac_tree_pos') || 0;
-    document.getElementById('treePosRange').value = currentPos;
-    document.getElementById('treePosVal').textContent = currentPos;
-
-    document.getElementById('settingsModal').style.display = 'flex';
-  }
-
-  function openBatchAddModal() {
-    if(!isAdmin) return alert("관리자 권한이 필요합니다.");
-    document.getElementById('batchModalTitle').textContent = "📋 일괄 자료 등록 (신규 추가)";
-    const tbody = document.getElementById('batchTbody'); tbody.innerHTML = '';
-    for(let i=0; i<30; i++) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${i+1}</td><td><input type="text" class="batch-input" placeholder="과목명" name="name"></td><td><input type="text" class="batch-input" placeholder="PDF 경로" name="pdf"></td><td><input type="text" class="batch-input" placeholder="링크 주소" name="link"></td><td><input type="text" class="batch-input" placeholder="오디오 경로" name="audio"></td>`;
-        tbody.appendChild(tr);
-    }
-    document.getElementById('batchSaveBtn').onclick = saveBatchAddData;
-    document.getElementById('settingsModal').style.display = 'none';
-    document.getElementById('batchModal').style.display = 'flex';
-  }
-
-  function openBatchEditModal() {
-    if(!isAdmin) return alert("관리자 권한이 필요합니다.");
-    document.getElementById('batchModalTitle').textContent = "📋 일괄 자료 수정 (기존 목록)";
-    const tbody = document.getElementById('batchTbody'); tbody.innerHTML = '';
-    subjects.forEach((sub, i) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${i+1}</td><td><input type="text" class="batch-input" value="${sub.name}" name="name" data-idx="${i}"></td><td><input type="text" class="batch-input" value="${sub.pdfName || ''}" name="pdf" data-idx="${i}"></td><td><input type="text" class="batch-input" value="${sub.link || ''}" name="link" data-idx="${i}"></td><td><input type="text" class="batch-input" value="${sub.audioName || ''}" name="audio" data-idx="${i}"></td>`;
-        tbody.appendChild(tr);
-    });
-    document.getElementById('batchSaveBtn').onclick = saveBatchEditData;
-    document.getElementById('settingsModal').style.display = 'none';
-    document.getElementById('batchModal').style.display = 'flex';
-  }
-
-  function saveBatchAddData() {
-    const rows = document.querySelectorAll('#batchTbody tr');
-    let addedCount = 0;
-    for(const row of rows) {
-        const name = row.querySelector('input[name="name"]').value.trim();
-        const pdf = row.querySelector('input[name="pdf"]').value.trim();
-        const link = row.querySelector('input[name="link"]').value.trim();
-        const audio = row.querySelector('input[name="audio"]').value.trim();
-        if(name) {
-            const newId = Date.now().toString() + Math.random().toString(36).substr(2, 5);
-            subjects.push({ id: newId, name: name, active: true, pdfName: pdf, link: link, audioName: audio });
-            addedCount++;
-        }
-    }
-    if(addedCount > 0) { saveSubjects(); alert(`${addedCount}개 과목이 등록되었습니다.`); document.getElementById('batchModal').style.display = 'none'; } 
-    else { alert("입력된 과목이 없습니다."); }
-  }
-
-  function saveBatchEditData() {
-    const rows = document.querySelectorAll('#batchTbody tr');
-    let updatedCount = 0;
-    for(const row of rows) {
-        const nameInput = row.querySelector('input[name="name"]');
-        const idx = parseInt(nameInput.getAttribute('data-idx'));
-        if(subjects[idx]) {
-            subjects[idx].name = nameInput.value.trim();
-            subjects[idx].pdfName = row.querySelector('input[name="pdf"]').value.trim();
-            subjects[idx].link = row.querySelector('input[name="link"]').value.trim();
-            subjects[idx].audioName = row.querySelector('input[name="audio"]').value.trim();
-            updatedCount++;
-        }
-    }
-    if(updatedCount > 0) { saveSubjects(); alert("수정되었습니다."); document.getElementById('batchModal').style.display = 'none'; }
-  }
-
-  let allSubjectsIndex = [];
-  function buildSearchIndex() {
-    allSubjectsIndex = [];
-    try {
-        const order = JSON.parse(localStorage.getItem('kac_index_order') || '[]');
-        order.forEach(t => {
-            if(!t) return;
-            const ms = JSON.parse(localStorage.getItem(`kac_menu_${t}`) || '[]');
-            const s = JSON.parse(localStorage.getItem(`kac_style_${t}`) || '{}');
-            ms.forEach(m => {
-                const subData = localStorage.getItem(`kac_subs_${t}_${m.dataId}`);
-                if(subData) {
-                    JSON.parse(subData).forEach(sub => {
-                        allSubjectsIndex.push({ 
-                            name: sub.name, type: t, code: s.code || t.substring(0,1), 
-                            menuName: m.label, menuId: m.dataId, subId: sub.id, 
-                            active: sub.active !== false, link: sub.link, color: s.color 
-                        });
-                    });
-                }
-            });
-        });
-    } catch(e) { console.error("Search Index Build Error", e); }
-  }
-
-  if(searchInput) {
-    searchInput.addEventListener('input', (e) => {
-        const query = e.target.value.trim().toLowerCase();
-        if(query.length === 0) { searchDropdown.classList.remove('active'); return; }
-        const matches = allSubjectsIndex.filter(item => item.name.toLowerCase().includes(query) || item.menuName.toLowerCase().includes(query));
-        renderSearchResults(matches, query);
-    });
-    
-    searchInput.addEventListener('focus', () => { 
-        document.body.classList.add('search-mode');
-        sOverlay.classList.add('active');
-        if(searchInput.value.trim().length > 0) searchDropdown.classList.add('active'); 
-    });
-  }
-  
-  if(sOverlay) {
-    sOverlay.addEventListener('click', () => {
-        document.body.classList.remove('search-mode');
-        sOverlay.classList.remove('active');
-        searchDropdown.classList.remove('active');
-    });
-  }
-
-  function renderSearchResults(list, query) {
-    searchDropdown.innerHTML = ''; searchDropdown.classList.add('active');
-    if(list.length === 0) { searchDropdown.innerHTML = `<div style="padding:15px; text-align:center; opacity:0.6;">검색 결과 없음</div>`; return; }
-    list.forEach(item => {
-      const div = document.createElement('div'); div.className = 'result-item';
-      const highlightName = item.name.replace(new RegExp(`(${query})`, 'gi'), `<span style="color:${item.color}; font-weight:900;">$1</span>`);
-      div.innerHTML = `<div class="result-info"><div class="res-title">${highlightName}</div><div class="res-path">${item.type} > ${item.menuName}</div></div><div class="res-tag" style="background:${item.color}">${item.code}</div>`;
-      div.onclick = () => { 
-        if(!item.active && !isAdmin) { alert("현재 과정 개발중으로 사용 불가합니다."); return; } 
-        if(item.link) { window.open(item.link, '_blank'); return; }
-        location.href = `viewer_list.html?type=${item.type}&menu=${encodeURIComponent(item.menuName)}&id=${item.menuId}&autoOpen=${item.subId}`; 
-      };
-      searchDropdown.appendChild(div);
-    });
-  }
-
-  function checkAutoOpen() {
-    const autoId = params.get('autoOpen');
-    if(autoId && subjects.length > 0) { 
-        const targetIdx = subjects.findIndex(s => s.id === autoId); 
-        if(targetIdx !== -1) setTimeout(() => openViewer(targetIdx), 300); 
-    }
-  }
-
-  let dragSrcIndex = null;
-  function handleDragStart(e, index) { dragSrcIndex = index; e.target.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
-  function handleDragOver(e) { if (e.preventDefault) e.preventDefault(); e.target.closest('.subject-card').classList.add('drag-over'); e.dataTransfer.dropEffect = 'move'; return false; }
-  function handleDrop(e, index) { if (e.stopPropagation) e.stopPropagation(); e.target.closest('.subject-card').classList.remove('drag-over'); if (dragSrcIndex !== null && dragSrcIndex !== index) { const movedItem = subjects.splice(dragSrcIndex, 1)[0]; subjects.splice(index, 0, movedItem); saveSubjects(); } return false; }
-  function handleDragEnd(e) { document.querySelectorAll('.subject-card').forEach(card => { card.classList.remove('dragging'); card.classList.remove('drag-over'); }); }
-
-  function saveSubjects() { localStorage.setItem(`kac_subs_${type}_${menuId}`, JSON.stringify(subjects)); render(); }
-  
-  async function deleteSubject(i) {
-    const input = prompt("삭제하려면 관리자 비밀번호를 입력하세요.");
-    if (!input) return;
-
-    const inputHash = await sha256(input.toUpperCase());
-    const targetHash = globalSecurity.admin_pw;
-
-    if(inputHash === targetHash) {
-        if(confirm("정말 삭제하시겠습니까?")) {
-            subjects.splice(i, 1);
-            saveSubjects();
-            alert("삭제되었습니다.");
-        }
-    } else {
-        alert("비밀번호가 일치하지 않습니다.");
-    }
-  }
-
+  // [수정] 저장 함수: 입력된 경로 + 선택된 확장자를 합쳐서 저장
   function saveFiles() {
     const idx = currentEditIdx;
     const name = document.getElementById('editSubjectName').value;
@@ -1474,12 +1308,29 @@
     subjects[idx].active = (isActiveStr === 'true');
     subjects[idx].pdfName = document.getElementById('inputPdfName').value.trim();
     subjects[idx].link = document.getElementById('inputLinkUrl').value.trim();
-    subjects[idx].audioName = document.getElementById('inputAudioName').value.trim();
+
+    // 오디오 경로 처리
+    let aPath = document.getElementById('inputAudioName').value.trim();
+    const aExt = document.getElementById('inputAudioExt').value;
+    
+    if (aPath) {
+        // 혹시 사용자가 앞쪽 슬래시를 입력했다면 제거
+        if(aPath.startsWith('/')) aPath = aPath.substring(1);
+        
+        // 혹시 사용자가 확장자까지 쳤다면 제거하고 우리가 선택한 걸로 붙임
+        if(aPath.toLowerCase().endsWith('.mp3')) aPath = aPath.slice(0, -4);
+        if(aPath.toLowerCase().endsWith('.wav')) aPath = aPath.slice(0, -4);
+        
+        subjects[idx].audioName = aPath + aExt; // 경로 + 확장자(.wav)
+    } else {
+        subjects[idx].audioName = '';
+    }
     
     saveSubjects();
     document.getElementById('uploadModal').style.display = 'none';
   }
 
+  // [수정] 수정창 열기 함수: 저장된 파일명에서 확장자를 분리해서 보여줌
   function openUploadMenu(idx) { 
     currentEditIdx = idx; 
     const sub = subjects[idx];
@@ -1487,7 +1338,23 @@
     document.getElementById('editActiveStatus').value = (sub.active !== false).toString();
     document.getElementById('inputPdfName').value = sub.pdfName || '';
     document.getElementById('inputLinkUrl').value = sub.link || '';
-    document.getElementById('inputAudioName').value = sub.audioName || '';
+
+    // 오디오 분리 로직
+    let aFull = sub.audioName || '';
+    let aPath = aFull;
+    let aExt = '.mp3'; // 기본값
+
+    if (aFull.toLowerCase().endsWith('.wav')) {
+        aExt = '.wav';
+        aPath = aFull.slice(0, -4);
+    } else if (aFull.toLowerCase().endsWith('.mp3')) {
+        aExt = '.mp3';
+        aPath = aFull.slice(0, -4);
+    }
+
+    document.getElementById('inputAudioName').value = aPath;
+    document.getElementById('inputAudioExt').value = aExt;
+
     document.getElementById('uploadModal').style.display = 'flex'; 
   }
 
@@ -1533,6 +1400,7 @@
     document.getElementById('moveModal').style.display = 'none';
   }
 
+  // [수정] 뷰어 열기 함수: 경로 처리 강화 및 자동 실행
   async function openViewer(idx) {
     document.querySelectorAll('.subject-card').forEach(c => c.classList.remove('last-viewed'));
     viewingIndex = idx; 
@@ -1541,10 +1409,19 @@
     let pdfName = sub.pdfName;
     
     if(!pdfName) return alert("등록된 PDF 파일이 없습니다.");
+    // PDF 확장자 체크 및 앞쪽 슬래시 제거
+    if (pdfName.startsWith('/')) pdfName = pdfName.substring(1);
     if (!pdfName.toLowerCase().endsWith('.pdf')) pdfName += '.pdf';
 
     const pdfUrl = `files/${pdfName}`;
-    const audioUrl = sub.audioName ? `files/${sub.audioName}` : null;
+    
+    // 오디오 경로 처리 강화
+    let audioUrl = null;
+    if(sub.audioName) {
+        let aName = sub.audioName.trim();
+        if(aName.startsWith('/')) aName = aName.substring(1); // 앞쪽 슬래시 제거
+        audioUrl = `files/${aName}`;
+    }
 
     overlay.style.display = 'block';
     
@@ -1571,9 +1448,14 @@
         audioPlayer.src = audioUrl;
         audioPlayer.load();
         audioBtn.classList.remove('disabled');
+        // 모바일이면 자동으로 패널 열기 (선택사항)
+        if(window.innerWidth <= 768) {
+             document.getElementById('audioPanel').classList.add('open');
+        }
     } else {
         audioPlayer.src = "";
         audioBtn.classList.add('disabled');
+        document.getElementById('audioPanel').classList.remove('open');
     }
     updateIconState(); 
   }
