@@ -1,7 +1,7 @@
 {
   "meta": {
     "version": "2.1",
-    "lastUpdated": "2026-01-03"
+    "lastUpdated": "2026-01-04"
   },
   "config": {
     "iconSize": 110,
@@ -846,9 +846,9 @@
       "code": "Q",
       "color": "#2563eb",
       "access": {
-        "visible": true,
+        "visible": false,
         "adminOnly": false,
-        "showSidebar": true
+        "showSidebar": false
       },
       "menus": [
         {
@@ -856,7 +856,7 @@
           "label": "항공정보통신시설 초기",
           "line1": "초기 교육",
           "line2": "",
-          "link": "https://jds0616-boop.github.io/CATC/",
+          "link": "https://jds0616-boop.github.io/CATC/?room=C",
           "visible": true,
           "subjects": []
         },
