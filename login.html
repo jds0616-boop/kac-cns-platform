@@ -19,7 +19,6 @@
   .logo { font-size: 24px; font-weight: 800; margin-bottom: 25px; display: block; }
   .logo span { color: #3b82f6; }
   
-  /* 로그인 타입 선택 탭 */
   .login-type-tabs {
     display: flex; background: #0f172a; padding: 5px; border-radius: 12px; margin-bottom: 25px;
   }
@@ -52,7 +51,6 @@
   <div class="login-card">
     <div class="logo">KAC <span>CNS</span> Platform</div>
     
-    <!-- 관리자/교육생 선택 -->
     <div class="login-type-tabs">
       <button id="tabEntry" class="tab-btn active" onclick="setLoginType('entry')">교육생</button>
       <button id="tabAdmin" class="tab-btn" onclick="setLoginType('admin')">관리자</button>
@@ -71,7 +69,7 @@
         currentType = type;
         document.getElementById('tabEntry').classList.toggle('active', type === 'entry');
         document.getElementById('tabAdmin').classList.toggle('active', type === 'admin');
-        document.getElementById('infoText').textContent = type === 'admin' ? "관리자 전용 패스워드를 입력하세요." : "교육생 전용 패스워드를 입력하세요.";
+        document.getElementById('infoText').textContent = type === 'admin' ? "관리자 전용 패스워드를 입력하세요. (대소문자 구분)" : "교육생 전용 패스워드를 입력하세요. (대소문자 구분)";
         document.getElementById('msg').textContent = "";
         document.getElementById('pwInput').value = "";
         document.getElementById('pwInput').focus();
@@ -84,7 +82,7 @@
     }
 
     async function tryLogin() {
-        const input = document.getElementById('pwInput').value.trim().toUpperCase();
+        const input = document.getElementById('pwInput').value.trim(); // 대소문자 유지
         const msgBox = document.getElementById('msg');
         if(!input) { msgBox.textContent = "비밀번호를 입력해주세요."; return; }
 
@@ -93,38 +91,26 @@
 
         try {
             const res = await fetch('data.json?v=' + new Date().getTime());
-            if(!res.ok) throw new Error("서버에서 데이터를 가져올 수 없습니다.");
+            if(!res.ok) throw new Error("서버 데이터 로드 실패");
             const data = await res.json();
             
             const targetHash = (currentType === 'admin') ? data.security.admin_pw : data.security.entry_pw;
-            const inputHash = await sha256(input);
+            const inputHash = await sha256(input); // 입력한 그대로 해싱
 
             if(inputHash === targetHash) {
                 msgBox.style.color = "#4ade80";
                 msgBox.textContent = "인증 성공! 이동 중...";
-                
-                // 로그인 상태 저장
                 sessionStorage.setItem('kac_access_token', 'granted');
                 localStorage.setItem('kac_admin_mode', currentType === 'admin' ? '1' : '0');
                 localStorage.setItem('kac_login_time', new Date().getTime());
-                
                 setTimeout(() => location.replace('index.html'), 500);
             } else {
-                throw new Error("비밀번호가 올바르지 않습니다.");
+                throw new Error("비밀번호가 올바르지 않습니다. (대소문자 구분)");
             }
         } catch(e) {
             msgBox.style.color = "#ef4444";
             msgBox.textContent = e.message;
             document.getElementById('pwInput').value = '';
-        }
-    }
-
-    window.onload = function() {
-        const loginTime = localStorage.getItem('kac_login_time');
-        const now = new Date().getTime();
-        if(loginTime && (now - loginTime < 5 * 60 * 60 * 1000)) {
-            sessionStorage.setItem('kac_access_token', 'granted');
-            location.replace('index.html');
         }
     }
   </script>

@@ -1,4 +1,3 @@
-<!-- START OF FILE index.html -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -6,648 +5,151 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>KAC CNS Training Platform</title>
 <script>
-  // [보안] 로그인 세션 체크
   if(sessionStorage.getItem('kac_access_token') !== 'granted') {
     location.replace('login.html');
   }
 </script>
 <style>
   @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-  
-  :root { 
-    --navy: #0f172a; --bg-main: #f0f4f8; --bg-card: #ffffff; 
-    --text-main: #000000; --text-sub: #334155;
-    --border-card: 2px solid transparent; 
-    --shadow: 0 10px 25px rgba(0,0,0,0.05);
-    --btn-bg: #f8fafc; --btn-border: #e2e8f0; --btn-text: #64748b;
-    --header-h: 75px;
-    --search-border: #cbd5e1;
-    --search-shadow: 0 8px 30px rgba(15, 23, 42, 0.12);
-  }
-
-  body.dark-mode {
-    --navy: #020617; --bg-main: #0f172a; --bg-card: #1e293b; 
-    --text-main: #f1f5f9; --text-sub: #cbd5e1;
-    --border-card: 2px solid rgba(255,255,255,0.1); 
-    --shadow: 0 10px 30px rgba(0,0,0,0.5);
-    --btn-bg: rgba(255,255,255,0.05); --btn-border: rgba(255,255,255,0.2); --btn-text: #e2e8f0;
-    --search-border: rgba(255,255,255,0.1);
-    --search-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-  }
-
+  :root { --navy: #0f172a; --bg-main: #f0f4f8; --bg-card: #ffffff; --text-main: #000000; --text-sub: #334155; --border-card: 2px solid transparent; --shadow: 0 10px 25px rgba(0,0,0,0.05); --btn-bg: #f8fafc; --btn-border: #e2e8f0; --btn-text: #64748b; --header-h: 75px; }
+  body.dark-mode { --navy: #020617; --bg-main: #0f172a; --bg-card: #1e293b; --text-main: #f1f5f9; --text-sub: #cbd5e1; --border-card: 2px solid rgba(255,255,255,0.1); --shadow: 0 10px 30px rgba(0,0,0,0.5); }
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
-  
   html, body { width: 100%; height: 100%; overflow: hidden; }
-  
-  body { 
-    background: var(--bg-main); display: flex; flex-direction: column; 
-    color: var(--text-main); transition: background 0.3s, color 0.3s; 
-  }
-
-  /* 모달 스타일 */
-  .modal-overlay { 
-      position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
-      z-index: 9999; display: none !important; 
-      align-items: center; justify-content: center; 
-  }
+  body { background: var(--bg-main); display: flex; flex-direction: column; color: var(--text-main); transition: background 0.3s, color 0.3s; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none !important; align-items: center; justify-content: center; }
   .modal-overlay[style*="display: flex"] { display: flex !important; }
-
-  body.preview-active .card-ctrl, body.preview-active .add-slot { display: none !important; }
-  
-  /* 헤더 스타일 */
-  header { 
-    height: var(--header-h); background: var(--navy); 
-    display: flex; align-items: center; justify-content: space-between; 
-    padding: 0 20px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.15); 
-    z-index: 5000; position: fixed; top: 0; left: 0; width: 100%;
-  }
-  
-  .header-left { display: flex; align-items: center; gap: 15px; z-index: 10; min-width: 0; flex-shrink: 1; }
-  .hamburger-btn { cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; flex-shrink: 0; }
-  .hamburger-btn:hover { background: rgba(255,255,255,0.1); }
-  .hamburger-btn svg { width: 24px; height: 24px; fill: #fff; }
-
-  .logo-text { 
-    font-size: 20px; font-weight: 800; letter-spacing: -0.5px; 
-    cursor: pointer; white-space: nowrap; 
-    overflow: hidden; text-overflow: ellipsis;
-  }
-  
-  /* 헤더 중앙 페이지 제목 */
-  .header-center-title {
-      position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      z-index: 5; white-space: nowrap;
-  }
-  .page-headline { font-size: 24px; font-weight: 800; color: #fff; letter-spacing: -0.5px; cursor: default; }
-  body.admin-mode .page-headline { cursor: pointer; opacity: 0.9; }
-  body.admin-mode .page-headline:hover { color: #bfdbfe; }
-
-  .page-badge {
-      font-size: 12px; font-weight: 800; color: #0f172a;
-      background: #38bdf8; padding: 4px 10px; border-radius: 20px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  }
-
-  .header-right { display: flex; align-items: center; gap: 15px; z-index: 10; flex-shrink: 0; }
-  
-  .theme-toggle { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); margin-right: 10px; }
-  .theme-btn { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; opacity: 0.5; }
-  .theme-btn.active { background: #fff; opacity: 1; color: var(--navy); }
-  .theme-btn svg { width: 16px; height: 16px; fill: currentColor; }
-  
-  .kac-logo-img { height: 30px; width: auto; display: block; object-fit: contain; }
-  .settings-btn { display: flex; padding: 8px; width: 34px; height: 34px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.3s; color: #cbd5e1; }
-  .settings-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
-
-  /* 사이드바 */
-  .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 6000; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(2px); }
-  .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
-  .sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background: var(--bg-card); z-index: 6001; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; border-right: 1px solid var(--btn-border); }
-  .sidebar.active { left: 0; }
-  .sidebar-header { height: var(--header-h); display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--btn-border); font-weight: 800; font-size: 18px; justify-content: space-between; color: var(--text-main); }
-  .sidebar-close { cursor: pointer; padding: 8px; border-radius: 50%; transition: 0.2s; }
-  .sidebar-close:hover { background: var(--btn-bg); }
-  .sidebar-content { flex: 1; overflow-y: auto; padding: 10px; }
-  .sb-item { padding: 12px 15px; cursor: pointer; border-radius: 10px; color: var(--text-main); font-weight: 600; transition: 0.2s; display: flex; align-items: center; justify-content: space-between; font-size: 14px; }
-  .sb-item:hover { background: var(--btn-bg); color: #2563eb; }
-  .sb-sub-list { display: none; padding-left: 20px; margin-bottom: 5px; }
-  .sb-sub-list.open { display: block; animation: slideDown 0.2s; }
-  .sb-sub-item { padding: 8px 15px; font-size: 13px; color: var(--text-sub); cursor: pointer; border-left: 2px solid var(--btn-border); transition: 0.2s; }
-  .sb-sub-item:hover { border-left-color: #2563eb; color: #2563eb; background: rgba(37,99,235,0.05); }
-
-  /* 컨텐츠 영역 */
-  .content-wrapper { 
-      width: 100%; height: 100%;
-      padding-top: 135px; 
-      padding-bottom: 120px; 
-      overflow: hidden; 
-      position: relative; 
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-  }
-  
-  .center-content-box { width: 100%; max-width: 1700px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-
-  /* 검색창 */
-  .search-wrapper-outer { width: 100%; display: flex; justify-content: center; margin-bottom: 40px; flex-shrink: 0; z-index: 2000; position: relative; padding: 0 20px; pointer-events: none; }
-  .search-container { position: relative; width: 600px; max-width: 100%; pointer-events: auto; }
-  
-  .search-bar { 
-    width: 100%; padding: 18px 30px; border-radius: 50px; 
-    border: 2px solid #cbd5e1; background: #fff; color: #000;
-    font-size: 16px; font-weight: 600; 
-    box-shadow: 0 8px 30px rgba(15, 23, 42, 0.12); transition: 0.3s; 
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'%3E%3Cpath d='M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z'/%3E%3C/svg%3E"); 
-    background-repeat: no-repeat; background-position: 25px center; background-size: 24px; padding-left: 65px; 
-  }
-  .search-bar:focus { outline: none; border-color: #2563eb; box-shadow: 0 12px 40px rgba(37, 99, 235, 0.18); transform: translateY(-2px); }
-  body.dark-mode .search-bar { background: #1e293b; color: #fff; border-color: #475569; }
-
-  .search-results { position: absolute; top: calc(100% + 15px); left: 0; right: 0; width: 100%; background: var(--bg-card); border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); border: 1px solid var(--border-card); overflow: hidden; display: none; max-height: 400px; overflow-y: auto; z-index: 2001; }
-  .search-results.active { display: block; animation: slideDown 0.2s ease-out; }
-  #searchOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1500; display: none; backdrop-filter: blur(2px); animation: fadeIn 0.3s; }
-  #searchOverlay.active { display: block; }
-
-  /* 메인 카드 영역 */
-  #cardContainerWrapper { width: 100%; max-width: 1700px; overflow: hidden; padding: 0 20px; flex-shrink: 0; }
-  #cardContainer { 
-    display: flex; flex-wrap: wrap; gap: 30px; width: 100%; justify-content: center; padding: 20px; 
-    transform-style: preserve-3d; min-height: auto; 
-    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s;
-  }
-  
-  .card { background: var(--bg-card); width: 280px; height: 280px; padding: 30px 20px; border-radius: 25px; box-shadow: var(--shadow); border: var(--border-card); cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; border-left: 10px solid transparent; color: var(--text-main); --card-color: #64748b; border-left-color: var(--card-color); z-index: 1; }
-  .card:hover { transform: translateY(-10px); border-color: var(--card-color); box-shadow: 0 15px 30px -5px var(--card-color); z-index: 2; }
-  
-  .card.restricted-view { opacity: 0.7; border: 2px dashed #94a3b8; }
-  .card.restricted-view:hover { opacity: 1; border-style: solid; }
-
-  .card.empty-placeholder { opacity: 0; pointer-events: none; border: none; box-shadow: none; background: transparent; cursor: default; }
-  body.admin-mode .card.empty-placeholder { opacity: 0.5; border: 2px dashed #cbd5e1; cursor: pointer; pointer-events: auto; }
-  body.admin-mode .card.empty-placeholder:hover { border-color: #2563eb; opacity: 1; }
-
-  .card.dragging { opacity: 0.4; border: 2px dashed #94a3b8; }
-  .card.drag-over { transform: scale(1.05); box-shadow: 0 0 20px rgba(37, 99, 235, 0.3); border-color: #2563eb; z-index: 10; }
-
-  .card-ctrl { position: absolute; top: 15px; width: 100%; display: none; gap: 5px; justify-content: center; z-index: 10; }
-  body.admin-mode .card .card-ctrl { display: flex; }
-
-  .icon-box { width: 100px; height: 100px; border-radius: 30px; margin-bottom: 20px; font-weight: 900; display: flex; align-items: center; justify-content: center; background: var(--btn-bg); border: 1px solid var(--btn-border); font-size: var(--icon-size-idx, 60px); color: var(--card-color); pointer-events: none; }
-  .card h2 { font-size: var(--label-size-idx, 24px); font-weight: 800; text-align: center; pointer-events: none; }
-
-  .pagination { display: flex; gap: 10px; margin-top: 20px; align-items: center; justify-content: center; padding-bottom: 0px; flex-shrink: 0; }
-  .page-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--btn-border); cursor: pointer; transition: 0.3s; }
-  .page-dot.active { background: var(--navy); transform: scale(1.3); }
-
-  /* 푸터 */
-  .main-footer {
-    width: 100%; height: auto;
-    background: var(--navy); padding: 25px 20px;
-    text-align: center; color: rgba(255,255,255,0.7);
-    font-size: 13px; line-height: 1.6;
-    border-top: 1px solid rgba(255,255,255,0.1); box-sizing: border-box;
-    position: absolute; bottom: 0; left: 0; 
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    z-index: 1000;
-  }
-  .footer-content p { margin: 0; word-break: keep-all; }
-  .footer-content p:last-child { font-weight: 700; margin-top: 8px; color: rgba(255,255,255,0.9); }
-  
-  .footer-edit-btn { margin-top: 10px; font-size: 11px; cursor: pointer; opacity: 0.5; color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 4px; display: none; }
-  .footer-edit-btn:hover { opacity: 1; background: rgba(255,255,255,0.1); }
-  body.admin-mode .footer-edit-btn { display: inline-block; }
-
-  /* 모바일 최적화 */
-  @media (max-width: 768px) {
-    html, body { overflow-y: auto !important; height: auto !important; position: relative !important; overflow-x: hidden; }
-    body { display: block; }
-    header { position: fixed; top: 0; padding: 0 10px; z-index: 5000; justify-content: space-between; }
-    .search-wrapper-outer { position: fixed !important; top: var(--header-h); left: 0; width: 100%; z-index: 4500; margin-bottom: 0; background: var(--bg-main); padding: 10px 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-    .search-container { width: 100%; }
-    .search-bar { padding: 12px 20px 12px 50px; font-size: 14px; background-position: 15px center; }
-    .content-wrapper { height: auto !important; overflow: visible; padding-top: 155px !important; padding-bottom: 120px; display: block; }
-    .center-content-box { display: block; width: 100%; }
-    .logo-text { position: absolute; left: 50%; transform: translateX(-50%); font-size: 16px !important; font-weight: 800; max-width: 90%; text-align: center; white-space: nowrap; }
-    .kac-logo-img { display: none; }
-    .header-center-title { display: none; }
-    .theme-toggle { display: none !important; }
-    .settings-btn { display: none; }
-    #cardContainerWrapper { padding: 0 15px; }
-    #cardContainer { gap: 15px; padding: 10px 0; min-height: auto; flex-direction: column; flex-wrap: nowrap; }
-    .card.empty-placeholder { display: none !important; }
-    .card { width: 100%; height: auto; min-height: 50px; flex-direction: row; justify-content: flex-start; padding: 10px 12px; gap: 15px; border-radius: 15px; }
-    .icon-box { width: 36px; height: 36px; border-radius: 8px; margin-bottom: 0; font-size: 18px; flex-shrink: 0; }
-    .card h2 { font-size: 15px; text-align: left; word-break: keep-all; flex: 1; }
-    #pagination { display: none !important; }
-    .main-footer { padding: 20px 15px; margin-top: 0; position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; height: auto; z-index: 5500; }
-  }
-
-  /* 애니메이션 및 기타 */
-  #loadingSpinner { position: fixed; inset: 0; background: var(--bg-main); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
-  .spinner { width: 50px; height: 50px; border: 5px solid #cbd5e1; border-top-color: #2563eb; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
-  .btn-sm { padding: 5px 10px; font-size: 11px; border-radius: 6px; border: 1px solid var(--btn-border); background: var(--btn-bg); font-weight: 700; cursor: pointer; color: var(--btn-text); }
-  .btn-del { color: #ef4444; border-color: #fee2e2; }
-  .btn-move { color: #3b82f6; border-color: #dbeafe; }
-  .modal-card { background: var(--bg-card); padding: 35px; border-radius: 25px; width: 450px; color: var(--text-main); box-shadow: 0 20px 50px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
-  .modal-card.large { width: 1000px; max-width: 95%; height: 85vh; }
-  .setting-group { margin-bottom: 20px; }
-  .setting-label { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; display: block; }
-  .setting-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--text-main); font-size: 14px; outline: none; }
-  .btn-modal { width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; margin-top: 5px; }
-  .btn-primary { background: var(--navy); color: #fff; }
-  .btn-secondary { background: var(--btn-border); color: var(--text-sub); }
+  header { height: var(--header-h); background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.15); z-index: 5000; position: fixed; top: 0; left: 0; width: 100%; }
+  .logo-text { font-size: 20px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+  .header-center-title { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 10px; }
+  .page-headline { font-size: 24px; font-weight: 800; color: #fff; }
+  .content-wrapper { width: 100%; height: 100%; padding-top: 135px; padding-bottom: 120px; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+  .search-bar { width: 100%; padding: 18px 30px; border-radius: 50px; border: 2px solid #cbd5e1; background: #fff; box-shadow: 0 8px 30px rgba(15, 23, 42, 0.12); font-size: 16px; font-weight: 600; padding-left: 65px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'%3E%3Cpath d='M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: 25px center; background-size: 24px; }
+  #cardContainer { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; padding: 20px; width: 100%; }
+  .card { background: var(--bg-card); width: 280px; height: 280px; border-radius: 25px; box-shadow: var(--shadow); cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 10px solid var(--card-color); position: relative; }
+  .card:hover { transform: translateY(-10px); }
+  .icon-box { width: 100px; height: 100px; border-radius: 30px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; font-size: 60px; color: var(--card-color); background: #f8fafc; }
+  .main-footer { width: 100%; position: absolute; bottom: 0; background: var(--navy); padding: 25px; text-align: center; color: rgba(255,255,255,0.7); font-size: 13px; }
+  #loadingSpinner { position: fixed; inset: 0; background: var(--bg-main); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .spinner { width: 50px; height: 50px; border: 5px solid #cbd5e1; border-top-color: #2563eb; border-radius: 50%; animation: spin 1s linear infinite; }
   @keyframes spin { 100% { transform: rotate(360deg); } }
-  @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 </style>
 </head>
 <body>
-
-<div id="loadingSpinner">
-  <div class="spinner"></div>
-  <div style="font-weight:700; color:#64748b;">시스템 로딩 중...</div>
-</div>
-
-<div id="searchOverlay"></div>
-
-<!-- 사이드바 -->
-<div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
-<div id="sidebar" class="sidebar">
-  <div class="sidebar-header">
-    <span>전체 메뉴</span>
-    <div class="sidebar-close" onclick="toggleSidebar()">✕</div>
-  </div>
-  <div class="sidebar-content" id="sidebarContent"></div>
-</div>
-
+<div id="loadingSpinner"><div class="spinner"></div><div style="margin-top:20px;">시스템 동기화 중...</div></div>
 <header>
-  <div class="header-left">
-    <div class="hamburger-btn" onclick="toggleSidebar()">
-      <svg viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
-    </div>
-    <div class="logo-text" onclick="location.reload()">KAC CNS Training Platform</div>
-  </div>
-  
-  <div class="header-center-title">
-      <span id="pageHeadline" class="page-headline" onclick="editPageTitle()"></span>
-      <span id="pageBadge" class="page-badge">Page 1</span>
-  </div>
-
-  <div class="header-right">
-    <div class="theme-toggle">
-      <div class="theme-btn" id="btnDay" onclick="setTheme('light')"><svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg></div>
-      <div class="theme-btn" id="btnNight" onclick="setTheme('dark')"><svg viewBox="0 0 24 24"><path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C6.94,10.39 9.79,16.87 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z"/></svg></div>
-    </div>
-    <div class="settings-btn" onclick="openSettings()">⚙️</div>
-    <img src="logo.png" alt="KAC Logo" class="kac-logo-img">
-  </div>
+  <div class="logo-text" onclick="location.reload()">KAC CNS Training Platform</div>
+  <div class="header-center-title"><span id="pageHeadline" class="page-headline"></span></div>
+  <div class="header-right"><div class="settings-btn" onclick="openSettings()">⚙️</div></div>
 </header>
-
 <div class="content-wrapper">
   <div class="center-content-box">
-    <div class="search-wrapper-outer">
-      <div class="search-container">
-        <input type="text" id="mainSearch" class="search-bar" placeholder="시설명 또는 교육 주제를 검색하세요..." autocomplete="off">
-        <div id="searchResults" class="search-results"></div>
-      </div>
-    </div>
-    <div id="cardContainerWrapper">
-      <main id="cardContainer"></main>
-    </div>
-    <div id="pagination" class="pagination"></div>
+    <div style="width:600px; margin-bottom:40px;"><input type="text" id="mainSearch" class="search-bar" placeholder="시설명 검색..."></div>
+    <div id="cardContainer"></div>
+    <div id="pagination" style="display:flex; gap:10px; margin-top:20px;"></div>
   </div>
-
-  <footer class="main-footer">
-    <div class="footer-content"></div>
-    <span class="footer-edit-btn" onclick="openFooterEditModal()">텍스트 수정</span>
-  </footer>
+  <footer class="main-footer"><div class="footer-content"></div></footer>
 </div>
 
 <!-- 설정 모달 -->
 <div id="settingsModal" class="modal-overlay">
-  <div class="modal-card">
-    <div class="modal-title">⚙️ 시스템 설정</div>
-    <div id="guestSettings">
-      <button class="btn-modal btn-primary" onclick="toggleAdmin()">관리자 로그인</button>
+  <div class="modal-card" style="background:var(--bg-card); padding:30px; border-radius:20px; width:400px;">
+    <div id="adminSettings">
+      <button class="btn-modal" onclick="toggleAdmin()" style="width:100%; padding:10px; margin-bottom:10px; background:#ef4444; color:#fff; border:none; border-radius:8px;">로그아웃</button>
+      <button class="btn-modal" onclick="openPwChangeModal()" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:8px;">비밀번호 변경</button>
+      <button class="btn-modal" onclick="openGithubModal()" style="width:100%; padding:10px; background:#24292f; color:#fff; border:none; border-radius:8px;">GitHub 업로드</button>
     </div>
-    <div id="adminSettings" style="display:none;">
-      <div class="setting-group">
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="btn-modal btn-danger" onclick="toggleAdmin()">로그아웃</button>
-          <button class="btn-modal btn-secondary" onclick="openPwChangeModal()">비밀번호 변경</button>
-          <button id="modalPreviewBtn" class="btn-modal btn-secondary" onclick="togglePreview()">미리보기</button>
-        </div>
-        <button class="btn-modal btn-primary" style="margin-top:10px; background:#4f46e5;" onclick="openIntegratedAdmin()">🗂️ 전체 데이터 종합 관리 (Tree Editor)</button>
-        <button class="btn-modal btn-success" style="background:#10b981; color:#fff;" onclick="exportJsonData()">변경사항 저장 (data.json 다운로드)</button>
-        <button class="btn-modal btn-primary" style="background:#24292f; margin-top:10px;" onclick="openGithubModal()">GitHub에 바로 업로드</button>
-      </div>
-      <div class="setting-group" style="background: rgba(0,0,0,0.02); padding: 15px; border-radius: 15px; border: 1px solid var(--btn-border);">
-        <label class="setting-label">↕️ 콘텐츠 상단 여백 (px)</label>
-        <input type="number" id="setContentTop" class="setting-input">
-        <label class="setting-label" style="margin-top:15px;">🎨 카드 UI 크기 (px)</label>
-        <div style="display:flex; gap:15px;">
-          <input type="number" id="setIconSize" class="setting-input" placeholder="아이콘">
-          <input type="number" id="setLabelSize" class="setting-input" placeholder="라벨">
-        </div>
-        <button class="btn-modal btn-primary" onclick="saveUISettings()" style="margin-top:10px;">설정 적용</button>
-      </div>
-    </div>
-    <button class="btn-modal btn-secondary" onclick="document.getElementById('settingsModal').style.display='none'">닫기</button>
+    <button onclick="document.getElementById('settingsModal').style.display='none'" style="width:100%; margin-top:20px; padding:10px; border:none; border-radius:8px;">닫기</button>
   </div>
 </div>
 
 <!-- 비밀번호 변경 모달 -->
 <div id="pwChangeModal" class="modal-overlay">
-  <div class="modal-card">
-    <div class="modal-title">🔐 비밀번호 변경</div>
-    <div class="setting-group">
-      <label class="setting-label">변경할 대상</label>
-      <select id="pwTarget" class="setting-input">
-        <option value="entry">교육생 (접속용) 비밀번호</option>
-        <option value="admin">관리자 (설정용) 비밀번호</option>
-      </select>
-    </div>
-    <div class="setting-group">
-      <label class="setting-label">새로운 비밀번호</label>
-      <input type="password" id="newPw" class="setting-input" placeholder="새 비밀번호 입력">
-    </div>
-    <div class="btn-row">
-      <button class="btn-modal btn-primary" onclick="executePwChange()">변경 실행</button>
-      <button class="btn-modal btn-secondary" onclick="document.getElementById('pwChangeModal').style.display='none'">취소</button>
-    </div>
+  <div class="modal-card" style="background:var(--bg-card); padding:30px; border-radius:20px; width:400px;">
+    <h3>🔐 비밀번호 변경</h3>
+    <select id="pwTarget" style="width:100%; padding:10px; margin:15px 0;"><option value="entry">교육생 비밀번호</option><option value="admin">관리자 비밀번호</option></select>
+    <input type="password" id="newPw" placeholder="새 비밀번호 입력" style="width:100%; padding:10px; margin-bottom:15px;">
+    <button onclick="executePwChange()" style="width:100%; padding:10px; background:#2563eb; color:#fff; border:none; border-radius:8px;">변경 실행</button>
+    <button onclick="document.getElementById('pwChangeModal').style.display='none'" style="width:100%; margin-top:10px; border:none;">취소</button>
   </div>
 </div>
-
-<!-- 공통 데이터 관리 모달 등은 생략된 상태로 기존 기능과 동일하게 작동하도록 스크립트에 포함됨 -->
-<div id="integratedAdminModal" class="modal-overlay">
-    <div class="modal-card modal-card large">
-      <div class="modal-title">🗂️ 전체 데이터 종합 관리</div>
-      <div style="display:flex; height:500px; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden; margin-top:15px;">
-        <div class="tree-sidebar" id="treeRoot" style="width:35%; background:#f8fafc; overflow-y:auto; padding:10px;"></div>
-        <div class="tree-content" id="treeDetail" style="width:65%; padding:20px; overflow-y:auto;"></div>
-      </div>
-      <div style="margin-top:20px; display:flex; gap:10px;">
-        <button class="btn-modal btn-primary" onclick="saveIntegratedData()">전체 저장 및 적용</button>
-        <button class="btn-modal btn-secondary" onclick="document.getElementById('integratedAdminModal').style.display='none'">닫기</button>
-      </div>
-    </div>
-</div>
-
-<div id="githubModal" class="modal-overlay"><div class="modal-card">
-    <div class="modal-title">🐙 GitHub 연동 설정</div>
-    <div class="setting-group"><label class="setting-label">ID</label><input type="text" id="ghOwner" class="setting-input"></div>
-    <div class="setting-group"><label class="setting-label">Repo</label><input type="text" id="ghRepo" class="setting-input"></div>
-    <div class="setting-group"><label class="setting-label">Token</label><input type="password" id="ghToken" class="setting-input"></div>
-    <button id="btnGhUpload" class="btn-modal btn-primary" onclick="uploadToGithub()">업로드 실행</button>
-    <button class="btn-modal btn-secondary" onclick="document.getElementById('githubModal').style.display='none'">취소</button>
-</div></div>
-
-<div id="footerEditModal" class="modal-overlay"><div class="modal-card">
-    <div class="modal-title">📝 푸터 수정</div>
-    <textarea id="footerTextInput" style="width:100%; height:200px; padding:15px; border-radius:10px; border:1px solid #e2e8f0;"></textarea>
-    <button class="btn-modal btn-primary" onclick="saveFooterText()">저장</button>
-    <button class="btn-modal btn-secondary" onclick="document.getElementById('footerEditModal').style.display='none'">취소</button>
-</div></div>
-
-<div id="cardEditModal" class="modal-overlay"><div class="modal-card">
-    <div class="modal-title">카테고리 수정</div>
-    <div class="setting-group"><label class="setting-label">명칭</label><input type="text" id="editName" class="setting-input"></div>
-    <div class="setting-group"><label class="setting-label">코드</label><input type="text" id="editCode" class="setting-input"></div>
-    <div class="setting-group"><label class="setting-label">색상</label><input type="color" id="editColor" style="width:100%; height:40px;"></div>
-    <div class="checkbox-group" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
-        <label><input type="checkbox" id="chkVisible"> 공개 여부</label>
-        <label><input type="checkbox" id="chkAdminOnly"> 관리자 전용</label>
-        <label><input type="checkbox" id="chkSidebar"> 사이드바 표시</label>
-    </div>
-    <button class="btn-modal btn-primary" onclick="saveCardEdit()">저장</button>
-    <button class="btn-modal btn-secondary" onclick="document.getElementById('cardEditModal').style.display='none'">취소</button>
-</div></div>
-
-<div id="movePageModal" class="modal-overlay"><div class="modal-card">
-    <div class="modal-title">📂 페이지 이동</div>
-    <select id="moveTargetPage" class="setting-input"></select>
-    <button class="btn-modal btn-primary" onclick="executeMovePage()">이동</button>
-    <button class="btn-modal btn-secondary" onclick="document.getElementById('movePageModal').style.display='none'">취소</button>
-</div></div>
 
 <script>
   let globalData = { categories: [], config: {}, security: {} };
   let isAdmin = localStorage.getItem('kac_admin_mode') === '1';
-  let isPreview = localStorage.getItem('kac_preview_active') === '1';
-  let searchIndex = [];
-  let editingCardId = null;
-  let moveSrcIndex = -1;
-  const itemsPerPage = 5;
-  let currentPage = 1;
-  let dragSrcIndex = null;
-  let currentTreeSelection = null; 
+  const itemsPerPage = 5; let currentPage = 1;
 
   async function init() {
-    setTheme(localStorage.getItem('kac_theme') || 'light');
-    if(isPreview) document.body.classList.add('preview-active');
-
-    // [중요] 1단계: 깃허브 서버(data.json) 최신본 강제 동기화
-    let serverDataLoaded = false;
     try {
+        // [중요] 접속할 때마다 무조건 서버에서 최신 데이터를 가져와 로컬을 갱신함
         const res = await fetch('data.json?v=' + Date.now());
         if(res.ok) {
-            const serverData = await res.json();
-            console.log("✅ 서버에서 최신 데이터를 가져왔습니다.");
-            globalData = serverData;
-            syncToLocalStorage(globalData); // 가져온 데이터를 로컬에 덮어씌움
-            applyConfig(globalData.config);
-            serverDataLoaded = true;
+            globalData = await res.json();
+            syncToLocalStorage(globalData);
+        } else {
+            reconstructGlobalDataFromLocal();
         }
-    } catch(e) { console.error("⚠️ 서버 데이터 로드 실패, 기존 데이터를 유지합니다."); }
+    } catch(e) { reconstructGlobalDataFromLocal(); }
 
-    // 서버 로드 실패 시에만 로컬 데이터 복원
-    if (!serverDataLoaded) {
-        if(localStorage.getItem('kac_index_order')) reconstructGlobalDataFromLocal();
-    }
-
-    if(!globalData.config.pageTitles) globalData.config.pageTitles = {};
-    loadFooterText();
-
-    const contentTop = localStorage.getItem('kac_content_top');
-    if(contentTop) document.querySelector('.content-wrapper').style.paddingTop = contentTop + 'px';
-
-    ensurePageSlots();
-    renderCards(false); 
-    buildSearchIndex();
-    renderSidebar(); 
-    
-    setTimeout(() => {
-      document.getElementById('loadingSpinner').style.opacity = '0';
-      setTimeout(() => document.getElementById('loadingSpinner').style.display='none', 500);
-    }, 500);
-
-    if(isAdmin) document.body.classList.add('admin-mode');
+    renderCards();
+    document.querySelector('.footer-content').innerHTML = globalData.config.footerText || "";
+    document.getElementById('loadingSpinner').style.display = 'none';
   }
 
   function syncToLocalStorage(data) {
-    const order = [];
-    data.categories.forEach(cat => {
-      if(cat) {
-        order.push(cat.id);
-        localStorage.setItem(`kac_style_${cat.id}`, JSON.stringify({ name: cat.name, code: cat.code, color: cat.color, access: cat.access }));
-        localStorage.setItem(`kac_menu_${cat.id}`, JSON.stringify(cat.menus.map(m=>({ dataId: m.id, label: m.label, line1: m.line1, line2: m.line2, link: m.link, visible: m.visible }))));
-        cat.menus.forEach(m => { localStorage.setItem(`kac_subs_${cat.id}_${m.id}`, JSON.stringify(m.subjects)); });
-      } else order.push(null);
-    });
+    const order = data.categories.map(c => c ? c.id : null);
     localStorage.setItem('kac_index_order', JSON.stringify(order));
-    if(data.config) {
-        localStorage.setItem('kac_idx_icon_size', data.config.iconSize);
-        localStorage.setItem('kac_idx_label_size', data.config.labelSize);
-        localStorage.setItem('kac_page_titles', JSON.stringify(data.config.pageTitles));
-        localStorage.setItem('kac_full_footer', data.config.footerText);
-        localStorage.setItem('kac_content_top', data.config.contentTop);
-    }
+    data.categories.forEach(cat => {
+        if(cat) {
+            localStorage.setItem(`kac_style_${cat.id}`, JSON.stringify({name:cat.name, code:cat.code, color:cat.color, access:cat.access}));
+            localStorage.setItem(`kac_menu_${cat.id}`, JSON.stringify(cat.menus.map(m=>({dataId:m.id, label:m.label, line1:m.line1, link:m.link, visible:m.visible}))));
+        }
+    });
   }
 
   function reconstructGlobalDataFromLocal() {
-    globalData = { config: {}, categories: [], security: {} };
-    globalData.config.iconSize = parseInt(localStorage.getItem('kac_idx_icon_size') || 60);
-    globalData.config.labelSize = parseInt(localStorage.getItem('kac_idx_label_size') || 24);
-    globalData.config.pageTitles = JSON.parse(localStorage.getItem('kac_page_titles') || '{}');
-    globalData.config.footerText = localStorage.getItem('kac_full_footer');
-    globalData.config.contentTop = localStorage.getItem('kac_content_top');
-    applyConfig(globalData.config);
-
     const order = JSON.parse(localStorage.getItem('kac_index_order') || '[]');
     globalData.categories = order.map(id => {
         if(!id) return null;
         const s = JSON.parse(localStorage.getItem(`kac_style_${id}`) || '{}');
-        const ms = JSON.parse(localStorage.getItem(`kac_menu_${id}`) || '[]');
-        return { id, name: s.name, code: s.code, color: s.color, access: s.access, menus: ms.map(m=>({ id: m.dataId, ...m, subjects: JSON.parse(localStorage.getItem(`kac_subs_${id}_${m.dataId}`) || '[]') })) };
+        const m = JSON.parse(localStorage.getItem(`kac_menu_${id}`) || '[]');
+        return { id, ...s, menus: m };
     });
   }
 
   async function executePwChange() {
     const target = document.getElementById('pwTarget').value;
-    const newPw = document.getElementById('newPw').value.trim().toUpperCase();
+    const newPw = document.getElementById('newPw').value.trim(); // 대소문자 유지
     if(!newPw) return alert("비밀번호를 입력하세요.");
 
-    // [버그 수정] 확인값도 대문자 변환하여 일관성 있게 비교
-    const rawConfirm = prompt(`[${target==='entry'?'교육생':'관리자'}] 새 비밀번호를 다시 한 번 입력하세요.`);
-    const confirmPw = rawConfirm ? rawConfirm.trim().toUpperCase() : null;
-
-    if(newPw !== confirmPw) return alert("비밀번호가 일치하지 않습니다.");
+    const rawConfirm = prompt("확인을 위해 새 비밀번호를 다시 입력하세요.");
+    if(newPw !== (rawConfirm ? rawConfirm.trim() : "")) return alert("비밀번호가 일치하지 않습니다.");
 
     const newHash = await sha256(newPw);
     if(target === 'entry') globalData.security.entry_pw = newHash;
     else globalData.security.admin_pw = newHash;
 
+    alert("변경되었습니다. [GitHub 업로드]를 수행해야 최종 반영됩니다.");
     document.getElementById('pwChangeModal').style.display='none';
-    alert("✅ 변경되었습니다. [GitHub 업로드]를 수행해야 최종 반영됩니다.");
-    openSettings(); 
   }
 
-  // --- 기존의 디자인 및 나머지 기능 함수들 (원본 그대로) ---
-
-  function applyConfig(cfg) {
-    if(!cfg) return;
-    document.documentElement.style.setProperty('--icon-size-idx', (cfg.iconSize||60)+'px');
-    document.documentElement.style.setProperty('--label-size-idx', (cfg.labelSize||24)+'px');
-  }
-  function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('active');
-      document.getElementById('sidebarOverlay').classList.toggle('active');
-  }
-  function renderSidebar() {
-      const content = document.getElementById('sidebarContent'); content.innerHTML = '';
-      globalData.categories.filter(c => c && (isAdmin || (c.access.visible && !c.access.adminOnly))).forEach(cat => {
-          const item = document.createElement('div');
-          item.innerHTML = `<div class="sb-item" onclick="location.href='facility.html?type=${cat.id}'"><span style="display:flex;align-items:center;gap:10px;"><span style="width:10px;height:10px;border-radius:50%;background:${cat.color}"></span>${cat.name}</span></div>`;
-          content.appendChild(item);
-      });
-  }
-  function updateHeadline() {
-      const titles = globalData.config.pageTitles || {};
-      document.getElementById('pageHeadline').textContent = titles[currentPage] || (isAdmin ? "제목 없음 (클릭 수정)" : "");
-      document.getElementById('pageBadge').textContent = `Page ${currentPage}`;
-  }
-  function editPageTitle() {
-      if(!isAdmin) return;
-      const t = prompt("페이지 제목 입력", globalData.config.pageTitles[currentPage] || "");
-      if(t !== null) { globalData.config.pageTitles[currentPage] = t; syncToLocalStorage(globalData); updateHeadline(); }
-  }
-  function renderCards(animate) {
+  function renderCards() {
     const container = document.getElementById('cardContainer');
-    const pagination = document.getElementById('pagination');
-    container.innerHTML = ''; pagination.innerHTML = '';
-    const start = (currentPage-1) * itemsPerPage;
-    const pageItems = globalData.categories.slice(start, start + itemsPerPage);
-
-    pageItems.forEach((cat, i) => {
-        const idx = start + i;
+    container.innerHTML = '';
+    const pageItems = globalData.categories.slice((currentPage-1)*itemsPerPage, currentPage*itemsPerPage);
+    pageItems.forEach(cat => {
+        if(!cat) return;
         const card = document.createElement('div');
-        if(cat) {
-            card.className = 'card' + (isAdmin && (!cat.access.visible || cat.access.adminOnly) ? ' restricted-view' : '');
-            card.style.setProperty('--card-color', cat.color);
-            card.onclick = () => location.href = `facility.html?type=${cat.id}`;
-            if(isAdmin && !isPreview) {
-                card.draggable = true;
-                card.ondragstart = (e) => { dragSrcIndex = idx; e.target.classList.add('dragging'); };
-                card.ondragover = (e) => e.preventDefault();
-                card.ondrop = (e) => { e.stopPropagation(); if(dragSrcIndex !== idx) { const tmp = globalData.categories[idx]; globalData.categories[idx] = globalData.categories[dragSrcIndex]; globalData.categories[dragSrcIndex] = tmp; renderCards(false); syncToLocalStorage(globalData); } };
-                card.ondragend = () => document.querySelectorAll('.card').forEach(c => c.classList.remove('dragging'));
-                card.innerHTML = `<div class="card-ctrl" onclick="event.stopPropagation()"><button class="btn-sm" onclick="openEdit('${cat.id}')">수정</button><button class="btn-sm btn-del" onclick="deleteCard(${idx})">삭제</button></div>`;
-            }
-            card.innerHTML += `<div class="icon-box">${cat.code}</div><h2>${cat.name}</h2>`;
-        } else {
-            card.className = 'card empty-placeholder';
-            if(isAdmin && !isPreview) {
-                card.innerHTML = '<div>+</div>';
-                card.onclick = () => openEdit('NEW', idx);
-            }
-        }
+        card.className = 'card'; card.style.setProperty('--card-color', cat.color);
+        card.onclick = () => location.href = `facility.html?type=${cat.id}`;
+        card.innerHTML = `<div class="icon-box">${cat.code}</div><h2>${cat.name}</h2>`;
         container.appendChild(card);
     });
-
-    const totalPages = Math.ceil(globalData.categories.length / itemsPerPage) || 1;
-    for(let i=1; i<=totalPages; i++) {
-        const dot = document.createElement('div');
-        dot.className = 'page-dot' + (i===currentPage?' active':'');
-        dot.onclick = () => { currentPage = i; renderCards(true); };
-        pagination.appendChild(dot);
-    }
-    updateHeadline();
   }
 
-  function deleteCard(idx) { if(confirm("삭제하시겠습니까?")) { globalData.categories[idx] = null; syncToLocalStorage(globalData); renderCards(false); } }
-  function openEdit(id, slot) {
-    editingCardId = id; moveSrcIndex = slot;
-    const cat = id==='NEW'?{name:'',code:'',color:'#2563eb',access:{visible:true,adminOnly:false,showSidebar:true}}:globalData.categories.find(c=>c.id===id);
-    document.getElementById('editName').value = cat.name;
-    document.getElementById('editCode').value = cat.code;
-    document.getElementById('editColor').value = cat.color;
-    document.getElementById('chkVisible').checked = cat.access.visible;
-    document.getElementById('chkAdminOnly').checked = cat.access.adminOnly;
-    document.getElementById('chkSidebar').checked = cat.access.showSidebar;
-    document.getElementById('cardEditModal').style.display='flex';
-  }
-  function saveCardEdit() {
-    const name = document.getElementById('editName').value;
-    const code = document.getElementById('editCode').value;
-    const color = document.getElementById('editColor').value;
-    const access = { visible: document.getElementById('chkVisible').checked, adminOnly: document.getElementById('chkAdminOnly').checked, showSidebar: document.getElementById('chkSidebar').checked };
-    if(editingCardId==='NEW') globalData.categories[moveSrcIndex] = { id:'CAT_'+Date.now(), name, code, color, access, menus:[] };
-    else { const c = globalData.categories.find(t=>t.id===editingCardId); c.name=name; c.code=code; c.color=color; c.access=access; }
-    syncToLocalStorage(globalData); renderCards(false); document.getElementById('cardEditModal').style.display='none';
-  }
-  function loadFooterText() { document.querySelector('.footer-content').innerHTML = globalData.config.footerText || ""; }
-  function openFooterEditModal() { document.getElementById('footerTextInput').value = globalData.config.footerText || ""; document.getElementById('footerEditModal').style.display='flex'; }
-  function saveFooterText() { globalData.config.footerText = document.getElementById('footerTextInput').value; syncToLocalStorage(globalData); loadFooterText(); document.getElementById('footerEditModal').style.display='none'; }
-  function saveUISettings() { globalData.config.iconSize = parseInt(document.getElementById('setIconSize').value); globalData.config.labelSize = parseInt(document.getElementById('setLabelSize').value); globalData.config.contentTop = parseInt(document.getElementById('setContentTop').value); syncToLocalStorage(globalData); applyConfig(globalData.config); document.querySelector('.content-wrapper').style.paddingTop = globalData.config.contentTop+'px'; document.getElementById('settingsModal').style.display='none'; }
-  function togglePreview() { isPreview=!isPreview; localStorage.setItem('kac_preview_active', isPreview?'1':'0'); location.reload(); }
-  function setTheme(m) { document.body.className = m==='dark'?'dark-mode':''; localStorage.setItem('kac_theme', m); document.getElementById('btnDay').classList.toggle('active', m==='light'); document.getElementById('btnNight').classList.toggle('active', m==='dark'); }
+  function openSettings() { document.getElementById('settingsModal').style.display = 'flex'; }
+  function openPwChangeModal() { document.getElementById('pwChangeModal').style.display='flex'; }
   async function sha256(m) { const b = new TextEncoder().encode(m); const h = await crypto.subtle.digest('SHA-256', b); return Array.from(new Uint8Array(h)).map(x => x.toString(16).padStart(2, '0')).join(''); }
-  function toggleAdmin() { if(isAdmin){ localStorage.setItem('kac_admin_mode','0'); location.reload(); } else { const p = prompt("관리자 비밀번호"); if(p) sha256(p.toUpperCase()).then(h=>{ if(h===globalData.security.admin_pw){ localStorage.setItem('kac_admin_mode','1'); location.reload(); } else alert("불일치"); }); } }
-  function ensurePageSlots() { while(globalData.categories.length % itemsPerPage !== 0) globalData.categories.push(null); }
-  function buildSearchIndex() { searchIndex=[]; globalData.categories.filter(c=>c).forEach(c=>c.menus.forEach(m=>m.subjects.forEach(s=>searchIndex.push({name:s.name, type:c.id, code:c.code, typeName:c.name, menuName:m.label, menuId:m.id, subId:s.id, color:c.color})))); }
-  function openSettings() { document.getElementById('setIconSize').value = globalData.config.iconSize; document.getElementById('setLabelSize').value = globalData.config.labelSize; document.getElementById('setContentTop').value = globalData.config.contentTop || 135; document.getElementById('guestSettings').style.display = isAdmin?'none':'block'; document.getElementById('adminSettings').style.display = isAdmin?'block':'none'; document.getElementById('settingsModal').style.display='flex'; }
-  function exportJsonData() { reconstructGlobalDataFromLocal(); const str = JSON.stringify(globalData, null, 2); const blob = new Blob([str], {type:"application/json"}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download="data.json"; a.click(); }
-  function openGithubModal() { document.getElementById('ghOwner').value=localStorage.getItem('kac_gh_owner'); document.getElementById('ghRepo').value=localStorage.getItem('kac_gh_repo'); document.getElementById('ghToken').value=localStorage.getItem('kac_gh_token'); document.getElementById('githubModal').style.display='flex'; }
-  async function uploadToGithub() {
-      const o=document.getElementById('ghOwner').value, r=document.getElementById('ghRepo').value, t=document.getElementById('ghToken').value;
-      localStorage.setItem('kac_gh_owner',o); localStorage.setItem('kac_gh_repo',r); localStorage.setItem('kac_gh_token',t);
-      const json = JSON.stringify(globalData, null, 2);
-      const content = btoa(unescape(encodeURIComponent(json)));
-      const res = await fetch(`https://api.github.com/repos/${o}/${r}/contents/data.json`, { headers:{ Authorization:`token ${t}` } });
-      const sha = res.ok ? (await res.json()).sha : null;
-      const put = await fetch(`https://api.github.com/repos/${o}/${r}/contents/data.json`, { method:"PUT", headers:{ Authorization:`token ${t}` }, body:JSON.stringify({message:"update", content, sha}) });
-      if(put.ok) alert("성공"); else alert("실패");
-  }
-
-  // 검색 기능
-  document.getElementById('mainSearch').addEventListener('input', (e)=>{
-      const q = e.target.value.toLowerCase();
-      const res = document.getElementById('searchResults');
-      if(!q) { res.classList.remove('active'); return; }
-      const matches = searchIndex.filter(i=>i.name.toLowerCase().includes(q));
-      res.innerHTML = matches.map(i=>`<div class="result-item" onclick="location.href='viewer_list.html?type=${i.type}&menu=${encodeURIComponent(i.menuName)}&id=${i.menuId}&autoOpen=${i.subId}'"><div class="res-title">${i.name}</div><div class="res-tag" style="background:${i.color}">${i.code}</div></div>`).join('');
-      res.classList.add('active');
-  });
+  function toggleAdmin() { localStorage.setItem('kac_admin_mode','0'); location.reload(); }
 
   init();
 </script>
