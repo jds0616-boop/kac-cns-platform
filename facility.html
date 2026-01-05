@@ -12,6 +12,26 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>시설 관리 - KAC CNS Training Platform</title>
+<!-- Firebase 엔진(라이브러리) 불러오기 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+<script>
+  // 서버 접속 주소 설정
+  const firebaseConfig = {
+    apiKey: "AIzaSyAUt6WqxWjRoB9xgAWXq2YhVMQutaOZCBc",
+    authDomain: "catc-dfb9a.firebaseapp.com",
+    databaseURL: "https://catc-dfb9a-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "catc-dfb9a",
+    storageBucket: "catc-dfb9a.firebasestorage.app",
+    messagingSenderId: "669905270724",
+    appId: "1:669905270724:web:c89fcc1d9c8f81b3071691"
+  };
+  // Firebase 시작
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+</script>
 <style>
   @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
   :root { 
@@ -698,31 +718,24 @@
   let dragSrcIndex = null;
   const storedHash = "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c";
 
-  async function init() {
-      const theme = localStorage.getItem('kac_theme') || 'light';
-      setTheme(theme);
-      
-      if(isPreview) document.body.classList.add('preview-active');
-      if(isAdmin) document.body.classList.add('admin-mode');
+async function init() {
+    // [변경] Firebase 서버에서 전체 데이터를 가져옴
+    try {
+        const snapshot = await db.ref('/').once('value');
+        if(snapshot.exists()) {
+            const serverData = snapshot.val();
+            // 해당 카테고리(type)의 데이터만 찾아옵니다.
+            const cat = serverData.categories.find(c => c && c.id === type);
+            if(cat) {
+                menus = cat.menus; // 기존 변수명에 맞춤
+                loadStyleData(cat); // 기존 디자인 함수 호출
+                render(); // 화면 그리기
+            }
+        }
+    } catch(e) { console.log("로드 실패", e); }
 
-      await loadData();
-      loadStyleData();
-      loadUISettings();
-      render();
-      renderSidebar();
-      buildSearchIndex();
-      
-      const lastId = sessionStorage.getItem('kac_last_viewed_menu_id');
-      if(lastId) {
-          setTimeout(() => {
-              const el = document.getElementById(`menu-${lastId}`);
-              if(el) {
-                  el.scrollIntoView({behavior: "smooth", block: "center"});
-                  el.classList.add('last-viewed');
-              }
-          }, 300);
-      }
-  }
+    if(isAdmin) document.body.classList.add('admin-mode');
+}
   
   async function loadData() {
       try {
@@ -1141,17 +1154,21 @@
       return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
-  async function toggleAdmin() {
-      if(isAdmin) { 
-          if(confirm("로그아웃?")) { localStorage.setItem('kac_admin_mode','0'); location.reload(); }
-      } else {
-          const pw = prompt("관리자 비밀번호");
-          if(!pw) return;
-          const hash = await sha256(pw);
-          if(hash === storedHash) { localStorage.setItem('kac_admin_mode','1'); location.reload(); }
-          else alert("비밀번호 불일치");
-      }
-  }
+async function toggleAdmin() {
+    if(isAdmin) { /* 로그아웃 로직... */ } 
+    else {
+        const pw = prompt("관리자 비밀번호");
+        if(!pw) return;
+        // 서버의 admin_pw 해시값 가져오기
+        const snapshot = await db.ref('security/admin_pw').once('value');
+        const serverHash = snapshot.val();
+        const inputHash = await sha256(korToEng(pw).toUpperCase());
+
+        if(inputHash === serverHash) {
+            localStorage.setItem('kac_admin_mode','1'); location.reload();
+        } else { alert("비밀번호 불일치"); }
+    }
+}
 
   function setTheme(m) { 
       document.body.classList.toggle('dark-mode', m==='dark'); 

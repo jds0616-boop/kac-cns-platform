@@ -5,6 +5,26 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>KAC CNS Training Platform</title>
+<!-- Firebase 엔진(라이브러리) 불러오기 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+<script>
+  // 서버 접속 주소 설정
+  const firebaseConfig = {
+    apiKey: "AIzaSyAUt6WqxWjRoB9xgAWXq2YhVMQutaOZCBc",
+    authDomain: "catc-dfb9a.firebaseapp.com",
+    databaseURL: "https://catc-dfb9a-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "catc-dfb9a",
+    storageBucket: "catc-dfb9a.firebasestorage.app",
+    messagingSenderId: "669905270724",
+    appId: "1:669905270724:web:c89fcc1d9c8f81b3071691"
+  };
+  // Firebase 시작
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+</script>
 <script>
   // [보안] 로그인 세션 체크
   if(sessionStorage.getItem('kac_access_token') !== 'granted') {
@@ -474,6 +494,7 @@
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
           <button class="btn-modal btn-danger" onclick="toggleAdmin()">로그아웃</button>
           <button class="btn-modal btn-secondary" onclick="openPwChangeModal()">비밀번호 변경</button>
+          <button class="btn-modal btn-success" onclick="saveToFirebase()">☁️ 서버에 최종 저장 (Firebase)</button>
           <button id="modalPreviewBtn" class="btn-modal btn-secondary" onclick="togglePreview()">미리보기 모드 시작</button>
         </div>
         
@@ -638,6 +659,12 @@
 </div>
 
 <script>
+
+function normalizeArray(v) {
+  if (Array.isArray(v)) return v;
+  if (v && typeof v === 'object') return Object.values(v);
+  return [];
+}
   let globalData = { categories: [], config: {}, security: {} };
   let isAdmin = localStorage.getItem('kac_admin_mode') === '1';
   let isPreview = localStorage.getItem('kac_preview_active') === '1';
@@ -655,19 +682,65 @@
   // 종합 관리용 변수
   let currentTreeSelection = null; 
 
-  async function init() {
-    setTheme(localStorage.getItem('kac_theme') || 'light');
-    if(isPreview) document.body.classList.add('preview-active');
+// ✅ 여기 붙여넣기
+async function ensureAnonAuth() {
+  try {
+    // 이미 로그인 되어 있으면 끝
+    if (firebase.auth().currentUser) return;
 
-    const isAdminSession = localStorage.getItem('kac_admin_mode') === '1';
+    // ✅ 먼저 익명 로그인 시도 (핵심)
+    await firebase.auth().signInAnonymously();
 
-    let serverData = null;
-    try {
-        const res = await fetch('data.json?v=' + Date.now());
-        if(res.ok) serverData = await res.json();
-    } catch(e) { console.log("data.json 로드 실패"); }
+    // ✅ user가 실제로 잡힐 때까지 짧게 대기 (안전장치)
+    await new Promise((resolve) => {
+      const unsub = firebase.auth().onAuthStateChanged((user) => {
+        if (user) { unsub(); resolve(); }
+      });
+      // 혹시 이벤트가 늦으면 2초 후 그냥 빠져나오게 (무한로딩 방지)
+      setTimeout(() => { try { unsub(); } catch(e) {} resolve(); }, 2000);
+    });
 
-    const hasLocalData = localStorage.getItem('kac_index_order');
+  } catch (e) {
+    console.error("ensureAnonAuth 실패:", e);
+    // 무한로딩 방지: 실패해도 init이 진행되게 함
+  }
+}
+
+const snapshot = await db.ref('/').once('value');
+if (snapshot.exists()) {
+  serverData = snapshot.val();
+
+  // ✅ Firebase 객체 → 배열 정규화 (핵심)
+  serverData = serverData || {};
+  serverData.categories = normalizeArray(serverData.categories).filter(Boolean);
+  serverData.config = serverData.config || {};
+  serverData.security = serverData.security || {};
+  serverData.meta = serverData.meta || {};
+}
+
+serverData = serverData || {};
+serverData.categories = normalizeArray(serverData.categories).filter(Boolean);
+serverData.config = serverData.config || {};
+serverData.security = serverData.security || {};
+serverData.meta = serverData.meta || {};
+function normalizeArray(v) {
+  if (Array.isArray(v)) return v;
+  if (v && typeof v === 'object') return Object.values(v);
+  return [];
+serverData = snapshot.val();
+
+// ✅ 추가(중요): Firebase에서 내려온 categories/config/security 구조 보정
+serverData = serverData || {};
+serverData.categories = normalizeArray(serverData.categories).filter(Boolean);
+serverData.config = serverData.config || {};
+serverData.security = serverData.security || {};
+}
+    }
+  } catch (e) {
+    console.log("Firebase 서버 데이터 로드 실패", e);
+  }
+
+  const hasLocalData = localStorage.getItem('kac_index_order'); // 맞는지 확인
 
     if (isAdminSession && hasLocalData) {
         console.log("🛠️ 관리자 모드: 로컬 편집 데이터를 복원합니다.");
@@ -1691,6 +1764,18 @@ function renderSidebar() {
   function setTheme(m) { document.body.className = m==='dark'?'dark-mode':''; localStorage.setItem('kac_theme', m); document.getElementById('btnDay').classList.toggle('active', m==='light'); document.getElementById('btnNight').classList.toggle('active', m==='dark'); }
 
   init();
+// [추가] 수정한 데이터를 Firebase 서버에 영구 저장하는 기능
+async function saveToFirebase() {
+    if(!confirm("현재 수정된 모든 내용을 Firebase 서버에 최종 저장하시겠습니까?")) return;
+    try {
+        // globalData 변수에 담긴 현재 상태를 서버에 통째로 덮어씁니다.
+        await db.ref('/').set(globalData); 
+        alert("✅ 서버 저장 완료! 이제 모든 접속자에게 이 데이터가 보입니다.");
+    } catch(e) {
+        alert("저장 실패: " + e.message);
+    }
+}
+
 </script>
 </body>
 </html>
