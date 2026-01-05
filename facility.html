@@ -2,61 +2,74 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<script>
-
-// 한글 입력(두벌식)을 영어 키보드 배열로 변환하는 함수
-function korToEng(str) {
-    const kor = "ㅂㅈㄷㄱㅅㅛㅕㅑㅐㅔㅁㄴㅇㄹㅎㅗㅓㅏㅣㅋㅌㅊㅍㅠㅜㅡ";
-    const eng = "qwertyuiopasdfghjklzxcvbnm";
-    let result = "";
-    for (let i = 0; i < str.length; i++) {
-        const char = str[i];
-        const index = kor.indexOf(char);
-        if (index !== -1) {
-            result += eng[index];
-        } else {
-            result += char;
-        }
-    }
-    return result;
-}
-
-
-
-// --- [활동 감지 자동 로그아웃 로직] ---
-let inactivityTimer;
-
-function resetInactivityTimer() {
-    clearTimeout(inactivityTimer);
-    // 1시간(3600000ms) 동안 아무 동작이 없으면 로그아웃 실행
-    inactivityTimer = setTimeout(forceLogout, 3600000); 
-}
-
-function forceLogout() {
-    alert("1시간 동안 활동이 없어 보안을 위해 로그아웃됩니다.");
-    sessionStorage.clear();
-    localStorage.removeItem('kac_login_time'); // 자동 로그인 기록 삭제
-    location.replace('login.html');
-}
-
-// 사용자 활동(마우스 이동, 클릭, 키보드 입력, 터치) 감지 시 타이머 리셋
-window.onload = resetInactivityTimer;
-window.onmousemove = resetInactivityTimer;
-window.onmousedown = resetInactivityTimer;
-window.ontouchstart = resetInactivityTimer;
-window.onclick = resetInactivityTimer;
-window.onkeypress = resetInactivityTimer;
-window.onscroll = resetInactivityTimer;
-// ------------------------------------------
-  // [보안] 로그인 세션 체크
-  if(sessionStorage.getItem('kac_access_token') !== 'granted') {
-    alert("로그인이 필요합니다.");
-    location.replace('login.html');
-  }
-</script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>시설 관리 - KAC CNS Training Platform</title>
+
+<!-- 1. Firebase SDK 로드 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+  // 2. Firebase 설정 (사용자 정보 반영)
+  const firebaseConfig = {
+    apiKey: "AIzaSyAUt6WqxWjRoB9xgAWXq2YhVMQutaOZCBc",
+    authDomain: "catc-dfb9a.firebaseapp.com",
+    databaseURL: "https://catc-dfb9a-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "catc-dfb9a",
+    storageBucket: "catc-dfb9a.firebasestorage.app",
+    messagingSenderId: "669905270724",
+    appId: "1:669905270724:web:c89fcc1d9c8f81b3071691",
+    measurementId: "G-H1ME51B4MZ"
+  };
+
+  // Firebase 초기화
+  if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+  }
+  const db = firebase.database();
+
+  // [보안] 로그인 세션 체크
+  if(sessionStorage.getItem('kac_access_token') !== 'granted') {
+    location.replace('login.html');
+  }
+
+  // [도구] 한글 입력 변환 함수
+  function korToEng(str) {
+      const kor = "ㅂㅈㄷㄱㅅㅛㅕㅑㅐㅔㅁㄴㅇㄹㅎㅗㅓㅏㅣㅋㅌㅊㅍㅠㅜㅡ";
+      const eng = "qwertyuiopasdfghjklzxcvbnm";
+      let result = "";
+      for (let i = 0; i < str.length; i++) {
+          const char = str[i];
+          const index = kor.indexOf(char);
+          if (index !== -1) result += eng[index];
+          else result += char;
+      }
+      return result;
+  }
+
+  // [보안] 1시간 활동 감지 로그아웃
+  let inactivityTimer;
+  function resetInactivityTimer() {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(forceLogout, 3600000); 
+  }
+  function forceLogout() {
+      alert("1시간 동안 활동이 없어 보안을 위해 로그아웃됩니다.");
+      sessionStorage.clear();
+      localStorage.removeItem('kac_login_time');
+      location.replace('login.html');
+  }
+
+  window.onload = resetInactivityTimer;
+  window.onmousemove = resetInactivityTimer;
+  window.onmousedown = resetInactivityTimer;
+  window.ontouchstart = resetInactivityTimer;
+  window.onclick = resetInactivityTimer;
+  window.onkeypress = resetInactivityTimer;
+  window.onscroll = resetInactivityTimer;
+</script>
+
 <style>
   @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
   :root { 
@@ -67,9 +80,6 @@ window.onscroll = resetInactivityTimer;
     --btn-bg: #f8fafc; --btn-border: #e2e8f0; --btn-text: #64748b;
     --icon-bg: #f1f5f9; --icon-border: #e2e8f0;
     --header-h: 75px;
-    --search-border: #cbd5e1;
-    
-    /* 사용자 설정 변수 */
     --icon-size-fac: 28px;
     --label-size-fac: 18px;
     --layout-x-pos: 0px;
@@ -79,1105 +89,222 @@ window.onscroll = resetInactivityTimer;
     --text-main: #f1f5f9; --text-sub: #cbd5e1; 
     --border-card: 1px solid rgba(255,255,255,0.1); 
     --shadow: 0 5px 20px rgba(0,0,0,0.5);
-    --btn-bg: rgba(255,255,255,0.05); --btn-border: rgba(255,255,255,0.2); --btn-text: #e2e8f0;
-    --icon-bg: rgba(255,255,255,0.05); --icon-border: rgba(255,255,255,0.2);
-    --search-border: rgba(255,255,255,0.1);
+    --btn-bg: rgba(255,255,255,0.05); --btn-border: rgba(255,255,255,0.2);
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
-  
   html, body { width: 100%; height: 100%; overflow: hidden; }
-
-  body { 
-    background: var(--bg-main); display: flex; flex-direction: column; 
-    color: var(--text-main); transition: background 0.3s, color 0.3s; 
-  }
-
-  body:not(.admin-mode) .admin-only { display: none !important; }
-
-  /* 검색 모드 효과 */
-  #searchOverlay { 
-      position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
-      z-index: 1500; display: none; backdrop-filter: blur(4px); animation: fadeIn 0.3s; 
-  }
-  #searchOverlay.active { display: block; }
-  body.search-mode .header-left, body.search-mode .header-right { opacity: 0.1; pointer-events: none; transition: 0.3s; }
-
-  /* 헤더 스타일 */
-  header { 
-    height: var(--header-h); background: var(--navy); 
-    display: flex; align-items: center; justify-content: space-between; 
-    padding: 0 20px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.15); 
-    z-index: 2000; flex-shrink: 0; 
-    position: fixed; top: 0; left: 0; width: 100%;
-  }
-  
-  .header-left { display: flex; align-items: center; gap: 15px; z-index: 10; min-width: 0; flex-shrink: 0; }
-  .hamburger-btn { cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; flex-shrink: 0; }
-  .hamburger-btn:hover { background: rgba(255,255,255,0.1); }
-  .hamburger-btn svg { width: 24px; height: 24px; fill: #fff; }
-  .logo-text { font-size: 20px; font-weight: 800; cursor: pointer; white-space: nowrap; }
-  
-  .breadcrumb { 
-      display: none; 
-      align-items: center; 
-      color: #94a3b8; 
-      font-weight: 500; 
-      font-size: 16px; 
-      margin-left: 10px; 
-      white-space: nowrap; 
-      height: 100%;
-  }
-  @media(min-width: 1024px) { .breadcrumb { display: flex; } }
-  .breadcrumb span { display: flex; align-items: center; }
-
-  .header-center { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 400px; max-width: 40vw; z-index: 2001; }
-  .header-search { 
-    width: 100%; padding: 12px 20px 12px 45px; border-radius: 50px; 
-    border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.15); 
-    color: #fff; font-size: 15px; outline: none; transition: 0.3s;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'%3E%3Cpath d='M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z'/%3E%3C/svg%3E"); 
-    background-repeat: no-repeat; background-position: 15px center; background-size: 20px;
-  }
-  .header-search:focus { background: rgba(255,255,255,1); color: #000; border-color: #fff; box-shadow: 0 0 30px rgba(255,255,255,0.3); }
-  
-  .search-dropdown { 
-      position: absolute; top: calc(100% + 8px); left: 0; width: 100%; 
-      background: var(--bg-card); border-radius: 15px; color: var(--text-main);
-      box-shadow: 0 10px 40px rgba(0,0,0,0.4); border: 1px solid var(--border-card); 
-      overflow: hidden; display: none; max-height: 400px; overflow-y: auto; z-index: 2002; 
-  }
-  .search-dropdown.active { display: block; }
-  .result-item { padding: 12px 20px; cursor: pointer; border-bottom: 1px solid var(--btn-border); display: flex; justify-content: space-between; align-items: center; transition:0.2s; }
-  .result-item:hover { background: rgba(var(--theme-rgb), 0.05); }
-  .res-title { font-weight: 700; font-size: 14px; }
-  .res-path { font-size: 11px; opacity: 0.6; margin-top: 3px; }
-  .res-tag { font-size: 11px; padding: 3px 8px; border-radius: 6px; background: var(--theme-color); color: #fff; font-weight: 800; }
-
-  .header-right { display: flex; align-items: center; gap: 15px; z-index: 10; flex-shrink: 0; }
-  .theme-toggle { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); margin-right: 10px; }
-  .theme-btn { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; opacity: 0.5; }
-  .theme-btn.active { background: #fff; opacity: 1; color: var(--navy); }
-  .theme-btn svg { width: 16px; height: 16px; fill: currentColor; }
-  .settings-btn { display: flex; padding: 8px; width: 34px; height: 34px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.3s; color: #cbd5e1; }
-  .settings-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
-  .kac-logo-img { height: 30px; width: auto; display: block; object-fit: contain; }
-
-  /* 사이드바 */
-  .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 3000; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(2px); }
-  .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
-  .sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background: var(--bg-card); z-index: 3001; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; border-right: 1px solid var(--btn-border); }
-  .sidebar.active { left: 0; }
-  .sidebar-header { height: var(--header-h); display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--btn-border); font-weight: 800; font-size: 18px; justify-content: space-between; color: var(--text-main); }
-  .sidebar-content { flex: 1; overflow-y: auto; padding: 10px; }
-  .sb-item { padding: 12px 15px; cursor: pointer; border-radius: 10px; color: var(--text-main); font-weight: 600; transition: 0.2s; display: flex; align-items: center; justify-content: space-between; font-size: 14px; }
-  .sb-item:hover { background: var(--btn-bg); color: #2563eb; }
-  .sb-item.active { background: #eff6ff; border-left: 4px solid #2563eb; color: #2563eb; }
-  body.dark-mode .sb-item.active { background: rgba(37,99,235,0.1); }
-  .sb-sub-list { display: none; padding-left: 20px; margin-bottom: 5px; }
-  .sb-sub-list.open { display: block; animation: slideDown 0.2s; }
-  .sb-sub-item { padding: 8px 15px; font-size: 13px; color: var(--text-sub); cursor: pointer; border-left: 2px solid var(--btn-border); transition: 0.2s; }
-  .sb-sub-item:hover { border-left-color: #2563eb; color: #2563eb; background: rgba(37,99,235,0.05); }
-
-  /* === [마인드맵 레이아웃] === */
-  .mindmap-container {
-      display: flex;
-      flex-direction: row;
-      width: 100%; height: 100vh;
-      padding-top: var(--header-h); 
-      padding-bottom: 0;
-      position: relative;
-      overflow-y: auto;
-      overflow-x: hidden;
-      align-items: flex-start;
-      justify-content: center;
-  }
-
-  .mindmap-wrapper {
-      display: flex;
-      align-items: flex-start;
-      position: relative;
-      transform: translateX(var(--layout-x-pos));
-      transition: transform 0.3s ease;
-      padding-bottom: 100px;
-  }
-
-  /* [좌측] 루트 섹션 (Sticky 고정) */
-  .root-section {
-      width: 300px; flex-shrink: 0;
-      display: flex; flex-direction: column;
-      align-items: center;
-      padding-right: 40px; 
-      
-      /* Sticky 고정 */
-      position: sticky;
-      top: 100px; 
-      z-index: 10;
-      margin-top: 50px; 
-      height: fit-content;
-  }
-  
-  .root-card-integrated {
-      background: var(--bg-card);
-      border: 3px solid var(--theme-color);
-      border-radius: 22px;
-      width: 240px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      position: relative;
-      z-index: 2;
-      display: flex; flex-direction: column;
-      overflow: hidden; 
-      transition: transform 0.2s;
-  }
-  .root-card-integrated:hover { transform: scale(1.03); }
-
-  .card-content {
-      padding: 30px 20px;
-      display: flex; flex-direction: column; align-items: center; gap: 15px;
-      cursor: pointer;
-      background: var(--bg-card);
-  }
-  
-  .card-home-btn {
-      padding: 15px 0;
-      background: var(--bg-card);
-      border-top: 1px solid rgba(var(--theme-rgb), 0.2);
-      color: var(--theme-color);
-      font-weight: 800; font-size: 14px;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      transition: 0.2s;
-  }
-  .root-card-integrated:hover .card-home-btn {
-      background: var(--theme-color);
-      color: #fff;
-  }
-
-  .root-icon {
-      width: 80px; height: 80px; border-radius: 25px;
-      background: var(--icon-bg); border: 2px solid var(--icon-border);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 56px; 
-      font-weight: 900; color: var(--theme-color);
-  }
-  .root-title { font-size: 20px; font-weight: 800; word-break: keep-all; line-height: 1.3; text-align: center; }
-
-  .triangle-pointer {
-      position: absolute;
-      right: -24px; 
-      top: 50%; transform: translateY(-50%);
-      width: 0; height: 0;
-      border-left: 24px solid var(--theme-color); 
-      border-top: 14px solid transparent;
-      border-bottom: 14px solid transparent;
-      z-index: 5;
-  }
-  
-  .branch-bus {
-      width: 8px; 
-      background: rgba(var(--theme-rgb), 0.2);
-      border-radius: 4px;
-      margin-right: 40px;
-      flex-shrink: 0;
-      align-self: stretch; 
-      margin-top: 20px; 
-      margin-bottom: 50px;
-  }
-  
-  .list-section {
-      display: flex; flex-direction: column; gap: 20px;
-      width: 600px; padding-bottom: 50px;
-      padding-top: 50px; 
-  }
-
-  /* 메뉴 카드 */
-  .menu-bar {
-      background: var(--bg-card);
-      border-radius: 18px;
-      padding: 20px 25px;
-      box-shadow: var(--shadow);
-      display: flex; align-items: center; gap: 20px;
-      position: relative;
-      transition: transform 0.2s, box-shadow 0.2s;
-      border: 1px solid var(--border-card);
-      border-left: 6px solid var(--theme-color);
-      cursor: pointer;
-      min-height: 80px;
-  }
-  .menu-bar:hover {
-      transform: translateX(5px);
-      box-shadow: 0 8px 25px rgba(var(--theme-rgb), 0.15);
-      z-index: 20; 
-  }
-  
-  /* 비공개 아이템 스타일 (관리자용) */
-  .menu-bar.hidden-item { opacity: 0.6; border: 2px dashed #cbd5e1; }
-  .menu-bar.hidden-item:hover { opacity: 1; border-style: solid; }
-
-  .menu-bar.dragging { opacity: 0.4; border: 2px dashed var(--theme-color); background: #f8fafc; }
-  .menu-bar.drag-over { border-top: 3px solid var(--theme-color); transform: translateY(-2px); }
-  
-  .last-viewed-icon {
-    position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
-    display: none; 
-    align-items: center; justify-content: center; gap: 6px;
-    color: #10b981; 
-    font-size: 12px; font-weight: 800; white-space: nowrap;
-    background: rgba(16, 185, 129, 0.1); padding: 6px 12px; border-radius: 50px; 
-    border: 1px solid rgba(16, 185, 129, 0.3);
-    pointer-events: none;
-  }
-  .menu-bar.last-viewed { border: 2px solid #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
-  .menu-bar.last-viewed .last-viewed-icon { display: flex; }
-  
-  body.admin-mode .menu-bar.last-viewed .last-viewed-icon {
-      right: -130px; 
-      background: #10b981; color: #fff;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  }
-
-  .preview-popup {
-      position: absolute;
-      left: 100%; top: 50%; 
-      transform: translate(15px, -50%);
-      background: var(--bg-card);
-      border: 1px solid var(--btn-border);
-      box-shadow: 0 10px 40px rgba(0,0,0,0.25);
-      border-radius: 15px;
-      padding: 20px;
-      min-width: 500px; max-width: 600px;
-      z-index: 100;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.2s;
-      display: none; 
-  }
-  .preview-popup.align-top { top: 0; transform: translate(15px, 0); }
-
-  .menu-bar:hover .preview-popup { display: block; opacity: 1; pointer-events: none; }
-  
-  .pp-title { font-size: 14px; font-weight: 800; color: var(--text-sub); margin-bottom: 12px; border-bottom: 1px solid var(--btn-border); padding-bottom: 8px; }
-  .pp-list { display: flex; flex-direction: column; gap: 8px; }
-  .pp-item { font-size: 14px; color: var(--text-main); display: flex; align-items: flex-start; gap: 8px; line-height: 1.5; }
-  .pp-status-dot { width: 6px; height: 6px; border-radius: 50%; background: #cbd5e1; margin-top: 8px; flex-shrink: 0; }
-  .pp-status-dot.active { background: #10b981; }
-  .pp-more { font-size: 12px; color: var(--text-sub); margin-top: 10px; text-align: center; font-weight: 700; background: var(--btn-bg); padding: 6px; border-radius: 6px; }
-
-  .menu-bar::before {
-      content: ''; position: absolute; left: -44px; top: 50%;
-      width: 44px; height: 2px; background: rgba(var(--theme-rgb), 0.3);
-  }
-  .menu-bar::after {
-      content: ''; position: absolute; left: -46px; top: 50%; transform: translateY(-50%);
-      width: 8px; height: 8px; border-radius: 50%; background: var(--theme-color);
-  }
-
-  .menu-pill-icon {
-      background: rgba(var(--theme-rgb), 0.1);
-      color: var(--theme-color);
-      border: 1px solid rgba(var(--theme-rgb), 0.2);
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: var(--icon-size-fac); font-weight: 800;
-      white-space: nowrap;
-      min-width: 60px; text-align: center;
-      display: flex; flex-direction: column; align-items: center;
-  }
-  .pill-sub { font-size: 10px; opacity: 0.8; font-weight: 600; margin-top: 2px; }
-
-  .menu-info { flex: 1; display: flex; align-items: center; gap: 10px; }
-  .menu-title { font-size: var(--label-size-fac); font-weight: 700; color: var(--text-main); }
-  
-  .ext-link-icon { color: var(--text-sub); opacity: 0.5; }
-  .menu-bar:hover .ext-link-icon { opacity: 1; color: var(--theme-color); }
-
-  .admin-btns { display: flex; gap: 5px; margin-left: auto; }
-  .btn-xs { padding: 4px 8px; font-size: 11px; border-radius: 6px; border: 1px solid #e2e8f0; background: #fff; cursor: pointer; color: #64748b; }
-  .btn-xs:hover { background: #f1f5f9; color: #0f172a; }
-
-  .add-menu-btn {
-      border: 2px dashed #cbd5e1; background: transparent;
-      justify-content: center; color: #94a3b8; font-weight: 700;
-      padding: 15px; box-shadow: none; cursor: pointer;
-  }
-  .add-menu-btn:hover { border-color: var(--theme-color); color: var(--theme-color); background: rgba(var(--theme-rgb), 0.05); }
-  .add-menu-btn::before, .add-menu-btn::after { display: none; }
-
-  .btn-preview-active { background: #10b981 !important; color: #fff !important; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
-
-  .bottom-nav { 
-    position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); 
-    background: var(--navy); padding: 15px 45px; border-radius: 100px; 
-    display: flex; gap: 40px; align-items: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000; border: 1px solid rgba(255,255,255,0.1); 
-  }
-  .nav-item { 
-    color: #fff; cursor: pointer; font-size: 18px; font-weight: 700; transition: 0.3s; opacity: 0.8; 
-    display: flex; align-items: center; gap: 10px;
-  }
-  .nav-item:hover { opacity: 1; transform: translateY(-3px); }
-  .nav-icon { width: 24px; height: 24px; fill: currentColor; }
-
-  body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(255, 255, 255, 0.3); }
-  body.dark-mode .nav-item { color: #e2e8f0; opacity: 1; }
-
-  .mobile-only-nav { display: none; }
-
-  .icon-mobile { display: none; }
-  .icon-pc { display: block; }
-
-  /* ========================================= */
-  /* [모바일 전용 최적화] */
-  /* ========================================= */
-  @media (max-width: 768px) {
-    .mindmap-container { 
-        flex-direction: column; overflow-y: auto; padding-top: var(--header-h); 
-        display: block; 
-    }
-    .mindmap-wrapper { 
-        display: block; transform: none !important; 
-        width: 100%; padding-bottom: 20px;
-    }
-
-    .header-center { 
-        display: block !important; position: static !important;
-        transform: none !important; width: auto !important;
-        max-width: none !important; flex: 1; margin: 0 10px;
-    }
-
-    .logo-text { display: none !important; }
-    .breadcrumb { display: none !important; }
-    .header-right { display: none !important; }
-
-    .header-search { width: 100% !important; font-size: 14px; padding: 10px 15px 10px 40px; height: 40px; background-position: 12px center; }
-
-    header { padding: 0 15px; gap: 5px; }
-
-    .preview-popup { display: none !important; }
-
-    /* 모바일 Root Section 스타일 개선 */
-    .root-section { 
-        width: 100%; height: auto; 
-        padding: 10px 20px; 
-        justify-content: center; 
-        position: sticky; top: 0; 
-        background: var(--bg-main); 
-        z-index: 500 !important; 
-        margin-top: 0; flex-direction: row; gap: 10px; flex-wrap: wrap;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
-    }
-    
-    .root-card-integrated { 
-        position: static; width: 100%; 
-        flex-direction: row; border-width: 2px; margin: 0;
-        align-items: stretch !important; /* [수정 1] 높이 꽉 채우기 */
-        overflow: hidden; 
-    }
-
-    /* [수정 2] 모바일에서 제목(왼쪽) 터치 시 버튼(오른쪽) 호버 효과 방지 */
-    .root-card-integrated:hover .card-home-btn {
-        background: transparent;
-        color: var(--theme-color);
-    }
-
-    .card-content { flex: 1; padding: 15px; flex-direction: row; gap: 15px; }
-    
-    /* [수정 1] 버튼 스타일 (flex 중앙 정렬 + active 시 배경 채우기) */
-    .card-home-btn { 
-        width: auto; padding: 0 20px; 
-        border-top: none; 
-        border-left: 1px solid rgba(var(--theme-rgb), 0.2); 
-        height: auto; 
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    /* [수정 1] 모바일 전용 버튼 눌림 효과 */
-    .card-home-btn:active {
-        background: var(--theme-color) !important;
-        color: #fff !important;
-    }
-    
-    .root-icon { margin-bottom: 0; font-size: 24px; width: 50px; height: 50px; border-radius: 15px; }
-    .root-title { font-size: 16px; flex: 1; text-align: left; }
-    .triangle-pointer, .branch-bus { display: none; } 
-
-    /* 모바일 하단 여백 추가 (버튼 가림 방지) */
-    .list-section { 
-        padding: 20px 20px 150px 20px !important; 
-        overflow: visible; 
-        border-left: 2px solid rgba(var(--theme-rgb), 0.2);
-        margin-left: 45px; margin-right: 20px;
-        gap: 15px;
-        width: auto;
-    }
-
-    .menu-bar { padding: 15px; gap: 12px; min-height: 60px; }
-    .menu-bar::before { left: -27px; width: 27px; } 
-    .menu-bar::after { left: -30px; width: 6px; height: 6px; }
-    
-    .menu-pill-icon { font-size: 11px; padding: 4px 10px; min-width: auto; }
-    .menu-title { font-size: 15px; padding-right: 20px; }
-    
-    .admin-btns { flex-direction: row; gap: 4px; }
-
-    .icon-pc { display: none !important; }
-    .last-viewed-icon span { display: none !important; }
-    .icon-mobile { display: block !important; }
-
-    .menu-bar.last-viewed .last-viewed-icon {
-        right: 15px !important; top: 50% !important; transform: translateY(-50%) !important;
-        width: 24px; height: 24px; border-radius: 50%; padding: 0;
-        background: #10b981; border: 2px solid #fff; color: #fff;
-        display: flex; justify-content: center; align-items: center;
-    }
-    .last-viewed-icon svg { width: 14px; height: 14px; margin: 0; }
-
-    .bottom-nav {
-        width: 90% !important; bottom: 20px !important; padding: 16px 0 !important;
-        gap: 30px !important; border-radius: 50px !important; justify-content: center !important;
-        background: rgba(15, 23, 42, 0.98) !important; backdrop-filter: blur(10px) !important;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.4) !important;
-    }
-
-    body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.98) !important; }
-    .nav-item { font-size: 14px !important; gap: 6px !important; font-weight: 800 !important; }
-    .nav-icon { width: 20px !important; height: 20px !important; }
-
-    .mobile-only-nav { display: flex !important; }
-  } 
-
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none !important; align-items: center; justify-content: center; }
-  .modal-overlay[style*="display: flex"] { display: flex !important; }
-  .modal-card { background: var(--bg-card); padding: 30px; border-radius: 20px; width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); color: var(--text-main); }
-  .modal-card.large { width: 900px; max-width: 95%; }
-  .setting-group { margin-bottom: 20px; }
-  .setting-label { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; display: block; }
-  .setting-input { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; color: var(--text-main); outline: none; }
+  body { background: var(--bg-main); display: flex; flex-direction: column; color: var(--text-main); transition: 0.3s; }
+  header { height: var(--header-h); background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.15); z-index: 2000; position: fixed; top: 0; left: 0; width: 100%; }
+  .logo-text { font-size: 20px; font-weight: 800; cursor: pointer; }
+  .mindmap-container { display: flex; width: 100%; height: 100vh; padding-top: var(--header-h); position: relative; overflow-y: auto; justify-content: center; }
+  .root-section { width: 300px; position: sticky; top: 50px; height: fit-content; margin-top: 50px; display: flex; flex-direction: column; align-items: center; }
+  .root-card-integrated { background: var(--bg-card); border: 3px solid var(--theme-color); border-radius: 22px; width: 240px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; cursor: pointer; }
+  .root-icon { width: 80px; height: 80px; border-radius: 25px; background: var(--icon-bg); display: flex; align-items: center; justify-content: center; font-size: 50px; font-weight: 900; color: var(--theme-color); margin: 20px auto; }
+  .root-title { font-size: 20px; font-weight: 800; text-align: center; padding-bottom: 20px; }
+  .list-section { display: flex; flex-direction: column; gap: 20px; width: 600px; padding: 50px 0; border-left: 8px solid rgba(var(--theme-rgb), 0.1); margin-left: 40px; padding-left: 40px; }
+  .menu-bar { background: var(--bg-card); border-radius: 18px; padding: 20px 25px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 20px; border-left: 6px solid var(--theme-color); cursor: pointer; transition: 0.2s; position: relative; }
+  .menu-bar:hover { transform: translateX(5px); }
+  .menu-pill-icon { background: rgba(var(--theme-rgb), 0.1); color: var(--theme-color); padding: 6px 14px; border-radius: 20px; font-size: 24px; font-weight: 800; }
+  .menu-title { font-size: 18px; font-weight: 700; flex: 1; }
+  .admin-btns { display: flex; gap: 5px; }
+  .btn-xs { padding: 4px 8px; font-size: 11px; border-radius: 6px; border: 1px solid #e2e8f0; cursor: pointer; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none; align-items: center; justify-content: center; }
+  .modal-card { background: var(--bg-card); padding: 30px; border-radius: 20px; width: 400px; }
+  .setting-input { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #e2e8f0; }
   .btn-modal { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; margin-top: 5px; }
   .btn-primary { background: #0f172a; color: #fff; }
-  .bulk-list-container { display: flex; flex-direction: column; gap: 5px; border: 1px solid var(--btn-border); border-radius: 10px; overflow-y: auto; max-height: 50vh; background: #fff; padding: 10px; }
-  .bulk-header-row { display: grid; grid-template-columns: 40px 100px 100px 1fr 1fr; background: #f1f5f9; padding: 10px; font-weight: 700; font-size: 12px; text-align: center; position: sticky; top: 0; color: #000; }
-  .bulk-row { display: grid; grid-template-columns: 40px 100px 100px 1fr 1fr; gap: 5px; padding: 5px; border-bottom: 1px solid #eee; align-items: center; }
-  .bulk-input { padding: 8px; border: 1px solid #ddd; border-radius: 5px; width: 100%; text-align: center; background: #fff; color: #000; }
-  @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .btn-success { background: #10b981; color: #fff; }
 </style>
 </head>
 <body>
 
-<div id="searchOverlay"></div>
-
-<!-- 사이드바 -->
-<div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
-<div id="sidebar" class="sidebar">
-  <div class="sidebar-header" style="padding:20px; font-weight:800;">
-    <span>전체 메뉴</span>
-    <span onclick="toggleSidebar()" style="cursor:pointer; float:right;">✕</span>
-  </div>
-  <div class="sidebar-content" id="sidebarContent" style="padding:10px;"></div>
-</div>
-
 <header>
   <div class="header-left">
-    <div class="hamburger-btn" onclick="toggleSidebar()">
-      <svg viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
-    </div>
     <div class="logo-text" onclick="location.href='index.html'">KAC CNS Training Platform</div>
-    <!-- Breadcrumb -->
-    <div class="breadcrumb" id="bc"></div>
   </div>
-  
-  <div class="header-center">
-      <input type="text" id="searchInput" class="header-search" placeholder="시설명 또는 교육 주제 검색..." autocomplete="off">
-      <div id="searchDropdown" class="search-dropdown"></div>
-  </div>
-
   <div class="header-right">
-    <div class="theme-toggle">
-        <div class="theme-btn" id="btnDay" onclick="setTheme('light')" title="주간">
-            <svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg>
-        </div>
-        <div class="theme-btn" id="btnNight" onclick="setTheme('dark')" title="야간">
-            <svg viewBox="0 0 24 24"><path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C6.94,10.39 9.79,16.87 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z"/></svg>
-        </div>
-    </div>
-    <div class="settings-btn" onclick="openSettings()">⚙️</div>
-    <img src="logo.png" alt="KAC Logo" class="kac-logo-img">
+    <div class="settings-btn" onclick="openSettings()" style="cursor:pointer; font-size:20px;">⚙️</div>
+    <img src="logo.png" style="height:30px; margin-left:15px;">
   </div>
 </header>
 
 <div class="mindmap-container">
-  <div class="mindmap-wrapper">
-      <div class="root-section">
-        <div class="root-card-integrated">
-            <div class="card-content" onclick="location.href='index.html'">
-                <div id="rootIcon" class="root-icon">?</div>
-                <div id="rootTitle" class="root-title">Loading...</div>
-            </div>
-            <div class="card-home-btn" onclick="location.href='index.html'">
-                <svg style="width:16px;height:16px;fill:currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-                홈으로 이동
-            </div>
-            <div class="triangle-pointer"></div>
-        </div>
-      </div>
-      <div class="branch-bus"></div>
-      <div id="menuListSection" class="list-section">
-        <div id="menuListContainer" style="display:flex; flex-direction:column; gap:20px;"></div>
-      </div>
+  <div class="root-section">
+    <div class="root-card-integrated" onclick="location.href='index.html'">
+      <div id="rootIcon" class="root-icon">?</div>
+      <div id="rootTitle" class="root-title">Loading...</div>
+      <div style="background:var(--theme-color); color:white; text-align:center; padding:10px; font-size:12px; font-weight:800;">홈으로 이동</div>
+    </div>
+  </div>
+  <div id="menuListSection" class="list-section">
+    <div id="menuListContainer" style="display:flex; flex-direction:column; gap:20px;"></div>
   </div>
 </div>
 
-<div id="moveMenuModal" class="modal-overlay" style="display:none;">
-  <div class="modal-card">
-    <h3>📂 메뉴 이동</h3>
-    <p style="font-size:13px; color:#64748b; margin-bottom:15px;">이 메뉴를 어느 시설로 보내시겠습니까?</p>
-    <div class="setting-group">
-        <label class="setting-label">이동할 목적지 시설</label>
-        <select id="moveTargetSelect" class="setting-input" style="cursor:pointer;"></select>
-    </div>
-    <div style="display:flex; gap:10px; margin-top:20px;">
-        <button class="btn-modal btn-primary" onclick="executeMoveMenu()">이동 확인</button>
-        <button class="btn-modal" style="background:#e2e8f0; color:#333" onclick="closeModal('moveMenuModal')">취소</button>
-    </div>
-  </div>
-</div>
-
-<div id="settingsModal" class="modal-overlay" style="display:none;">
+<!-- 설정 모달 -->
+<div id="settingsModal" class="modal-overlay">
   <div class="modal-card">
     <h3>⚙️ 시스템 설정</h3>
-    <div id="guestSettings" style="display:none;">
-      <p style="margin-bottom:20px; font-size:14px; color:var(--text-sub);">관리자 권한이 필요합니다.</p>
+    <div id="adminSettings" style="display:none; margin-top:20px;">
+      <button class="btn-modal btn-success" onclick="saveAllToFirebase()">☁️ 서버에 최종 저장 (Firebase)</button>
+      <button class="btn-modal btn-danger" style="margin-top:10px;" onclick="logoutAdmin()">관리자 로그아웃</button>
+    </div>
+    <div id="guestSettings">
       <button class="btn-modal btn-primary" onclick="toggleAdmin()">관리자 로그인</button>
     </div>
-    <div id="adminSettings" style="display:none;">
-        <div class="setting-group">
-            <button class="btn-modal btn-danger" onclick="toggleAdmin()">로그아웃</button>
-            <button id="modalPreviewBtn" class="btn-modal" onclick="togglePreview()">미리보기 모드</button>
-        </div>
-        <div class="setting-group" style="background:rgba(0,0,0,0.03); padding:15px; border-radius:10px; margin-top:15px;">
-            <label class="setting-label">🎨 화면 레이아웃 & UI</label>
-            <div style="display:flex; gap:10px; margin-bottom:10px;">
-                <div style="flex:1">
-                    <span style="font-size:11px; display:block; color:#64748b;">아이콘 크기(px)</span>
-                    <input type="number" id="setFacIconSize" class="setting-input">
-                </div>
-                <div style="flex:1">
-                    <span style="font-size:11px; display:block; color:#64748b;">라벨 크기(px)</span>
-                    <input type="number" id="setFacLabelSize" class="setting-input">
-                </div>
-            </div>
-            <label class="setting-label">↔️ 컨텐츠 전체 가로 이동 (px)</label>
-            <div style="display:flex; gap:10px; align-items:center;">
-                <input type="range" id="rangeLayoutX" min="-300" max="300" step="10" style="flex:1" oninput="updateLayoutPreview(this.value)">
-                <input type="number" id="setLayoutX" class="setting-input" style="width:70px; margin-bottom:0;" oninput="updateLayoutPreview(this.value)">
-            </div>
-            <button class="btn-modal btn-primary" onclick="saveUISettings()" style="margin-top:10px;">설정 저장 및 적용</button>
-        </div>
-        <button class="btn-modal btn-primary" style="margin-top:10px;" onclick="openBulkEdit()">📋 메뉴 일괄 수정</button>
-    </div>
-    <button class="btn-modal" style="margin-top:10px;" onclick="closeModal('settingsModal')">닫기</button>
+    <button class="btn-modal" style="margin-top:20px; background:#eee;" onclick="closeModal('settingsModal')">닫기</button>
   </div>
 </div>
 
-<!-- 개별 수정 모달 -->
-<div id="itemEditModal" class="modal-overlay" style="display:none;">
+<!-- 수정 모달 -->
+<div id="itemEditModal" class="modal-overlay">
   <div class="modal-card">
-    <h3>📦 메뉴 수정/추가</h3>
-    <input type="text" id="editItemLine1" class="setting-input" placeholder="아이콘 상단 (예: VOR)">
-    <input type="text" id="editItemLine2" class="setting-input" placeholder="아이콘 하단 (선택)">
+    <h3>📦 메뉴 수정</h3>
     <input type="text" id="editItemLabel" class="setting-input" placeholder="시설 명칭">
-    <input type="text" id="editItemLink" class="setting-input" placeholder="연동 링크 (선택)">
-    
-    <!-- 공개 여부 체크박스 -->
-    <div class="checkbox-group" style="margin-top:10px; margin-bottom:20px;">
-        <label class="checkbox-item" style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer;">
-            <input type="checkbox" id="editItemVisible" checked style="width:16px;height:16px;cursor:pointer;">
-            <span>공개 (체크 해제 시 비공개)</span>
-        </label>
-    </div>
-
-    <button class="btn-modal btn-primary" onclick="saveIndividualEdit()">저장</button>
-    <button class="btn-modal" style="background:#e2e8f0; color:#333" onclick="closeModal('itemEditModal')">취소</button>
-  </div>
-</div>
-
-<div id="bulkEditModal" class="modal-overlay" style="display:none;">
-  <div class="modal-card modal-card large">
-    <h3>📋 메뉴 일괄 수정</h3>
-    <div class="bulk-list-container">
-        <div class="bulk-header-row"><div>No</div><div>아이콘1</div><div>아이콘2</div><div>명칭</div><div>링크</div></div>
-        <div id="bulkRowContainer"></div>
-    </div>
-    <div style="margin-top:20px; display:flex; gap:10px;">
-        <button class="btn-modal btn-primary" onclick="saveBulkData()">전체 저장</button>
-        <button class="btn-modal" style="background:#e2e8f0; color:#333" onclick="closeModal('bulkEditModal')">취소</button>
-    </div>
-  </div>
-</div>
-
-<div class="bottom-nav">
-  <div class="nav-item" onclick="history.back()">
-    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-    뒤로가기
-  </div>
-  <div class="nav-item" onclick="location.href='index.html'">
-    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-    홈으로
-  </div>
-  <div class="nav-item mobile-only-nav" onclick="toggleThemeMobile()">
-    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg>
-    테마
+    <input type="text" id="editItemLine1" class="setting-input" placeholder="아이콘 텍스트">
+    <input type="text" id="editItemLink" class="setting-input" placeholder="외부 링크 (선택)">
+    <button class="btn-modal btn-primary" onclick="applyEdit()">임시 적용</button>
+    <button class="btn-modal" style="background:#eee;" onclick="closeModal('itemEditModal')">취소</button>
   </div>
 </div>
 
 <script>
   const params = new URLSearchParams(location.search);
-  const type = params.get('type');
+  const type = params.get('type'); // CAT_... ID값
   
+  let globalData = { categories: [] };
   let isAdmin = localStorage.getItem('kac_admin_mode') === '1';
-  let isPreview = localStorage.getItem('kac_preview_active') === '1';
-  let menus = [];
+  let currentCategory = null;
   let currentEditIdx = -1;
-  let dragSrcIndex = null;
-  const storedHash = "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c";
 
   async function init() {
-      const theme = localStorage.getItem('kac_theme') || 'light';
-      setTheme(theme);
-      
-      if(isPreview) document.body.classList.add('preview-active');
-      if(isAdmin) document.body.classList.add('admin-mode');
+    if(isAdmin) document.body.classList.add('admin-mode');
 
-      await loadData();
-      loadStyleData();
-      loadUISettings();
-      render();
-      renderSidebar();
-      buildSearchIndex();
-      
-      const lastId = sessionStorage.getItem('kac_last_viewed_menu_id');
-      if(lastId) {
-          setTimeout(() => {
-              const el = document.getElementById(`menu-${lastId}`);
-              if(el) {
-                  el.scrollIntoView({behavior: "smooth", block: "center"});
-                  el.classList.add('last-viewed');
-              }
-          }, 300);
-      }
-  }
-  
-  async function loadData() {
-      try {
-          const res = await fetch('data.json?v=' + Date.now());
-          if(res.ok) {
-              const serverData = await res.json();
-              const cat = serverData.categories.find(c => c.id === type);
-              if(cat && !localStorage.getItem(`kac_menu_${type}`)) {
-                   localStorage.setItem(`kac_menu_${type}`, JSON.stringify(cat.menus.map(m=>({
-                       dataId: m.id, 
-                       label: m.label, 
-                       line1: m.line1, 
-                       line2: m.line2, 
-                       link: m.link,
-                       visible: m.visible !== false 
-                   }))));
-                   localStorage.setItem(`kac_style_${type}`, JSON.stringify({name: cat.name, code: cat.code, color: cat.color}));
-                   
-                   cat.menus.forEach(m => {
-                       localStorage.setItem(`kac_subs_${type}_${m.id}`, JSON.stringify(m.subjects));
-                   });
-              }
-          }
-      } catch(e) {}
-      const saved = localStorage.getItem(`kac_menu_${type}`);
-      menus = saved ? JSON.parse(saved) : [];
+    // 1. Firebase에서 데이터 로드
+    try {
+        const snapshot = await db.ref('/').once('value');
+        if(snapshot.exists()) {
+            globalData = snapshot.val();
+            currentCategory = globalData.categories.find(c => c && c.id === type);
+            if(currentCategory) {
+                render();
+                updateStyles();
+            } else {
+                alert("잘못된 접근입니다.");
+                location.href = 'index.html';
+            }
+        }
+    } catch(e) { console.error("Firebase 로드 실패", e); }
   }
 
-  function loadStyleData() {
-      const sData = localStorage.getItem(`kac_style_${type}`);
-      const style = sData ? JSON.parse(sData) : { name: type || 'Unknown', color: '#2563eb', code: '?' };
-      
-      document.documentElement.style.setProperty('--theme-color', style.color || '#2563eb');
-      document.documentElement.style.setProperty('--theme-rgb', hexToRgb(style.color || '#2563eb'));
-
-      document.getElementById('rootIcon').textContent = style.code || '?';
-      document.getElementById('rootIcon').style.color = style.color;
-      document.getElementById('rootTitle').textContent = style.name;
-      
-      const bc = document.getElementById('bc');
-      if(bc) bc.innerHTML = `<span>&nbsp;&gt;&nbsp;</span><span>${style.name}</span>`;
-  }
-
-  function loadUISettings() {
-      const iconSize = localStorage.getItem('kac_fac_icon_size') || 28;
-      const labelSize = localStorage.getItem('kac_fac_label_size') || 18;
-      const layoutX = localStorage.getItem('kac_fac_layout_x') || 0;
-      
-      document.documentElement.style.setProperty('--icon-size-fac', iconSize + 'px');
-      document.documentElement.style.setProperty('--label-size-fac', labelSize + 'px');
-      document.documentElement.style.setProperty('--layout-x-pos', layoutX + 'px');
-  }
-  
-  function hexToRgb(hex) {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '37, 99, 235';
+  function updateStyles() {
+    document.documentElement.style.setProperty('--theme-color', currentCategory.color);
+    document.getElementById('rootIcon').textContent = currentCategory.code;
+    document.getElementById('rootTitle').textContent = currentCategory.name;
   }
 
   function render() {
-      const container = document.getElementById('menuListContainer');
-      container.innerHTML = '';
+    const container = document.getElementById('menuListContainer');
+    container.innerHTML = '';
+    
+    // 비공개 항목 필터링 (관리자 아닐 때)
+    const menus = isAdmin ? currentCategory.menus : currentCategory.menus.filter(m => m.visible !== false);
 
-      if(menus.length === 0 && !isAdmin) {
-          container.innerHTML = `<div style="text-align:center; color:#94a3b8; padding:50px;">등록된 메뉴가 없습니다.</div>`;
-          return;
-      }
+    menus.forEach((menu, idx) => {
+        const bar = document.createElement('div');
+        bar.className = 'menu-bar';
+        bar.onclick = () => {
+            if(menu.link) window.open(menu.link, '_blank');
+            else location.href = `viewer_list.html?type=${type}&menu=${encodeURIComponent(menu.label)}&id=${menu.id}`;
+        };
 
-      menus.forEach((menu, idx) => {
-          if(!menu) return;
+        let adminHtml = isAdmin ? `
+            <div class="admin-btns" onclick="event.stopPropagation()">
+                <button class="btn-xs" onclick="openEdit(${idx})">수정</button>
+                <button class="btn-xs" style="color:red" onclick="deleteMenu(${idx})">삭제</button>
+            </div>
+        ` : '';
 
-          const isVisible = (menu.visible !== false); 
-          
-          if(!isAdmin && !isVisible) return;
+        bar.innerHTML = `
+            <div class="menu-pill-icon">${menu.line1 || '?'}</div>
+            <div class="menu-title">${menu.label}</div>
+            ${adminHtml}
+        `;
+        container.appendChild(bar);
+    });
 
-          const bar = document.createElement('div');
-          bar.className = 'menu-bar';
-          bar.id = `menu-${menu.dataId}`;
-          
-          if(isAdmin && !isVisible) {
-              bar.classList.add('hidden-item');
-          }
-          
-          if(isAdmin && !isPreview) {
-              bar.setAttribute('draggable', 'true');
-              bar.ondragstart = (e) => {
-                  dragSrcIndex = idx;
-                  e.target.classList.add('dragging');
-                  e.dataTransfer.effectAllowed = 'move';
-              };
-              bar.ondragover = (e) => {
-                  e.preventDefault(); 
-                  e.dataTransfer.dropEffect = 'move';
-                  bar.classList.add('drag-over');
-              };
-              bar.ondragleave = () => {
-                  bar.classList.remove('drag-over');
-              };
-              bar.ondrop = (e) => {
-                  e.preventDefault();
-                  bar.classList.remove('drag-over');
-                  if (dragSrcIndex !== null && dragSrcIndex !== idx) {
-                      const movedItem = menus.splice(dragSrcIndex, 1)[0];
-                      menus.splice(idx, 0, movedItem);
-                      localStorage.setItem(`kac_menu_${type}`, JSON.stringify(menus));
-                      render();
-                  }
-              };
-              bar.ondragend = () => {
-                  bar.classList.remove('dragging');
-                  document.querySelectorAll('.menu-bar').forEach(b => b.classList.remove('drag-over'));
-              };
-          }
-
-          bar.onmouseenter = () => {
-              const rect = bar.getBoundingClientRect();
-              const isNearTop = rect.top < 200; 
-
-              const subsData = localStorage.getItem(`kac_subs_${type}_${menu.dataId}`);
-              let previewHtml = '';
-              if(subsData) {
-                  const subs = JSON.parse(subsData);
-                  if(subs.length > 0) {
-                      const displayLimit = 10;
-                      const showList = subs.slice(0, displayLimit);
-                      previewHtml = `
-                        <div class="pp-title">포함된 교육 교보재 (${subs.length})</div>
-                        <div class="pp-list">
-                            ${showList.map(s => `
-                                <div class="pp-item">
-                                    <div class="pp-status-dot ${s.active!==false?'active':''}"></div>
-                                    <span>${s.name}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                        ${subs.length > displayLimit ? `<div class="pp-more">...외 ${subs.length - displayLimit}건 더 있음</div>` : ''}
-                      `;
-                  } else {
-                      previewHtml = `<div class="pp-title">교육 교보재 없음</div><div style="font-size:11px; color:#94a3b8;">등록된 과목이 없습니다.</div>`;
-                  }
-              } else {
-                   previewHtml = `<div class="pp-title">교육 교보재 없음</div><div style="font-size:11px; color:#94a3b8;">데이터가 없습니다.</div>`;
-              }
-              
-              const popup = document.createElement('div');
-              popup.className = 'preview-popup';
-              if(isNearTop) popup.classList.add('align-top'); 
-              popup.innerHTML = previewHtml;
-              bar.appendChild(popup);
-          };
-          
-          bar.onmouseleave = () => {
-              const popup = bar.querySelector('.preview-popup');
-              if(popup) popup.remove();
-          };
-
-          bar.onclick = () => {
-              sessionStorage.setItem('kac_last_viewed_menu_id', menu.dataId);
-              document.querySelectorAll('.menu-bar').forEach(b => b.classList.remove('last-viewed'));
-              bar.classList.add('last-viewed');
-
-              if(menu.link) window.open(menu.link, '_blank');
-              else location.href = `viewer_list.html?type=${type}&menu=${encodeURIComponent(menu.label)}&id=${menu.dataId}`;
-          };
-
-          let iconInner = `<span>${menu.line1 || ''}</span>`;
-          if(menu.line2) iconInner += `<span class="pill-sub">${menu.line2}</span>`;
-
-          let adminHtml = '';
-          if(isAdmin && !isPreview) {
-              adminHtml = `
-                <div class="admin-btns admin-only" onclick="event.stopPropagation()">
-                   <button class="btn-xs" style="color:#2563eb; border-color:#bfdbfe;" onclick="openMoveMenu(${idx})">이동</button>
-                   <button class="btn-xs" onclick="openEdit(${idx})">수정</button>
-                   <button class="btn-xs" style="color:#ef4444" onclick="deleteMenu(${idx})">삭제</button>
-                </div>
-              `;
-          }
-          
-          const linkIconHtml = menu.link ? 
-            `<svg class="ext-link-icon" viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z" /></svg>` 
-            : '';
-          
-          let badgeHtml = '';
-          if(isAdmin && !isVisible) {
-              badgeHtml = `<span style="font-size:10px; color:white; background:#ef4444; padding:2px 6px; border-radius:4px; font-weight:700; margin-left:5px;">비공개</span>`;
-          }
-
-          bar.innerHTML = `
-              <div class="last-viewed-icon">
-                <svg class="icon-pc" viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-                <svg class="icon-mobile" viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                <span>Last Viewed</span>
-              </div>
-              <div class="menu-pill-icon">${iconInner}</div>
-              <div class="menu-info">
-                  <div class="menu-title">
-                      ${menu.label}
-                      ${badgeHtml}
-                  </div>
-                  ${linkIconHtml}
-              </div>
-              ${adminHtml}
-          `;
-          container.appendChild(bar);
-      });
-
-      if(isAdmin && !isPreview) {
-          const addBtn = document.createElement('div');
-          addBtn.className = 'menu-bar add-menu-btn admin-only';
-          addBtn.innerHTML = '+ 새 메뉴 추가';
-          addBtn.onclick = () => openEdit('NEW');
-          container.appendChild(addBtn);
-      }
-  }
-  
-  function openMoveMenu(idx) {
-      currentEditIdx = idx;
-      const select = document.getElementById('moveTargetSelect');
-      select.innerHTML = '';
-      
-      const order = JSON.parse(localStorage.getItem('kac_index_order') || '[]');
-      let hasOption = false;
-
-      order.forEach(tid => {
-          if(!tid || tid === type) return; 
-          const style = JSON.parse(localStorage.getItem(`kac_style_${tid}`) || '{}');
-          const option = document.createElement('option');
-          option.value = tid;
-          option.textContent = style.name || tid;
-          select.appendChild(option);
-          hasOption = true;
-      });
-
-      if(!hasOption) {
-          alert("이동할 다른 시설 카테고리가 없습니다.");
-          return;
-      }
-      document.getElementById('moveMenuModal').style.display = 'flex';
-  }
-
-  function executeMoveMenu() {
-      const targetType = document.getElementById('moveTargetSelect').value;
-      if(!targetType) return;
-
-      const itemToMove = menus[currentEditIdx]; 
-      
-      menus.splice(currentEditIdx, 1);
-      localStorage.setItem(`kac_menu_${type}`, JSON.stringify(menus));
-
-      const targetMenus = JSON.parse(localStorage.getItem(`kac_menu_${targetType}`) || '[]');
-      targetMenus.push(itemToMove);
-      localStorage.setItem(`kac_menu_${targetType}`, JSON.stringify(targetMenus));
-
-      const oldKey = `kac_subs_${type}_${itemToMove.dataId}`;
-      const newKey = `kac_subs_${targetType}_${itemToMove.dataId}`;
-      const subsData = localStorage.getItem(oldKey);
-      
-      if(subsData) {
-          localStorage.setItem(newKey, subsData);
-          localStorage.removeItem(oldKey);
-      }
-
-      alert(`[${itemToMove.label}] 메뉴가 이동되었습니다.`);
-      closeModal('moveMenuModal');
-      render();
+    if(isAdmin) {
+        const addBtn = document.createElement('div');
+        addBtn.className = 'menu-bar';
+        addBtn.style.borderStyle = 'dashed';
+        addBtn.style.justifyContent = 'center';
+        addBtn.innerHTML = '+ 새 메뉴 추가';
+        addBtn.onclick = () => addNewMenu();
+        container.appendChild(addBtn);
+    }
   }
 
   function openEdit(idx) {
-      currentEditIdx = idx;
-      if(idx === 'NEW') {
-          document.getElementById('editItemLine1').value = '';
-          document.getElementById('editItemLine2').value = '';
-          document.getElementById('editItemLabel').value = '';
-          document.getElementById('editItemLink').value = '';
-          document.getElementById('editItemVisible').checked = true; // 기본값 공개
-      } else {
-          const m = menus[idx];
-          document.getElementById('editItemLine1').value = m.line1 || '';
-          document.getElementById('editItemLine2').value = m.line2 || '';
-          document.getElementById('editItemLabel').value = m.label || '';
-          document.getElementById('editItemLink').value = m.link || '';
-          document.getElementById('editItemVisible').checked = (m.visible !== false);
-      }
-      document.getElementById('itemEditModal').style.display = 'flex';
+    currentEditIdx = idx;
+    const m = currentCategory.menus[idx];
+    document.getElementById('editItemLabel').value = m.label;
+    document.getElementById('editItemLine1').value = m.line1;
+    document.getElementById('editItemLink').value = m.link || '';
+    document.getElementById('itemEditModal').style.display = 'flex';
   }
 
-  function saveIndividualEdit() {
-      const newItem = {
-          dataId: (currentEditIdx === 'NEW') ? 'id_' + Date.now() : menus[currentEditIdx].dataId,
-          line1: document.getElementById('editItemLine1').value,
-          line2: document.getElementById('editItemLine2').value,
-          label: document.getElementById('editItemLabel').value,
-          link: document.getElementById('editItemLink').value,
-          visible: document.getElementById('editItemVisible').checked // [추가] 공개 여부 저장
-      };
+  function applyEdit() {
+    const m = currentCategory.menus[currentEditIdx];
+    m.label = document.getElementById('editItemLabel').value;
+    m.line1 = document.getElementById('editItemLine1').value;
+    m.link = document.getElementById('editItemLink').value;
+    render();
+    closeModal('itemEditModal');
+    alert("임시 적용되었습니다. 최종 저장을 위해 설정 메뉴에서 [서버에 최종 저장]을 눌러주세요.");
+  }
 
-      if(!newItem.label) return alert("메뉴 명칭을 입력하세요.");
-
-      if(currentEditIdx === 'NEW') menus.push(newItem);
-      else menus[currentEditIdx] = newItem;
-
-      localStorage.setItem(`kac_menu_${type}`, JSON.stringify(menus));
-      render();
-      closeModal('itemEditModal');
+  function addNewMenu() {
+    const name = prompt("새 메뉴 명칭을 입력하세요.");
+    if(name) {
+        currentCategory.menus.push({ id: 'id_'+Date.now(), label: name, line1: 'NEW', subjects: [] });
+        render();
+    }
   }
 
   function deleteMenu(idx) {
-      if(confirm("정말 삭제하시겠습니까?")) {
-          menus.splice(idx, 1);
-          localStorage.setItem(`kac_menu_${type}`, JSON.stringify(menus));
-          render();
-      }
-  }
-  
-  function openBulkEdit() {
-      const container = document.getElementById('bulkRowContainer');
-      container.innerHTML = '';
-      const totalRows = Math.max(menus.length + 5, 20);
-      
-      for(let i=0; i<totalRows; i++) {
-          const m = menus[i] || {};
-          container.innerHTML += `
-            <div class="bulk-row">
-                <div>${i+1}</div>
-                <input class="bulk-input b-l1" value="${m.line1||''}">
-                <input class="bulk-input b-l2" value="${m.line2||''}">
-                <input class="bulk-input b-nm" value="${m.label||''}">
-                <input class="bulk-input b-lk" value="${m.link||''}">
-            </div>`;
-      }
-      document.getElementById('settingsModal').style.display = 'none';
-      document.getElementById('bulkEditModal').style.display = 'flex';
-  }
-  
-  function saveBulkData() {
-      const rows = document.querySelectorAll('.bulk-row');
-      const newMenus = [];
-      rows.forEach((row, idx) => {
-          const l1 = row.querySelector('.b-l1').value;
-          const label = row.querySelector('.b-nm').value;
-          if(l1 || label) {
-              const original = menus[idx] || {};
-              newMenus.push({
-                  dataId: original.dataId || 'id_'+Date.now()+'_'+idx,
-                  line1: l1,
-                  line2: row.querySelector('.b-l2').value,
-                  label: label,
-                  link: row.querySelector('.b-lk').value,
-                  visible: original.visible !== false // 일괄 수정 시 기존 visibility 유지
-              });
-          }
-      });
-      menus = newMenus;
-      localStorage.setItem(`kac_menu_${type}`, JSON.stringify(menus));
-      render();
-      closeModal('bulkEditModal');
-      alert("일괄 수정 완료");
+    if(confirm("정말 삭제하시겠습니까?")) {
+        currentCategory.menus.splice(idx, 1);
+        render();
+    }
   }
 
-  function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-  
+  async function saveAllToFirebase() {
+    if(!confirm("수정된 내용을 서버에 저장하시겠습니까?")) return;
+    try {
+        await db.ref('/').set(globalData);
+        alert("✅ 서버에 실시간 저장되었습니다!");
+    } catch(e) { alert("저장 실패: " + e.message); }
+  }
+
   function openSettings() {
-      const g = document.getElementById('guestSettings');
-      const a = document.getElementById('adminSettings');
-      g.style.display = isAdmin ? 'none' : 'block';
-      a.style.display = isAdmin ? 'block' : 'none';
-      
-      if(isAdmin) {
-          const iSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--icon-size-fac')) || 28;
-          const lSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--label-size-fac')) || 18;
-          const xPos = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--layout-x-pos')) || 0;
-          
-          document.getElementById('setFacIconSize').value = iSize;
-          document.getElementById('setFacLabelSize').value = lSize;
-          document.getElementById('setLayoutX').value = xPos;
-          document.getElementById('rangeLayoutX').value = xPos;
-          
-          const pBtn = document.getElementById('modalPreviewBtn');
-          pBtn.textContent = isPreview ? "미리보기 종료" : "미리보기 시작";
-          pBtn.className = isPreview ? "btn-modal btn-preview-active" : "btn-modal btn-secondary";
-      }
-      document.getElementById('settingsModal').style.display = 'flex';
+    document.getElementById('adminSettings').style.display = isAdmin ? 'block' : 'none';
+    document.getElementById('guestSettings').style.display = isAdmin ? 'none' : 'block';
+    document.getElementById('settingsModal').style.display = 'flex';
   }
-  
-  function updateLayoutPreview(val) {
-      document.getElementById('rangeLayoutX').value = val;
-      document.getElementById('setLayoutX').value = val;
-      document.documentElement.style.setProperty('--layout-x-pos', val + 'px');
+
+  async function toggleAdmin() {
+    const pw = prompt("관리자 비밀번호");
+    if(!pw) return;
+    const hash = await sha256(korToEng(pw).toUpperCase());
+    if(hash === globalData.security.admin_pw) {
+        localStorage.setItem('kac_admin_mode', '1');
+        location.reload();
+    } else { alert("비밀번호 불일치"); }
   }
-  
-  function saveUISettings() {
-      const iSize = document.getElementById('setFacIconSize').value;
-      const lSize = document.getElementById('setFacLabelSize').value;
-      const xPos = document.getElementById('setLayoutX').value;
-      
-      localStorage.setItem('kac_fac_icon_size', iSize);
-      localStorage.setItem('kac_fac_label_size', lSize);
-      localStorage.setItem('kac_fac_layout_x', xPos);
-      
-      loadUISettings();
-      closeModal('settingsModal');
-      alert("설정이 저장되었습니다.");
-  }
-  
-  function togglePreview() {
-      isPreview = !isPreview;
-      localStorage.setItem('kac_preview_active', isPreview ? '1' : '0');
-      document.body.classList.toggle('preview-active', isPreview);
-      render();
-      closeModal('settingsModal');
+
+  function logoutAdmin() {
+    localStorage.removeItem('kac_admin_mode');
+    location.reload();
   }
 
   async function sha256(message) {
@@ -1186,144 +313,8 @@ window.onscroll = resetInactivityTimer;
       return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
-  async function toggleAdmin() {
-      if(isAdmin) { 
-          if(confirm("로그아웃?")) { localStorage.setItem('kac_admin_mode','0'); location.reload(); }
-      } else {
-          const pw = prompt("관리자 비밀번호");
-if(!pw) return;
-const hash = await sha256(korToEng(pw).toUpperCase());
-          if(hash === storedHash) { localStorage.setItem('kac_admin_mode','1'); location.reload(); }
-          else alert("비밀번호 불일치");
-      }
-  }
-
-  function setTheme(m) { 
-      document.body.classList.toggle('dark-mode', m==='dark'); 
-      localStorage.setItem('kac_theme', m);
-      document.getElementById('btnDay').classList.toggle('active', m==='light'); 
-      document.getElementById('btnNight').classList.toggle('active', m==='dark'); 
-  }
-
-  // [추가] 모바일 전용 토글 함수
-  function toggleThemeMobile() {
-      const current = localStorage.getItem('kac_theme') || 'light';
-      setTheme(current === 'light' ? 'dark' : 'light');
-  }
-  
-  function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('active');
-      document.getElementById('sidebarOverlay').classList.toggle('active');
-  }
-  
-function renderSidebar() {
-      const content = document.getElementById('sidebarContent');
-      content.innerHTML = '';
-      const order = JSON.parse(localStorage.getItem('kac_index_order') || '[]');
-      
-      order.forEach(tid => {
-          if(!tid) return;
-          const style = JSON.parse(localStorage.getItem(`kac_style_${tid}`) || '{}');
-          const ms = JSON.parse(localStorage.getItem(`kac_menu_${tid}`) || '[]');
-          
-          // 접근 권한 및 사이드바 노출 여부 체크
-          const acc = style.access || { visible: true, adminOnly: false, showSidebar: true };
-          
-          // 일반 사용자: 비공개거나, 관리자 전용이거나, 사이드바 미노출이면 건너뜀
-          if (!isAdmin) {
-              if (!acc.visible || acc.adminOnly || !acc.showSidebar) return;
-          }
-
-          // 관리자: 숨겨진 카테고리는 흐리게 표시 (카테고리 자체 설정 유지)
-          const hiddenStyle = (isAdmin && (!acc.visible || acc.adminOnly || !acc.showSidebar)) ? 'opacity: 0.5;' : '';
-
-          let subHtml = '';
-          if(ms.length > 0) {
-              subHtml = `<div class="sb-sub-list" id="sb-${tid}">`;
-              ms.forEach(m => {
-                  const isMenuVisible = (m.visible !== undefined) ? m.visible : true;
-                  
-                  // [수정됨] 관리자(isAdmin)여도 isMenuVisible이 false면 사이드바에 표시하지 않음
-                  if(isMenuVisible) {
-                      subHtml += `<div class="sb-sub-item" onclick="location.href='viewer_list.html?type=${tid}&menu=${encodeURIComponent(m.label)}&id=${m.dataId}'">
-                          ${m.label}
-                      </div>`;
-                  }
-              });
-              subHtml += `</div>`;
-          }
-
-          // 하위 메뉴가 하나도 없으면(모두 비공개면) 카테고리만 덩그러니 남을 수 있으므로 체크
-          // (원하시면 하위 메뉴 없는 카테고리도 숨기는 로직 추가 가능하지만, 일단 요청하신 '비공개 메뉴 미표시'만 적용)
-          
-          const item = document.createElement('div');
-          item.innerHTML = `
-            <div class="sb-item ${tid===type?'active':''}" onclick="toggleSub('${tid}')" style="${hiddenStyle}">
-                <span style="display:flex;align-items:center;gap:10px;">
-                    <span style="width:10px;height:10px;border-radius:50%;background:${style.color}"></span>
-                    ${style.name} ${hiddenStyle ? '<span style="font-size:10px;">(숨김)</span>' : ''}
-                </span>
-                <span>${ms.length>0 ? '▼' : ''}</span>
-            </div>
-            ${subHtml}
-          `;
-          content.appendChild(item);
-      });
-  }
-  
-  function toggleSub(id) {
-      const el = document.getElementById(`sb-${id}`);
-      if(el) el.classList.toggle('open');
-  }
-
-  let searchIndex = [];
-  function buildSearchIndex() {
-      searchIndex = [];
-      const order = JSON.parse(localStorage.getItem('kac_index_order') || '[]');
-      order.forEach(tid => {
-          if(!tid) return;
-          const s = JSON.parse(localStorage.getItem(`kac_style_${tid}`) || '{}');
-          const ms = JSON.parse(localStorage.getItem(`kac_menu_${tid}`) || '[]');
-          ms.forEach(m => {
-              const subs = JSON.parse(localStorage.getItem(`kac_subs_${tid}_${m.dataId}`) || '[]');
-              subs.forEach(sub => {
-                  searchIndex.push({ 
-                      name: sub.name, type: tid, code: s.code, typeName: s.name, 
-                      menuName: m.label, menuId: m.dataId, subId: sub.id, color: s.color 
-                  });
-              });
-          });
-      });
-  }
-
-  const sInput = document.getElementById('searchInput');
-  const sRes = document.getElementById('searchDropdown');
-  const sOverlay = document.getElementById('searchOverlay');
-  
-  sInput.onfocus = () => { 
-      document.body.classList.add('search-mode'); 
-      sOverlay.classList.add('active'); 
-      if(sInput.value) sRes.classList.add('active'); 
-  };
-  
-  sOverlay.onclick = () => { 
-      document.body.classList.remove('search-mode'); 
-      sOverlay.classList.remove('active'); 
-      sRes.classList.remove('active'); 
-  };
-  
-  sInput.oninput = (e) => {
-    const q = e.target.value.toLowerCase().trim();
-    if(!q) { sRes.classList.remove('active'); return; }
-    const matches = searchIndex.filter(i => i.name.toLowerCase().includes(q));
-    sRes.innerHTML = matches.map(i => `
-      <div class="result-item" onclick="location.href='viewer_list.html?type=${i.type}&menu=${encodeURIComponent(i.menuName)}&id=${i.menuId}&autoOpen=${i.subId}'">
-        <div><div class="res-title">${i.name}</div><div class="res-path">${i.typeName} > ${i.menuName}</div></div>
-        <div class="res-tag" style="background:${i.color}">${i.code}</div>
-      </div>
-    `).join('') || '<div style="padding:15px; text-align:center;">결과 없음</div>';
-    sRes.classList.add('active');
-  };
+  function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+  function hexToRgb(hex) { /* 생략(CSS 변수용) */ }
 
   init();
 </script>
