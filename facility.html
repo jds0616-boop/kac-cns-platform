@@ -1172,8 +1172,8 @@ window.onscroll = resetInactivityTimer;
           if(confirm("로그아웃?")) { localStorage.setItem('kac_admin_mode','0'); location.reload(); }
       } else {
           const pw = prompt("관리자 비밀번호");
-          if(!pw) return;
-          const hash = await sha256(pw);
+if(!pw) return;
+const hash = await sha256(pw.toUpperCase()); // 대문자로 변환하여 비교
           if(hash === storedHash) { localStorage.setItem('kac_admin_mode','1'); location.reload(); }
           else alert("비밀번호 불일치");
       }
