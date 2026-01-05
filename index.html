@@ -678,20 +678,27 @@
 
 // ✅ 여기 붙여넣기
 async function ensureAnonAuth() {
-  if (firebase.auth().currentUser) return;
+  try {
+    // 이미 로그인 되어 있으면 끝
+    if (firebase.auth().currentUser) return;
 
-  await new Promise((resolve) => {
-    const unsub = firebase.auth().onAuthStateChanged((user) => {
-      if (user) { unsub(); resolve(); }
-    });
-    if (firebase.auth().currentUser) { unsub(); resolve(); }
-  }).catch(()=>{});
-
-  if (!firebase.auth().currentUser) {
+    // ✅ 먼저 익명 로그인 시도 (핵심)
     await firebase.auth().signInAnonymously();
+
+    // ✅ user가 실제로 잡힐 때까지 짧게 대기 (안전장치)
+    await new Promise((resolve) => {
+      const unsub = firebase.auth().onAuthStateChanged((user) => {
+        if (user) { unsub(); resolve(); }
+      });
+      // 혹시 이벤트가 늦으면 2초 후 그냥 빠져나오게 (무한로딩 방지)
+      setTimeout(() => { try { unsub(); } catch(e) {} resolve(); }, 2000);
+    });
+
+  } catch (e) {
+    console.error("ensureAnonAuth 실패:", e);
+    // 무한로딩 방지: 실패해도 init이 진행되게 함
   }
 }
-
 
 async function init() {
   // ✅ 1) 페이지 시작하자마자 인증 보장
