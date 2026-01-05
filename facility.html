@@ -3,6 +3,32 @@
 <html lang="ko">
 <head>
 <script>
+
+// --- [활동 감지 자동 로그아웃 로직] ---
+let inactivityTimer;
+
+function resetInactivityTimer() {
+    clearTimeout(inactivityTimer);
+    // 1시간(3600000ms) 동안 아무 동작이 없으면 로그아웃 실행
+    inactivityTimer = setTimeout(forceLogout, 3600000); 
+}
+
+function forceLogout() {
+    alert("1시간 동안 활동이 없어 보안을 위해 로그아웃됩니다.");
+    sessionStorage.clear();
+    localStorage.removeItem('kac_login_time'); // 자동 로그인 기록 삭제
+    location.replace('login.html');
+}
+
+// 사용자 활동(마우스 이동, 클릭, 키보드 입력, 터치) 감지 시 타이머 리셋
+window.onload = resetInactivityTimer;
+window.onmousemove = resetInactivityTimer;
+window.onmousedown = resetInactivityTimer;
+window.ontouchstart = resetInactivityTimer;
+window.onclick = resetInactivityTimer;
+window.onkeypress = resetInactivityTimer;
+window.onscroll = resetInactivityTimer;
+// ------------------------------------------
   // [보안] 로그인 세션 체크
   if(sessionStorage.getItem('kac_access_token') !== 'granted') {
     alert("로그인이 필요합니다.");
