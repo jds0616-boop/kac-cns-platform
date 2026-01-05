@@ -846,9 +846,9 @@
       "code": "Q",
       "color": "#2563eb",
       "access": {
-        "visible": true,
+        "visible": false,
         "adminOnly": false,
-        "showSidebar": true
+        "showSidebar": false
       },
       "menus": [
         {
