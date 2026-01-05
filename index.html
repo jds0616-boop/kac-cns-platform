@@ -719,6 +719,18 @@ async function init() {
     const snapshot = await db.ref('/').once('value');
     if (snapshot.exists()) {
       serverData = snapshot.val();
+// ✅ Firebase에서 내려온 categories가 {0:...,1:...} 형태일 수 있어 배열로 정리
+function normalizeArray(v) {
+  if (Array.isArray(v)) return v;
+  if (v && typeof v === 'object') return Object.values(v);
+  return [];
+}
+
+serverData = serverData || {};
+serverData.categories = normalizeArray(serverData.categories).filter(Boolean);
+serverData.config = serverData.config || {};
+serverData.security = serverData.security || {};
+serverData.meta = serverData.meta || {};
 function normalizeArray(v) {
   if (Array.isArray(v)) return v;
   if (v && typeof v === 'object') return Object.values(v);
