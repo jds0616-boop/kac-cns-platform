@@ -764,17 +764,18 @@
               // 현재 페이지에 해당하는 카테고리(type) 찾기
               const cat = serverData.categories ? serverData.categories.find(c => c && c.id === type) : null;
               
-              if(cat) {
-                   // 서버 데이터를 로컬 스토리지에 최신화 (편집을 위해)
-                   // 1. 메뉴 리스트 저장
-                   localStorage.setItem(`kac_menu_${type}`, JSON.stringify(cat.menus.map(m=>({
-                       dataId: m.id, 
-                       label: m.label, 
-                       line1: m.line1, 
-                       line2: m.line2, 
-                       link: m.link,
-                       visible: m.visible !== false 
-                   }))));
+ if(cat) {
+     // [수정] cat.menus 뒤에 || [] 추가
+     const safeMenus = cat.menus || [];
+
+     localStorage.setItem(`kac_menu_${type}`, JSON.stringify(safeMenus.map(m=>({
+         dataId: m.id, 
+         label: m.label, 
+         line1: m.line1, 
+         line2: m.line2, 
+         link: m.link,
+         visible: m.visible !== false 
+     }))));
                    
                    // 2. 스타일/접근권한 저장
                    localStorage.setItem(`kac_style_${type}`, JSON.stringify({
@@ -786,9 +787,9 @@
                    
                    // 3. 하위 과목들 저장
                    if(cat.menus) {
-                       cat.menus.forEach(m => {
-                           if(m.subjects) {
-                               localStorage.setItem(`kac_subs_${type}_${m.id}`, JSON.stringify(m.subjects));
+     safeMenus.forEach(m => {
+         if(m.subjects) {
+             localStorage.setItem(`kac_subs_${type}_${m.id}`, JSON.stringify(m.subjects));
                            }
                        });
                    }

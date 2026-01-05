@@ -887,46 +887,56 @@ async function init() {
     }
   }
 
-  function syncToLocalStorage(data) {
-    const order = [];
-    data.categories.forEach(cat => {
-      if(cat) {
-        order.push(cat.id);
-        const access = cat.access || { visible: true, adminOnly: false, showSidebar: true };
-        localStorage.setItem(`kac_style_${cat.id}`, JSON.stringify({ name: cat.name, code: cat.code, color: cat.color, access: access }));
-        
-        // [수정] 서버에서 가져온 메뉴 데이터 저장 시 visible 속성 포함
-        const menus = cat.menus.map(m => ({ 
-            dataId: m.id, 
-            label: m.label, 
-            line1: m.line1, 
-            line2: m.line2, 
-            link: m.link,
-            visible: (m.visible !== undefined) ? m.visible : true // 기본값 true
-        }));
-        localStorage.setItem(`kac_menu_${cat.id}`, JSON.stringify(menus));
-        
-        cat.menus.forEach(m => { localStorage.setItem(`kac_subs_${cat.id}_${m.id}`, JSON.stringify(m.subjects)); });
-      } else {
-        order.push(null);
-      }
-    });
-    localStorage.setItem('kac_index_order', JSON.stringify(order));
-    
-    if(data.config) {
-        localStorage.setItem('kac_idx_icon_size', data.config.iconSize);
-        localStorage.setItem('kac_idx_label_size', data.config.labelSize);
-        if(data.config.pageTitles) {
-            localStorage.setItem('kac_page_titles', JSON.stringify(data.config.pageTitles));
-        }
-        if(data.config.footerText) {
-            localStorage.setItem('kac_full_footer', data.config.footerText);
-        }
-        if(data.config.contentTop) {
-            localStorage.setItem('kac_content_top', data.config.contentTop);
-        }
+function syncToLocalStorage(data) {
+  const order = [];
+  
+  if (!data.categories) return; // 데이터가 없으면 중단
+
+  data.categories.forEach(cat => {
+    if(cat) {
+      order.push(cat.id);
+      const access = cat.access || { visible: true, adminOnly: false, showSidebar: true };
+      localStorage.setItem(`kac_style_${cat.id}`, JSON.stringify({ name: cat.name, code: cat.code, color: cat.color, access: access }));
+      
+      // [핵심 수정] cat.menus가 없으면 빈 배열([])을 사용하도록 (|| []) 추가
+      const safeMenus = cat.menus || []; 
+
+      const menuList = safeMenus.map(m => ({ 
+          dataId: m.id, 
+          label: m.label, 
+          line1: m.line1, 
+          line2: m.line2, 
+          link: m.link,
+          visible: (m.visible !== undefined) ? m.visible : true
+      }));
+      localStorage.setItem(`kac_menu_${cat.id}`, JSON.stringify(menuList));
+      
+      // 여기도 safeMenus 사용
+      safeMenus.forEach(m => { 
+          if(m.subjects) {
+              localStorage.setItem(`kac_subs_${cat.id}_${m.id}`, JSON.stringify(m.subjects)); 
+          }
+      });
+    } else {
+      order.push(null);
     }
+  });
+  localStorage.setItem('kac_index_order', JSON.stringify(order));
+  
+  if(data.config) {
+      localStorage.setItem('kac_idx_icon_size', data.config.iconSize);
+      localStorage.setItem('kac_idx_label_size', data.config.labelSize);
+      if(data.config.pageTitles) {
+          localStorage.setItem('kac_page_titles', JSON.stringify(data.config.pageTitles));
+      }
+      if(data.config.footerText) {
+          localStorage.setItem('kac_full_footer', data.config.footerText);
+      }
+      if(data.config.contentTop) {
+          localStorage.setItem('kac_content_top', data.config.contentTop);
+      }
   }
+}
 
   function applyConfig(cfg) {
     if(!cfg) return;
