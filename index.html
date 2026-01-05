@@ -693,23 +693,31 @@ async function ensureAnonAuth() {
 }
 
 
-  async function init() {
-  await ensureAnonAuth();   // ← ⭐ 이 줄을 맨 위에 추가 ⭐
-    setTheme(localStorage.getItem('kac_theme') || 'light');
-    if(isPreview) document.body.classList.add('preview-active');
+async function init() {
+  // ✅ 1) 페이지 시작하자마자 인증 보장
+  await ensureAnonAuth();
 
-    const isAdminSession = localStorage.getItem('kac_admin_mode') === '1';
+  setTheme(localStorage.getItem('kac_theme') || 'light');
+  if (isPreview) document.body.classList.add('preview-active');
 
-    let serverData = null;
-    try {
-       // [변경] data.json 파일 대신 서버 DB에서 전체 데이터를 가져옴
+  const isAdminSession = localStorage.getItem('kac_admin_mode') === '1';
+
+  let serverData = null;
+
+  try {
+    // ✅ 2) DB 읽기 직전에도 한 번 더 보장(안전)
+    await ensureAnonAuth();
+
+    // [Firebase] 루트 데이터 로드
     const snapshot = await db.ref('/').once('value');
-    if(snapshot.exists()) {
-        serverData = snapshot.val(); // 파일에서 읽던 데이터를 서버 데이터로 대체
+    if (snapshot.exists()) {
+      serverData = snapshot.val();
     }
-    } catch(e) { console.log("Firebase 서버 데이터 로드 실패");
-   }
-    const hasLocalData = localStorage.getItem('kac_index_order');
+  } catch (e) {
+    console.log("Firebase 서버 데이터 로드 실패", e);
+  }
+
+  const hasLocalData = localStorage.getItem('kac_index_order'); // 맞는지 확인
 
     if (isAdminSession && hasLocalData) {
         console.log("🛠️ 관리자 모드: 로컬 편집 데이터를 복원합니다.");
