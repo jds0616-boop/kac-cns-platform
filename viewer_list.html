@@ -6,6 +6,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>과목 리스트 - KAC CNS Training Platform</title>
 <script>
+// 한글 입력(두벌식)을 영어 키보드 배열로 변환하는 함수
+function korToEng(str) {
+    const kor = "ㅂㅈㄷㄱㅅㅛㅕㅑㅐㅔㅁㄴㅇㄹㅎㅗㅓㅏㅣㅋㅌㅊㅍㅠㅜㅡ";
+    const eng = "qwertyuiopasdfghjklzxcvbnm";
+    let result = "";
+    for (let i = 0; i < str.length; i++) {
+        const char = str[i];
+        const index = kor.indexOf(char);
+        if (index !== -1) {
+            result += eng[index];
+        } else {
+            result += char;
+        }
+    }
+    return result;
+}
+
+
 // --- [활동 감지 자동 로그아웃 로직] ---
 let inactivityTimer;
 
@@ -1108,7 +1126,7 @@ function renderSidebar() {
         if(confirm("로그아웃?")) { localStorage.setItem('kac_admin_mode','0'); location.reload(); } 
     } else { 
         const pw = prompt("비밀번호"); if(!pw) return;
-        const inputHash = await sha256(pw.toUpperCase());
+        const inputHash = await sha256(korToEng(pw).toUpperCase());
         const storedHash = globalSecurity.admin_pw;
         if(inputHash === storedHash) { localStorage.setItem('kac_admin_mode','1'); location.reload(); } 
         else alert('비밀번호 불일치');
@@ -1383,7 +1401,7 @@ function renderSidebar() {
     const input = prompt("삭제하려면 관리자 비밀번호를 입력하세요.");
     if (!input) return;
 
-    const inputHash = await sha256(input.toUpperCase());
+    const inputHash = await sha256(korToEng(input).toUpperCase());
     const targetHash = globalSecurity.admin_pw;
 
     if(inputHash === targetHash) {

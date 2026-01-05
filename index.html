@@ -7,6 +7,23 @@
 <title>KAC CNS Training Platform</title>
 <script>
 
+// 한글 입력(두벌식)을 영어 키보드 배열로 변환하는 함수
+function korToEng(str) {
+    const kor = "ㅂㅈㄷㄱㅅㅛㅕㅑㅐㅔㅁㄴㅇㄹㅎㅗㅓㅏㅣㅋㅌㅊㅍㅠㅜㅡ";
+    const eng = "qwertyuiopasdfghjklzxcvbnm";
+    let result = "";
+    for (let i = 0; i < str.length; i++) {
+        const char = str[i];
+        const index = kor.indexOf(char);
+        if (index !== -1) {
+            result += eng[index];
+        } else {
+            result += char;
+        }
+    }
+    return result;
+}
+
 // --- [활동 감지 자동 로그아웃 로직] ---
 let inactivityTimer;
 
@@ -1592,10 +1609,11 @@ function renderSidebar() {
 
 async function executePwChange() {
     const target = document.getElementById('pwTarget').value;
-    // 1차 입력값 (대문자 변환)
-    const newPw = document.getElementById('newPw').value.trim().toUpperCase();
-    // 2차 입력값 (대문자 변환) - 이제 prompt가 아닌 input에서 가져옵니다.
-    const confirmPw = document.getElementById('newPwConfirm').value.trim().toUpperCase();
+    let newPwRaw = document.getElementById('newPw').value.trim();
+let confirmPwRaw = document.getElementById('newPwConfirm').value.trim();
+
+const newPw = korToEng(newPwRaw).toUpperCase();
+const confirmPw = korToEng(confirmPwRaw).toUpperCase();
 
     if(!newPw) return alert("변경할 비밀번호를 입력하세요.");
     

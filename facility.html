@@ -4,6 +4,25 @@
 <head>
 <script>
 
+// 한글 입력(두벌식)을 영어 키보드 배열로 변환하는 함수
+function korToEng(str) {
+    const kor = "ㅂㅈㄷㄱㅅㅛㅕㅑㅐㅔㅁㄴㅇㄹㅎㅗㅓㅏㅣㅋㅌㅊㅍㅠㅜㅡ";
+    const eng = "qwertyuiopasdfghjklzxcvbnm";
+    let result = "";
+    for (let i = 0; i < str.length; i++) {
+        const char = str[i];
+        const index = kor.indexOf(char);
+        if (index !== -1) {
+            result += eng[index];
+        } else {
+            result += char;
+        }
+    }
+    return result;
+}
+
+
+
 // --- [활동 감지 자동 로그아웃 로직] ---
 let inactivityTimer;
 
@@ -1173,7 +1192,7 @@ window.onscroll = resetInactivityTimer;
       } else {
           const pw = prompt("관리자 비밀번호");
 if(!pw) return;
-const hash = await sha256(pw.toUpperCase()); // 대문자로 변환하여 비교
+const hash = await sha256(korToEng(pw).toUpperCase());
           if(hash === storedHash) { localStorage.setItem('kac_admin_mode','1'); location.reload(); }
           else alert("비밀번호 불일치");
       }
