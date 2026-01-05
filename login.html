@@ -71,63 +71,90 @@
     <div id="msg" class="message"></div>
   </div>
 
-  <script>
-    // SHA-256 암호화 함수
+<script>
+    // 1. Firebase 설정
+    const firebaseConfig = {
+      apiKey: "AIzaSyAUt6WqxWjRoB9xgAWXq2YhVMQutaOZCBc",
+      authDomain: "catc-dfb9a.firebaseapp.com",
+      databaseURL: "https://catc-dfb9a-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "catc-dfb9a",
+      storageBucket: "catc-dfb9a.firebasestorage.app",
+      messagingSenderId: "669905270724",
+      appId: "1:669905270724:web:c89fcc1d9c8f81b3071691"
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // 2. 한영 변환 도구 (필수!)
+    function korToEng(str) {
+        const kor = "ㅂㅈㄷㄱㅅㅛㅕㅑㅐㅔㅁㄴㅇㄹㅎㅗㅓㅏㅣㅋㅌㅊㅍㅠㅜㅡ";
+        const eng = "qwertyuiopasdfghjklzxcvbnm";
+        let result = "";
+        if(!str) return "";
+        for (let i = 0; i < str.length; i++) {
+            const char = str[i];
+            const index = kor.indexOf(char);
+            if (index !== -1) result += eng[index];
+            else result += char;
+        }
+        return result;
+    }
+
+    // 3. SHA-256 암호화
     async function sha256(message) {
         const msgBuffer = new TextEncoder().encode(message);
         const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
         return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
+    // 4. 로그인 함수 (문법 오류 수정됨)
     async function tryLogin() {
-        const input = document.getElementById('pwInput').value.trim().toUpperCase();
+        const rawInput = document.getElementById('pwInput').value.trim();
         const msgBox = document.getElementById('msg');
         
-        if(!input) {
+        if(!rawInput) {
             msgBox.textContent = "비밀번호를 입력해주세요.";
             return;
         }
 
+        // 대소문자 및 한영키 보정
+        const input = korToEng(rawInput).toUpperCase();
         msgBox.style.color = "#94a3b8";
         msgBox.textContent = "인증 확인 중...";
 
-try {
-        // 서버 DB에서 암호화된 비번 가져오기
-        const snapshot = await db.ref('security/entry_pw').once('value');
-        const serverHash = snapshot.val();
-        
-        // 사용자가 입력한 비번을 한영변환+대문자화해서 암호화하기
-        const inputHash = await sha256(korToEng(input).toUpperCase());
-
-        if(inputHash === serverHash) {
-            // 서버에 "익명 손님"으로 등록 (보안 규칙 통과용)
-            await firebase.auth().signInAnonymously(); 
+        try {
+            // 서버에서 비번 가져오기
+            const snapshot = await db.ref('security/entry_pw').once('value');
+            const serverHash = snapshot.val();
             
-            msgBox.style.color = "#4ade80";
-            msgBox.textContent = "접속 성공!";
-            localStorage.setItem('kac_login_time', new Date().getTime());
-            sessionStorage.setItem('kac_access_token', 'granted');
-            setTimeout(() => location.replace('index.html'), 500);
-        } else {
-            throw new Error("비밀번호 불일치");
-        }
-    } catch(e) {
-        msgBox.style.color = "#ef4444";
-        msgBox.textContent = "비밀번호가 올바르지 않습니다.";
-    }
+            // 입력한 비번 암호화
+            const inputHash = await sha256(input);
+
+            if(inputHash === serverHash) {
+                // 익명 인증 승인 (보안규칙 통과용)
+                await firebase.auth().signInAnonymously(); 
+                
+                msgBox.style.color = "#4ade80";
+                msgBox.textContent = "접속 성공! 이동합니다...";
+                localStorage.setItem('kac_login_time', new Date().getTime());
+                sessionStorage.setItem('kac_access_token', 'granted');
+                setTimeout(() => location.replace('index.html'), 500);
+            } else {
+                throw new Error("비밀번호가 일치하지 않습니다.");
+            }
         } catch(e) {
             msgBox.style.color = "#ef4444";
-            msgBox.textContent = e.message === "Failed to fetch" ? "데이터 파일을 찾을 수 없습니다." : "비밀번호가 올바르지 않습니다.";
+            msgBox.textContent = "비밀번호가 올바르지 않습니다.";
             document.getElementById('pwInput').value = '';
             document.getElementById('pwInput').focus();
         }
     }
     
-    // 자동 로그인 체크
     window.onload = function() {
         const loginTime = localStorage.getItem('kac_login_time');
         const now = new Date().getTime();
-        const expiry = 5 * 60 * 60 * 1000; // 5시간
+        const expiry = 1 * 60 * 60 * 1000; 
 
         if(loginTime && (now - loginTime < expiry)) {
             sessionStorage.setItem('kac_access_token', 'granted');
