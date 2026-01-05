@@ -656,6 +656,18 @@
   let currentTreeSelection = null; 
 
   async function init() {
+  // [추가] 입장 시 딱 한 번만 자동 초기화 실행 로직
+  if (!sessionStorage.getItem('kac_auto_reset_flag')) {
+      // 1. 로컬에 저장된 모든 편집용 데이터를 삭제 (버튼 기능과 동일)
+      localStorage.clear(); 
+      
+      // 2. 초기화가 실행되었다는 표시를 세션에 기록 (새로고침 시 재실행 방지)
+      sessionStorage.setItem('kac_auto_reset_flag', 'true');
+      
+      // 3. 데이터를 지운 상태로 페이지를 다시 로드하여 서버(data.json) 값을 가져옴
+      location.reload(); 
+      return; // 리로드 전까지 아래 코드는 실행하지 않음
+  }
     setTheme(localStorage.getItem('kac_theme') || 'light');
     if(isPreview) document.body.classList.add('preview-active');
 
