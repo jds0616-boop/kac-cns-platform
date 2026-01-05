@@ -1230,19 +1230,30 @@ function renderSidebar() {
 
   function buildSearchIndex() {
     searchIndex = [];
+    
+    // globalData나 categories가 없으면 그냥 종료 (에러 방지)
+    if (!globalData || !globalData.categories) return;
+
     globalData.categories.forEach(cat => {
       if(!cat) return;
+      
       const acc = cat.access || { visible: true, adminOnly: false, showSidebar: true };
       if (!isAdmin) {
           if (!acc.visible || acc.adminOnly) return;
       }
 
-      cat.menus.forEach(menu => {
-        // [수정] 검색 인덱스 생성 시에도 메뉴의 visible 속성 체크
+      // [핵심 수정 1] menus가 없으면 빈 배열([])로 처리하여 forEach 에러 방지
+      const safeMenus = cat.menus || [];
+
+      safeMenus.forEach(menu => {
+        // 메뉴의 visible 속성 체크
         const isMenuVisible = (menu.visible !== undefined) ? menu.visible : true;
         if(!isAdmin && !isMenuVisible) return;
 
-        menu.subjects.forEach(sub => {
+        // [핵심 수정 2] subjects가 없으면 빈 배열([])로 처리
+        const safeSubjects = menu.subjects || [];
+
+        safeSubjects.forEach(sub => {
           searchIndex.push({
             name: sub.name, type: cat.id, code: cat.code, typeName: cat.name,
             menuName: menu.label, menuId: menu.id, subId: sub.id, color: cat.color, active: sub.active
@@ -1251,7 +1262,6 @@ function renderSidebar() {
       });
     });
   }
-
   const searchInput = document.getElementById('mainSearch');
   const searchRes = document.getElementById('searchResults');
   const sOverlay = document.getElementById('searchOverlay');
