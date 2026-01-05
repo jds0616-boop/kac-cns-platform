@@ -1589,6 +1589,8 @@ function renderSidebar() {
       const newPw = document.getElementById('newPw').value.trim().toUpperCase();
       if(!newPw) return alert("변경할 비밀번호를 입력하세요.");
       const confirmPw = prompt(`[${target==='entry'?'교육생':'관리자'} 비밀번호]를 변경하시겠습니까?\n확인을 위해 새 비밀번호를 다시 입력해주세요.`);
+// confirmPw 뒤에 .trim().toUpperCase() 를 추가합니다.
+if(!confirmPw || newPw !== confirmPw.trim().toUpperCase()) return alert("비밀번호가 일치하지 않습니다.");
       if(newPw !== confirmPw) return alert("비밀번호가 일치하지 않습니다.");
 
       const newHash = await sha256(newPw);
