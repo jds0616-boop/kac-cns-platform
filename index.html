@@ -676,7 +676,25 @@
   // 종합 관리용 변수
   let currentTreeSelection = null; 
 
+// ✅ 여기 붙여넣기
+async function ensureAnonAuth() {
+  if (firebase.auth().currentUser) return;
+
+  await new Promise((resolve) => {
+    const unsub = firebase.auth().onAuthStateChanged((user) => {
+      if (user) { unsub(); resolve(); }
+    });
+    if (firebase.auth().currentUser) { unsub(); resolve(); }
+  }).catch(()=>{});
+
+  if (!firebase.auth().currentUser) {
+    await firebase.auth().signInAnonymously();
+  }
+}
+
+
   async function init() {
+  await ensureAnonAuth();   // ← ⭐ 이 줄을 맨 위에 추가 ⭐
     setTheme(localStorage.getItem('kac_theme') || 'light');
     if(isPreview) document.body.classList.add('preview-active');
 
