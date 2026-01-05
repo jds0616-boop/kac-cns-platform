@@ -682,95 +682,94 @@ function normalizeArray(v) {
   // 종합 관리용 변수
   let currentTreeSelection = null; 
 
-// ✅ 여기 붙여넣기
+// [수정 1] 인증 및 초기화 로직 강화
 async function ensureAnonAuth() {
-  try {
-    // 이미 로그인 되어 있으면 끝
-    if (firebase.auth().currentUser) return;
-
-    // ✅ 먼저 익명 로그인 시도 (핵심)
-    await firebase.auth().signInAnonymously();
-
-    // ✅ user가 실제로 잡힐 때까지 짧게 대기 (안전장치)
-    await new Promise((resolve) => {
-      const unsub = firebase.auth().onAuthStateChanged((user) => {
-        if (user) { unsub(); resolve(); }
+  return new Promise((resolve, reject) => {
+    // 이미 로그인 상태면 통과
+    if (firebase.auth().currentUser) {
+      resolve(); 
+      return;
+    }
+    // 아니면 익명 로그인 시도
+    firebase.auth().signInAnonymously()
+      .then(() => {
+        // 로그인 상태 변화 감지될 때까지 잠시 대기
+        const unsub = firebase.auth().onAuthStateChanged((user) => {
+          if (user) { unsub(); resolve(); }
+        });
+      })
+      .catch((error) => {
+        console.error("익명 로그인 실패:", error);
+        // 실패해도 로컬 데이터로라도 띄우기 위해 resolve 처리
+        resolve();
       });
-      // 혹시 이벤트가 늦으면 2초 후 그냥 빠져나오게 (무한로딩 방지)
-      setTimeout(() => { try { unsub(); } catch(e) {} resolve(); }, 2000);
-    });
-
-  } catch (e) {
-    console.error("ensureAnonAuth 실패:", e);
-    // 무한로딩 방지: 실패해도 init이 진행되게 함
-  }
+  });
 }
 
 async function init() {
-  // ✅ 0) 익명 로그인(권한) 확보
+  // 1. 로딩 표시
+  const spinner = document.getElementById('loadingSpinner');
+  if(spinner) spinner.style.display = 'flex';
+
+  // 2. 익명 권한 획득 (DB 읽기 위해 필수)
   await ensureAnonAuth();
 
-  // ✅ 1) 테마/미리보기 적용
+  // 3. 테마 적용
   setTheme(localStorage.getItem('kac_theme') || 'light');
   if (isPreview) document.body.classList.add('preview-active');
+  if (isAdmin) document.body.classList.add('admin-mode');
 
-  const isAdminSession = localStorage.getItem('kac_admin_mode') === '1';
-  let serverData = null;
-
-  // ✅ 2) Firebase에서 전체 데이터 읽기
+  // 4. Firebase에서 데이터 가져오기
+  console.log("🔥 Firebase 데이터 로딩 시도...");
   try {
     const snapshot = await db.ref('/').once('value');
-    if (snapshot.exists()) serverData = snapshot.val();
+    if (snapshot.exists()) {
+      const serverData = snapshot.val();
+      console.log("✅ 서버 데이터 수신 성공");
+
+      // 서버 데이터가 있으면 globalData를 덮어씌움
+      globalData = serverData;
+      
+      // 데이터 배열 보정 (빈 구멍이나 null값 처리)
+      if (globalData.categories) {
+          globalData.categories = normalizeArray(globalData.categories);
+      } else {
+          globalData.categories = [];
+      }
+      
+      // 로컬 스토리지도 서버 데이터로 동기화 (새로고침 대비)
+      syncToLocalStorage(globalData);
+      
+      if(globalData.config) applyConfig(globalData.config);
+
+    } else {
+      console.log("⚠️ 서버에 데이터가 없습니다. (초기 상태)");
+      // 서버가 비어있으면 로컬 데이터 또는 기본값 사용
+      reconstructGlobalDataFromLocal();
+    }
   } catch (e) {
-    console.log("Firebase 서버 데이터 로드 실패", e);
-  }
-
-  // ✅ 3) Firebase categories는 {0:...,1:...} 형태로 올 수 있어 배열로 정리
-  if (serverData) {
-    serverData = serverData || {};
-    serverData.categories = normalizeArray(serverData.categories).filter(Boolean);
-    serverData.config = serverData.config || {};
-    serverData.security = serverData.security || {};
-    serverData.meta = serverData.meta || {};
-  }
-
-  const hasLocalData = localStorage.getItem('kac_index_order');
-
-  // ✅ 4) 관리자 모드: 로컬 편집본 우선 / 일반 사용자: 서버 데이터 강제 적용
-  if (isAdminSession && hasLocalData) {
-    console.log("🛠️ 관리자 모드: 로컬 편집 데이터를 복원합니다.");
-    reconstructGlobalDataFromLocal();
-    // 보안(비번)은 서버 것을 유지
-    if (serverData && serverData.security) globalData.security = serverData.security;
-  } else if (serverData) {
-    console.log("🔄 일반 사용자: 서버 데이터로 강제 업데이트합니다.");
-    globalData = serverData;
-    syncToLocalStorage(globalData);
-    applyConfig(globalData.config);
-  } else {
-    console.log("⚠️ 서버 데이터가 없어 로컬 데이터를 사용합니다.");
+    console.error("❌ 데이터 로드 실패(로컬 모드 진입):", e);
     reconstructGlobalDataFromLocal();
   }
 
-    const contentTop = localStorage.getItem('kac_content_top');
-    if(contentTop) {
-        document.querySelector('.content-wrapper').style.paddingTop = contentTop + 'px';
-    }
-
-    ensurePageSlots();
-    renderCards(false); 
-    buildSearchIndex();
-    renderSidebar(); 
-    
-    setTimeout(() => {
-      document.getElementById('loadingSpinner').style.opacity = '0';
-      setTimeout(() => document.getElementById('loadingSpinner').style.display='none', 500);
-    }, 500);
-
-    if(isAdmin) {
-        document.body.classList.add('admin-mode');
-    }
+  // 5. 화면 렌더링
+  const contentTop = localStorage.getItem('kac_content_top');
+  if(contentTop) {
+      document.querySelector('.content-wrapper').style.paddingTop = contentTop + 'px';
   }
+  
+  loadFooterText(); // 하단 문구 로드
+  ensurePageSlots(); // 빈 슬롯 채우기
+  renderCards(false); // 카드 그리기
+  buildSearchIndex(); // 검색엔진 생성
+  renderSidebar(); // 사이드바 생성
+  
+  // 로딩 종료
+  if(spinner) {
+      spinner.style.opacity = '0';
+      setTimeout(() => spinner.style.display='none', 500);
+  }
+}
   
   function loadFooterText() {
       let savedHtml = globalData.config.footerText;
@@ -1506,6 +1505,7 @@ function renderSidebar() {
       return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
+  // [수정 2] 관리자 로그인 (Firebase DB 비밀번호 대조)
   async function toggleAdmin() {
     if(isAdmin) {
       if(confirm("관리자 모드를 종료하시겠습니까?")) {
@@ -1513,16 +1513,30 @@ function renderSidebar() {
         location.reload();
       }
     } else {
-      const pw = prompt("관리자 비밀번호 입력");
+      const pw = prompt("관리자 비밀번호를 입력하세요");
       if(!pw) return;
-      const inputHash = await sha256(pw.toUpperCase());
-      const storedHash = globalData.security.admin_pw;
 
-      if(inputHash === storedHash) {
-        localStorage.setItem('kac_admin_mode','1');
-        location.reload();
-      } else {
-        alert("비밀번호 불일치");
+      try {
+          // 입력받은 비번 암호화
+          const inputHash = await sha256(pw.toUpperCase());
+          
+          // Firebase에서 관리자 비번 가져오기
+          const snapshot = await db.ref('security/admin_pw').once('value');
+          let serverHash = snapshot.val();
+          
+          // 서버에 비번 없으면 기본값(초기값) 사용 (CATC1234 해시)
+          if(!serverHash) serverHash = "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c";
+
+          if(inputHash === serverHash) {
+              alert("관리자 모드로 전환됩니다.");
+              localStorage.setItem('kac_admin_mode','1');
+              location.reload();
+          } else {
+              alert("비밀번호가 일치하지 않습니다.");
+          }
+      } catch(e) {
+          console.error(e);
+          alert("인증 오류가 발생했습니다. (인터넷 연결 확인)");
       }
     }
   }
@@ -1755,15 +1769,32 @@ function renderSidebar() {
   function setTheme(m) { document.body.className = m==='dark'?'dark-mode':''; localStorage.setItem('kac_theme', m); document.getElementById('btnDay').classList.toggle('active', m==='light'); document.getElementById('btnNight').classList.toggle('active', m==='dark'); }
 
   init();
-// [추가] 수정한 데이터를 Firebase 서버에 영구 저장하는 기능
+// [수정 3] 파이어베이스 저장 함수
 async function saveToFirebase() {
-    if(!confirm("현재 수정된 모든 내용을 Firebase 서버에 최종 저장하시겠습니까?")) return;
+    if(!isAdmin) return alert("관리자 권한이 필요합니다.");
+    if(!confirm("⚠️ 주의: 현재 화면의 모든 데이터를 서버에 덮어씁니다.\n\n계속하시겠습니까?")) return;
+
+    const btn = document.querySelector('.btn-success'); // 저장 버튼 찾기
+    const originalText = btn ? btn.innerText : "";
+    if(btn) btn.innerText = "저장 중...";
+
     try {
-        // globalData 변수에 담긴 현재 상태를 서버에 통째로 덮어씁니다.
-        await db.ref('/').set(globalData); 
-        alert("✅ 서버 저장 완료! 이제 모든 접속자에게 이 데이터가 보입니다.");
+        // 현재 로컬의 최신 상태를 globalData로 재구성
+        reconstructGlobalDataFromLocal();
+        
+        // 메타데이터 업데이트
+        globalData.meta = globalData.meta || {};
+        globalData.meta.lastUpdated = new Date().toISOString();
+
+        // 파이어베이스에 덮어쓰기
+        await db.ref('/').set(globalData);
+        
+        alert("✅ 서버 저장 완료!\n이제 다른 사람도 변경된 내용을 볼 수 있습니다.");
     } catch(e) {
-        alert("저장 실패: " + e.message);
+        console.error(e);
+        alert("❌ 저장 실패: " + e.message);
+    } finally {
+        if(btn) btn.innerText = originalText;
     }
 }
 
