@@ -602,10 +602,15 @@ window.onscroll = resetInactivityTimer;
         <option value="admin">관리자 (설정용) 비밀번호</option>
       </select>
     </div>
-    <div class="setting-group">
-      <label class="setting-label">새로운 비밀번호</label>
-      <input type="password" id="newPw" class="setting-input" placeholder="변경할 비밀번호 입력">
-    </div>
+<!-- 수정 후: 아래 내용을 추가하세요 -->
+<div class="setting-group">
+  <label class="setting-label">새로운 비밀번호</label>
+  <input type="password" id="newPw" class="setting-input" placeholder="변경할 비밀번호 입력">
+</div>
+<div class="setting-group">
+  <label class="setting-label">비밀번호 확인 (한 번 더 입력)</label>
+  <input type="password" id="newPwConfirm" class="setting-input" placeholder="비밀번호 재입력">
+</div>
     <div class="btn-row">
       <button class="btn-modal btn-primary" onclick="executePwChange()">변경 실행</button>
       <button class="btn-modal btn-secondary" onclick="document.getElementById('pwChangeModal').style.display='none'">취소</button>
@@ -1582,25 +1587,34 @@ function renderSidebar() {
       document.getElementById('settingsModal').style.display='none';
       document.getElementById('pwChangeModal').style.display='flex';
       document.getElementById('newPw').value = '';
+     document.getElementById('newPwConfirm').value = ''; // 이 줄을 추가하세요
   }
 
-  async function executePwChange() {
-      const target = document.getElementById('pwTarget').value;
-      const newPw = document.getElementById('newPw').value.trim().toUpperCase();
-      if(!newPw) return alert("변경할 비밀번호를 입력하세요.");
-      const confirmPw = prompt(`[${target==='entry'?'교육생':'관리자'} 비밀번호]를 변경하시겠습니까?\n확인을 위해 새 비밀번호를 다시 입력해주세요.`);
-// confirmPw 뒤에 .trim().toUpperCase() 를 추가합니다.
-if(!confirmPw || newPw !== confirmPw.trim().toUpperCase()) return alert("비밀번호가 일치하지 않습니다.");
-      if(newPw !== confirmPw) return alert("비밀번호가 일치하지 않습니다.");
+async function executePwChange() {
+    const target = document.getElementById('pwTarget').value;
+    // 1차 입력값 (대문자 변환)
+    const newPw = document.getElementById('newPw').value.trim().toUpperCase();
+    // 2차 입력값 (대문자 변환) - 이제 prompt가 아닌 input에서 가져옵니다.
+    const confirmPw = document.getElementById('newPwConfirm').value.trim().toUpperCase();
 
-      const newHash = await sha256(newPw);
-      if(target === 'entry') globalData.security.entry_pw = newHash;
-      else globalData.security.admin_pw = newHash;
+    if(!newPw) return alert("변경할 비밀번호를 입력하세요.");
+    
+    // 두 입력값이 일치하는지 확인
+    if(newPw !== confirmPw) {
+        alert("입력하신 두 비밀번호가 서로 일치하지 않습니다.");
+        return;
+    }
 
-      document.getElementById('pwChangeModal').style.display='none';
-      alert("✅ 비밀번호가 내부적으로 변경되었습니다.\n\n⚠️ 주의: [변경사항 저장] 또는 [GitHub 업로드]를 눌러야 완전히 적용됩니다!");
-      openSettings(); 
-  }
+    if(!confirm(`[${target==='entry'?'교육생':'관리자'}] 비밀번호를 정말로 변경하시겠습니까?`)) return;
+
+    const newHash = await sha256(newPw);
+    if(target === 'entry') globalData.security.entry_pw = newHash;
+    else globalData.security.admin_pw = newHash;
+
+    document.getElementById('pwChangeModal').style.display='none';
+    alert("✅ 비밀번호가 내부적으로 변경되었습니다.\n\n⚠️ 주의: [변경사항 저장] 또는 [GitHub 업로드]를 눌러야 완전히 적용됩니다!");
+    openSettings(); 
+}
 
   let tempSlotIdx = -1;
   function openEdit(id, slotIdx = -1) {
