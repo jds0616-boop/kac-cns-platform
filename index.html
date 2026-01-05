@@ -682,27 +682,27 @@ function normalizeArray(v) {
   // 종합 관리용 변수
   let currentTreeSelection = null; 
 
-// [수정 1] 인증 및 초기화 로직 강화
-async function ensureAnonAuth() {
-  return new Promise((resolve, reject) => {
-    // 이미 로그인 상태면 통과
-    if (firebase.auth().currentUser) {
-      resolve(); 
-      return;
-    }
-    // 아니면 익명 로그인 시도
-    firebase.auth().signInAnonymously()
-      .then(() => {
-        // 로그인 상태 변화 감지될 때까지 잠시 대기
-        const unsub = firebase.auth().onAuthStateChanged((user) => {
-          if (user) { unsub(); resolve(); }
-        });
-      })
-      .catch((error) => {
-        console.error("익명 로그인 실패:", error);
-        // 실패해도 로컬 데이터로라도 띄우기 위해 resolve 처리
+// [수정] 안전한 인증 확인 함수
+function ensureAnonAuth() {
+  return new Promise((resolve) => {
+    // 1. 상태 변화 감지 리스너 등록
+    const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        // 이미 로그인 되어 있거나, 방금 로그인 됨
+        console.log("✅ Firebase Auth 상태: 인증됨 (UID: " + user.uid + ")");
+        unsubscribe(); // 리스너 해제
         resolve();
-      });
+      } else {
+        // 로그인 안 된 상태 -> 익명 로그인 시도
+        console.log("🔒 인증 정보 없음. 익명 로그인 시도...");
+        // 주의: 여기서 unsubscribe 하지 않음. 로그인 성공 시 위 if(user) 블록이 다시 실행됨.
+        firebase.auth().signInAnonymously().catch((error) => {
+          console.error("❌ 익명 로그인 실패:", error);
+          unsubscribe();
+          resolve(); // 실패하더라도 로컬 데이터로 진행하기 위해 resolve
+        });
+      }
+    });
   });
 }
 
