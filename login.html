@@ -106,7 +106,7 @@
     window.onload = function() {
         const loginTime = localStorage.getItem('kac_login_time');
         const now = new Date().getTime();
-        const expiry = 5 * 60 * 60 * 1000; // 5시간
+        const expiry = 1 * 60 * 60 * 1000; // 1시간 (60분 * 60초 * 1000ms)
 
         if(loginTime && (now - loginTime < expiry)) {
             sessionStorage.setItem('kac_access_token', 'granted');
