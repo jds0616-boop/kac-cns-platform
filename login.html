@@ -5,54 +5,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login - KAC CNS Training Platform</title>
-<!-- Firebase 엔진(라이브러리) 불러오기 -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-
-<script>
-async function ensureAnonAuth() {
-  if (firebase.auth().currentUser) return;
-  // auth 상태가 아직 반영 안됐을 수도 있으니 한번 기다리는 패턴
-  await firebase.auth().signInAnonymously();
-}
-
-async function tryLogin() {
-  const rawInput = document.getElementById('pwInput').value.trim();
-  const msgBox = document.getElementById('msg');
-  if(!rawInput) { msgBox.textContent = "비밀번호를 입력해주세요."; return; }
-
-  const input = korToEng(rawInput).toUpperCase();
-  msgBox.style.color = "#94a3b8";
-  msgBox.textContent = "인증 확인 중...";
-
-  try {
-    // ✅ 먼저 익명 로그인 (DB 규칙이 auth 필요하면 필수)
-    await ensureAnonAuth();
-
-    const snapshot = await db.ref('security/entry_pw').once('value');
-    const serverHash = snapshot.val();
-
-    const inputHash = await sha256(input);
-
-    if(inputHash === serverHash) {
-      msgBox.style.color = "#4ade80";
-      msgBox.textContent = "접속 성공! 이동합니다...";
-      localStorage.setItem('kac_login_time', Date.now());
-      sessionStorage.setItem('kac_access_token', 'granted');
-      setTimeout(() => location.replace('index.html'), 500);
-    } else {
-      throw new Error("비밀번호 불일치");
-    }
-  } catch(e) {
-    msgBox.style.color = "#ef4444";
-    msgBox.textContent = "비밀번호가 올바르지 않습니다.";
-    document.getElementById('pwInput').value = '';
-    document.getElementById('pwInput').focus();
-    console.error(e); // ✅ 콘솔에서 Permission denied 여부 확인 가능
-  }
-}
-</script>
 <style>
   @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
   * { box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
@@ -99,90 +51,62 @@ async function tryLogin() {
     <div id="msg" class="message"></div>
   </div>
 
-<script>
-    // 1. Firebase 설정
-    const firebaseConfig = {
-      apiKey: "AIzaSyAUt6WqxWjRoB9xgAWXq2YhVMQutaOZCBc",
-      authDomain: "catc-dfb9a.firebaseapp.com",
-      databaseURL: "https://catc-dfb9a-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "catc-dfb9a",
-      storageBucket: "catc-dfb9a.firebasestorage.app",
-      messagingSenderId: "669905270724",
-      appId: "1:669905270724:web:c89fcc1d9c8f81b3071691"
-    };
-
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    // 2. 한영 변환 도구 (필수!)
-    function korToEng(str) {
-        const kor = "ㅂㅈㄷㄱㅅㅛㅕㅑㅐㅔㅁㄴㅇㄹㅎㅗㅓㅏㅣㅋㅌㅊㅍㅠㅜㅡ";
-        const eng = "qwertyuiopasdfghjklzxcvbnm";
-        let result = "";
-        if(!str) return "";
-        for (let i = 0; i < str.length; i++) {
-            const char = str[i];
-            const index = kor.indexOf(char);
-            if (index !== -1) result += eng[index];
-            else result += char;
-        }
-        return result;
-    }
-
-    // 3. SHA-256 암호화
+  <script>
+    // SHA-256 암호화 함수
     async function sha256(message) {
         const msgBuffer = new TextEncoder().encode(message);
         const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
         return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
-    // 4. 로그인 함수 (문법 오류 수정됨)
     async function tryLogin() {
-        const rawInput = document.getElementById('pwInput').value.trim();
+        const input = document.getElementById('pwInput').value.trim().toUpperCase();
         const msgBox = document.getElementById('msg');
         
-        if(!rawInput) {
+        if(!input) {
             msgBox.textContent = "비밀번호를 입력해주세요.";
             return;
         }
 
-        // 대소문자 및 한영키 보정
-        const input = korToEng(rawInput).toUpperCase();
         msgBox.style.color = "#94a3b8";
         msgBox.textContent = "인증 확인 중...";
 
         try {
-            // 서버에서 비번 가져오기
-            const snapshot = await db.ref('security/entry_pw').once('value');
-            const serverHash = snapshot.val();
+            // data.json을 불러와서 비밀번호 확인
+            const res = await fetch('data.json?v=' + new Date().getTime());
+            if(!res.ok) throw new Error("데이터 로딩 실패");
             
-            // 입력한 비번 암호화
+            const data = await res.json();
+            const serverHash = data.security ? data.security.entry_pw : null;
+            
+            // 만약 data.json에 비번 설정이 없으면 기본값(CATC1234) 처리
+            const defaultHash = "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c";
+            const targetHash = serverHash || defaultHash;
+
             const inputHash = await sha256(input);
 
-            if(inputHash === serverHash) {
-                // 익명 인증 승인 (보안규칙 통과용)
-                await firebase.auth().signInAnonymously(); 
-                
+            if(inputHash === targetHash) {
                 msgBox.style.color = "#4ade80";
                 msgBox.textContent = "접속 성공! 이동합니다...";
                 localStorage.setItem('kac_login_time', new Date().getTime());
                 sessionStorage.setItem('kac_access_token', 'granted');
                 setTimeout(() => location.replace('index.html'), 500);
             } else {
-                throw new Error("비밀번호가 일치하지 않습니다.");
+                throw new Error("비밀번호가 올바르지 않습니다.");
             }
         } catch(e) {
             msgBox.style.color = "#ef4444";
-            msgBox.textContent = "비밀번호가 올바르지 않습니다.";
+            msgBox.textContent = e.message === "Failed to fetch" ? "데이터 파일을 찾을 수 없습니다." : "비밀번호가 올바르지 않습니다.";
             document.getElementById('pwInput').value = '';
             document.getElementById('pwInput').focus();
         }
     }
     
+    // 자동 로그인 체크
     window.onload = function() {
         const loginTime = localStorage.getItem('kac_login_time');
         const now = new Date().getTime();
-        const expiry = 1 * 60 * 60 * 1000; 
+        const expiry = 5 * 60 * 60 * 1000; // 5시간
 
         if(loginTime && (now - loginTime < expiry)) {
             sessionStorage.setItem('kac_access_token', 'granted');

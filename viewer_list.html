@@ -5,26 +5,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>과목 리스트 - KAC CNS Training Platform</title>
-<!-- Firebase 엔진(라이브러리) 불러오기 -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-
-<script>
-  // 서버 접속 주소 설정
-  const firebaseConfig = {
-    apiKey: "AIzaSyAUt6WqxWjRoB9xgAWXq2YhVMQutaOZCBc",
-    authDomain: "catc-dfb9a.firebaseapp.com",
-    databaseURL: "https://catc-dfb9a-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "catc-dfb9a",
-    storageBucket: "catc-dfb9a.firebasestorage.app",
-    messagingSenderId: "669905270724",
-    appId: "1:669905270724:web:c89fcc1d9c8f81b3071691"
-  };
-  // Firebase 시작
-  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-</script>
 <script>
   // [보안] 로그인 세션 체크
   if(sessionStorage.getItem('kac_access_token') !== 'granted') {
@@ -858,15 +838,11 @@ function openSettings() {
         if(isAdmin) document.body.classList.add('admin-mode');
         if(isPreview) document.body.classList.add('preview-active');
         
-let serverData = null;
-try {
-    // 서버(Firebase)에서 전체 데이터를 한 번에 가져옵니다.
-    const snapshot = await db.ref('/').once('value');
-    if(snapshot.exists()) {
-        serverData = snapshot.val();
-        console.log("✅ Firebase 데이터 로드 완료");
-    }
-} catch(e) { console.log("Firebase 로드 실패", e); }
+        let serverData = null;
+        try {
+            const res = await fetch('data.json?v=' + Date.now());
+            if(res.ok) serverData = await res.json();
+        } catch(e) { console.log("data.json 로드 실패"); }
 
         if(serverData && serverData.security) {
             globalSecurity = serverData.security;
