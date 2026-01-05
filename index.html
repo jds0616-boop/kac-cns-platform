@@ -719,6 +719,18 @@ async function init() {
     const snapshot = await db.ref('/').once('value');
     if (snapshot.exists()) {
       serverData = snapshot.val();
+function normalizeArray(v) {
+  if (Array.isArray(v)) return v;
+  if (v && typeof v === 'object') return Object.values(v);
+  return [];
+serverData = snapshot.val();
+
+// ✅ 추가(중요): Firebase에서 내려온 categories/config/security 구조 보정
+serverData = serverData || {};
+serverData.categories = normalizeArray(serverData.categories).filter(Boolean);
+serverData.config = serverData.config || {};
+serverData.security = serverData.security || {};
+}
     }
   } catch (e) {
     console.log("Firebase 서버 데이터 로드 실패", e);
