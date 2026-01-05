@@ -7,111 +7,60 @@
 <style>
   @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
   * { box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
-  body { 
-    background: #0f172a; height: 100vh; display: flex; flex-direction: column; 
-    align-items: center; justify-content: center; margin: 0; color: #fff;
-  }
-  .login-card {
-    background: #1e293b; padding: 40px; border-radius: 20px; width: 400px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5); text-align: center;
-    border: 1px solid rgba(255,255,255,0.1);
-  }
+  body { background: #0f172a; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0; color: #fff; }
+  .login-card { background: #1e293b; padding: 40px; border-radius: 20px; width: 400px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); text-align: center; border: 1px solid rgba(255,255,255,0.1); }
   .logo { font-size: 24px; font-weight: 800; margin-bottom: 25px; display: block; }
   .logo span { color: #3b82f6; }
-  
-  .login-type-tabs {
-    display: flex; background: #0f172a; padding: 5px; border-radius: 12px; margin-bottom: 25px;
-  }
-  .tab-btn {
-    flex: 1; padding: 12px; border-radius: 8px; border: none; background: transparent;
-    color: #94a3b8; cursor: pointer; font-weight: 700; transition: 0.3s;
-  }
+  .login-type-tabs { display: flex; background: #0f172a; padding: 5px; border-radius: 12px; margin-bottom: 25px; }
+  .tab-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; background: transparent; color: #94a3b8; cursor: pointer; font-weight: 700; transition: 0.3s; }
   .tab-btn.active { background: #3b82f6; color: #fff; }
-
   .info-text { font-size: 13px; color: #94a3b8; margin-bottom: 20px; word-break: keep-all; }
-  
-  input {
-    width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #334155;
-    background: #0f172a; color: #fff; margin-bottom: 15px; font-size: 16px; outline: none;
-    transition: 0.3s;
-  }
+  input { width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #334155; background: #0f172a; color: #fff; margin-bottom: 15px; font-size: 16px; outline: none; transition: 0.3s; }
   input:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
-  
-  button#btnAction {
-    width: 100%; padding: 15px; border-radius: 10px; border: none;
-    background: #3b82f6; color: #fff; font-size: 16px; font-weight: 700;
-    cursor: pointer; transition: 0.3s;
-  }
+  button#btnAction { width: 100%; padding: 15px; border-radius: 10px; border: none; background: #3b82f6; color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; }
   button#btnAction:hover { background: #2563eb; transform: translateY(-2px); }
-  
   .message { margin-top: 15px; font-size: 14px; min-height: 20px; color: #ef4444; font-weight: 500; }
 </style>
 </head>
 <body>
   <div class="login-card">
     <div class="logo">KAC <span>CNS</span> Platform</div>
-    
     <div class="login-type-tabs">
       <button id="tabEntry" class="tab-btn active" onclick="setLoginType('entry')">교육생</button>
       <button id="tabAdmin" class="tab-btn" onclick="setLoginType('admin')">관리자</button>
     </div>
-
     <p id="infoText" class="info-text">교육생 전용 패스워드를 입력하세요.</p>
     <input type="password" id="pwInput" placeholder="비밀번호 입력" onkeyup="if(window.event.keyCode==13){tryLogin()}">
     <button id="btnAction" onclick="tryLogin()">접속하기</button>
     <div id="msg" class="message"></div>
   </div>
-
   <script>
     let currentType = 'entry';
-
     function setLoginType(type) {
         currentType = type;
         document.getElementById('tabEntry').classList.toggle('active', type === 'entry');
         document.getElementById('tabAdmin').classList.toggle('active', type === 'admin');
-        document.getElementById('infoText').textContent = type === 'admin' ? "관리자 전용 패스워드를 입력하세요. (대소문자 구분)" : "교육생 전용 패스워드를 입력하세요. (대소문자 구분)";
-        document.getElementById('msg').textContent = "";
-        document.getElementById('pwInput').value = "";
-        document.getElementById('pwInput').focus();
+        document.getElementById('infoText').textContent = type === 'admin' ? "관리자 패스워드를 입력하세요. (대소문자 구분)" : "교육생 패스워드를 입력하세요. (대소문자 구분)";
+        document.getElementById('pwInput').value = ""; document.getElementById('pwInput').focus();
     }
-
-    async function sha256(message) {
-        const msgBuffer = new TextEncoder().encode(message);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-        return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
+    async function sha256(m) { const b = new TextEncoder().encode(m); const h = await crypto.subtle.digest('SHA-256', b); return Array.from(new Uint8Array(h)).map(x => x.toString(16).padStart(2, '0')).join(''); }
     async function tryLogin() {
         const input = document.getElementById('pwInput').value.trim(); // 대소문자 유지
         const msgBox = document.getElementById('msg');
         if(!input) { msgBox.textContent = "비밀번호를 입력해주세요."; return; }
-
-        msgBox.style.color = "#94a3b8";
-        msgBox.textContent = "인증 확인 중...";
-
+        msgBox.style.color = "#94a3b8"; msgBox.textContent = "인증 확인 중...";
         try {
-            const res = await fetch('data.json?v=' + new Date().getTime());
-            if(!res.ok) throw new Error("서버 데이터 로드 실패");
+            const res = await fetch('data.json?v=' + Date.now());
             const data = await res.json();
-            
             const targetHash = (currentType === 'admin') ? data.security.admin_pw : data.security.entry_pw;
-            const inputHash = await sha256(input); // 입력한 그대로 해싱
-
+            const inputHash = await sha256(input);
             if(inputHash === targetHash) {
-                msgBox.style.color = "#4ade80";
-                msgBox.textContent = "인증 성공! 이동 중...";
                 sessionStorage.setItem('kac_access_token', 'granted');
                 localStorage.setItem('kac_admin_mode', currentType === 'admin' ? '1' : '0');
-                localStorage.setItem('kac_login_time', new Date().getTime());
-                setTimeout(() => location.replace('index.html'), 500);
-            } else {
-                throw new Error("비밀번호가 올바르지 않습니다. (대소문자 구분)");
-            }
-        } catch(e) {
-            msgBox.style.color = "#ef4444";
-            msgBox.textContent = e.message;
-            document.getElementById('pwInput').value = '';
-        }
+                localStorage.setItem('kac_login_time', Date.now());
+                location.replace('index.html');
+            } else { throw new Error("비밀번호가 올바르지 않습니다."); }
+        } catch(e) { msgBox.style.color = "#ef4444"; msgBox.textContent = e.message; }
     }
   </script>
 </body>
