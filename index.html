@@ -6,13 +6,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>KAC CNS Training Platform</title>
 
-<!-- 1. Firebase 라이브러리 로드 (순서 중요) -->
+<!-- [위치 1] Firebase 라이브러리 로드 (가장 먼저 위치해야 함) -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
 <script>
-  // 2. Firebase 연결 정보
+  // [위치 2] Firebase 설정 및 보안 도구 함수들
   const firebaseConfig = {
     apiKey: "AIzaSyAUt6WqxWjRoB9xgAWXq2YhVMQutaOZCBc",
     authDomain: "catc-dfb9a.firebaseapp.com",
@@ -24,10 +24,7 @@
     measurementId: "G-H1ME51B4MZ"
   };
 
-  // 3. Firebase 초기화
-  if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-  }
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
   // [보안] 로그인 세션 체크
@@ -35,7 +32,7 @@
     location.replace('login.html');
   }
 
-  // [도구] 한글 입력 변환 함수
+  // [도구] 한영 변환 함수 (한영키 무시)
   function korToEng(str) {
       const kor = "ㅂㅈㄷㄱㅅㅛㅕㅑㅐㅔㅁㄴㅇㄹㅎㅗㅓㅏㅣㅋㅌㅊㅍㅠㅜㅡ";
       const eng = "qwertyuiopasdfghjklzxcvbnm";
@@ -49,7 +46,14 @@
       return result;
   }
 
-  // [보안] 1시간 활동 감지 로그아웃
+  // [도구] SHA-256 암호화
+  async function sha256(message) {
+      const msgBuffer = new TextEncoder().encode(message);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  // [보안] 1시간 활동 감지 로그아웃 로직
   let inactivityTimer;
   function resetInactivityTimer() {
       clearTimeout(inactivityTimer);
@@ -67,9 +71,11 @@
   window.onmousedown = resetInactivityTimer;
   window.ontouchstart = resetInactivityTimer;
   window.onclick = resetInactivityTimer;
+  window.onkeypress = resetInactivityTimer;
 </script>
 
 <style>
+  /* [위치 3] 기존 원본 스타일 유지 및 보완 */
   @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
   :root { 
     --navy: #0f172a; --bg-main: #f0f4f8; --bg-card: #ffffff; 
@@ -107,14 +113,15 @@
   <div style="width:50px; height:50px; border:5px solid #eee; border-top-color:#2563eb; border-radius:50%; animation:spin 1s linear infinite;"></div>
   <p style="margin-top:20px; font-weight:700; color:#666;">실시간 서버 데이터 로딩 중...</p>
 </div>
-<style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>
 
 <header>
-  <div class="logo-text" onclick="location.reload()">KAC CNS Training Platform</div>
+  <div class="header-left">
+    <div class="logo-text" onclick="location.reload()">KAC CNS Training Platform</div>
+  </div>
   <div class="header-center-title">
       <span id="pageHeadline" class="page-headline" onclick="editPageTitle()">제목 로딩 중...</span>
   </div>
-  <div class="settings-btn" onclick="openSettings()" style="color:white; cursor:pointer; font-size:20px;">⚙️</div>
+  <div class="settings-btn" onclick="openSettings()" style="color:white; cursor:pointer; font-size:20px; margin-right: 20px;">⚙️</div>
 </header>
 
 <div class="content-wrapper">
@@ -127,11 +134,12 @@
   <div id="footerContent"></div>
 </footer>
 
-<!-- 설정 모달 -->
+<!-- 설정 모달 (서버에 최종저장 버튼 포함) -->
 <div id="settingsModal" class="modal-overlay">
   <div class="modal-card">
     <h3 style="margin-bottom:20px;">⚙️ 시스템 설정</h3>
     <div id="adminSettings" style="display:none;">
+      <!-- [수정사항] 여기에 최종 저장 버튼 배치 -->
       <button class="btn-modal btn-success" onclick="saveToFirebase()">☁️ 서버에 최종 저장 (Firebase)</button>
       <button class="btn-modal btn-primary" onclick="openPwChangeModal()">🔐 비밀번호 변경</button>
       <button class="btn-modal" style="background:#ef4444; color:white;" onclick="logoutAdmin()">관리자 로그아웃</button>
@@ -143,7 +151,7 @@
   </div>
 </div>
 
-<!-- 비밀번호 변경 모달 -->
+<!-- 비밀번호 변경 모달 (마스킹 적용) -->
 <div id="pwChangeModal" class="modal-overlay">
   <div class="modal-card">
     <h3>🔐 비밀번호 변경</h3>
@@ -151,21 +159,22 @@
         <option value="entry">교육생 접속 비밀번호</option>
         <option value="admin">관리자 설정 비밀번호</option>
     </select>
-    <input type="password" id="newPw1" class="setting-input" placeholder="새 비밀번호">
-    <input type="password" id="newPw2" class="setting-input" placeholder="비밀번호 확인">
+    <input type="password" id="newPw1" class="setting-input" placeholder="새 비밀번호 입력">
+    <input type="password" id="newPw2" class="setting-input" placeholder="새 비밀번호 확인 재입력">
     <button class="btn-modal btn-primary" onclick="executePwChange()">변경 실행</button>
     <button class="btn-modal" onclick="closeModal('pwChangeModal')" style="background:#eee;">취소</button>
   </div>
 </div>
 
 <script>
+  // [위치 4] 메인 자바스크립트 로직
   let globalData = { categories: [], config: {}, security: {} };
   let isAdmin = localStorage.getItem('kac_admin_mode') === '1';
   let currentPage = 1;
   const itemsPerPage = 5;
 
   async function init() {
-    // 1회 자동 초기화 로직
+    // [1] 입장 시 딱 한 번만 자동 초기화 실행 로직 (서버 동기화용)
     if (!sessionStorage.getItem('kac_auto_reset_flag')) {
         localStorage.clear(); 
         sessionStorage.setItem('kac_auto_reset_flag', 'true');
@@ -175,7 +184,7 @@
 
     if(isAdmin) document.body.classList.add('admin-mode');
 
-    // Firebase 데이터 로드
+    // [2] Firebase에서 데이터 실시간 로드
     try {
         const snapshot = await db.ref('/').once('value');
         if(snapshot.exists()) {
@@ -183,8 +192,10 @@
             renderCards();
             updateHeadline();
             loadFooter();
+        } else {
+            alert("서버에 데이터가 없습니다. JSON 가져오기를 먼저 수행하세요.");
         }
-    } catch(e) { console.error("데이터 로드 실패", e); }
+    } catch(e) { console.error("Firebase 데이터 로드 실패", e); }
     
     document.getElementById('loadingSpinner').style.display = 'none';
   }
@@ -193,9 +204,10 @@
     const container = document.getElementById('cardContainer');
     container.innerHTML = '';
     
-    // 비공개 필터링
+    // 비공개 필터링 (관리자 모드가 아닐 때만 적용)
     const list = isAdmin ? globalData.categories : globalData.categories.filter(c => c && (c.access?.visible || c.visible !== false));
-    
+    if(!list) return;
+
     const start = (currentPage - 1) * itemsPerPage;
     const pageItems = list.slice(start, start + itemsPerPage);
 
@@ -214,6 +226,7 @@
   function renderPagination(total) {
     const p = document.getElementById('pagination'); p.innerHTML = '';
     const pages = Math.ceil(total / itemsPerPage);
+    if(pages <= 1) return;
     for(let i=1; i<=pages; i++) {
         const dot = document.createElement('div');
         dot.style.cssText = `width:12px; height:12px; border-radius:50%; cursor:pointer; background:${i===currentPage?'#0f172a':'#ccc'}`;
@@ -235,15 +248,18 @@
     if(hash === globalData.security.admin_pw) {
         localStorage.setItem('kac_admin_mode', '1');
         location.reload();
-    } else { alert("비밀번호가 틀립니다."); }
+    } else { alert("비밀번호가 올바르지 않습니다."); }
   }
 
   function logoutAdmin() { localStorage.removeItem('kac_admin_mode'); location.reload(); }
 
+  // [중요] Firebase에 최종 저장
   async function saveToFirebase() {
-    if(!confirm("수정된 내용을 서버(Firebase)에 저장하시겠습니까?")) return;
-    await db.ref('/').set(globalData);
-    alert("✅ 서버에 실시간 저장되었습니다.");
+    if(!confirm("수정된 모든 내용을 Firebase 서버에 최종 저장하시겠습니까?")) return;
+    try {
+        await db.ref('/').set(globalData);
+        alert("✅ 서버에 실시간 저장되었습니다.");
+    } catch(e) { alert("저장 실패: " + e.message); }
   }
 
   function openPwChangeModal() { closeModal('settingsModal'); document.getElementById('pwChangeModal').style.display = 'flex'; }
@@ -252,17 +268,15 @@
     const target = document.getElementById('pwTarget').value;
     const p1 = document.getElementById('newPw1').value.trim();
     const p2 = document.getElementById('newPw2').value.trim();
-    if(!p1 || korToEng(p1).toUpperCase() !== korToEng(p2).toUpperCase()) return alert("비밀번호가 일치하지 않습니다.");
+    
+    if(!p1) return alert("비밀번호를 입력하세요.");
+    // 대소문자 및 한영키 보정 후 비교
+    if(korToEng(p1).toUpperCase() !== korToEng(p2).toUpperCase()) return alert("입력하신 두 비밀번호가 일치하지 않습니다.");
     
     globalData.security[target === 'entry' ? 'entry_pw' : 'admin_pw'] = await sha256(korToEng(p1).toUpperCase());
-    alert("임시 적용되었습니다. 반드시 [서버에 최종 저장] 버튼을 눌러주세요.");
+    alert("✅ 비밀번호가 임시 적용되었습니다. 반드시 설정창에서 [서버에 최종 저장] 버튼을 눌러야 영구 반영됩니다.");
     closeModal('pwChangeModal');
-  }
-
-  async function sha256(message) {
-      const msgBuffer = new TextEncoder().encode(message);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    openSettings();
   }
 
   function closeModal(id) { document.getElementById(id).style.display = 'none'; }
