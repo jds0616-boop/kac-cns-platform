@@ -12,6 +12,11 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>시설 관리 - KAC CNS Training Platform</title>
+<!-- [수정] Firebase SDK 추가 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
 <style>
   @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
   :root { 
@@ -688,6 +693,21 @@
 </div>
 
 <script>
+  // 1. Firebase 설정 및 초기화
+  const firebaseConfig = {
+    apiKey: "AIzaSyAUt6WqxWjRoB9xgAWXq2YhVMQutaOZCBc",
+    authDomain: "catc-dfb9a.firebaseapp.com",
+    databaseURL: "https://catc-dfb9a-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "catc-dfb9a",
+    storageBucket: "catc-dfb9a.firebasestorage.app",
+    messagingSenderId: "669905270724",
+    appId: "1:669905270724:web:c89fcc1d9c8f81b3071691"
+  };
+
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const auth = firebase.auth();
+
   const params = new URLSearchParams(location.search);
   const type = params.get('type');
   
@@ -696,8 +716,8 @@
   let menus = [];
   let currentEditIdx = -1;
   let dragSrcIndex = null;
-  const storedHash = "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c";
 
+  // [중요] 초기화 함수
   async function init() {
       const theme = localStorage.getItem('kac_theme') || 'light';
       setTheme(theme);
@@ -705,7 +725,9 @@
       if(isPreview) document.body.classList.add('preview-active');
       if(isAdmin) document.body.classList.add('admin-mode');
 
+      // Firebase에서 최신 데이터 가져오기
       await loadData();
+      
       loadStyleData();
       loadUISettings();
       render();
@@ -724,13 +746,26 @@
       }
   }
   
+  // [수정] 데이터 로드 함수 (Firebase -> LocalStorage 동기화)
   async function loadData() {
       try {
-          const res = await fetch('data.json?v=' + Date.now());
-          if(res.ok) {
-              const serverData = await res.json();
-              const cat = serverData.categories.find(c => c.id === type);
-              if(cat && !localStorage.getItem(`kac_menu_${type}`)) {
+          // DB 접근을 위한 익명 로그인
+          if (!auth.currentUser) {
+              await auth.signInAnonymously();
+          }
+
+          // 파이어베이스에서 전체 데이터 가져오기
+          const snapshot = await db.ref('/').once('value');
+          
+          if(snapshot.exists()) {
+              const serverData = snapshot.val();
+              
+              // 현재 페이지에 해당하는 카테고리(type) 찾기
+              const cat = serverData.categories ? serverData.categories.find(c => c && c.id === type) : null;
+              
+              if(cat) {
+                   // 서버 데이터를 로컬 스토리지에 최신화 (편집을 위해)
+                   // 1. 메뉴 리스트 저장
                    localStorage.setItem(`kac_menu_${type}`, JSON.stringify(cat.menus.map(m=>({
                        dataId: m.id, 
                        label: m.label, 
@@ -739,14 +774,30 @@
                        link: m.link,
                        visible: m.visible !== false 
                    }))));
-                   localStorage.setItem(`kac_style_${type}`, JSON.stringify({name: cat.name, code: cat.code, color: cat.color}));
                    
-                   cat.menus.forEach(m => {
-                       localStorage.setItem(`kac_subs_${type}_${m.id}`, JSON.stringify(m.subjects));
-                   });
+                   // 2. 스타일/접근권한 저장
+                   localStorage.setItem(`kac_style_${type}`, JSON.stringify({
+                       name: cat.name, 
+                       code: cat.code, 
+                       color: cat.color,
+                       access: cat.access // 권한 정보도 동기화
+                   }));
+                   
+                   // 3. 하위 과목들 저장
+                   if(cat.menus) {
+                       cat.menus.forEach(m => {
+                           if(m.subjects) {
+                               localStorage.setItem(`kac_subs_${type}_${m.id}`, JSON.stringify(m.subjects));
+                           }
+                       });
+                   }
               }
           }
-      } catch(e) {}
+      } catch(e) {
+          console.error("데이터 로드 중 오류 (오프라인 모드 작동):", e);
+      }
+
+      // 로컬 스토리지에서 최종 로드
       const saved = localStorage.getItem(`kac_menu_${type}`);
       menus = saved ? JSON.parse(saved) : [];
   }
@@ -912,7 +963,7 @@
 
           bar.innerHTML = `
               <div class="last-viewed-icon">
-                <svg class="icon-pc" viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                <svg class="icon-pc" viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
                 <svg class="icon-mobile" viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
                 <span>Last Viewed</span>
               </div>
@@ -1016,7 +1067,7 @@
           line2: document.getElementById('editItemLine2').value,
           label: document.getElementById('editItemLabel').value,
           link: document.getElementById('editItemLink').value,
-          visible: document.getElementById('editItemVisible').checked // [추가] 공개 여부 저장
+          visible: document.getElementById('editItemVisible').checked 
       };
 
       if(!newItem.label) return alert("메뉴 명칭을 입력하세요.");
@@ -1071,7 +1122,7 @@
                   line2: row.querySelector('.b-l2').value,
                   label: label,
                   link: row.querySelector('.b-lk').value,
-                  visible: original.visible !== false // 일괄 수정 시 기존 visibility 유지
+                  visible: original.visible !== false 
               });
           }
       });
@@ -1147,9 +1198,29 @@
       } else {
           const pw = prompt("관리자 비밀번호");
           if(!pw) return;
-          const hash = await sha256(pw);
-          if(hash === storedHash) { localStorage.setItem('kac_admin_mode','1'); location.reload(); }
-          else alert("비밀번호 불일치");
+
+          try {
+              // 입력값 해시
+              const inputHash = await sha256(pw.toUpperCase());
+              
+              // Firebase에서 관리자 비밀번호 가져오기
+              const snapshot = await db.ref('security/admin_pw').once('value');
+              let serverHash = snapshot.val();
+              
+              // 서버에 비번 없으면 기본값(CATC1234)
+              if(!serverHash) serverHash = "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c";
+
+              if(inputHash === serverHash) {
+                  alert("관리자 모드로 전환됩니다.");
+                  localStorage.setItem('kac_admin_mode','1');
+                  location.reload();
+              } else {
+                  alert("비밀번호가 일치하지 않습니다.");
+              }
+          } catch(e) {
+              console.error(e);
+              alert("인증 서버 접속 실패");
+          }
       }
   }
 
