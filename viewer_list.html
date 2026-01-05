@@ -11,6 +11,11 @@
     location.replace('login.html'); 
   }
 </script>
+<!-- [수정 1] Firebase SDK 추가 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
@@ -638,6 +643,10 @@
         <button id="modalAdminBtn" class="btn-modal btn-secondary" onclick="toggleAdmin()">관리자 로그인</button>
         <button id="modalPreviewBtn" class="btn-modal btn-secondary" onclick="togglePreview()" style="display:none;">👁️ 미리보기</button>
       </div>
+      <!-- [수정 2] 서버 저장 버튼 추가 -->
+      <button id="btnSaveServer" class="btn-modal btn-success" onclick="saveToFirebase()" style="display:none; margin-top:10px; background:#10b981;">
+        ☁️ 서버에 변경사항 저장
+      </button>
     </div>
     
     <div class="setting-group">
@@ -771,7 +780,25 @@
 <div class="creator-info">Developed by <b>DooSeok, JANG</b> (jds0616@airport.co.kr)</div>
 
 <script>
+  // [수정 3] PDFJS 워커 설정 (기존 유지)
   pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
+
+  // [수정 4] Firebase 설정 및 초기화
+  const firebaseConfig = {
+    apiKey: "AIzaSyAUt6WqxWjRoB9xgAWXq2YhVMQutaOZCBc",
+    authDomain: "catc-dfb9a.firebaseapp.com",
+    databaseURL: "https://catc-dfb9a-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "catc-dfb9a",
+    storageBucket: "catc-dfb9a.firebasestorage.app",
+    messagingSenderId: "669905270724",
+    appId: "1:669905270724:web:c89fcc1d9c8f81b3071691",
+    measurementId: "G-H1ME51B4MZ"
+  };
+
+
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const auth = firebase.auth();
 
   const params = new URLSearchParams(location.search);
   const type = params.get('type');
@@ -781,36 +808,34 @@
   let isAdmin = localStorage.getItem('kac_admin_mode') === '1';
   let isPreview = localStorage.getItem('kac_preview_active') === '1';
 
-  let globalSecurity = {
-      admin_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c"
-  };
-
   let subjects = [];
   let currentMenuData = null;
+  let allData = null; // 전체 데이터를 담을 변수 (저장용)
 
+  // 뷰어 관련 변수
   let pdfDoc = null, pageNum = 1, isRendering = false, isDragging = false;
   const canvasContainer = document.getElementById('pageContainer');
   const viewerBody = document.getElementById('viewerBody');
   const overlay = document.getElementById('pdfOverlay');
   const hitArea = document.getElementById('progressHitArea');
   const audioPlayer = document.getElementById('mainAudio');
-  
   const searchInput = document.getElementById('searchInput');
   const searchDropdown = document.getElementById('searchDropdown');
   const sOverlay = document.getElementById('searchOverlay');
-
   let allSubjectsIndex = [];
 
-function openSettings() {
+  // [수정 5] 설정 모달 열기 (버튼 제어 추가)
+  function openSettings() {
     const modal = document.getElementById('settingsModal');
-    
     const adminBtn = document.getElementById('modalAdminBtn');
     const batchGroup = document.getElementById('batchAdminGroup');
     const previewBtn = document.getElementById('modalPreviewBtn');
-    
+    const saveBtn = document.getElementById('btnSaveServer'); // 저장 버튼
+
     if(isAdmin) {
         if(adminBtn) adminBtn.textContent = "로그아웃";
         if(batchGroup) batchGroup.style.display = 'block'; 
+        if(saveBtn) saveBtn.style.display = 'block'; // 관리자일 때 저장 버튼 표시
         if(previewBtn) {
             previewBtn.style.display = 'block'; 
             previewBtn.textContent = isPreview ? "👁️ 미리보기 종료" : "👁️ 미리보기 시작";
@@ -819,68 +844,66 @@ function openSettings() {
     } else {
         if(adminBtn) adminBtn.textContent = "관리자 로그인";
         if(batchGroup) batchGroup.style.display = 'none'; 
+        if(saveBtn) saveBtn.style.display = 'none';
         if(previewBtn) previewBtn.style.display = 'none'; 
     }
 
     const currentPos = localStorage.getItem('kac_tree_pos') || 0;
     const range = document.getElementById('treePosRange');
     const valDisplay = document.getElementById('treePosVal');
-    
     if(range) range.value = currentPos;
     if(valDisplay) valDisplay.textContent = currentPos;
 
     modal.style.display = 'flex';
-}
+  }
 
+  // [수정 6] 초기화 함수 (Firebase 연동)
   async function init() {
     try {
         setTheme(localStorage.getItem('kac_theme') || 'light');
         if(isAdmin) document.body.classList.add('admin-mode');
         if(isPreview) document.body.classList.add('preview-active');
         
-        let serverData = null;
-        try {
-            const res = await fetch('data.json?v=' + Date.now());
-            if(res.ok) serverData = await res.json();
-        } catch(e) { console.log("data.json 로드 실패"); }
-
-        if(serverData && serverData.security) {
-            globalSecurity = serverData.security;
+        // 1. 익명 로그인 (DB 읽기 권한)
+        if (!auth.currentUser) {
+            await auth.signInAnonymously();
         }
 
-        const hasLocalData = localStorage.getItem('kac_index_order');
-        let loaded = loadSubjectsFromLocal();
-
-        if (isAdmin && hasLocalData) {
-            console.log("🛠️ Admin: Using Local Data");
-        } 
-        else if (serverData) {
-            serverData.categories.forEach(cat => {
-                if(cat) {
-                    cat.menus.forEach(m => {
-                        localStorage.setItem(`kac_subs_${cat.id}_${m.id}`, JSON.stringify(m.subjects));
-                    });
-                }
-            });
-            const currentCat = serverData.categories.find(c => c && c.id === type);
-            if(currentCat) {
+        // 2. Firebase 데이터 로드
+        const snapshot = await db.ref('/').once('value');
+        if (snapshot.exists()) {
+            allData = snapshot.val(); // 전체 데이터 메모리에 저장 (저장시 사용)
+            
+            // 현재 카테고리 찾기
+            const currentCat = allData.categories ? allData.categories.find(c => c && c.id === type) : null;
+            
+            if(currentCat && currentCat.menus) {
+                // 현재 메뉴 찾기
                 const currentMenu = currentCat.menus.find(m => m.id === menuId);
                 if(currentMenu) {
-                    subjects = currentMenu.subjects;
-                    loaded = true;
+                    subjects = currentMenu.subjects || [];
+                    // 로컬 스토리지 동기화 (오프라인/새로고침 대비)
+                    localStorage.setItem(`kac_subs_${type}_${menuId}`, JSON.stringify(subjects));
                 }
             }
         }
 
-        if (!loaded) subjects = [];
-        
+        // 3. 로컬 데이터 폴백 (서버 실패시)
+        if (!subjects || subjects.length === 0) {
+            const localData = localStorage.getItem(`kac_subs_${type}_${menuId}`);
+            if (localData) subjects = JSON.parse(localData);
+        }
+
+        // 4. 메뉴 정보 세팅
         const menuList = JSON.parse(localStorage.getItem(`kac_menu_${type}`) || '[]');
         currentMenuData = menuList.find(m => m.dataId === menuId) || { label: menuName, line1: 'Tag' };
 
+        // 5. 스타일 적용
         const sData = localStorage.getItem(`kac_style_${type}`);
         const style = sData ? JSON.parse(sData) : { name: type, color: '#2563eb' };
         applyStyles(style);
 
+        // 6. UI 렌더링
         const savedPos = localStorage.getItem('kac_tree_pos') || 0;
         document.documentElement.style.setProperty('--tree-pos-x', savedPos + 'px');
 
@@ -890,10 +913,79 @@ function openSettings() {
         renderSidebar();
 
     } catch (err) {
-        console.error("Initialization Error:", err);
-        alert("페이지 로딩 중 오류가 발생했습니다.\n" + err.message);
+        console.error("Init Error:", err);
+        alert("데이터 로딩 중 오류가 발생했습니다.");
     }
   }
+
+  // [수정 7] 파이어베이스 저장 함수
+  async function saveToFirebase() {
+      if(!isAdmin) return alert("관리자 권한이 필요합니다.");
+      if(!confirm("현재 목록의 변경사항을 서버에 저장하시겠습니까?")) return;
+
+      try {
+          if(!allData || !allData.categories) {
+              // 메모리에 데이터가 없으면 새로 로드
+              const snap = await db.ref('/').once('value');
+              allData = snap.val();
+          }
+
+          // 현재 수정된 subjects를 전체 데이터 구조에 반영
+          const catIndex = allData.categories.findIndex(c => c && c.id === type);
+          if (catIndex !== -1) {
+              const menuIndex = allData.categories[catIndex].menus.findIndex(m => m.id === menuId);
+              if (menuIndex !== -1) {
+                  allData.categories[catIndex].menus[menuIndex].subjects = subjects;
+                  
+                  // 메타 데이터 업데이트
+                  if(!allData.meta) allData.meta = {};
+                  allData.meta.lastUpdated = new Date().toISOString();
+
+                  // 서버에 저장
+                  await db.ref('/').set(allData);
+                  alert("✅ 서버 저장 완료!");
+              } else {
+                  throw new Error("메뉴를 찾을 수 없습니다.");
+              }
+          } else {
+              throw new Error("카테고리를 찾을 수 없습니다.");
+          }
+      } catch(e) {
+          console.error(e);
+          alert("저장 실패: " + e.message);
+      }
+  }
+
+  // [수정 8] 관리자 로그인 (DB 비번 체크)
+  async function toggleAdmin() {
+    if(isAdmin) { 
+        if(confirm("로그아웃 하시겠습니까?")) { 
+            localStorage.setItem('kac_admin_mode','0'); 
+            location.reload(); 
+        } 
+    } else { 
+        const pw = prompt("관리자 비밀번호 입력"); 
+        if(!pw) return;
+        
+        try {
+            const inputHash = await sha256(pw.toUpperCase());
+            const snapshot = await db.ref('security/admin_pw').once('value');
+            let serverHash = snapshot.val();
+            if(!serverHash) serverHash = "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c"; // Default
+
+            if(inputHash === serverHash) { 
+                localStorage.setItem('kac_admin_mode','1'); 
+                location.reload(); 
+            } else { 
+                alert('비밀번호 불일치');
+            }
+        } catch(e) {
+            alert("인증 오류");
+        }
+    } 
+  }
+
+  // --- 기존 로직 유지 (렌더링, 뷰어, 사이드바 등) ---
 
   function toggleSidebar() {
       const sb = document.getElementById('sidebar');
@@ -911,13 +1003,8 @@ function renderSidebar() {
           if(!tid) return;
           const style = JSON.parse(localStorage.getItem(`kac_style_${tid}`) || '{}');
           
-          // 접근 권한 및 사이드바 노출 여부 체크
           const acc = style.access || { visible: true, adminOnly: false, showSidebar: true };
-          
-          // [수정 1] 카테고리 필터링
-          // 1. 비공개이거나 사이드바 미노출이면 무조건 숨김 (관리자 포함)
           if (!acc.visible || !acc.showSidebar) return;
-          // 2. 관리자 전용인데 관리자가 아니면 숨김
           if (acc.adminOnly && !isAdmin) return;
           
           const isActive = tid === type; 
@@ -925,18 +1012,14 @@ function renderSidebar() {
           const menus = JSON.parse(localStorage.getItem(`kac_menu_${tid}`) || '[]');
           
           let subHtml = '';
-          let validMenuCount = 0; // 실제로 표시될 메뉴 개수 카운트
+          let validMenuCount = 0; 
 
           if(menus.length > 0) {
               const listClass = isActive ? 'sb-sub-list open' : 'sb-sub-list';
-              // 임시 변수에 HTML 구성
               let tempHtml = `<div class="${listClass}" id="sb-sub-${tid}">`;
               
               menus.forEach(m => {
-                  // [수정 2] 하위 메뉴 필터링
-                  // 메뉴가 공개(visible:true)인 경우에만 렌더링
                   const isMenuVisible = (m.visible !== undefined) ? m.visible : true;
-                  
                   if(isMenuVisible) {
                       validMenuCount++;
                       const isSubActive = (tid === type && m.dataId === menuId);
@@ -947,19 +1030,11 @@ function renderSidebar() {
                   }
               });
               tempHtml += '</div>';
-              
-              // 표시할 하위 메뉴가 있을 때만 subHtml에 할당
-              if(validMenuCount > 0) {
-                  subHtml = tempHtml;
-              }
+              if(validMenuCount > 0) subHtml = tempHtml;
           }
 
-          // [수정 3] 화살표 표시 여부: 실제로 표시된 하위 메뉴가 있을 때만 화살표 생성
           const arrow = validMenuCount > 0 ? `<span class="sb-toggle">${isActive ? '▼' : '▶'}</span>` : '';
-          
-          // 관리자 전용 표시 (비공개는 위에서 걸러지므로 로직 삭제)
-          let namePrefix = "";
-          if (isAdmin && acc.adminOnly) namePrefix = "(관리자) ";
+          let namePrefix = (isAdmin && acc.adminOnly) ? "(관리자) " : "";
 
           const item = document.createElement('div');
           item.innerHTML = `
@@ -1073,18 +1148,6 @@ function renderSidebar() {
       const msgBuffer = new TextEncoder().encode(message);
       const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
       return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-  }
-
-  async function toggleAdmin() {
-    if(isAdmin) { 
-        if(confirm("로그아웃?")) { localStorage.setItem('kac_admin_mode','0'); location.reload(); } 
-    } else { 
-        const pw = prompt("비밀번호"); if(!pw) return;
-        const inputHash = await sha256(pw.toUpperCase());
-        const storedHash = globalSecurity.admin_pw;
-        if(inputHash === storedHash) { localStorage.setItem('kac_admin_mode','1'); location.reload(); } 
-        else alert('비밀번호 불일치');
-    } 
   }
 
   function togglePreview() {
@@ -1205,11 +1268,15 @@ function renderSidebar() {
 
       card.innerHTML = `
         <div class="last-viewed-icon">
-            <!-- PC용 눈 아이콘 -->
-            <svg class="icon-pc" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5-2.24 5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <!-- PC용 눈 아이콘 (정상 코드) -->
+            <svg class="icon-pc" viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;">
+                <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/>
+            </svg>
             
-            <!-- 모바일용 체크 아이콘 -->
-            <svg class="icon-mobile" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            <!-- 모바일용 체크 아이콘 (정상 코드) -->
+            <svg class="icon-mobile" viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
 
             <span>Last Viewed</span>
         </div>
