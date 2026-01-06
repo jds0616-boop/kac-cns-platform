@@ -918,19 +918,13 @@
     }
   }
 
-  // [수정 7] 파이어베이스 저장 함수 (문구 및 UI 피드백 강화)
+  // [수정 7] 파이어베이스 저장 함수
   async function saveToFirebase() {
       if(!isAdmin) return alert("관리자 권한이 필요합니다.");
-      
-      if(!confirm("현재 목록의 변경사항(추가, 수정, 삭제)을 서버에 저장하시겠습니까?\n저장 후에는 모든 사용자에게 즉시 반영됩니다.")) return;
-
-      const btn = document.getElementById('btnSaveServer');
-      const originalText = btn.innerText;
-      
-      btn.innerText = "서버 전송 중...";
-      btn.disabled = true;
+      if(!confirm("현재 목록의 변경사항을 서버에 저장하시겠습니까?")) return;
 
       try {
+          // 메모리에 데이터가 없으면 새로 로드
           if(!allData || !allData.categories) {
               const snap = await db.ref('/').once('value');
               allData = snap.val();
@@ -938,32 +932,34 @@
 
           if (!allData || !allData.categories) throw new Error("서버 데이터를 불러올 수 없습니다.");
 
+          // 현재 수정된 subjects를 전체 데이터 구조에 반영
           const catIndex = allData.categories.findIndex(c => c && c.id === type);
+          
           if (catIndex !== -1) {
+              // [안전장치] menus가 없으면 빈 배열로 처리하여 에러 방지
               const menus = allData.categories[catIndex].menus || [];
               const menuIndex = menus.findIndex(m => m.id === menuId);
               
               if (menuIndex !== -1) {
-                  // 현재 수정된 subjects 배열을 전체 데이터 구조에 삽입
+                  // 해당 메뉴에 과목 데이터 업데이트
                   allData.categories[catIndex].menus[menuIndex].subjects = subjects;
                   
+                  // 메타 데이터 업데이트
                   if(!allData.meta) allData.meta = {};
                   allData.meta.lastUpdated = new Date().toISOString();
 
-                  await db.ref('/').set(allData); // 서버 덮어쓰기
-                  alert("✅ 서버에 성공적으로 저장되었습니다!");
+                  // 서버에 저장
+                  await db.ref('/').set(allData);
+                  alert("✅ 서버 저장 완료!");
               } else {
                   throw new Error("서버 데이터에서 현재 메뉴를 찾을 수 없습니다.");
               }
           } else {
-              throw new Error("서버 데이터에서 현재 시설을 찾을 수 없습니다.");
+              throw new Error("서버 데이터에서 현재 카테고리를 찾을 수 없습니다.");
           }
       } catch(e) {
           console.error(e);
-          alert("❌ 저장 실패: " + e.message);
-      } finally {
-          btn.innerText = originalText;
-          btn.disabled = false;
+          alert("저장 실패: " + e.message);
       }
   }
 
@@ -1429,31 +1425,21 @@ function renderSidebar() {
 
   function saveSubjects() { localStorage.setItem(`kac_subs_${type}_${menuId}`, JSON.stringify(subjects)); render(); }
   
-  // [수정] 과목 삭제 함수 (서버 비번 확인 및 로직 보강)
   async function deleteSubject(i) {
-    const subName = subjects[i].name;
-    if(!confirm(`'${subName}' 과목을 삭제하시겠습니까?\n이 작업은 즉시 취소할 수 없습니다.`)) return;
-
-    const input = prompt("삭제를 확정하려면 관리자 비밀번호를 입력하세요.");
+    const input = prompt("삭제하려면 관리자 비밀번호를 입력하세요.");
     if (!input) return;
 
-    try {
-        const inputHash = await sha256(input.toUpperCase());
-        // Firebase에서 관리자 비밀번호 가져오기
-        const snapshot = await db.ref('security/admin_pw').once('value');
-        let serverHash = snapshot.val();
-        if(!serverHash) serverHash = "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c";
+    const inputHash = await sha256(input.toUpperCase());
+    const targetHash = globalSecurity.admin_pw;
 
-        if(inputHash === serverHash) {
-            subjects.splice(i, 1); // 배열에서 삭제
-            saveSubjects(); // UI 업데이트 및 로컬 저장
-            alert("삭제되었습니다.\n최종 반영을 위해 반드시 '서버에 변경사항 저장' 버튼을 눌러주세요.");
-        } else {
-            alert("비밀번호가 일치하지 않습니다.");
+    if(inputHash === targetHash) {
+        if(confirm("정말 삭제하시겠습니까?")) {
+            subjects.splice(i, 1);
+            saveSubjects();
+            alert("삭제되었습니다.");
         }
-    } catch(e) {
-        console.error(e);
-        alert("인증 오류가 발생했습니다.");
+    } else {
+        alert("비밀번호가 일치하지 않습니다.");
     }
   }
 
@@ -1499,11 +1485,7 @@ function renderSidebar() {
             addedCount++;
         }
     }
-    if(addedCount > 0) { 
-        saveSubjects(); 
-        alert(`${addedCount}개 과목이 등록되었습니다.\n최종 반영을 위해 '서버에 저장' 버튼을 꼭 눌러주세요.`); 
-        document.getElementById('batchModal').style.display = 'none'; 
-    } 
+    if(addedCount > 0) { saveSubjects(); alert(`${addedCount}개 과목이 등록되었습니다.`); document.getElementById('batchModal').style.display = 'none'; } 
     else { alert("입력된 과목이 없습니다."); }
   }
 
@@ -1521,11 +1503,7 @@ function renderSidebar() {
             updatedCount++;
         }
     }
-    if(updatedCount > 0) { 
-        saveSubjects(); 
-        alert(`수정되었습니다.\n최종 반영을 위해 '서버에 저장' 버튼을 꼭 눌러주세요.`); 
-        document.getElementById('batchModal').style.display = 'none'; 
-    }
+    if(updatedCount > 0) { saveSubjects(); alert("수정되었습니다."); document.getElementById('batchModal').style.display = 'none'; }
   }
 
   function buildSearchIndex() {

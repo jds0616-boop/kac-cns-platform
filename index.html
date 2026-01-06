@@ -1,3 +1,4 @@
+<!-- START OF FILE index.html -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -213,23 +214,7 @@
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     z-index: 1000;
   }
-  
-  /* [추가] 푸터 내부 정렬 */
-  .footer-inner {
-      display: flex; align-items: center; justify-content: center; gap: 30px; 
-      max-width: 1200px; width: 100%; position: relative;
-  }
-
-  /* [추가] QR 코드 스타일 */
-  .footer-qr {
-      width: 65px; height: 65px; 
-      background: #fff; padding: 5px; border-radius: 8px; 
-      cursor: pointer; transition: 0.3s; flex-shrink: 0;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  }
-  .footer-qr:hover { transform: scale(1.1); filter: brightness(1.1); }
-
-  .footer-content p { margin: 0; word-break: keep-all; text-align: left; }
+  .footer-content p { margin: 0; word-break: keep-all; }
   .footer-content p:last-child { font-weight: 700; margin-top: 8px; color: rgba(255,255,255,0.9); }
   
   .footer-edit-btn { margin-top: 10px; font-size: 11px; cursor: pointer; opacity: 0.5; color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 4px; display: none; }
@@ -343,10 +328,7 @@
         border-top: 1px solid rgba(255,255,255,0.1);
         box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
     }
-    
-    /* [수정] 모바일에서는 QR 코드 숨기기 */
-    .footer-qr { display: none !important; }
-    .footer-content p { font-size: 11px; white-space: normal; text-align: center; }
+    .main-footer p { font-size: 11px; white-space: normal; }
 
     /* [수정 7] 주/야간 아이콘 플로팅 (하단바 좌측 위) */
     .mobile-theme-float {
@@ -366,10 +348,6 @@
     }
     .mobile-theme-float svg { width: 18px; height: 18px; fill: currentColor; }
   }
-
-  /* 확대용 QR 모달 전용 스타일 */
-  #qrZoomModal .modal-card { width: auto; padding: 20px; text-align: center; }
-  #qrZoomModal img { width: 350px; height: 350px; display: block; border-radius: 10px; }
 
   #loadingSpinner { position: fixed; inset: 0; background: var(--bg-main); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
   .spinner { width: 50px; height: 50px; border: 5px solid #cbd5e1; border-top-color: #2563eb; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
@@ -465,7 +443,7 @@
 
   <div class="header-right">
     <div class="theme-toggle">
-      <div class="theme-btn" id="btnDay" onclick="setTheme('light')"><svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41(17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg></div>
+      <div class="theme-btn" id="btnDay" onclick="setTheme('light')"><svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg></div>
       <div class="theme-btn" id="btnNight" onclick="setTheme('dark')"><svg viewBox="0 0 24 24"><path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C6.94,10.39 9.79,16.87 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z"/></svg></div>
     </div>
     <div class="settings-btn" onclick="openSettings()">⚙️</div>
@@ -491,29 +469,16 @@
 
   <!-- 모바일용 플로팅 테마 버튼 -->
   <div class="mobile-theme-float" onclick="toggleThemeMobile()">
-      <svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41(17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg>
   </div>
 
   <!-- 하단바 (Footer) -->
   <footer class="main-footer">
-    <div class="footer-inner">
-        <!-- [추가] QR 코드 이미지 -->
-        <img src="qr_code.png" alt="QR Code" class="footer-qr" onclick="openQrZoom()" title="확대하려면 클릭하세요">
-        
-        <div class="footer-content">
-            <!-- JS로 로드됨 -->
-        </div>
+    <div class="footer-content">
+        <!-- JS로 로드됨 -->
     </div>
     <span class="footer-edit-btn" onclick="openFooterEditModal()">텍스트 수정</span>
   </footer>
-</div>
-
-<!-- [추가] QR 확대 모달 -->
-<div id="qrZoomModal" class="modal-overlay" onclick="this.style.display='none'">
-    <div class="modal-card">
-        <img src="qr_code.png" alt="Zoomed QR">
-        <p style="margin-top:15px; font-weight:800; color:var(--text-main);">클릭하면 닫힙니다.</p>
-    </div>
 </div>
 
 <!-- 설정 모달 -->
@@ -721,65 +686,86 @@ function normalizeArray(v) {
 // [수정] 안전한 인증 확인 함수
 function ensureAnonAuth() {
   return new Promise((resolve) => {
+    // 1. 상태 변화 감지 리스너 등록
     const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        unsubscribe();
+        // 이미 로그인 되어 있거나, 방금 로그인 됨
+        console.log("✅ Firebase Auth 상태: 인증됨 (UID: " + user.uid + ")");
+        unsubscribe(); // 리스너 해제
         resolve();
       } else {
+        // 로그인 안 된 상태 -> 익명 로그인 시도
+        console.log("🔒 인증 정보 없음. 익명 로그인 시도...");
+        // 주의: 여기서 unsubscribe 하지 않음. 로그인 성공 시 위 if(user) 블록이 다시 실행됨.
         firebase.auth().signInAnonymously().catch((error) => {
+          console.error("❌ 익명 로그인 실패:", error);
           unsubscribe();
-          resolve();
+          resolve(); // 실패하더라도 로컬 데이터로 진행하기 위해 resolve
         });
       }
     });
   });
 }
 
-// [추가] QR 확대 함수
-function openQrZoom() {
-    document.getElementById('qrZoomModal').style.display = 'flex';
-}
-
 async function init() {
+  // 1. 로딩 표시
   const spinner = document.getElementById('loadingSpinner');
   if(spinner) spinner.style.display = 'flex';
 
+  // 2. 익명 권한 획득 (DB 읽기 위해 필수)
   await ensureAnonAuth();
 
+  // 3. 테마 적용
   setTheme(localStorage.getItem('kac_theme') || 'light');
   if (isPreview) document.body.classList.add('preview-active');
   if (isAdmin) document.body.classList.add('admin-mode');
 
+  // 4. Firebase에서 데이터 가져오기
+  console.log("🔥 Firebase 데이터 로딩 시도...");
   try {
     const snapshot = await db.ref('/').once('value');
     if (snapshot.exists()) {
       const serverData = snapshot.val();
+      console.log("✅ 서버 데이터 수신 성공");
+
+      // 서버 데이터가 있으면 globalData를 덮어씌움
       globalData = serverData;
+      
+      // 데이터 배열 보정 (빈 구멍이나 null값 처리)
       if (globalData.categories) {
           globalData.categories = normalizeArray(globalData.categories);
       } else {
           globalData.categories = [];
       }
+      
+      // 로컬 스토리지도 서버 데이터로 동기화 (새로고침 대비)
       syncToLocalStorage(globalData);
+      
       if(globalData.config) applyConfig(globalData.config);
+
     } else {
+      console.log("⚠️ 서버에 데이터가 없습니다. (초기 상태)");
+      // 서버가 비어있으면 로컬 데이터 또는 기본값 사용
       reconstructGlobalDataFromLocal();
     }
   } catch (e) {
+    console.error("❌ 데이터 로드 실패(로컬 모드 진입):", e);
     reconstructGlobalDataFromLocal();
   }
 
+  // 5. 화면 렌더링
   const contentTop = localStorage.getItem('kac_content_top');
   if(contentTop) {
       document.querySelector('.content-wrapper').style.paddingTop = contentTop + 'px';
   }
   
-  loadFooterText(); 
-  ensurePageSlots(); 
-  renderCards(false); 
-  buildSearchIndex(); 
-  renderSidebar(); 
+  loadFooterText(); // 하단 문구 로드
+  ensurePageSlots(); // 빈 슬롯 채우기
+  renderCards(false); // 카드 그리기
+  buildSearchIndex(); // 검색엔진 생성
+  renderSidebar(); // 사이드바 생성
   
+  // 로딩 종료
   if(spinner) {
       spinner.style.opacity = '0';
       setTimeout(() => spinner.style.display='none', 500);
@@ -791,7 +777,7 @@ async function init() {
       if (!savedHtml) {
           savedHtml = localStorage.getItem('kac_full_footer');
       }
-      const defaultHtml = "<p>본 웹사이트는 한국공항공사 항공기술훈련원의 항행안전시설 분야 교육 관련 플랫폼입니다.</p><p>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)</p><p>© 2026 Korea Airports Corporation. All rights reserved.</p>";
+      const defaultHtml = "<p>본 웹사이트는 한국공항공사 항공기술훈련원의 항행안전시설 분야 교육 관련 플랫폼입니다.</p><p>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)</p><p>문의 이메일 : jds0616@airport.co.kr (Developed by DooSeok, Jang)</p><p>© 2026 Korea Airports Corporation. All rights reserved.</p>";
       document.querySelector('.footer-content').innerHTML = savedHtml || defaultHtml;
   }
 
@@ -820,7 +806,7 @@ async function init() {
       syncToLocalStorage(globalData);
       loadFooterText();
       document.getElementById('footerEditModal').style.display = 'none';
-      alert("하단 문구가 저장되었습니다.");
+      alert("하단 문구가 저장되었습니다. (JSON 저장 시 함께 포함됩니다)");
   }
   
   function reconstructGlobalDataFromLocal() {
@@ -855,10 +841,13 @@ async function init() {
             if(!id) return null;
             const s = JSON.parse(localStorage.getItem(`kac_style_${id}`) || '{}');
             const ms = JSON.parse(localStorage.getItem(`kac_menu_${id}`) || '[]');
+            
+            // access 정보 복원
             const access = s.access || { visible: true, adminOnly: false, showSidebar: true };
 
             const menuList = ms.map(m => {
                 const subs = JSON.parse(localStorage.getItem(`kac_subs_${id}_${m.dataId}`) || '[]');
+                // [수정] 메뉴의 visible 속성도 복원 (없으면 true)
                 const isVisible = (m.visible !== undefined) ? m.visible : true;
                 return { id: m.dataId, label: m.label, line1: m.line1, line2: m.line2, link: m.link, visible: isVisible, subjects: subs };
             });
@@ -869,7 +858,7 @@ async function init() {
   }
 
   function resetToDataJson() {
-    if(confirm("모든 내용이 사라지고 서버 상태로 되돌아갑니다. 계속하시겠습니까?")) {
+    if(confirm("현재까지 수정한 모든 내용이 사라지고 서버의 원본 파일(data.json) 상태로 되돌아갑니다.\n계속하시겠습니까?")) {
         localStorage.clear();
         location.reload();
     }
@@ -878,6 +867,12 @@ async function init() {
   window.addEventListener('pageshow', () => {
       const savedStatus = localStorage.getItem('kac_admin_mode') === '1';
       if (isAdmin !== savedStatus) location.reload();
+      const savedPreview = localStorage.getItem('kac_preview_active') === '1';
+      if(isPreview !== savedPreview) location.reload();
+  });
+
+  window.addEventListener('storage', (e) => {
+      if (e.key === 'kac_admin_mode' || e.key === 'kac_preview_active') location.reload();
   });
 
   function ensurePageSlots() {
@@ -887,18 +882,25 @@ async function init() {
         const needed = itemsPerPage - (globalData.categories.length % itemsPerPage);
         for(let i=0; i<needed; i++) globalData.categories.push(null);
     }
+    if(globalData.categories.length === 0) {
+        for(let i=0; i<itemsPerPage; i++) globalData.categories.push(null);
+    }
   }
 
 function syncToLocalStorage(data) {
   const order = [];
-  if (!data.categories) return;
+  
+  if (!data.categories) return; // 데이터가 없으면 중단
 
   data.categories.forEach(cat => {
     if(cat) {
       order.push(cat.id);
       const access = cat.access || { visible: true, adminOnly: false, showSidebar: true };
       localStorage.setItem(`kac_style_${cat.id}`, JSON.stringify({ name: cat.name, code: cat.code, color: cat.color, access: access }));
+      
+      // [핵심 수정] cat.menus가 없으면 빈 배열([])을 사용하도록 (|| []) 추가
       const safeMenus = cat.menus || []; 
+
       const menuList = safeMenus.map(m => ({ 
           dataId: m.id, 
           label: m.label, 
@@ -908,6 +910,8 @@ function syncToLocalStorage(data) {
           visible: (m.visible !== undefined) ? m.visible : true
       }));
       localStorage.setItem(`kac_menu_${cat.id}`, JSON.stringify(menuList));
+      
+      // 여기도 safeMenus 사용
       safeMenus.forEach(m => { 
           if(m.subjects) {
               localStorage.setItem(`kac_subs_${cat.id}_${m.id}`, JSON.stringify(m.subjects)); 
@@ -922,9 +926,15 @@ function syncToLocalStorage(data) {
   if(data.config) {
       localStorage.setItem('kac_idx_icon_size', data.config.iconSize);
       localStorage.setItem('kac_idx_label_size', data.config.labelSize);
-      if(data.config.pageTitles) localStorage.setItem('kac_page_titles', JSON.stringify(data.config.pageTitles));
-      if(data.config.footerText) localStorage.setItem('kac_full_footer', data.config.footerText);
-      if(data.config.contentTop) localStorage.setItem('kac_content_top', data.config.contentTop);
+      if(data.config.pageTitles) {
+          localStorage.setItem('kac_page_titles', JSON.stringify(data.config.pageTitles));
+      }
+      if(data.config.footerText) {
+          localStorage.setItem('kac_full_footer', data.config.footerText);
+      }
+      if(data.config.contentTop) {
+          localStorage.setItem('kac_content_top', data.config.contentTop);
+      }
   }
 }
 
@@ -934,6 +944,7 @@ function syncToLocalStorage(data) {
     document.documentElement.style.setProperty('--label-size-idx', (cfg.labelSize||24)+'px');
   }
 
+  /* 사이드바 로직 */
   function toggleSidebar() {
       const sb = document.getElementById('sidebar');
       const ov = document.getElementById('sidebarOverlay');
@@ -944,11 +955,18 @@ function syncToLocalStorage(data) {
 function renderSidebar() {
       const content = document.getElementById('sidebarContent');
       content.innerHTML = '';
+      
       const cats = globalData.categories.filter(c => {
           if (c === null) return false;
           const acc = c.access || { visible: true, adminOnly: false, showSidebar: true };
+          
+          // [수정 1] 카테고리 필터링
+          // 비공개(visible:false)거나 사이드바 미노출(showSidebar:false)이면 관리자 여부 상관없이 제외
           if (!acc.visible || !acc.showSidebar) return false;
+          
+          // 관리자 전용(adminOnly)인데 관리자가 아니면 제외
           if (acc.adminOnly && !isAdmin) return false;
+          
           return true;
       });
 
@@ -957,13 +975,21 @@ function renderSidebar() {
       } else {
           cats.forEach((cat, cIdx) => {
               const acc = cat.access || { visible: true, adminOnly: false, showSidebar: true };
-              let namePrefix = (isAdmin && acc.adminOnly) ? "(관리자) " : "";
+              
+              // 관리자 전용일 때만 표시할 접두어 (비공개는 위에서 걸러지므로 로직 삭제)
+              let namePrefix = "";
+              if (isAdmin && acc.adminOnly) namePrefix = "(관리자) ";
+              
               const item = document.createElement('div');
+              
               let subHtml = '';
               if(cat.menus && cat.menus.length > 0) {
                   subHtml = `<div class="sb-sub-list" id="sb-sub-${cat.id}">`;
                   cat.menus.forEach(m => {
+                      // [수정 2] 하위 메뉴 필터링
+                      // 메뉴가 공개(visible:true)인 경우에만 렌더링 (관리자도 비공개 메뉴는 안 보임)
                       const isMenuVisible = (m.visible !== undefined) ? m.visible : true;
+                      
                       if(isMenuVisible) {
                           subHtml += `<div class="sb-sub-item" onclick="location.href='viewer_list.html?type=${cat.id}&menu=${encodeURIComponent(m.label)}&id=${m.id}'">
                               ${m.label}
@@ -972,6 +998,7 @@ function renderSidebar() {
                   });
                   subHtml += `</div>`;
               }
+
               item.innerHTML = `
                 <div class="sb-item" onclick="toggleSubMenu('${cat.id}', this)">
                     <span style="display:flex;align-items:center;gap:10px;">
@@ -985,11 +1012,17 @@ function renderSidebar() {
               content.appendChild(item);
           });
       }
+
+      // [수정 6] 모바일 사이드바 맨 아래에 '설정' 버튼 추가
       const settingsItem = document.createElement('div');
       settingsItem.className = 'sb-item';
       settingsItem.style.marginTop = '20px';
       settingsItem.style.borderTop = '1px solid var(--btn-border)';
-      settingsItem.innerHTML = `<span style="display:flex;align-items:center;gap:10px;" onclick="openSettings(); toggleSidebar();">⚙️ 시스템 설정</span>`;
+      settingsItem.innerHTML = `
+        <span style="display:flex;align-items:center;gap:10px;" onclick="openSettings(); toggleSidebar();">
+            ⚙️ 시스템 설정
+        </span>
+      `;
       content.appendChild(settingsItem);
   }
 
@@ -1006,6 +1039,7 @@ function renderSidebar() {
       }
   }
 
+  /* 페이지 헤드라인 로직 */
   function updateHeadline() {
       const el = document.getElementById('pageHeadline');
       const titles = globalData.config.pageTitles || {};
@@ -1033,9 +1067,12 @@ function renderSidebar() {
       }
   }
 
+  /* 메인 카드 렌더링 */
   function renderCards(animate = true) {
     const containerWrapper = document.getElementById('cardContainer');
     const pagination = document.getElementById('pagination');
+    
+    // [수정 5] 모바일인지 체크 (768px 이하)
     const isMobile = window.innerWidth <= 768;
 
     if(animate) {
@@ -1053,6 +1090,7 @@ function renderSidebar() {
     function performRender(isMobileMode) {
         containerWrapper.innerHTML = ''; 
         pagination.innerHTML = '';
+
         let renderList = [];
         
         if (isAdmin) {
@@ -1061,41 +1099,57 @@ function renderSidebar() {
             renderList = globalData.categories.filter(cat => {
                 if(!cat) return false;
                 const acc = cat.access || { visible: true, adminOnly: false, showSidebar: true };
-                return acc.visible && !acc.adminOnly;
+                if(!acc.visible || acc.adminOnly) return false;
+                return true;
             });
         }
 
+        // [수정 5] 모바일일 경우 전체 목록을 필터링하여 출력 (페이지네이션 무시)
         if(isMobileMode) {
-            const mobileList = renderList.filter(item => item !== null);
+            const mobileList = renderList.filter(item => item !== null); // 빈칸 제외
             mobileList.forEach((cat, i) => {
+                // 원래 globalData에서의 인덱스를 찾아야 수정/삭제가 정확함
                 const originalIdx = globalData.categories.indexOf(cat);
                 createAndAppendCard(cat, originalIdx, true); 
             });
+            // 모바일에서는 페이지네이션 점을 생성하지 않음
             return; 
         }
 
+        // PC 모드: 기존 페이지네이션 로직 유지
         const totalPages = Math.ceil(renderList.length / itemsPerPage) || 1;
         if(currentPage > totalPages) currentPage = 1; 
         const startIdx = (currentPage - 1) * itemsPerPage;
         const pageItems = renderList.slice(startIdx, startIdx + itemsPerPage);
 
         pageItems.forEach((cat, i) => {
-          let globalIdx = isAdmin ? startIdx + i : -1;
+          let globalIdx = -1;
+          if(isAdmin) {
+             globalIdx = startIdx + i;
+          }
           createAndAppendCard(cat, globalIdx, false);
         });
 
+        // 페이지네이션 점 생성 (PC만)
         for(let i=1; i<=totalPages; i++) {
             const dot = document.createElement('div');
             dot.className = `page-dot ${i === currentPage ? 'active' : ''}`;
-            dot.onclick = () => { if(i !== currentPage) { currentPage = i; renderCards(true); } };
+            dot.onclick = () => { 
+                if(i === currentPage) return;
+                currentPage = i; 
+                renderCards(true); 
+            };
             pagination.appendChild(dot);
         }
         
         if(isAdmin && !isPreview) {
             const addPageBtn = document.createElement('div');
             addPageBtn.className = 'page-dot';
+            addPageBtn.style.background = 'transparent';
             addPageBtn.style.border = '1px solid #cbd5e1';
             addPageBtn.innerText = '+';
+            addPageBtn.style.textAlign = 'center';
+            addPageBtn.style.lineHeight = '10px';
             addPageBtn.onclick = () => {
                 for(let k=0; k<itemsPerPage; k++) globalData.categories.push(null);
                 currentPage = Math.ceil(globalData.categories.length / itemsPerPage);
@@ -1106,30 +1160,32 @@ function renderSidebar() {
         updateHeadline();
     }
 
+    // 카드 생성 헬퍼 함수
     function createAndAppendCard(cat, idx, isMobileRender) {
         if(cat) { 
             const acc = cat.access || { visible: true, adminOnly: false, showSidebar: true };
+            const isHidden = !acc.visible;
+            const isAdminOnly = acc.adminOnly;
+            
             const card = document.createElement('div');
             card.className = 'card';
             card.style.setProperty('--card-color', cat.color);
             card.onclick = () => location.href = `facility.html?type=${cat.id}`;
-            if (isAdmin && (!acc.visible || acc.adminOnly)) card.classList.add('restricted-view');
+            
+            if (isAdmin && (isHidden || isAdminOnly)) {
+                card.classList.add('restricted-view');
+            }
 
-            if(isAdmin && !isPreview && !isMobileRender) {
+            if(isAdmin && !isPreview && !isMobileRender) { // 모바일에서는 드래그 앤 드롭 등 복잡한거 제외하거나 단순화
               card.setAttribute('draggable', 'true');
-              card.ondragstart = (e) => { dragSrcIndex = idx; e.target.classList.add('dragging'); };
-              card.ondragover = (e) => e.preventDefault();
-              card.ondrop = (e) => {
-                const srcItem = globalData.categories[dragSrcIndex];
-                globalData.categories[dragSrcIndex] = globalData.categories[idx];
-                globalData.categories[idx] = srcItem;
-                renderCards(false);
-              };
-              card.ondragend = () => document.querySelectorAll('.card').forEach(c => c.classList.remove('dragging'));
-
+              card.ondragstart = (e) => handleDragStart(e, idx);
+              card.ondragover = (e) => handleDragOver(e);
+              card.ondrop = (e) => handleDrop(e, idx);
+              card.ondragend = (e) => handleDragEnd(e);
+              
               let statusBadges = "";
-              if(!acc.visible) statusBadges += "🚫비공개 ";
-              if(acc.adminOnly) statusBadges += "🔒관리자전용 ";
+              if(isHidden) statusBadges += "🚫비공개 ";
+              if(isAdminOnly) statusBadges += "🔒관리자전용 ";
 
               card.innerHTML = `
                 <div class="card-ctrl" onclick="event.stopPropagation()">
@@ -1142,46 +1198,70 @@ function renderSidebar() {
                 ${statusBadges ? `<div style="position:absolute; bottom:15px; font-size:12px; color:red; font-weight:800; background:rgba(255,255,255,0.8); padding:2px 8px; border-radius:10px;">${statusBadges}</div>` : ''}
               `;
             } else {
+                // 일반 모드 또는 모바일 뷰
                 card.innerHTML = `<div class="icon-box">${cat.code}</div><h2>${cat.name}</h2>`;
             }
             containerWrapper.appendChild(card);
-        } else if(isAdmin && !isPreview && !isMobileRender) { 
+        } else { 
+            // 빈 슬롯 (모바일에서는 안보임, CSS로 제어됨)
             const empty = document.createElement('div');
             empty.className = 'card add-slot';
-            empty.innerHTML = '<div style="font-size:40px;">+</div><div>추가</div>';
-            empty.onclick = () => openEdit('NEW', idx);
+            if(isAdmin && !isPreview && !isMobileRender) {
+               empty.innerHTML = '<div style="font-size:40px;">+</div><div>카테고리 추가</div>';
+               empty.onclick = () => openEdit('NEW', idx);
+               empty.ondragover = (e) => handleDragOver(e);
+               empty.ondrop = (e) => handleDrop(e, idx);
+            }
             containerWrapper.appendChild(empty);
         }
     }
   }
 
+  // [추가] 모바일용 테마 토글 함수
   function toggleThemeMobile() {
       const current = localStorage.getItem('kac_theme') || 'light';
       setTheme(current === 'light' ? 'dark' : 'light');
   }
 
+  function handleDragStart(e, idx) { dragSrcIndex = idx; e.target.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
+  function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; return false; }
+  function handleDrop(e, targetIdx) { e.stopPropagation(); if(dragSrcIndex !== null && dragSrcIndex !== targetIdx) { const srcItem = globalData.categories[dragSrcIndex]; const targetItem = globalData.categories[targetIdx]; globalData.categories[targetIdx] = srcItem; globalData.categories[dragSrcIndex] = targetItem; renderCards(false); } return false; }
+  function handleDragEnd(e) { document.querySelectorAll('.card').forEach(c => c.classList.remove('dragging')); }
+
   function buildSearchIndex() {
     searchIndex = [];
+    
+    // globalData나 categories가 없으면 그냥 종료 (에러 방지)
     if (!globalData || !globalData.categories) return;
+
     globalData.categories.forEach(cat => {
       if(!cat) return;
+      
       const acc = cat.access || { visible: true, adminOnly: false, showSidebar: true };
-      if (!isAdmin && (!acc.visible || acc.adminOnly)) return;
+      if (!isAdmin) {
+          if (!acc.visible || acc.adminOnly) return;
+      }
+
+      // [핵심 수정 1] menus가 없으면 빈 배열([])로 처리하여 forEach 에러 방지
       const safeMenus = cat.menus || [];
+
       safeMenus.forEach(menu => {
+        // 메뉴의 visible 속성 체크
         const isMenuVisible = (menu.visible !== undefined) ? menu.visible : true;
         if(!isAdmin && !isMenuVisible) return;
+
+        // [핵심 수정 2] subjects가 없으면 빈 배열([])로 처리
         const safeSubjects = menu.subjects || [];
+
         safeSubjects.forEach(sub => {
           searchIndex.push({
             name: sub.name, type: cat.id, code: cat.code, typeName: cat.name,
-            menuName: menu.label, menuId: menu.id, subId: sub.id, color: cat.color
+            menuName: menu.label, menuId: menu.id, subId: sub.id, color: cat.color, active: sub.active
           });
         });
       });
     });
   }
-
   const searchInput = document.getElementById('mainSearch');
   const searchRes = document.getElementById('searchResults');
   const sOverlay = document.getElementById('searchOverlay');
@@ -1189,6 +1269,7 @@ function renderSidebar() {
   searchInput.addEventListener('input', (e) => {
     const q = e.target.value.toLowerCase().trim();
     if(!q) { searchRes.classList.remove('active'); return; }
+    
     const matches = searchIndex.filter(i => i.name.toLowerCase().includes(q) || i.menuName.toLowerCase().includes(q));
     searchRes.innerHTML = matches.map(i => `
       <div class="result-item" onclick="location.href='viewer_list.html?type=${i.type}&menu=${encodeURIComponent(i.menuName)}&id=${i.menuId}&autoOpen=${i.subId}'">
@@ -1196,6 +1277,7 @@ function renderSidebar() {
         <div class="res-tag" style="background:${i.color}">${i.code}</div>
       </div>
     `).join('') || '<div style="padding:15px;text-align:center;">결과 없음</div>';
+    
     searchRes.classList.add('active');
   });
 
@@ -1203,34 +1285,248 @@ function renderSidebar() {
   sOverlay.onclick = () => { sOverlay.classList.remove('active'); searchRes.classList.remove('active'); };
 
   function openSettings() {
-    document.getElementById('guestSettings').style.display = isAdmin ? 'none' : 'block';
-    document.getElementById('adminSettings').style.display = isAdmin ? 'block' : 'none';
+    const gSet = document.getElementById('guestSettings');
+    const aSet = document.getElementById('adminSettings');
+    gSet.style.display = isAdmin ? 'none' : 'block';
+    aSet.style.display = isAdmin ? 'block' : 'none';
+    
     if(isAdmin) {
         document.getElementById('setIconSize').value = globalData.config.iconSize || 60;
         document.getElementById('setLabelSize').value = globalData.config.labelSize || 24;
         document.getElementById('setContentTop').value = localStorage.getItem('kac_content_top') || 135; 
-        document.getElementById('modalPreviewBtn').textContent = isPreview ? "미리보기 종료" : "미리보기 시작";
-        document.getElementById('modalPreviewBtn').classList.toggle('btn-preview-active', isPreview);
+
+        const pBtn = document.getElementById('modalPreviewBtn');
+        pBtn.textContent = isPreview ? "미리보기 종료" : "미리보기 시작";
+        pBtn.classList.toggle('btn-preview-active', isPreview);
     }
     document.getElementById('settingsModal').style.display='flex';
   }
 
   function saveUISettings() {
-    globalData.config.iconSize = parseInt(document.getElementById('setIconSize').value);
-    globalData.config.labelSize = parseInt(document.getElementById('setLabelSize').value);
-    globalData.config.contentTop = parseInt(document.getElementById('setContentTop').value);
+    const is = document.getElementById('setIconSize').value;
+    const ls = document.getElementById('setLabelSize').value;
+    const ct = document.getElementById('setContentTop').value; 
+
+    globalData.config.iconSize = parseInt(is);
+    globalData.config.labelSize = parseInt(ls);
+    globalData.config.contentTop = parseInt(ct);
+
     applyConfig(globalData.config);
+    
+    localStorage.setItem('kac_idx_icon_size', globalData.config.iconSize);
+    localStorage.setItem('kac_idx_label_size', globalData.config.labelSize);
     localStorage.setItem('kac_content_top', globalData.config.contentTop);
-    document.querySelector('.content-wrapper').style.paddingTop = globalData.config.contentTop + 'px';
+    
+    document.querySelector('.content-wrapper').style.paddingTop = ct + 'px';
     document.getElementById('settingsModal').style.display='none';
   }
 
   function togglePreview() {
     isPreview = !isPreview;
     localStorage.setItem('kac_preview_active', isPreview ? '1' : '0');
-    location.reload();
+    document.body.classList.toggle('preview-active', isPreview);
+    document.getElementById('settingsModal').style.display='none';
+    renderCards(false);
   }
 
+  /* 종합 관리자 (Tree Editor) 로직 */
+  function openIntegratedAdmin() {
+    document.getElementById('settingsModal').style.display='none';
+    document.getElementById('integratedAdminModal').style.display='flex';
+    renderTree();
+    document.getElementById('treeDetail').innerHTML = '<div style="display:flex; height:100%; align-items:center; justify-content:center; color:var(--text-sub);">항목을 선택해주세요.</div>';
+    currentTreeSelection = null;
+  }
+
+  function renderTree() {
+      const root = document.getElementById('treeRoot');
+      root.innerHTML = '';
+      globalData.categories.forEach((cat, cIdx) => {
+          if(!cat) return;
+          const cDiv = createTreeNode(`📂 ${cat.name}`, 'cat', cIdx, null, null, true);
+          root.appendChild(cDiv);
+          const cChildren = document.createElement('div');
+          cChildren.className = 't-children'; 
+          cChildren.id = `child-cat-${cIdx}`;
+          root.appendChild(cChildren);
+
+          if(cat.menus) {
+              cat.menus.forEach((menu, mIdx) => {
+                  const mDiv = createTreeNode(`📁 ${menu.label}`, 'menu', cIdx, mIdx, null, true);
+                  cChildren.appendChild(mDiv);
+                  const mChildren = document.createElement('div');
+                  mChildren.className = 't-children';
+                  mChildren.id = `child-menu-${cIdx}-${mIdx}`;
+                  cChildren.appendChild(mChildren);
+                  if(menu.subjects) {
+                      menu.subjects.forEach((subj, sIdx) => {
+                          const sDiv = createTreeNode(`📄 ${subj.name}`, 'subj', cIdx, mIdx, sIdx, false);
+                          mChildren.appendChild(sDiv);
+                      });
+                  }
+              });
+          }
+      });
+  }
+
+  function createTreeNode(label, type, cIdx, mIdx, sIdx, hasChildren) {
+      const row = document.createElement('div');
+      row.className = 't-node-row';
+      const toggleBtn = document.createElement('div');
+      toggleBtn.className = hasChildren ? 't-toggle-btn' : 't-toggle-btn empty';
+      toggleBtn.textContent = hasChildren ? '▶' : '';
+      if(hasChildren) {
+          toggleBtn.onclick = (e) => {
+              e.stopPropagation();
+              toggleNode(toggleBtn, type, cIdx, mIdx);
+          };
+      }
+      const labelDiv = document.createElement('div');
+      labelDiv.className = 't-label';
+      labelDiv.textContent = label;
+      labelDiv.onclick = (e) => {
+          e.stopPropagation();
+          selectTreeNode(type, cIdx, mIdx, sIdx, labelDiv);
+      };
+      row.appendChild(toggleBtn);
+      row.appendChild(labelDiv);
+      return row;
+  }
+
+  function toggleNode(btn, type, cIdx, mIdx) {
+      let targetId = '';
+      if(type === 'cat') targetId = `child-cat-${cIdx}`;
+      else if(type === 'menu') targetId = `child-menu-${cIdx}-${mIdx}`;
+      const target = document.getElementById(targetId);
+      if(target) {
+          if(target.classList.contains('open')) {
+              target.classList.remove('open');
+              btn.textContent = '▶';
+          } else {
+              target.classList.add('open');
+              btn.textContent = '▼';
+          }
+      }
+  }
+
+  function selectTreeNode(type, cIdx, mIdx, sIdx, element) {
+      document.querySelectorAll('.t-label').forEach(n => n.classList.remove('selected'));
+      element.classList.add('selected');
+      currentTreeSelection = { type, cIdx, mIdx, sIdx };
+      const content = document.getElementById('treeDetail');
+      const cat = globalData.categories[cIdx];
+
+      if(type === 'cat') {
+          content.innerHTML = `
+            <h3>🗂️ 카테고리 수정</h3>
+            <div class="setting-group"><label class="setting-label">명칭</label><input type="text" id="tName" class="setting-input" value="${cat.name}"></div>
+            <div class="setting-group"><label class="setting-label">코드 (영문 1자)</label><input type="text" id="tCode" class="setting-input" value="${cat.code}"></div>
+            <div class="setting-group"><label class="setting-label">색상</label><input type="color" id="tColor" style="width:100%;height:40px;" value="${cat.color}"></div>
+            <button class="btn-modal btn-success" onclick="addChildMenu()">+ 하위 메뉴(Menu) 추가</button>
+          `;
+      } else if (type === 'menu') {
+          const menu = globalData.categories[cIdx].menus[mIdx];
+          content.innerHTML = `
+            <h3>📁 시설(메뉴) 수정</h3>
+            <div class="setting-group"><label class="setting-label">시설 명칭</label><input type="text" id="tLabel" class="setting-input" value="${menu.label}"></div>
+            <div class="setting-group"><label class="setting-label">아이콘 1줄</label><input type="text" id="tLine1" class="setting-input" value="${menu.line1||''}"></div>
+            <div class="setting-group"><label class="setting-label">아이콘 2줄</label><input type="text" id="tLine2" class="setting-input" value="${menu.line2||''}"></div>
+            <div class="setting-group"><label class="setting-label">외부 링크</label><input type="text" id="tLink" class="setting-input" value="${menu.link||''}"></div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-modal btn-success" onclick="addChildSubject()">+ 하위 과목(Subject) 추가</button>
+                <button class="btn-modal btn-danger" onclick="deleteTreeNode()">삭제</button>
+            </div>
+          `;
+      } else if (type === 'subj') {
+          const subj = globalData.categories[cIdx].menus[mIdx].subjects[sIdx];
+          content.innerHTML = `
+            <h3>📄 과목(Subject) 수정</h3>
+            <div class="setting-group"><label class="setting-label">과목명</label><input type="text" id="sName" class="setting-input" value="${subj.name}"></div>
+            <div class="setting-group"><label class="setting-label">활성 상태</label>
+                <select id="sActive" class="setting-input">
+                    <option value="true" ${subj.active !== false ? 'selected':''}>활성</option>
+                    <option value="false" ${subj.active === false ? 'selected':''}>비활성 (개발중)</option>
+                </select>
+            </div>
+            <div class="setting-group"><label class="setting-label">PDF 경로</label><input type="text" id="sPdf" class="setting-input" value="${subj.pdfName||''}"></div>
+            <div class="setting-group"><label class="setting-label">링크 주소</label><input type="text" id="sLink" class="setting-input" value="${subj.link||''}"></div>
+            <div class="setting-group"><label class="setting-label">오디오 경로</label><input type="text" id="sAudio" class="setting-input" value="${subj.audioName||''}"></div>
+            <button class="btn-modal btn-danger" onclick="deleteTreeNode()">삭제</button>
+          `;
+      }
+  }
+  
+  function addChildMenu() {
+      if(!currentTreeSelection || currentTreeSelection.type !== 'cat') return;
+      const cat = globalData.categories[currentTreeSelection.cIdx];
+      const newMenu = { id: 'id_'+Date.now(), label: '새 메뉴', line1: '', line2: '', link: '', subjects: [] };
+      if(!cat.menus) cat.menus = [];
+      cat.menus.push(newMenu);
+      renderTree();
+      alert("메뉴가 추가되었습니다.");
+  }
+  
+  function addChildSubject() {
+      if(!currentTreeSelection || currentTreeSelection.type !== 'menu') return;
+      const menu = globalData.categories[currentTreeSelection.cIdx].menus[currentTreeSelection.mIdx];
+      const newSubj = { id: Date.now().toString(), name: '새 과목', active: true, pdfName: '', link: '', audioName: '' };
+      if(!menu.subjects) menu.subjects = [];
+      menu.subjects.push(newSubj);
+      renderTree();
+      alert("과목이 추가되었습니다.");
+  }
+  
+  function deleteTreeNode() {
+      if(!confirm("정말 삭제하시겠습니까?")) return;
+      const { type, cIdx, mIdx, sIdx } = currentTreeSelection;
+      if(type === 'menu') {
+          globalData.categories[cIdx].menus.splice(mIdx, 1);
+      } else if (type === 'subj') {
+          globalData.categories[cIdx].menus[mIdx].subjects.splice(sIdx, 1);
+      }
+      renderTree();
+      document.getElementById('treeDetail').innerHTML = '<div style="display:flex; height:100%; align-items:center; justify-content:center; color:var(--text-sub);">삭제되었습니다.</div>';
+      currentTreeSelection = null;
+  }
+
+  function saveIntegratedData() {
+      if(!currentTreeSelection) return alert("수정할 항목이 없거나 저장되었습니다.");
+      const { type, cIdx, mIdx, sIdx } = currentTreeSelection;
+      
+      if(type === 'cat') {
+          const cat = globalData.categories[cIdx];
+          cat.name = document.getElementById('tName').value;
+          cat.code = document.getElementById('tCode').value;
+          cat.color = document.getElementById('tColor').value;
+      } else if (type === 'menu') {
+          const menu = globalData.categories[cIdx].menus[mIdx];
+          menu.label = document.getElementById('tLabel').value;
+          menu.line1 = document.getElementById('tLine1').value;
+          menu.line2 = document.getElementById('tLine2').value;
+          menu.link = document.getElementById('tLink').value;
+      } else if (type === 'subj') {
+          const subj = globalData.categories[cIdx].menus[mIdx].subjects[sIdx];
+          subj.name = document.getElementById('sName').value;
+          subj.active = document.getElementById('sActive').value === 'true';
+          subj.pdfName = document.getElementById('sPdf').value;
+          subj.link = document.getElementById('sLink').value;
+          subj.audioName = document.getElementById('sAudio').value;
+      }
+      syncToLocalStorage(globalData);
+      renderCards(false);
+      renderSidebar();
+      renderTree(); 
+      alert("✅ 저장 및 적용되었습니다.");
+  }
+
+
+  async function sha256(message) {
+      const msgBuffer = new TextEncoder().encode(message);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  // [수정 2] 관리자 로그인 (Firebase DB 비밀번호 대조)
   async function toggleAdmin() {
     if(isAdmin) {
       if(confirm("관리자 모드를 종료하시겠습니까?")) {
@@ -1240,30 +1536,289 @@ function renderSidebar() {
     } else {
       const pw = prompt("관리자 비밀번호를 입력하세요");
       if(!pw) return;
-      const inputHash = await sha256(pw.toUpperCase());
-      const snapshot = await db.ref('security/admin_pw').once('value');
-      let serverHash = snapshot.val() || "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c";
-      if(inputHash === serverHash) {
-          localStorage.setItem('kac_admin_mode','1');
-          location.reload();
-      } else alert("비밀번호 불일치");
+
+      try {
+          // 입력받은 비번 암호화
+          const inputHash = await sha256(pw.toUpperCase());
+          
+          // Firebase에서 관리자 비번 가져오기
+          const snapshot = await db.ref('security/admin_pw').once('value');
+          let serverHash = snapshot.val();
+          
+          // 서버에 비번 없으면 기본값(초기값) 사용 (CATC1234 해시)
+          if(!serverHash) serverHash = "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c";
+
+          if(inputHash === serverHash) {
+              alert("관리자 모드로 전환됩니다.");
+              localStorage.setItem('kac_admin_mode','1');
+              location.reload();
+          } else {
+              alert("비밀번호가 일치하지 않습니다.");
+          }
+      } catch(e) {
+          console.error(e);
+          alert("인증 오류가 발생했습니다. (인터넷 연결 확인)");
+      }
     }
   }
 
-  async function sha256(message) {
-    const msgBuffer = new TextEncoder().encode(message);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-    return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+  function openGithubModal() {
+    document.getElementById('ghOwner').value = localStorage.getItem('kac_gh_owner') || '';
+    document.getElementById('ghRepo').value = localStorage.getItem('kac_gh_repo') || '';
+    document.getElementById('ghToken').value = localStorage.getItem('kac_gh_token') || '';
+    document.getElementById('settingsModal').style.display = 'none';
+    document.getElementById('githubModal').style.display = 'flex';
   }
 
-  function setTheme(m) { 
-    document.body.className = m==='dark'?'dark-mode':''; 
-    localStorage.setItem('kac_theme', m); 
-    document.getElementById('btnDay').classList.toggle('active', m==='light'); 
-    document.getElementById('btnNight').classList.toggle('active', m==='dark'); 
+  async function uploadToGithub() {
+    const owner = document.getElementById('ghOwner').value.trim();
+    const repo = document.getElementById('ghRepo').value.trim();
+    const token = document.getElementById('ghToken').value.trim();
+    const path = "data.json"; 
+    const branch = "main"; 
+
+    if(!owner || !repo || !token) return alert("모든 정보를 입력해주세요.");
+
+    localStorage.setItem('kac_gh_owner', owner);
+    localStorage.setItem('kac_gh_repo', repo);
+    localStorage.setItem('kac_gh_token', token);
+
+    const btn = document.getElementById('btnGhUpload');
+    const originalText = btn.textContent;
+    btn.textContent = "업로드 중...";
+    btn.disabled = true;
+
+    try {
+        reconstructGlobalDataFromLocal();
+        globalData.meta.lastUpdated = new Date().toISOString().split('T')[0];
+        const jsonString = JSON.stringify(globalData, null, 2);
+        const contentBase64 = btoa(unescape(encodeURIComponent(jsonString)));
+
+        const getUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
+        let sha = "";
+        const getRes = await fetch(getUrl, {
+            method: "GET",
+            headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json" }
+        });
+        if (getRes.ok) {
+            const getData = await getRes.json();
+            sha = getData.sha;
+        }
+
+        const putUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+        const bodyData = {
+            message: `Update data.json via Web (${new Date().toLocaleString()})`,
+            content: contentBase64,
+            branch: branch
+        };
+        if (sha) bodyData.sha = sha;
+
+        const putRes = await fetch(putUrl, {
+            method: "PUT",
+            headers: {
+                "Authorization": `token ${token}`,
+                "Accept": "application/vnd.github.v3+json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(bodyData)
+        });
+
+        if (putRes.ok) {
+            alert("✅ 성공적으로 GitHub에 저장되었습니다!\n잠시 후(약 1~3분) 페이지에 반영됩니다.");
+            document.getElementById('githubModal').style.display = 'none';
+        } else {
+            const errData = await putRes.json();
+            throw new Error(errData.message);
+        }
+    } catch (e) {
+        alert("❌ 업로드 실패: " + e.message);
+        console.error(e);
+    } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+    }
   }
+
+  function openPwChangeModal() {
+      document.getElementById('settingsModal').style.display='none';
+      document.getElementById('pwChangeModal').style.display='flex';
+      document.getElementById('newPw').value = '';
+  }
+
+  async function executePwChange() {
+      const target = document.getElementById('pwTarget').value;
+      const newPw = document.getElementById('newPw').value.trim().toUpperCase();
+      if(!newPw) return alert("변경할 비밀번호를 입력하세요.");
+      const confirmPw = prompt(`[${target==='entry'?'교육생':'관리자'} 비밀번호]를 변경하시겠습니까?\n확인을 위해 새 비밀번호를 다시 입력해주세요.`);
+      if(newPw !== confirmPw) return alert("비밀번호가 일치하지 않습니다.");
+
+      const newHash = await sha256(newPw);
+      if(target === 'entry') globalData.security.entry_pw = newHash;
+      else globalData.security.admin_pw = newHash;
+
+      document.getElementById('pwChangeModal').style.display='none';
+      alert("✅ 비밀번호가 내부적으로 변경되었습니다.\n\n⚠️ 주의: [변경사항 저장] 또는 [GitHub 업로드]를 눌러야 완전히 적용됩니다!");
+      openSettings(); 
+  }
+
+  let tempSlotIdx = -1;
+  function openEdit(id, slotIdx = -1) {
+    editingCardId = id;
+    tempSlotIdx = slotIdx;
+    
+    if(id === 'NEW') {
+      document.getElementById('editName').value = '';
+      document.getElementById('editCode').value = '';
+      document.getElementById('editColor').value = '#2563eb';
+      // 신규 생성 시 기본값
+      document.getElementById('chkVisible').checked = true;
+      document.getElementById('chkAdminOnly').checked = false;
+      document.getElementById('chkSidebar').checked = true;
+    } else {
+      const t = globalData.categories.find(c => c && c.id === id);
+      document.getElementById('editName').value = t.name;
+      document.getElementById('editCode').value = t.code;
+      document.getElementById('editColor').value = t.color;
+      
+      const acc = t.access || { visible: true, adminOnly: false, showSidebar: true };
+      document.getElementById('chkVisible').checked = acc.visible;
+      document.getElementById('chkAdminOnly').checked = acc.adminOnly;
+      document.getElementById('chkSidebar').checked = acc.showSidebar;
+    }
+    document.getElementById('cardEditModal').style.display='flex';
+  }
+
+  function saveCardEdit() {
+    const name = document.getElementById('editName').value;
+    const code = document.getElementById('editCode').value;
+    const color = document.getElementById('editColor').value;
+    
+    // 체크박스 값 읽기
+    const access = {
+        visible: document.getElementById('chkVisible').checked,
+        adminOnly: document.getElementById('chkAdminOnly').checked,
+        showSidebar: document.getElementById('chkSidebar').checked
+    };
+
+    if(editingCardId === 'NEW') {
+      const newCat = { id: 'CAT_' + Date.now(), name, code, color, access, menus: [] };
+      if(tempSlotIdx !== -1) { globalData.categories[tempSlotIdx] = newCat; } 
+      else {
+          const emptyIdx = globalData.categories.indexOf(null);
+          if(emptyIdx !== -1) globalData.categories[emptyIdx] = newCat;
+          else globalData.categories.push(newCat);
+      }
+    } else {
+      const t = globalData.categories.find(c => c && c.id === editingCardId);
+      if(t) { 
+          t.name = name; t.code = code; t.color = color; 
+          t.access = access; // access 업데이트
+      }
+    }
+    syncToLocalStorage(globalData);
+    renderCards(false);
+    renderSidebar(); // 사이드바도 업데이트
+    document.getElementById('cardEditModal').style.display='none';
+  }
+
+  function openMovePageModal(idx) {
+    moveSrcIndex = idx;
+    const select = document.getElementById('moveTargetPage'); 
+    select.innerHTML = '';
+    const totalPages = Math.ceil(globalData.categories.length / itemsPerPage);
+    for(let i=1; i<=totalPages; i++) {
+        const opt = document.createElement('option');
+        opt.value = i; opt.textContent = `${i} 페이지로 이동`;
+        select.appendChild(opt);
+    }
+    const newPageOpt = document.createElement('option');
+    newPageOpt.value = 'NEW'; newPageOpt.textContent = "새 페이지로 이동 (마지막)";
+    select.appendChild(newPageOpt);
+    document.getElementById('movePageModal').style.display='flex';
+  }
+
+  function executeMovePage() {
+    const val = document.getElementById('moveTargetPage').value;
+    const item = globalData.categories[moveSrcIndex];
+    globalData.categories[moveSrcIndex] = null;
+    if(val === 'NEW') {
+        const currentLen = globalData.categories.length;
+        const newStart = Math.ceil(currentLen / itemsPerPage) * itemsPerPage;
+        for(let i=currentLen; i<newStart; i++) globalData.categories.push(null);
+        globalData.categories.push(item);
+        for(let i=0; i<itemsPerPage-1; i++) globalData.categories.push(null);
+    } else {
+        const page = parseInt(val);
+        const startIdx = (page-1) * itemsPerPage;
+        const endIdx = startIdx + itemsPerPage;
+        let foundEmpty = -1;
+        for(let i=startIdx; i<endIdx; i++) {
+            if(globalData.categories[i] === null) { foundEmpty = i; break; }
+        }
+        if(foundEmpty !== -1) globalData.categories[foundEmpty] = item;
+        else { alert("해당 페이지에 빈 공간이 없습니다."); globalData.categories[moveSrcIndex] = item; return; }
+    }
+    document.getElementById('movePageModal').style.display='none';
+    renderCards(false);
+    syncToLocalStorage(globalData);
+  }
+
+  function deleteCard(idx) {
+    if(confirm("정말 삭제하시겠습니까? (하위 메뉴도 모두 삭제됩니다)")) {
+      globalData.categories[idx] = null; 
+      syncToLocalStorage(globalData);
+      renderCards(false);
+      renderSidebar();
+    }
+  }
+
+  function exportJsonData() {
+    reconstructGlobalDataFromLocal();
+    globalData.meta.lastUpdated = new Date().toISOString().split('T')[0];
+    const str = JSON.stringify(globalData, null, 2);
+    const blob = new Blob([str], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = "data.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    alert("data.json 파일이 다운로드되었습니다.\n서버/폴더의 기존 파일을 덮어쓰기 해주세요.");
+  }
+
+  function setTheme(m) { document.body.className = m==='dark'?'dark-mode':''; localStorage.setItem('kac_theme', m); document.getElementById('btnDay').classList.toggle('active', m==='light'); document.getElementById('btnNight').classList.toggle('active', m==='dark'); }
 
   init();
+// [수정 3] 파이어베이스 저장 함수
+async function saveToFirebase() {
+    if(!isAdmin) return alert("관리자 권한이 필요합니다.");
+    if(!confirm("⚠️ 주의: 현재 화면의 모든 데이터를 서버에 덮어씁니다.\n\n계속하시겠습니까?")) return;
+
+    const btn = document.querySelector('.btn-success'); // 저장 버튼 찾기
+    const originalText = btn ? btn.innerText : "";
+    if(btn) btn.innerText = "저장 중...";
+
+    try {
+        // 현재 로컬의 최신 상태를 globalData로 재구성
+        reconstructGlobalDataFromLocal();
+        
+        // 메타데이터 업데이트
+        globalData.meta = globalData.meta || {};
+        globalData.meta.lastUpdated = new Date().toISOString();
+
+        // 파이어베이스에 덮어쓰기
+        await db.ref('/').set(globalData);
+        
+        alert("✅ 서버 저장 완료!\n이제 다른 사람도 변경된 내용을 볼 수 있습니다.");
+    } catch(e) {
+        console.error(e);
+        alert("❌ 저장 실패: " + e.message);
+    } finally {
+        if(btn) btn.innerText = originalText;
+    }
+}
+
 </script>
 </body>
 </html>
