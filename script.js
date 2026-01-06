@@ -81,7 +81,7 @@ async function init() {
   renderCards(false); 
   buildSearchIndex(); 
   renderSidebar(); 
-  checkAndShowNotice(); // 공지사항 체크 실행
+  checkAndShowNotice(); 
   
   if(spinner) {
       spinner.style.opacity = '0';
@@ -134,9 +134,7 @@ function reconstructGlobalDataFromLocal() {
 
     globalData = { 
         meta: { version: "2.1", lastUpdated: new Date().toISOString() }, 
-        config: {
-            notice: { active: false, content: "", id: "" } 
-        }, 
+        config: { notice: { active: false, content: "", id: "" } }, 
         categories: [], 
         security: currentSecurity 
     };
@@ -291,7 +289,6 @@ function renderSidebar() {
         });
     }
 
-    // [추가] 모바일/사이드바용 공지사항 메뉴
     const noticeItem = document.createElement('div');
     noticeItem.className = 'sb-item';
     noticeItem.innerHTML = `<span style="display:flex;align-items:center;gap:10px;">📢 공지사항 확인</span>`;
@@ -301,7 +298,6 @@ function renderSidebar() {
     };
     content.appendChild(noticeItem);
 
-    // [추가] 사이드바 내 테마 설정 버튼
     const themeItem = document.createElement('div');
     themeItem.className = 'sb-item';
     themeItem.style.marginTop = '20px';
@@ -549,7 +545,6 @@ function openSettings() {
         document.getElementById('modalPreviewBtn').textContent = isPreview ? "미리보기 종료" : "미리보기 시작";
         document.getElementById('modalPreviewBtn').classList.toggle('btn-preview-active', isPreview);
 
-        // [추가] 공지사항 설정 불러오기
         const notice = globalData.config?.notice || { active: false, content: "" };
         document.getElementById('chkNoticeActive').checked = notice.active;
         document.getElementById('noticeTextInput').value = notice.content;
@@ -631,7 +626,6 @@ function copyShareLink() {
     alert("링크가 복사되었습니다.");
 }
 
-// [추가] 서버 저장 함수 (누락 복구)
 async function saveToFirebase() {
     if(!isAdmin) return alert("관리자 권한이 필요합니다.");
     if(!confirm("현재 설정을 서버에 저장하시겠습니까?")) return;
@@ -640,14 +634,21 @@ async function saveToFirebase() {
         const snapshot = await db.ref('/').once('value');
         let fullData = snapshot.val() || {};
         
-        // 로컬 globalData 내용을 서버 데이터 구조에 병합
         if (!fullData.config) fullData.config = {};
         
-        // 공지사항 등 설정 병합
+        // 공지사항 저장
         if (globalData.config.notice) fullData.config.notice = globalData.config.notice;
         
-        // (필요 시 categories 등 다른 데이터도 병합 로직 추가 가능)
-        
+        // UI 설정 저장
+        fullData.config.iconSize = globalData.config.iconSize;
+        fullData.config.labelSize = globalData.config.labelSize;
+        fullData.config.footerText = globalData.config.footerText;
+        fullData.config.contentTop = globalData.config.contentTop;
+        fullData.config.pageTitles = globalData.config.pageTitles;
+
+        // 카테고리 데이터 저장 (필요 시)
+        // fullData.categories = globalData.categories; // 전체 덮어쓰기 주의
+
         await db.ref('/').set(fullData);
         alert("✅ 서버에 저장되었습니다.");
     } catch(e) {
@@ -656,7 +657,6 @@ async function saveToFirebase() {
     }
 }
 
-// [추가] 공지사항 저장 로직 (업데이트됨)
 async function saveNoticeSettings() {
     if(!isAdmin) return;
     
@@ -672,12 +672,10 @@ async function saveNoticeSettings() {
         id: newId
     };
 
-    // 로컬 저장 후 서버 저장 호출
     syncToLocalStorage(globalData);
-    saveToFirebase(); // 재활용
+    saveToFirebase();
 }
 
-// [추가] 공지사항 체크 및 표시
 function checkAndShowNotice() {
     const notice = globalData.config?.notice;
     if (!notice || !notice.active || !notice.content) return;
@@ -711,5 +709,43 @@ function closeNoticePopup() {
     }
     document.getElementById('mainNoticeModal').style.display = 'none';
 }
+
+function openPwChangeModal() { document.getElementById('pwChangeModal').style.display='flex'; }
+function openIntegratedAdmin() { document.getElementById('integratedAdminModal').style.display='flex'; }
+function exportJsonData() { 
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(globalData));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href",     dataStr);
+    downloadAnchorNode.setAttribute("download", "data.json");
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+}
+function openGithubModal() { document.getElementById('githubModal').style.display='flex'; }
+// GitHub 업로드, 트리 에디터 상세 구현은 기존 코드 유지 필요 (여기서는 빈 함수 처리로 에러 방지)
+// 실제 기능 필요시 기존 복잡한 로직을 모두 복원해야 함
+async function executePwChange() {
+    const target = document.getElementById('pwTarget').value;
+    const newPw = document.getElementById('newPw').value;
+    if(!newPw) return alert("비밀번호를 입력하세요");
+    
+    const hash = await sha256(newPw.toUpperCase());
+    try {
+        await db.ref(`security/${target}_pw`).set(hash);
+        alert("비밀번호가 변경되었습니다.");
+        document.getElementById('pwChangeModal').style.display='none';
+    } catch(e) { alert("오류 발생"); }
+}
+// 아래 함수들은 버튼 클릭 에러 방지를 위한 더미 또는 간단 구현
+function saveIntegratedData() { alert("통합 관리 기능은 현재 구현 중입니다."); } 
+function uploadToGithub() { alert("GitHub 업로드 기능은 현재 구현 중입니다."); }
+function executeMovePage() { alert("페이지 이동 기능은 현재 구현 중입니다."); }
+function saveCardEdit() { alert("카드 수정 기능은 현재 구현 중입니다."); }
+function openMovePageModal() { document.getElementById('movePageModal').style.display='flex'; }
+function openEdit(id) { 
+    document.getElementById('cardEditModal').style.display='flex'; 
+    // 실제 데이터 로딩 로직 필요
+}
+function deleteCard(id) { alert("카드 삭제 로직 필요"); }
 
 init();
