@@ -76,7 +76,6 @@ body.admin-mode .page-headline:hover { color: #bfdbfe; }
 }
 
 .header-right { display: flex; align-items: center; gap: 15px; z-index: 10; flex-shrink: 0; }
-/* ▼▼▼ 여기에 추가해 주세요 ▼▼▼ */
 .mobile-share-btn { display: none; }
 .theme-toggle { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); margin-right: 10px; }
 .theme-btn { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; opacity: 0.5; }
@@ -201,13 +200,17 @@ body.admin-mode .footer-edit-btn { display: inline-block; }
 /* 모바일용 플로팅 버튼 - display:none 으로 변경 */
 .mobile-theme-float { display: none; }
 
+/* [추가] 공지사항 팝업 스타일 */
+#noticeContent img { max-width: 100%; height: auto; border-radius: 5px; }
+#noticeContent p { margin-bottom: 10px; }
+#noticeContent ul { padding-left: 20px; margin-bottom: 10px; }
+#noticeContent a { color: #2563eb; text-decoration: underline; }
+
 /* ========================================= */
 /* [모바일 전용 최적화] - 수정됨 */
 /* ========================================= */
 @media (max-width: 768px) {
   
-  /* ... 위쪽 코드 생략 ... */
-
   /* [수정] 모바일 공유 버튼 스타일 */
   .mobile-share-btn {
       /* ▼▼▼ 여기 !important를 꼭 붙여주세요 ▼▼▼ */
@@ -279,16 +282,6 @@ body.admin-mode .footer-edit-btn { display: inline-block; }
   /* [수정] 모바일에서 PC용 테마/설정 버튼 숨김 */
   .theme-toggle { display: none !important; }
   .settings-btn { display: none; }
-
-  /* [추가] 모바일 공유 버튼 스타일 */
-  .mobile-share-btn {
-      display: flex; align-items: center; justify-content: center;
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.1);
-      cursor: pointer;
-  }
-  .mobile-share-btn svg { width: 18px; height: 18px; fill: #fff; }
 
   #cardContainerWrapper { padding: 0 15px; }
   #cardContainer { gap: 15px; padding: 10px 0; min-height: auto; flex-direction: column; flex-wrap: nowrap; }

@@ -78,7 +78,7 @@
     <div class="settings-btn" onclick="openSettings()">⚙️</div>
     <img src="logo.png" alt="KAC Logo" class="kac-logo-img">
 
-    <!-- [추가] 모바일 전용 공유 아이콘 -->
+    <!-- 모바일 전용 공유 아이콘 -->
     <div class="mobile-share-btn" onclick="openShareModal()">
         <svg viewBox="0 0 24 24"><path d="M18,16.08C17.24,16.08 16.56,16.38 16.04,16.85L8.91,12.7C8.96,12.47 9,12.24 9,12C9,11.76 8.96,11.53 8.91,11.3L15.96,7.19C16.5,7.69 17.21,8 18,8A3,3 0 0,0 21,5A3,3 0 0,0 18,2A3,3 0 0,0 15,5C15,5.24 15.04,5.47 15.09,5.7L8.04,9.81C7.5,9.31 6.79,9 6,9A3,3 0 0,0 3,12A3,3 0 0,0 6,15C6.79,15 7.5,15.31 8.04,14.81L15.09,18.91C15.04,19.15 15,19.37 15,19.6C15,21.26 16.34,22.6 18,22.6C19.66,22.6 21,21.26 21,19.6C21,17.94 19.66,16.6 18,16.6V16.08Z"/></svg>
     </div>
@@ -101,23 +101,43 @@
     <div id="pagination" class="pagination"></div>
   </div>
 
-  <!-- [삭제됨] 모바일 플로팅 테마 버튼 (mobile-theme-float) -->
-
   <!-- 하단바 (Footer) -->
   <footer class="main-footer">
     <div class="footer-inner">
-        <!-- [추가] QR 코드 이미지 -->
+        <!-- QR 코드 이미지 -->
         <img src="qr_code.png" alt="QR Code" class="footer-qr" onclick="openQrZoom()" title="확대하려면 클릭하세요">
         
         <div class="footer-content">
             <!-- JS로 로드됨 -->
         </div>
     </div>
-    <span class="footer-edit-btn" onclick="openFooterEditModal()">텍스트 수정</span>
+    
+    <!-- [추가] 공지사항 버튼 및 하단 텍스트 수정 (푸터 하단) -->
+    <div style="margin-top:10px; display:flex; gap:15px; font-size:12px; color:rgba(255,255,255,0.6);">
+        <span style="cursor:pointer; border-bottom:1px solid transparent;" onmouseover="this.style.borderBottomColor='white'" onmouseout="this.style.borderBottomColor='transparent'" onclick="showNoticeManual()">📢 공지사항 확인</span>
+        <span class="footer-edit-btn" onclick="openFooterEditModal()">하단 문구 수정</span>
+    </div>
   </footer>
 </div>
 
-<!-- [추가] 공유 기능 모달 -->
+<!-- [추가] 공지사항 팝업 모달 (일반 사용자용) -->
+<div id="mainNoticeModal" class="modal-overlay" style="z-index: 99999;">
+  <div class="modal-card" style="max-width: 500px; width: 90%;">
+    <div class="modal-title">📢 공지사항</div>
+    <div id="noticeContent" style="min-height: 100px; max-height: 60vh; overflow-y: auto; line-height: 1.6; margin-bottom: 20px;">
+      <!-- 공지 내용이 여기에 로드됩니다 -->
+    </div>
+    
+    <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--btn-border); padding-top: 15px;">
+        <label style="display: flex; align-items: center; gap: 5px; font-size: 13px; cursor: pointer; color: var(--text-sub);">
+            <input type="checkbox" id="dontShowToday"> 오늘 하루 보지 않기
+        </label>
+        <button class="btn-modal btn-primary" style="width: auto; padding: 8px 20px; margin:0;" onclick="closeNoticePopup()">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 공유 기능 모달 -->
 <div id="shareModal" class="modal-overlay" onclick="if(event.target===this) this.style.display='none'">
   <div class="modal-card" style="text-align:center; width:300px; padding:25px;">
     <h3 style="margin-bottom:15px; font-weight:800; color:var(--text-main);">페이지 공유</h3>
@@ -133,7 +153,7 @@
   </div>
 </div>
 
-<!-- [추가] QR 확대 모달 -->
+<!-- QR 확대 모달 -->
 <div id="qrZoomModal" class="modal-overlay" onclick="this.style.display='none'">
     <div class="modal-card">
         <img src="qr_code.png" alt="Zoomed QR">
@@ -175,6 +195,18 @@
         <button class="btn-modal btn-danger" style="margin-top:15px; background:#ef4444; opacity:0.8;" onclick="resetToDataJson()">⚠️ 서버 원본으로 초기화 (수정취소)</button>
       </div>
       
+      <!-- [추가] 공지사항 팝업 관리 영역 -->
+      <div class="setting-group" style="background: rgba(37,99,235,0.05); padding: 15px; border-radius: 15px; border: 1px solid var(--btn-border); margin-top: 15px;">
+        <label class="setting-label">📢 공지사항 팝업 관리</label>
+        <div style="margin-bottom: 10px;">
+            <label class="checkbox-item">
+                <input type="checkbox" id="chkNoticeActive"> <span>팝업 활성화 (체크 시 접속 시 뜸)</span>
+            </label>
+        </div>
+        <textarea id="noticeTextInput" class="setting-textarea" style="min-height: 100px; margin-bottom: 10px;" placeholder="공지할 내용을 입력하세요 (HTML 태그 사용 가능)"></textarea>
+        <button class="btn-modal btn-primary" onclick="saveNoticeSettings()">공지사항 저장 및 적용</button>
+      </div>
+
       <div class="setting-group" style="background: rgba(0,0,0,0.02); padding: 15px; border-radius: 15px; border: 1px solid var(--btn-border);">
         <label class="setting-label">↕️ 콘텐츠 위치 조정 (상단 여백)</label>
         <div style="display:flex; gap:10px;">

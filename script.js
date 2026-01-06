@@ -81,6 +81,7 @@ async function init() {
   renderCards(false); 
   buildSearchIndex(); 
   renderSidebar(); 
+  checkAndShowNotice(); // [추가] 공지사항 팝업 체크
   
   if(spinner) {
       spinner.style.opacity = '0';
@@ -131,9 +132,12 @@ const currentSecurity = globalData.security || {
     admin_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c"
 };
 
+// [수정] 공지사항 설정 초기화 추가
 globalData = { 
     meta: { version: "2.1", lastUpdated: new Date().toISOString() }, 
-    config: {}, 
+    config: {
+        notice: { active: false, content: "", id: "" } 
+    }, 
     categories: [], 
     security: currentSecurity 
 };
@@ -243,7 +247,6 @@ function toggleSidebar() {
     ov.classList.toggle('active');
 }
 
-// [수정] 사이드바 렌더링 - 테마 설정 버튼 추가
 function renderSidebar() {
     const content = document.getElementById('sidebarContent');
     content.innerHTML = '';
@@ -288,6 +291,16 @@ function renderSidebar() {
             content.appendChild(item);
         });
     }
+
+    // [추가] 모바일/사이드바용 공지사항 메뉴
+    const noticeItem = document.createElement('div');
+    noticeItem.className = 'sb-item';
+    noticeItem.innerHTML = `<span style="display:flex;align-items:center;gap:10px;">📢 공지사항 확인</span>`;
+    noticeItem.onclick = () => {
+        showNoticeManual();
+        toggleSidebar();
+    };
+    content.appendChild(noticeItem);
 
     // [추가] 사이드바 내 테마 설정 버튼 (모바일용 대체)
     const themeItem = document.createElement('div');
@@ -536,6 +549,11 @@ if(isAdmin) {
     document.getElementById('setContentTop').value = localStorage.getItem('kac_content_top') || 135; 
     document.getElementById('modalPreviewBtn').textContent = isPreview ? "미리보기 종료" : "미리보기 시작";
     document.getElementById('modalPreviewBtn').classList.toggle('btn-preview-active', isPreview);
+
+    // [추가] 공지사항 설정 불러오기
+    const notice = globalData.config?.notice || { active: false, content: "" };
+    document.getElementById('chkNoticeActive').checked = notice.active;
+    document.getElementById('noticeTextInput').value = notice.content;
 }
 document.getElementById('settingsModal').style.display='flex';
 }
@@ -616,6 +634,84 @@ function copyShareLink() {
     copyText.setSelectionRange(0, 99999); // 모바일 대응
     document.execCommand("copy");
     alert("링크가 복사되었습니다.");
+}
+
+// [추가] ================= 공지사항 관련 로직 =================
+
+// 1. 공지사항 설정 저장 (관리자용)
+async function saveNoticeSettings() {
+    if(!isAdmin) return;
+    
+    const active = document.getElementById('chkNoticeActive').checked;
+    const content = document.getElementById('noticeTextInput').value;
+    
+    // 내용이 변경되면 새로운 ID 부여하여 '오늘 보지 않기' 초기화 효과
+    const currentId = globalData.config.notice?.id || Date.now();
+    const newId = (globalData.config.notice?.content !== content) ? Date.now() : currentId;
+
+    globalData.config.notice = {
+        active: active,
+        content: content,
+        id: newId
+    };
+
+    // Firebase 및 로컬 저장
+    syncToLocalStorage(globalData);
+    
+    // Firebase에 바로 저장
+    const snapshot = await db.ref('/').once('value');
+    let fullData = snapshot.val();
+    if(!fullData.config) fullData.config = {};
+    fullData.config.notice = globalData.config.notice;
+    
+    try {
+        await db.ref('/').set(fullData);
+        alert("공지사항 설정이 저장되었습니다.");
+    } catch(e) {
+        console.error(e);
+        alert("로컬에는 저장되었으나 서버 전송 중 오류가 발생했습니다.");
+    }
+}
+
+// 2. 접속 시 공지 띄우기 체크
+function checkAndShowNotice() {
+    const notice = globalData.config?.notice;
+    if (!notice || !notice.active || !notice.content) return;
+
+    // '오늘 하루 보지 않기' 체크 확인
+    const hideKey = `kac_hide_notice_${notice.id}`;
+    const hideDate = localStorage.getItem(hideKey);
+    const today = new Date().toDateString();
+
+    if (hideDate === today) return; // 오늘 이미 숨김 처리함
+
+    // 팝업 내용 주입 및 표시
+    document.getElementById('noticeContent').innerHTML = notice.content;
+    document.getElementById('mainNoticeModal').style.display = 'flex';
+}
+
+// 3. 수동으로 공지사항 열기 (푸터/사이드바 클릭 시)
+function showNoticeManual() {
+    const notice = globalData.config?.notice;
+    const content = (notice && notice.content) ? notice.content : "<p style='text-align:center; padding:20px; color:#64748b;'>현재 등록된 공지사항이 없습니다.</p>";
+    
+    document.getElementById('noticeContent').innerHTML = content;
+    
+    // 수동 오픈 시 '오늘 보지 않기' 체크박스는 숨기거나 초기화
+    document.getElementById('dontShowToday').checked = false;
+    document.getElementById('mainNoticeModal').style.display = 'flex';
+}
+
+// 4. 팝업 닫기 및 쿠키 처리
+function closeNoticePopup() {
+    const checkbox = document.getElementById('dontShowToday');
+    const notice = globalData.config?.notice;
+
+    if (checkbox.checked && notice && notice.id) {
+        const hideKey = `kac_hide_notice_${notice.id}`;
+        localStorage.setItem(hideKey, new Date().toDateString());
+    }
+    document.getElementById('mainNoticeModal').style.display = 'none';
 }
 
 init();
