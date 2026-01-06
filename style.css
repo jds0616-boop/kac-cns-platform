@@ -76,7 +76,8 @@ body.admin-mode .page-headline:hover { color: #bfdbfe; }
 }
 
 .header-right { display: flex; align-items: center; gap: 15px; z-index: 10; flex-shrink: 0; }
-
+/* ▼▼▼ 여기에 추가해 주세요 ▼▼▼ */
+.mobile-share-btn { display: none; }
 .theme-toggle { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); margin-right: 10px; }
 .theme-btn { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; opacity: 0.5; }
 .theme-btn.active { background: #fff; opacity: 1; color: var(--navy); }
