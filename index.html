@@ -221,8 +221,15 @@
   .footer-edit-btn:hover { opacity: 1; background: rgba(255,255,255,0.1); }
   body.admin-mode .footer-edit-btn { display: inline-block; }
 
-  /* 모바일용 떠있는 테마 버튼 */
-  .mobile-theme-float { display: none; }
+  /* [추가] 1. PC 하단 QR 코드 스타일 */
+  .footer-qr { width: 100px; height: 100px; margin-top: 15px; display: block; }
+  
+  /* [추가] 4. 모바일 상단 공유 아이콘 */
+  .header-share-btn { display: none; padding: 8px; width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,0.1); align-items: center; justify-content: center; cursor: pointer; color: #fff; margin-right: 5px; }
+  
+  /* 공지사항 팝업 스타일 */
+  #mainNoticeModal .modal-card { text-align: left; }
+  .notice-content-box { background: var(--btn-bg); padding: 15px; border-radius: 10px; border: 1px solid var(--btn-border); min-height: 100px; margin-bottom: 20px; white-space: pre-wrap; line-height: 1.6; font-size: 14px; }
 
   /* ========================================= */
   /* [모바일 전용 최적화] */
@@ -265,14 +272,14 @@
 
     .header-left { flex: 0 0 auto; }
     
-    /* [수정 1] 모바일 헤더 타이틀 크기 축소 및 잘림 방지 */
+    /* 모바일 헤더 타이틀 */
     .logo-text { 
         position: absolute; 
         left: 50%; 
         transform: translateX(-50%); 
-        font-size: 16px !important; /* 축소 */
+        font-size: 16px !important; 
         font-weight: 800;
-        max-width: 90%; /* 늘림 */
+        max-width: 90%; 
         text-align: center;
         white-space: nowrap; 
     }
@@ -285,24 +292,25 @@
     .theme-toggle { display: none !important; }
     .settings-btn { display: none; }
 
+    /* [수정] 모바일에서만 공유 아이콘 표시 */
+    .header-share-btn { display: flex !important; }
+
     #cardContainerWrapper { padding: 0 15px; }
-    /* [수정 5] 리스트 연속 출력을 위한 flex column */
     #cardContainer { gap: 15px; padding: 10px 0; min-height: auto; flex-direction: column; flex-wrap: nowrap; }
     
     .card.empty-placeholder { display: none !important; }
 
-    /* [수정 2] 카드(버튼) 높이 더 축소 (50px) */
+    /* 모바일 카드 스타일 */
     .card { 
       width: 100%; 
       height: auto; 
-      min-height: 50px; /* 50px로 축소 */
+      min-height: 50px; 
       flex-direction: row; justify-content: flex-start; 
-      padding: 10px 12px; /* 패딩 축소 */
+      padding: 10px 12px; 
       gap: 15px; 
       border-radius: 15px;
     }
     .card:hover { transform: translateY(-3px); }
-    /* 아이콘 박스 크기 축소 */
     .icon-box { 
         width: 36px; height: 36px; 
         border-radius: 8px; margin-bottom: 0; 
@@ -312,10 +320,9 @@
     .card-ctrl { top: 50%; right: 10px; transform: translateY(-50%); width: auto; flex-direction: row; }
     .btn-sm { padding: 6px 10px; }
 
-    /* [수정 4] 페이지네이션(회색박스) 제거 */
     #pagination { display: none !important; }
 
-    /* [수정 3] 하단바 고정 */
+    /* 하단바 */
     .main-footer { 
         padding: 20px 15px; 
         margin-top: 0; 
@@ -330,23 +337,8 @@
     }
     .main-footer p { font-size: 11px; white-space: normal; }
 
-    /* [수정 7] 주/야간 아이콘 플로팅 (하단바 좌측 위) */
-    .mobile-theme-float {
-        display: flex !important;
-        position: fixed;
-        bottom: 25px; /* 하단바 위에 살짝 걸치거나 위로 */
-        left: 15px;
-        z-index: 6000;
-        width: 36px; height: 36px;
-        border-radius: 50%;
-        background: var(--bg-card);
-        border: 1px solid var(--btn-border);
-        color: var(--text-sub);
-        align-items: center; justify-content: center;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        cursor: pointer;
-    }
-    .mobile-theme-float svg { width: 18px; height: 18px; fill: currentColor; }
+    /* [수정] 모바일에서는 PC용 하단 QR 코드 숨김 */
+    .footer-qr { display: none !important; }
   }
 
   #loadingSpinner { position: fixed; inset: 0; background: var(--bg-main); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
@@ -446,6 +438,12 @@
       <div class="theme-btn" id="btnDay" onclick="setTheme('light')"><svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg></div>
       <div class="theme-btn" id="btnNight" onclick="setTheme('dark')"><svg viewBox="0 0 24 24"><path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C6.94,10.39 9.79,16.87 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z"/></svg></div>
     </div>
+    
+    <!-- [추가] 모바일 전용 공유/QR 버튼 -->
+    <div class="header-share-btn" onclick="openShareModal()">
+        <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:currentColor;"><path d="M16,21L14.12,19.12L17.29,16H5V8H11V6H5C3.89,6 3,6.89 3,8V16C3,17.11 3.89,18 5,18H17.29L14.12,14.88L16,13L21,18L16,21M19,10H21V12H19V10M19,14H21V16H19V14M17,12H19V14H17V12M17,8H19V10H17V8Z"/></svg>
+    </div>
+
     <div class="settings-btn" onclick="openSettings()">⚙️</div>
     <img src="logo.png" alt="KAC Logo" class="kac-logo-img">
   </div>
@@ -467,16 +465,14 @@
     <div id="pagination" class="pagination"></div>
   </div>
 
-  <!-- 모바일용 플로팅 테마 버튼 -->
-  <div class="mobile-theme-float" onclick="toggleThemeMobile()">
-      <svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41C17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg>
-  </div>
-
   <!-- 하단바 (Footer) -->
   <footer class="main-footer">
     <div class="footer-content">
         <!-- JS로 로드됨 -->
     </div>
+    <!-- [추가] PC 화면용 하단 QR 코드 -->
+    <img src="qr_code.png" class="footer-qr" alt="QR Code">
+    
     <span class="footer-edit-btn" onclick="openFooterEditModal()">텍스트 수정</span>
   </footer>
 </div>
@@ -505,6 +501,11 @@
 
         <button class="btn-modal btn-success" onclick="exportJsonData()">변경사항 저장 (data.json 다운로드)</button>
         
+        <!-- [추가] 공지사항 설정 버튼 -->
+        <button class="btn-modal btn-primary" style="margin-top:10px; background:#f59e0b;" onclick="openNoticeSettings()">
+            📢 공지사항 설정
+        </button>
+
         <button class="btn-modal btn-primary" style="background:#24292f; margin-top:10px;" onclick="openGithubModal()">
           <svg style="width:16px;height:16px;vertical-align:middle;margin-right:5px;fill:white;" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
           GitHub에 바로 업로드
@@ -532,6 +533,59 @@
       </div>
     </div>
     <button class="btn-modal btn-secondary" onclick="document.getElementById('settingsModal').style.display='none'">닫기</button>
+  </div>
+</div>
+
+<!-- [추가] 공지사항 설정 모달 (관리자용) -->
+<div id="noticeSettingsModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-title">📢 공지사항 설정</div>
+    <div class="setting-group">
+        <label class="setting-label">공지 상태</label>
+        <select id="noticeActive" class="setting-input">
+            <option value="true">🟢 활성 (방문자에게 팝업 띄움)</option>
+            <option value="false">⚪ 비활성 (숨김)</option>
+        </select>
+    </div>
+    <div class="setting-group">
+        <label class="setting-label">제목</label>
+        <input type="text" id="noticeTitle" class="setting-input" placeholder="공지 제목 입력">
+    </div>
+    <div class="setting-group">
+        <label class="setting-label">내용</label>
+        <textarea id="noticeContent" class="setting-textarea" style="min-height:150px;" placeholder="공지 내용을 입력하세요"></textarea>
+    </div>
+    <div class="btn-row">
+        <button class="btn-modal btn-primary" onclick="saveNoticeSettings()">저장 및 적용</button>
+        <button class="btn-modal btn-secondary" onclick="document.getElementById('noticeSettingsModal').style.display='none'">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- [추가] 메인 공지사항 팝업 (사용자용) -->
+<div id="mainNoticeModal" class="modal-overlay" style="z-index:9000;">
+  <div class="modal-card">
+    <div class="modal-title" id="dispNoticeTitle">📢 공지사항</div>
+    <div id="dispNoticeContent" class="notice-content-box"></div>
+    <div class="checkbox-group" style="margin-bottom:10px; background:transparent; border:none; padding:0;">
+        <label class="checkbox-item">
+            <input type="checkbox" id="chkTodayHide"> <span>오늘 하루 보지 않기</span>
+        </label>
+    </div>
+    <button class="btn-modal btn-primary" onclick="closeNoticePopup()">닫기</button>
+  </div>
+</div>
+
+<!-- [추가] 모바일 공유/QR 모달 -->
+<div id="shareModal" class="modal-overlay">
+  <div class="modal-card" style="text-align:center;">
+    <div class="modal-title">📱 모바일 접속 QR</div>
+    <img src="qr_code.png" style="width:200px; height:200px; margin-bottom:20px; border-radius:10px;">
+    <p style="margin-bottom:20px; font-size:13px; color:var(--text-sub); word-break:break-all;" id="shareUrlDisplay"></p>
+    <div class="btn-row">
+        <button class="btn-modal btn-primary" onclick="copyLink()">🔗 링크 복사하기</button>
+        <button class="btn-modal btn-secondary" onclick="document.getElementById('shareModal').style.display='none'">닫기</button>
+    </div>
   </div>
 </div>
 
@@ -765,6 +819,8 @@ async function init() {
   buildSearchIndex(); // 검색엔진 생성
   renderSidebar(); // 사이드바 생성
   
+  checkNotice(); // [추가] 공지사항 확인 및 띄우기
+
   // 로딩 종료
   if(spinner) {
       spinner.style.opacity = '0';
@@ -822,6 +878,9 @@ async function init() {
         security: currentSecurity 
     };
     
+    // [추가] 공지사항 데이터 복원
+    globalData.notice = JSON.parse(localStorage.getItem('kac_notice_data') || 'null');
+
     globalData.config.iconSize = parseInt(localStorage.getItem('kac_idx_icon_size') || 60);
     globalData.config.labelSize = parseInt(localStorage.getItem('kac_idx_label_size') || 24);
     
@@ -936,6 +995,11 @@ function syncToLocalStorage(data) {
           localStorage.setItem('kac_content_top', data.config.contentTop);
       }
   }
+
+  // [추가] 공지사항 데이터 저장
+  if(data.notice) {
+      localStorage.setItem('kac_notice_data', JSON.stringify(data.notice));
+  }
 }
 
   function applyConfig(cfg) {
@@ -1013,11 +1077,21 @@ function renderSidebar() {
           });
       }
 
+      // [추가] 모바일용 주/야간 전환 버튼 (PC에서는 숨겨지도록 CSS 처리 안해도 됨, 모바일에서만 사이드바 쓰니까)
+      const themeItem = document.createElement('div');
+      themeItem.className = 'sb-item';
+      themeItem.style.borderTop = '1px solid var(--btn-border)';
+      themeItem.innerHTML = `
+        <span style="display:flex;align-items:center;gap:10px;" onclick="toggleThemeMobile(); toggleSidebar();">
+            🌓 주/야간 모드 전환
+        </span>
+      `;
+      content.appendChild(themeItem);
+
       // [수정 6] 모바일 사이드바 맨 아래에 '설정' 버튼 추가
       const settingsItem = document.createElement('div');
       settingsItem.className = 'sb-item';
-      settingsItem.style.marginTop = '20px';
-      settingsItem.style.borderTop = '1px solid var(--btn-border)';
+      settingsItem.style.marginTop = '0px'; // 테두리 때문에 조정
       settingsItem.innerHTML = `
         <span style="display:flex;align-items:center;gap:10px;" onclick="openSettings(); toggleSidebar();">
             ⚙️ 시스템 설정
@@ -1789,7 +1863,73 @@ function renderSidebar() {
 
   function setTheme(m) { document.body.className = m==='dark'?'dark-mode':''; localStorage.setItem('kac_theme', m); document.getElementById('btnDay').classList.toggle('active', m==='light'); document.getElementById('btnNight').classList.toggle('active', m==='dark'); }
 
-  init();
+/* ===============================
+   [추가] 공지사항 관리 로직
+   =============================== */
+function openNoticeSettings() {
+    const notice = globalData.notice || { active: false, title: '', content: '' };
+    document.getElementById('noticeActive').value = notice.active.toString();
+    document.getElementById('noticeTitle').value = notice.title || '';
+    document.getElementById('noticeContent').value = notice.content || '';
+    
+    document.getElementById('settingsModal').style.display = 'none';
+    document.getElementById('noticeSettingsModal').style.display = 'flex';
+}
+
+function saveNoticeSettings() {
+    const active = document.getElementById('noticeActive').value === 'true';
+    const title = document.getElementById('noticeTitle').value;
+    const content = document.getElementById('noticeContent').value;
+
+    globalData.notice = { active, title, content };
+    syncToLocalStorage(globalData);
+    
+    alert("공지사항 설정이 저장되었습니다.\n(서버 저장 후 반영됩니다)");
+    document.getElementById('noticeSettingsModal').style.display = 'none';
+    openSettings(); // 설정창 다시 열기
+}
+
+function checkNotice() {
+    // 1. 공지 데이터 확인
+    const notice = globalData.notice;
+    if(!notice || !notice.active) return;
+
+    // 2. 오늘 하루 보지 않기 쿠키(로컬스토리지) 확인
+    const hideDate = localStorage.getItem('kac_hide_notice_date');
+    const today = new Date().toDateString();
+    if(hideDate === today) return;
+
+    // 3. 팝업 띄우기
+    document.getElementById('dispNoticeTitle').textContent = "📢 " + (notice.title || "공지사항");
+    document.getElementById('dispNoticeContent').textContent = notice.content;
+    document.getElementById('mainNoticeModal').style.display = 'flex';
+}
+
+function closeNoticePopup() {
+    if(document.getElementById('chkTodayHide').checked) {
+        localStorage.setItem('kac_hide_notice_date', new Date().toDateString());
+    }
+    document.getElementById('mainNoticeModal').style.display = 'none';
+}
+
+/* ===============================
+   [추가] 모바일 공유/QR 로직
+   =============================== */
+function openShareModal() {
+    document.getElementById('shareUrlDisplay').textContent = location.href;
+    document.getElementById('shareModal').style.display = 'flex';
+}
+
+function copyLink() {
+    const url = location.href;
+    navigator.clipboard.writeText(url).then(() => {
+        alert("링크가 복사되었습니다!");
+    }).catch(err => {
+        alert("복사 실패 (브라우저 보안 설정 확인 필요)");
+        prompt("아래 주소를 복사하세요:", url);
+    });
+}
+
 // [수정 3] 파이어베이스 저장 함수
 async function saveToFirebase() {
     if(!isAdmin) return alert("관리자 권한이 필요합니다.");
@@ -1819,6 +1959,7 @@ async function saveToFirebase() {
     }
 }
 
+  init();
 </script>
 </body>
 </html>
