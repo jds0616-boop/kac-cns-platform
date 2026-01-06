@@ -81,7 +81,7 @@ async function init() {
   renderCards(false); 
   buildSearchIndex(); 
   renderSidebar(); 
-  checkAndShowNotice(); // [추가] 공지사항 팝업 체크
+  checkAndShowNotice(); // 공지사항 체크 실행
   
   if(spinner) {
       spinner.style.opacity = '0';
@@ -127,58 +127,57 @@ function saveFooterText() {
 }
 
 function reconstructGlobalDataFromLocal() {
-const currentSecurity = globalData.security || {
-    entry_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c",
-    admin_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c"
-};
+    const currentSecurity = globalData.security || {
+        entry_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c",
+        admin_pw: "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c"
+    };
 
-// [수정] 공지사항 설정 초기화 추가
-globalData = { 
-    meta: { version: "2.1", lastUpdated: new Date().toISOString() }, 
-    config: {
-        notice: { active: false, content: "", id: "" } 
-    }, 
-    categories: [], 
-    security: currentSecurity 
-};
+    globalData = { 
+        meta: { version: "2.1", lastUpdated: new Date().toISOString() }, 
+        config: {
+            notice: { active: false, content: "", id: "" } 
+        }, 
+        categories: [], 
+        security: currentSecurity 
+    };
 
-globalData.config.iconSize = parseInt(localStorage.getItem('kac_idx_icon_size') || 60);
-globalData.config.labelSize = parseInt(localStorage.getItem('kac_idx_label_size') || 24);
+    globalData.config.iconSize = parseInt(localStorage.getItem('kac_idx_icon_size') || 60);
+    globalData.config.labelSize = parseInt(localStorage.getItem('kac_idx_label_size') || 24);
 
-const savedTitles = localStorage.getItem('kac_page_titles');
-globalData.config.pageTitles = savedTitles ? JSON.parse(savedTitles) : {};
-globalData.config.footerText = localStorage.getItem('kac_full_footer');
+    const savedTitles = localStorage.getItem('kac_page_titles');
+    globalData.config.pageTitles = savedTitles ? JSON.parse(savedTitles) : {};
+    globalData.config.footerText = localStorage.getItem('kac_full_footer');
 
-const contentTop = localStorage.getItem('kac_content_top');
-if(contentTop) globalData.config.contentTop = contentTop;
+    const contentTop = localStorage.getItem('kac_content_top');
+    if(contentTop) globalData.config.contentTop = contentTop;
 
-applyConfig(globalData.config);
+    applyConfig(globalData.config);
 
-const orderRaw = localStorage.getItem('kac_index_order');
-if(orderRaw) {
-    const order = JSON.parse(orderRaw);
-    globalData.categories = order.map(id => {
-        if(!id) return null;
-        const s = JSON.parse(localStorage.getItem(`kac_style_${id}`) || '{}');
-        const ms = JSON.parse(localStorage.getItem(`kac_menu_${id}`) || '[]');
-        const access = s.access || { visible: true, adminOnly: false, showSidebar: true };
+    const orderRaw = localStorage.getItem('kac_index_order');
+    if(orderRaw) {
+        const order = JSON.parse(orderRaw);
+        globalData.categories = order.map(id => {
+            if(!id) return null;
+            const s = JSON.parse(localStorage.getItem(`kac_style_${id}`) || '{}');
+            const ms = JSON.parse(localStorage.getItem(`kac_menu_${id}`) || '[]');
+            const access = s.access || { visible: true, adminOnly: false, showSidebar: true };
 
-        const menuList = ms.map(m => {
-            const subs = JSON.parse(localStorage.getItem(`kac_subs_${id}_${m.dataId}`) || '[]');
-            const isVisible = (m.visible !== undefined) ? m.visible : true;
-            return { id: m.dataId, label: m.label, line1: m.line1, line2: m.line2, link: m.link, visible: isVisible, subjects: subs };
+            const menuList = ms.map(m => {
+                const subs = JSON.parse(localStorage.getItem(`kac_subs_${id}_${m.dataId}`) || '[]');
+                const isVisible = (m.visible !== undefined) ? m.visible : true;
+                return { id: m.dataId, label: m.label, line1: m.line1, line2: m.line2, link: m.link, visible: isVisible, subjects: subs };
+            });
+
+            return { id: id, name: s.name, code: s.code, color: s.color, access: access, menus: menuList };
         });
-
-        return { id: id, name: s.name, code: s.code, color: s.color, access: access, menus: menuList };
-    });
-}
+    }
 }
 
 function resetToDataJson() {
-if(confirm("모든 내용이 사라지고 서버 상태로 되돌아갑니다. 계속하시겠습니까?")) {
-    localStorage.clear();
-    location.reload();
-}
+    if(confirm("모든 내용이 사라지고 서버 상태로 되돌아갑니다. 계속하시겠습니까?")) {
+        localStorage.clear();
+        location.reload();
+    }
 }
 
 window.addEventListener('pageshow', () => {
@@ -187,12 +186,12 @@ window.addEventListener('pageshow', () => {
 });
 
 function ensurePageSlots() {
-const cleanList = globalData.categories.filter(c => c !== null);
-globalData.categories = cleanList;
-if (globalData.categories.length % itemsPerPage !== 0) {
-    const needed = itemsPerPage - (globalData.categories.length % itemsPerPage);
-    for(let i=0; i<needed; i++) globalData.categories.push(null);
-}
+    const cleanList = globalData.categories.filter(c => c !== null);
+    globalData.categories = cleanList;
+    if (globalData.categories.length % itemsPerPage !== 0) {
+        const needed = itemsPerPage - (globalData.categories.length % itemsPerPage);
+        for(let i=0; i<needed; i++) globalData.categories.push(null);
+    }
 }
 
 function syncToLocalStorage(data) {
@@ -235,9 +234,9 @@ function syncToLocalStorage(data) {
 }
 
 function applyConfig(cfg) {
-if(!cfg) return;
-document.documentElement.style.setProperty('--icon-size-idx', (cfg.iconSize||60)+'px');
-document.documentElement.style.setProperty('--label-size-idx', (cfg.labelSize||24)+'px');
+    if(!cfg) return;
+    document.documentElement.style.setProperty('--icon-size-idx', (cfg.iconSize||60)+'px');
+    document.documentElement.style.setProperty('--label-size-idx', (cfg.labelSize||24)+'px');
 }
 
 function toggleSidebar() {
@@ -302,7 +301,7 @@ function renderSidebar() {
     };
     content.appendChild(noticeItem);
 
-    // [추가] 사이드바 내 테마 설정 버튼 (모바일용 대체)
+    // [추가] 사이드바 내 테마 설정 버튼
     const themeItem = document.createElement('div');
     themeItem.className = 'sb-item';
     themeItem.style.marginTop = '20px';
@@ -541,21 +540,21 @@ if(sOverlay) {
 }
 
 function openSettings() {
-document.getElementById('guestSettings').style.display = isAdmin ? 'none' : 'block';
-document.getElementById('adminSettings').style.display = isAdmin ? 'block' : 'none';
-if(isAdmin) {
-    document.getElementById('setIconSize').value = globalData.config.iconSize || 60;
-    document.getElementById('setLabelSize').value = globalData.config.labelSize || 24;
-    document.getElementById('setContentTop').value = localStorage.getItem('kac_content_top') || 135; 
-    document.getElementById('modalPreviewBtn').textContent = isPreview ? "미리보기 종료" : "미리보기 시작";
-    document.getElementById('modalPreviewBtn').classList.toggle('btn-preview-active', isPreview);
+    document.getElementById('guestSettings').style.display = isAdmin ? 'none' : 'block';
+    document.getElementById('adminSettings').style.display = isAdmin ? 'block' : 'none';
+    if(isAdmin) {
+        document.getElementById('setIconSize').value = globalData.config.iconSize || 60;
+        document.getElementById('setLabelSize').value = globalData.config.labelSize || 24;
+        document.getElementById('setContentTop').value = localStorage.getItem('kac_content_top') || 135; 
+        document.getElementById('modalPreviewBtn').textContent = isPreview ? "미리보기 종료" : "미리보기 시작";
+        document.getElementById('modalPreviewBtn').classList.toggle('btn-preview-active', isPreview);
 
-    // [추가] 공지사항 설정 불러오기
-    const notice = globalData.config?.notice || { active: false, content: "" };
-    document.getElementById('chkNoticeActive').checked = notice.active;
-    document.getElementById('noticeTextInput').value = notice.content;
-}
-document.getElementById('settingsModal').style.display='flex';
+        // [추가] 공지사항 설정 불러오기
+        const notice = globalData.config?.notice || { active: false, content: "" };
+        document.getElementById('chkNoticeActive').checked = notice.active;
+        document.getElementById('noticeTextInput').value = notice.content;
+    }
+    document.getElementById('settingsModal').style.display='flex';
 }
 
 function saveUISettings() {
@@ -599,7 +598,6 @@ const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
 return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// [수정] setTheme 함수 업데이트 (사이드바 텍스트 갱신용)
 function setTheme(m) { 
     document.body.className = m==='dark'?'dark-mode':''; 
     localStorage.setItem('kac_theme', m); 
@@ -608,12 +606,10 @@ function setTheme(m) {
     if(btnDay) btnDay.classList.toggle('active', m==='light'); 
     if(btnNight) btnNight.classList.toggle('active', m==='dark'); 
 
-    // [추가] 사이드바 상태 텍스트 업데이트
     const sbStatus = document.getElementById('sbThemeStatus');
     if(sbStatus) sbStatus.innerText = m==='light' ? '주간' : '야간';
 }
 
-// [추가] 공유 모달 관련 함수
 function openShareModal() {
     const url = window.location.href;
     const input = document.getElementById('shareUrlInput');
@@ -622,7 +618,6 @@ function openShareModal() {
     
     if(input && img && modal) {
         input.value = url;
-        // 무료 QR 생성 API (goqr.me)
         img.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(url)}`;
         modal.style.display = 'flex';
     }
@@ -631,21 +626,43 @@ function openShareModal() {
 function copyShareLink() {
     const copyText = document.getElementById("shareUrlInput");
     copyText.select();
-    copyText.setSelectionRange(0, 99999); // 모바일 대응
+    copyText.setSelectionRange(0, 99999); 
     document.execCommand("copy");
     alert("링크가 복사되었습니다.");
 }
 
-// [추가] ================= 공지사항 관련 로직 =================
+// [추가] 서버 저장 함수 (누락 복구)
+async function saveToFirebase() {
+    if(!isAdmin) return alert("관리자 권한이 필요합니다.");
+    if(!confirm("현재 설정을 서버에 저장하시겠습니까?")) return;
 
-// 1. 공지사항 설정 저장 (관리자용)
+    try {
+        const snapshot = await db.ref('/').once('value');
+        let fullData = snapshot.val() || {};
+        
+        // 로컬 globalData 내용을 서버 데이터 구조에 병합
+        if (!fullData.config) fullData.config = {};
+        
+        // 공지사항 등 설정 병합
+        if (globalData.config.notice) fullData.config.notice = globalData.config.notice;
+        
+        // (필요 시 categories 등 다른 데이터도 병합 로직 추가 가능)
+        
+        await db.ref('/').set(fullData);
+        alert("✅ 서버에 저장되었습니다.");
+    } catch(e) {
+        console.error(e);
+        alert("❌ 저장 실패: " + e.message);
+    }
+}
+
+// [추가] 공지사항 저장 로직 (업데이트됨)
 async function saveNoticeSettings() {
     if(!isAdmin) return;
     
     const active = document.getElementById('chkNoticeActive').checked;
     const content = document.getElementById('noticeTextInput').value;
     
-    // 내용이 변경되면 새로운 ID 부여하여 '오늘 보지 않기' 초기화 효과
     const currentId = globalData.config.notice?.id || Date.now();
     const newId = (globalData.config.notice?.content !== content) ? Date.now() : currentId;
 
@@ -655,54 +672,35 @@ async function saveNoticeSettings() {
         id: newId
     };
 
-    // Firebase 및 로컬 저장
+    // 로컬 저장 후 서버 저장 호출
     syncToLocalStorage(globalData);
-    
-    // Firebase에 바로 저장
-    const snapshot = await db.ref('/').once('value');
-    let fullData = snapshot.val();
-    if(!fullData.config) fullData.config = {};
-    fullData.config.notice = globalData.config.notice;
-    
-    try {
-        await db.ref('/').set(fullData);
-        alert("공지사항 설정이 저장되었습니다.");
-    } catch(e) {
-        console.error(e);
-        alert("로컬에는 저장되었으나 서버 전송 중 오류가 발생했습니다.");
-    }
+    saveToFirebase(); // 재활용
 }
 
-// 2. 접속 시 공지 띄우기 체크
+// [추가] 공지사항 체크 및 표시
 function checkAndShowNotice() {
     const notice = globalData.config?.notice;
     if (!notice || !notice.active || !notice.content) return;
 
-    // '오늘 하루 보지 않기' 체크 확인
     const hideKey = `kac_hide_notice_${notice.id}`;
     const hideDate = localStorage.getItem(hideKey);
     const today = new Date().toDateString();
 
-    if (hideDate === today) return; // 오늘 이미 숨김 처리함
+    if (hideDate === today) return; 
 
-    // 팝업 내용 주입 및 표시
     document.getElementById('noticeContent').innerHTML = notice.content;
     document.getElementById('mainNoticeModal').style.display = 'flex';
 }
 
-// 3. 수동으로 공지사항 열기 (푸터/사이드바 클릭 시)
 function showNoticeManual() {
     const notice = globalData.config?.notice;
     const content = (notice && notice.content) ? notice.content : "<p style='text-align:center; padding:20px; color:#64748b;'>현재 등록된 공지사항이 없습니다.</p>";
     
     document.getElementById('noticeContent').innerHTML = content;
-    
-    // 수동 오픈 시 '오늘 보지 않기' 체크박스는 숨기거나 초기화
     document.getElementById('dontShowToday').checked = false;
     document.getElementById('mainNoticeModal').style.display = 'flex';
 }
 
-// 4. 팝업 닫기 및 쿠키 처리
 function closeNoticePopup() {
     const checkbox = document.getElementById('dontShowToday');
     const notice = globalData.config?.notice;

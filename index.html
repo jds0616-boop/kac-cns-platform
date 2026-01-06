@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>KAC CNS Training Platform</title>
-<!-- Firebase 엔진(라이브러리) 불러오기 -->
+<!-- Firebase 엔진 -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="style.css">
 
 <script>
-  // 서버 접속 주소 설정 (HTML에 유지하여 로딩 순서 보장)
+  // Firebase 설정
   const firebaseConfig = {
     apiKey: "AIzaSyAUt6WqxWjRoB9xgAWXq2YhVMQutaOZCBc",
     authDomain: "catc-dfb9a.firebaseapp.com",
@@ -51,9 +51,7 @@
     <span>전체 메뉴</span>
     <div class="sidebar-close" onclick="toggleSidebar()">✕</div>
   </div>
-  <div class="sidebar-content" id="sidebarContent">
-    <!-- JS로 동적 생성 -->
-  </div>
+  <div class="sidebar-content" id="sidebarContent"></div>
 </div>
 
 <header>
@@ -70,7 +68,6 @@
   </div>
 
   <div class="header-right">
-    <!-- PC용 테마/설정 버튼 -->
     <div class="theme-toggle">
       <div class="theme-btn" id="btnDay" onclick="setTheme('light')"><svg viewBox="0 0 24 24"><path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,5.29C7.24,6.03 7.06,6.79 7,7.59C6.94,8.39 7.03,9.19 7.26,9.95L3.34,7M3.36,17L7.26,14.04C7.03,14.81 6.94,15.61 7,16.41C7.06,17.21 7.24,17.97 7.5,18.71L3.36,17M20.65,7L16.74,9.95C16.97,9.19 17.06,8.39 17,7.59C16.94,6.79 16.76,6.03 16.5,5.29L20.65,7M20.64,17L16.5,18.71C16.76,17.97 16.94,17.21 17,16.41(17.06,15.61 16.97,14.81 16.74,14.04L20.64,17M12,22L9.61,18.58C10.35,18.85 11.16,19 12,19C12.84,19 13.65,18.85 14.39,18.58L12,22Z"/></svg></div>
       <div class="theme-btn" id="btnNight" onclick="setTheme('dark')"><svg viewBox="0 0 24 24"><path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C6.94,10.39 9.79,16.87 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z"/></svg></div>
@@ -78,7 +75,7 @@
     <div class="settings-btn" onclick="openSettings()">⚙️</div>
     <img src="logo.png" alt="KAC Logo" class="kac-logo-img">
 
-    <!-- 모바일 전용 공유 아이콘 -->
+    <!-- 모바일 공유 아이콘 -->
     <div class="mobile-share-btn" onclick="openShareModal()">
         <svg viewBox="0 0 24 24"><path d="M18,16.08C17.24,16.08 16.56,16.38 16.04,16.85L8.91,12.7C8.96,12.47 9,12.24 9,12C9,11.76 8.96,11.53 8.91,11.3L15.96,7.19C16.5,7.69 17.21,8 18,8A3,3 0 0,0 21,5A3,3 0 0,0 18,2A3,3 0 0,0 15,5C15,5.24 15.04,5.47 15.09,5.7L8.04,9.81C7.5,9.31 6.79,9 6,9A3,3 0 0,0 3,12A3,3 0 0,0 6,15C6.79,15 7.5,15.31 8.04,14.81L15.09,18.91C15.04,19.15 15,19.37 15,19.6C15,21.26 16.34,22.6 18,22.6C19.66,22.6 21,21.26 21,19.6C21,17.94 19.66,16.6 18,16.6V16.08Z"/></svg>
     </div>
@@ -86,7 +83,6 @@
 </header>
 
 <div class="content-wrapper">
-  
   <div class="center-content-box">
     <div class="search-wrapper-outer">
       <div class="search-container">
@@ -101,32 +97,25 @@
     <div id="pagination" class="pagination"></div>
   </div>
 
-  <!-- 하단바 (Footer) -->
+  <!-- 하단바 -->
   <footer class="main-footer">
     <div class="footer-inner">
-        <!-- QR 코드 이미지 -->
         <img src="qr_code.png" alt="QR Code" class="footer-qr" onclick="openQrZoom()" title="확대하려면 클릭하세요">
-        
-        <div class="footer-content">
-            <!-- JS로 로드됨 -->
-        </div>
+        <div class="footer-content"></div>
     </div>
     
-    <!-- [추가] 공지사항 버튼 및 하단 텍스트 수정 (푸터 하단) -->
+    <!-- [수정] 공지사항 삭제, 수정 버튼만 남김 -->
     <div style="margin-top:10px; display:flex; gap:15px; font-size:12px; color:rgba(255,255,255,0.6);">
-        <span style="cursor:pointer; border-bottom:1px solid transparent;" onmouseover="this.style.borderBottomColor='white'" onmouseout="this.style.borderBottomColor='transparent'" onclick="showNoticeManual()">📢 공지사항 확인</span>
         <span class="footer-edit-btn" onclick="openFooterEditModal()">하단 문구 수정</span>
     </div>
   </footer>
 </div>
 
-<!-- [추가] 공지사항 팝업 모달 (일반 사용자용) -->
+<!-- 공지사항 팝업 -->
 <div id="mainNoticeModal" class="modal-overlay" style="z-index: 99999;">
   <div class="modal-card" style="max-width: 500px; width: 90%;">
     <div class="modal-title">📢 공지사항</div>
-    <div id="noticeContent" style="min-height: 100px; max-height: 60vh; overflow-y: auto; line-height: 1.6; margin-bottom: 20px;">
-      <!-- 공지 내용이 여기에 로드됩니다 -->
-    </div>
+    <div id="noticeContent" style="min-height: 100px; max-height: 60vh; overflow-y: auto; line-height: 1.6; margin-bottom: 20px;"></div>
     
     <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--btn-border); padding-top: 15px;">
         <label style="display: flex; align-items: center; gap: 5px; font-size: 13px; cursor: pointer; color: var(--text-sub);">
@@ -137,15 +126,13 @@
   </div>
 </div>
 
-<!-- 공유 기능 모달 -->
+<!-- 공유 모달 -->
 <div id="shareModal" class="modal-overlay" onclick="if(event.target===this) this.style.display='none'">
   <div class="modal-card" style="text-align:center; width:300px; padding:25px;">
     <h3 style="margin-bottom:15px; font-weight:800; color:var(--text-main);">페이지 공유</h3>
-    
     <div style="background:#fff; padding:10px; border-radius:10px; display:inline-block; margin-bottom:10px; border:1px solid #e2e8f0;">
         <img id="shareQrImg" src="" style="width:120px; height:120px; display:block;">
     </div>
-    
     <div style="margin-top:15px; display:flex; gap:5px;">
        <input type="text" id="shareUrlInput" class="setting-input" readonly style="font-size:12px; color:#64748b; background:var(--btn-bg);">
        <button class="btn-modal btn-primary" style="width:auto; padding:0 15px; margin-top:0;" onclick="copyShareLink()">복사</button>
@@ -195,7 +182,7 @@
         <button class="btn-modal btn-danger" style="margin-top:15px; background:#ef4444; opacity:0.8;" onclick="resetToDataJson()">⚠️ 서버 원본으로 초기화 (수정취소)</button>
       </div>
       
-      <!-- [추가] 공지사항 팝업 관리 영역 -->
+      <!-- 공지사항 팝업 관리 -->
       <div class="setting-group" style="background: rgba(37,99,235,0.05); padding: 15px; border-radius: 15px; border: 1px solid var(--btn-border); margin-top: 15px;">
         <label class="setting-label">📢 공지사항 팝업 관리</label>
         <div style="margin-bottom: 10px;">
@@ -227,7 +214,8 @@
   </div>
 </div>
 
-<!-- 통합 관리자 (Tree Editor) 모달 -->
+<!-- 통합 관리자 (Tree Editor), GitHub, 비밀번호, 하단텍스트, 카드수정, 페이지이동 모달들 생략 (기존 유지) -->
+<!-- (전체 코드 필요시 기존 코드에서 해당 부분 유지) -->
 <div id="integratedAdminModal" class="modal-overlay">
   <div class="modal-card modal-card large">
     <div class="modal-title">🗂️ 전체 데이터 종합 관리</div>
@@ -252,107 +240,56 @@
   </div>
 </div>
 
-<!-- GitHub 업로드 설정 모달 -->
 <div id="githubModal" class="modal-overlay">
   <div class="modal-card">
     <div class="modal-title">🐙 GitHub 연동 설정</div>
-    <p style="font-size:12px; color:#64748b; margin-bottom:15px;">
-      깃허브 저장소 정보를 입력하세요. 정보는 브라우저에만 저장됩니다.
-    </p>
-    <div class="setting-group">
-      <label class="setting-label">GitHub 아이디 (Owner)</label>
-      <input type="text" id="ghOwner" class="setting-input" placeholder="예: MyGitID">
-    </div>
-    <div class="setting-group">
-      <label class="setting-label">저장소 이름 (Repo)</label>
-      <input type="text" id="ghRepo" class="setting-input" placeholder="예: kac-training-platform">
-    </div>
-    <div class="setting-group">
-      <label class="setting-label">Personal Access Token</label>
-      <input type="password" id="ghToken" class="setting-input" placeholder="ghp_..." autocomplete="new-password">
-      <p style="font-size:11px; color:red; margin-top:5px;">* 토큰은 절대 타인에게 공유하지 마세요.</p>
-    </div>
-    <div class="btn-row">
-      <button id="btnGhUpload" class="btn-modal btn-primary" onclick="uploadToGithub()">업로드 실행</button>
-      <button class="btn-modal btn-secondary" onclick="document.getElementById('githubModal').style.display='none'">취소</button>
-    </div>
+    <div class="setting-group"><label class="setting-label">GitHub 아이디</label><input type="text" id="ghOwner" class="setting-input"></div>
+    <div class="setting-group"><label class="setting-label">저장소 이름</label><input type="text" id="ghRepo" class="setting-input"></div>
+    <div class="setting-group"><label class="setting-label">Token</label><input type="password" id="ghToken" class="setting-input"></div>
+    <div class="btn-row"><button id="btnGhUpload" class="btn-modal btn-primary" onclick="uploadToGithub()">업로드</button><button class="btn-modal btn-secondary" onclick="document.getElementById('githubModal').style.display='none'">취소</button></div>
   </div>
 </div>
 
-<!-- 비밀번호 변경 모달 -->
 <div id="pwChangeModal" class="modal-overlay">
   <div class="modal-card">
     <div class="modal-title">🔐 비밀번호 변경</div>
-    <div class="setting-group">
-      <label class="setting-label">변경할 대상</label>
-      <select id="pwTarget" class="setting-input">
-        <option value="entry">교육생 (접속용) 비밀번호</option>
-        <option value="admin">관리자 (설정용) 비밀번호</option>
-      </select>
-    </div>
-    <div class="setting-group">
-      <label class="setting-label">새로운 비밀번호</label>
-      <input type="password" id="newPw" class="setting-input" placeholder="변경할 비밀번호 입력">
-    </div>
-    <div class="btn-row">
-      <button class="btn-modal btn-primary" onclick="executePwChange()">변경 실행</button>
-      <button class="btn-modal btn-secondary" onclick="document.getElementById('pwChangeModal').style.display='none'">취소</button>
-    </div>
+    <div class="setting-group"><label class="setting-label">대상</label><select id="pwTarget" class="setting-input"><option value="entry">교육생</option><option value="admin">관리자</option></select></div>
+    <div class="setting-group"><label class="setting-label">새 비밀번호</label><input type="password" id="newPw" class="setting-input"></div>
+    <div class="btn-row"><button class="btn-modal btn-primary" onclick="executePwChange()">변경</button><button class="btn-modal btn-secondary" onclick="document.getElementById('pwChangeModal').style.display='none'">취소</button></div>
   </div>
 </div>
 
-<!-- 하단바 텍스트 수정 모달 (간편 입력) -->
 <div id="footerEditModal" class="modal-overlay">
   <div class="modal-card">
     <div class="modal-title">📝 하단바 문구 수정</div>
-    <p style="font-size:13px; color:#64748b; margin-bottom:15px;">
-        원하는 내용을 입력하고 엔터(Enter)를 치면 자동으로 줄바꿈이 적용됩니다.<br>
-        마지막 줄은 자동으로 <b>굵게(저작권 스타일)</b> 표시됩니다.
-    </p>
-    <div class="setting-group">
-      <textarea id="footerTextInput" class="setting-textarea" placeholder="내용을 입력하세요..."></textarea>
-    </div>
-    <div class="btn-row">
-      <button class="btn-modal btn-primary" onclick="saveFooterText()">저장 및 적용</button>
-      <button class="btn-modal btn-secondary" onclick="document.getElementById('footerEditModal').style.display='none'">취소</button>
-    </div>
+    <div class="setting-group"><textarea id="footerTextInput" class="setting-textarea"></textarea></div>
+    <div class="btn-row"><button class="btn-modal btn-primary" onclick="saveFooterText()">저장</button><button class="btn-modal btn-secondary" onclick="document.getElementById('footerEditModal').style.display='none'">취소</button></div>
   </div>
 </div>
 
-<!-- 카드 수정 모달 (간편) -->
 <div id="cardEditModal" class="modal-overlay">
   <div class="modal-card">
     <div class="modal-title">카테고리 수정</div>
     <div class="setting-group"><label class="setting-label">명칭</label><input type="text" id="editName" class="setting-input"></div>
-    <div class="setting-group"><label class="setting-label">아이콘 코드 (영문 1자)</label><input type="text" id="editCode" class="setting-input"></div>
-    <div class="setting-group"><label class="setting-label">테마 색상</label><input type="color" id="editColor" style="width:100%; height:40px; cursor:pointer;"></div>
-    
-    <!-- 공개/관리자/사이드바 설정 -->
+    <div class="setting-group"><label class="setting-label">아이콘</label><input type="text" id="editCode" class="setting-input"></div>
+    <div class="setting-group"><label class="setting-label">색상</label><input type="color" id="editColor" style="width:100%;height:40px;"></div>
     <div class="checkbox-group">
-        <label class="setting-label">노출 및 권한 설정</label>
-        <label class="checkbox-item"><input type="checkbox" id="chkVisible" checked> <span>공개 여부 (체크 시 사용자에게 보임)</span></label>
-        <label class="checkbox-item"><input type="checkbox" id="chkAdminOnly"> <span>관리자 전용 (체크 시 관리자만 보임)</span></label>
-        <label class="checkbox-item"><input type="checkbox" id="chkSidebar" checked> <span>사이드바 메뉴에 표시</span></label>
+        <label class="checkbox-item"><input type="checkbox" id="chkVisible"> 공개</label>
+        <label class="checkbox-item"><input type="checkbox" id="chkAdminOnly"> 관리자전용</label>
+        <label class="checkbox-item"><input type="checkbox" id="chkSidebar"> 사이드바 표시</label>
     </div>
-
-    <div class="btn-row">
-      <button class="btn-modal btn-primary" onclick="saveCardEdit()">저장</button>
-      <button class="btn-modal btn-secondary" onclick="document.getElementById('cardEditModal').style.display='none'">취소</button>
-    </div>
+    <div class="btn-row"><button class="btn-modal btn-primary" onclick="saveCardEdit()">저장</button><button class="btn-modal btn-secondary" onclick="document.getElementById('cardEditModal').style.display='none'">취소</button></div>
   </div>
 </div>
 
-<!-- 이동 모달 -->
 <div id="movePageModal" class="modal-overlay">
   <div class="modal-card">
     <div class="modal-title">📂 페이지 이동</div>
-    <select id="moveTargetPage" class="setting-input" style="margin-bottom:20px;"></select>
+    <select id="moveTargetPage" class="setting-input"></select>
     <div class="btn-row"><button class="btn-modal btn-primary" onclick="executeMovePage()">이동</button><button class="btn-modal btn-secondary" onclick="document.getElementById('movePageModal').style.display='none'">취소</button></div>
   </div>
 </div>
 
-<!-- 외부 JS 파일 연결 -->
 <script src="script.js"></script>
-
 </body>
 </html>
