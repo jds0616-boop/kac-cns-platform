@@ -29,9 +29,10 @@
   const db = firebase.database();
 </script>
 <script>
-  // [보안] 로그인 세션 체크
+  // [보안] 로그인 세션 체크 및 스마트 리다이렉트
   if(sessionStorage.getItem('kac_access_token') !== 'granted') {
-    location.replace('login.html');
+    // 현재 보고 있는 주소를 기억한 상태로 로그인 페이지로 이동합니다.
+    location.replace('login.html?redirect=' + encodeURIComponent(window.location.href));
   }
 </script>
 <style>
