@@ -18,6 +18,9 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<!-- [QR 코드 생성 라이브러리 추가] -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 <style>
   @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
   :root { 
@@ -704,6 +707,10 @@
       <div class="mobile-exit-btn" onclick="closeViewer()">
           <svg viewBox="0 0 24 24"><path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" /></svg>
       </div>
+      <!-- [모바일 QR 버튼 추가] -->
+      <div class="mobile-exit-btn" onclick="toggleQrModal(event)" style="margin-left: 10px; background: rgba(255,255,255,0.15);">
+        <svg viewBox="0 0 24 24"><path d="M3,11h2v-2h-2V11z M3,7h2V5h-2V7z M7,11h2v-2h-2V11z M10,11h2v-2h-2V11z M10,7h2V5h-2V7z M7,7h2V5h-2V7z M13,7h2V5h-2V7z M13,11h2v-2h-2V11z M16,11h2v-2h-2V11z M16,7h2V5h-2V7z M19,7h2V5h-2V7z M19,11h2v-2h-2V11z M3,15h2v-2h-2V15z M3,19h2v-2h-2V19z M7,15h2v-2h-2V15z M10,15h2v-2h-2V15z M10,19h2v-2h-2V19z M7,19h2v-2h-2V19z M13,15h2v-2h-2V15z M13,19h2v-2h-2V19z M16,15h2v-2h-2V15z M16,19h2v-2h-2V19z M19,15h2v-2h-2V15z M19,19h2v-2h-2V19z" fill="white"/></svg>
+      </div>
       <div id="mobileAudioGroup" class="mobile-audio-group" style="display:none;">
           <button id="mobilePlayBtn" class="audio-btn-sm">▶</button>
           <input type="range" id="mobileAudioProgress" class="audio-slider-sm" value="0">
@@ -720,6 +727,11 @@
       <div id="vTitle" class="v-title-box"></div>
     </div>
     <div class="v-header-right">
+      <!-- [PC QR 공유 버튼 추가] -->
+      <div class="v-icon-btn" onmousedown="event.stopPropagation()" onclick="toggleQrModal(event)" title="QR 공유">
+        <svg viewBox="0 0 24 24"><path d="M3,11h2v-2h-2V11z M3,7h2V5h-2V7z M7,11h2v-2h-2V11z M10,11h2v-2h-2V11z M10,7h2V5h-2V7z M7,7h2V5h-2V7z M13,7h2V5h-2V7z M13,11h2v-2h-2V11z M16,11h2v-2h-2V11z M16,7h2V5h-2V7z M19,7h2V5h-2V7z M19,11h2v-2h-2V11z M3,15h2v-2h-2V15z M3,19h2v-2h-2V19z M7,15h2v-2h-2V15z M10,15h2v-2h-2V15z M10,19h2v-2h-2V19z M7,19h2v-2h-2V19z M13,15h2v-2h-2V15z M13,19h2v-2h-2V19z M16,15h2v-2h-2V15z M16,19h2v-2h-2V19z M19,15h2v-2h-2V15z M19,19h2v-2h-2V19z" fill="currentColor"/></svg>
+        <span>(QR)</span>
+      </div>
       <div class="v-icon-btn" id="fsBtn" onmousedown="event.stopPropagation()" onclick="toggleFullScreen(event)" title="전체화면 전환">
         <svg id="iconExpand" viewBox="0 0 24 24"><path d="M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17H7V14H5V19H10V17Z"/></svg>
         <svg id="iconCompress" viewBox="0 0 24 24" style="display:none;"><path d="M14,14H19V16H16V19H14V14M5,14H10V19H8V16H5V14M8,5H10V10H5V8H8V5M14,5H16V8H19V10H14V5Z"/></svg>
@@ -754,6 +766,18 @@
       <div id="pageFill" class="progress-fill">
         <div class="progress-handle"></div>
         <div id="progressFlag" class="progress-flag">0 / 0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [QR 코드 팝업 레이어 추가] -->
+  <div id="qrModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9500; align-items:center; justify-content:center;" onclick="toggleQrModal(event)">
+    <div style="background:#fff; padding:30px; border-radius:24px; text-align:center; box-shadow: 0 20px 40px rgba(0,0,0,0.4);" onclick="event.stopPropagation()">
+      <h3 style="color:#000; margin-bottom:10px; font-size:20px; font-weight:800;">모바일로 접속하기</h3>
+      <p style="color:#64748b; font-size:13px; margin-bottom:20px; line-height:1.5;">카메라 앱으로 아래 QR 코드를 찍으면<br>현재 교육 과정을 휴대폰에서 볼 수 있습니다.</p>
+      <div id="qrcode" style="display:inline-block; padding:15px; background:#fff; border-radius:12px; border: 1px solid #e2e8f0;"></div>
+      <div style="margin-top:25px;">
+        <button onclick="toggleQrModal(event)" style="width:100%; padding:14px; border-radius:12px; border:none; background:#0f172a; color:#fff; font-weight:700; cursor:pointer; font-size:15px;">닫기</button>
       </div>
     </div>
   </div>
@@ -1104,13 +1128,7 @@ function renderSidebar() {
           bc.innerHTML = '';
           const midSpan = document.createElement('span');
           midSpan.innerHTML = ` &nbsp;>&nbsp; ${typeName}`;
-          midSpan.className = 'crumb-link';
-          midSpan.onclick = () => location.href = `facility.html?type=${type}`;
-          const currSpan = document.createElement('span');
-          currSpan.innerHTML = ` &nbsp;>&nbsp; ${menuName || '상세'}`;
-          currSpan.className = 'crumb-current';
           bc.appendChild(midSpan);
-          bc.appendChild(currSpan);
       }
   }
 
@@ -1871,6 +1889,32 @@ async function openViewer(idx) {
   function handleSwipe() {
       const distance = touchStartY - touchEndY;
       if (distance > minSwipeDistance) { nextPage(); } else if (distance < -minSwipeDistance) { prevPage(); }
+  }
+
+  // [QR 코드 모달 토글 및 생성 함수 추가]
+  function toggleQrModal(e) {
+    if (e) e.stopPropagation();
+    const modal = document.getElementById('qrModal');
+    const qrContainer = document.getElementById('qrcode');
+    
+    if (modal.style.display === 'none') {
+      qrContainer.innerHTML = '';
+      // 현재 페이지 URL을 읽어옴 (특정 과목이 선택된 상태의 URL)
+      const currentUrl = window.location.href;
+      
+      new QRCode(qrContainer, {
+        text: currentUrl,
+        width: 180,
+        height: 180,
+        colorDark : "#0f172a",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+      });
+      
+      modal.style.display = 'flex';
+    } else {
+      modal.style.display = 'none';
+    }
   }
   
   init();
