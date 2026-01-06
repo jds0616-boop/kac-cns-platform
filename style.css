@@ -204,11 +204,21 @@ body.admin-mode .footer-edit-btn { display: inline-block; }
 /* [모바일 전용 최적화] - 수정됨 */
 /* ========================================= */
 @media (max-width: 768px) {
-  html, body { 
-      overflow-y: auto !important; 
-      height: auto !important; 
-      position: relative !important;
-      overflow-x: hidden;
+  
+  /* ... 위쪽 코드 생략 ... */
+
+  /* [수정] 모바일 공유 버튼 스타일 */
+  .mobile-share-btn {
+      /* ▼▼▼ 여기 !important를 꼭 붙여주세요 ▼▼▼ */
+      display: flex !important; 
+      
+      align-items: center; 
+      justify-content: center;
+      width: 32px; 
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      cursor: pointer;
   }
   
   body { display: block; }
@@ -246,7 +256,7 @@ body.admin-mode .footer-edit-btn { display: inline-block; }
       position: absolute; 
       left: 50%; 
       transform: translateX(-50%); 
-      font-size: 20px !important; 
+      font-size: 18px !important; 
       font-weight: 800;
       max-width: 60%;
       text-align: center;
