@@ -203,15 +203,22 @@
   .page-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--btn-border); cursor: pointer; transition: 0.3s; }
   .page-dot.active { background: var(--navy); transform: scale(1.3); }
 
-  /* 하단바 (Footer) - PC 절대 고정 */
+  /* [수정] 하단바 (PC): 가로 정렬(QR 좌측, 텍스트 우측) */
   .main-footer {
     width: 100%; height: auto;
-    background: var(--navy); padding: 25px 20px;
-    text-align: center; color: rgba(255,255,255,0.7);
+    background: var(--navy); padding: 15px 20px; /* 패딩 약간 축소 */
+    text-align: left; /* 텍스트 좌측 정렬 */
+    color: rgba(255,255,255,0.7);
     font-size: 13px; line-height: 1.6;
     border-top: 1px solid rgba(255,255,255,0.1); box-sizing: border-box;
     position: absolute; bottom: 0; left: 0; 
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    
+    /* 플렉스 박스로 변경하여 가로 배치 */
+    display: flex; 
+    flex-direction: row; 
+    align-items: center; 
+    justify-content: center;
+    gap: 20px; /* QR과 텍스트 사이 간격 */
     z-index: 1000;
   }
   .footer-content p { margin: 0; word-break: keep-all; }
@@ -221,8 +228,18 @@
   .footer-edit-btn:hover { opacity: 1; background: rgba(255,255,255,0.1); }
   body.admin-mode .footer-edit-btn { display: inline-block; }
 
-  /* [추가] 1. PC 하단 QR 코드 스타일 */
-  .footer-qr { width: 100px; height: 100px; margin-top: 15px; display: block; }
+  /* [수정] PC 하단 QR 코드: 사이즈 축소 및 클릭 커서 */
+  .footer-qr { 
+      width: 50px; height: 50px; /* 기존 100px에서 1/2로 축소 */
+      margin-top: 0; 
+      display: block; 
+      cursor: pointer; /* 클릭 가능하다는 손가락 표시 */
+      transition: transform 0.2s;
+      background: #fff; /* QR이 투명할 경우 대비용 */
+      padding: 2px;
+      border-radius: 4px;
+  }
+  .footer-qr:hover { transform: scale(1.1); } /* 마우스 올리면 살짝 커짐 */
   
   /* [추가] 4. 모바일 상단 공유 아이콘 */
   .header-share-btn { display: none; padding: 8px; width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,0.1); align-items: center; justify-content: center; cursor: pointer; color: #fff; margin-right: 5px; }
@@ -322,7 +339,7 @@
 
     #pagination { display: none !important; }
 
-    /* 하단바 */
+    /* [수정] 하단바 모바일 구조 변경 */
     .main-footer { 
         padding: 20px 15px; 
         margin-top: 0; 
@@ -334,6 +351,10 @@
         z-index: 5500;
         border-top: 1px solid rgba(255,255,255,0.1);
         box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+        
+        flex-direction: column; /* 모바일은 세로 정렬 */
+        text-align: center;
+        gap: 0;
     }
     .main-footer p { font-size: 11px; white-space: normal; }
 
@@ -467,11 +488,12 @@
 
   <!-- 하단바 (Footer) -->
   <footer class="main-footer">
+    <!-- [위치 변경] QR코드를 텍스트보다 먼저 둠 (좌측 배치) + 클릭 이벤트 추가 -->
+    <img src="qr_code.png" class="footer-qr" alt="QR Code" onclick="openQrZoomModal()" title="클릭하면 확대됩니다">
+    
     <div class="footer-content">
         <!-- JS로 로드됨 -->
     </div>
-    <!-- [추가] PC 화면용 하단 QR 코드 -->
-    <img src="qr_code.png" class="footer-qr" alt="QR Code">
     
     <span class="footer-edit-btn" onclick="openFooterEditModal()">텍스트 수정</span>
   </footer>
@@ -586,6 +608,15 @@
         <button class="btn-modal btn-primary" onclick="copyLink()">🔗 링크 복사하기</button>
         <button class="btn-modal btn-secondary" onclick="document.getElementById('shareModal').style.display='none'">닫기</button>
     </div>
+  </div>
+</div>
+
+<!-- [추가] PC 하단 QR 확대 팝업 -->
+<div id="qrZoomModal" class="modal-overlay" onclick="document.getElementById('qrZoomModal').style.display='none'">
+  <div style="position:relative; background:transparent; padding:0; display:flex; flex-direction:column; align-items:center;">
+    <img src="qr_code.png" style="width:300px; height:300px; border-radius:15px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); background:#fff; padding:10px;">
+    <p style="color:#fff; font-weight:700; margin-top:15px; font-size:16px; text-shadow:0 2px 5px rgba(0,0,0,0.5);">모바일로 접속하려면 스캔하세요</p>
+    <p style="color:rgba(255,255,255,0.7); font-size:12px; margin-top:5px;">(화면 아무 곳이나 누르면 닫힙니다)</p>
   </div>
 </div>
 
@@ -1928,6 +1959,11 @@ function copyLink() {
         alert("복사 실패 (브라우저 보안 설정 확인 필요)");
         prompt("아래 주소를 복사하세요:", url);
     });
+}
+
+/* [추가] QR 확대 모달 열기 */
+function openQrZoomModal() {
+    document.getElementById('qrZoomModal').style.display = 'flex';
 }
 
 // [수정 3] 파이어베이스 저장 함수
