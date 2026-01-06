@@ -594,6 +594,13 @@
         <option value="false">🚧 비활성 (개발 중)</option>
     </select>
     
+    <!-- [수정] 다운로드 권한 설정 추가 -->
+    <label class="setting-label">📥 PDF 다운로드 허용</label>
+    <select id="editAllowDownload" class="setting-input" style="margin-bottom:15px;">
+        <option value="true">✅ 허용 (기본)</option>
+        <option value="false">🚫 금지 (보기만 가능)</option>
+    </select>
+    
     <label class="setting-label">📄 PDF 파일 경로 (예: COMM/manual.pdf)</label>
     <input type="text" id="inputPdfName" class="setting-input" placeholder="예: COMM/manual.pdf" style="margin-bottom:10px;">
     
@@ -724,7 +731,8 @@
         <svg id="iconExpand" viewBox="0 0 24 24"><path d="M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17H7V14H5V19H10V17Z"/></svg>
         <svg id="iconCompress" viewBox="0 0 24 24" style="display:none;"><path d="M14,14H19V16H16V19H14V14M5,14H10V19H8V16H5V14M8,5H10V10H5V8H8V5M14,5H16V8H19V10H14V5Z"/></svg>
       </div>
-      <div class="v-icon-btn" onmousedown="event.stopPropagation()" onclick="downloadPdf(event)" title="다운로드">
+      <!-- [수정] 다운로드 버튼에 id 추가 -->
+      <div id="downloadBtn" class="v-icon-btn" onmousedown="event.stopPropagation()" onclick="downloadPdf(event)" title="다운로드">
         <svg viewBox="0 0 24 24"><path d="M14,2L20,8V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V4A2,2 0 0,1 6,2H14M18,20V9H13V4H6V20H18M12,19L8,15H10.5V11H13.5V15H16L12,19Z"/></svg>
       </div>
       <div id="audioBtn" class="v-icon-btn" onmousedown="event.stopPropagation()" onclick="toggleAudioPanel(event)" title="오디오">
@@ -1330,10 +1338,15 @@ function renderSidebar() {
     const name = document.getElementById('editSubjectName').value;
     const isActiveStr = document.getElementById('editActiveStatus').value; 
     
+    // [수정] 다운로드 설정 값 읽기
+    const isDownloadStr = document.getElementById('editAllowDownload').value;
+
     if(!name) return alert("과목명을 입력해주세요.");
     
     subjects[idx].name = name;
     subjects[idx].active = (isActiveStr === 'true');
+    subjects[idx].allowDownload = (isDownloadStr === 'true'); // [수정] 저장
+
     subjects[idx].pdfName = document.getElementById('inputPdfName').value.trim();
     subjects[idx].link = document.getElementById('inputLinkUrl').value.trim();
 
@@ -1360,6 +1373,11 @@ function renderSidebar() {
     const sub = subjects[idx];
     document.getElementById('editSubjectName').value = sub.name; 
     document.getElementById('editActiveStatus').value = (sub.active !== false).toString();
+    
+    // [수정] 저장된 다운로드 값 불러오기 (없으면 true가 기본)
+    const allowDown = (sub.allowDownload !== false).toString(); 
+    document.getElementById('editAllowDownload').value = allowDown;
+
     document.getElementById('inputPdfName').value = sub.pdfName || '';
     document.getElementById('inputLinkUrl').value = sub.link || '';
 
@@ -1425,21 +1443,33 @@ function renderSidebar() {
 
   function saveSubjects() { localStorage.setItem(`kac_subs_${type}_${menuId}`, JSON.stringify(subjects)); render(); }
   
+  // [수정] 삭제 함수: Firebase에서 비밀번호 Hash를 직접 조회하도록 변경
   async function deleteSubject(i) {
     const input = prompt("삭제하려면 관리자 비밀번호를 입력하세요.");
     if (!input) return;
 
-    const inputHash = await sha256(input.toUpperCase());
-    const targetHash = globalSecurity.admin_pw;
+    try {
+        const inputHash = await sha256(input.toUpperCase());
+        
+        // DB에서 비밀번호 가져오기
+        const snapshot = await db.ref('security/admin_pw').once('value');
+        let serverHash = snapshot.val();
+        
+        // 비밀번호가 설정 안 되어 있을 경우 기본값 (기존 코드 참조)
+        if(!serverHash) serverHash = "db2d3257df630ebeb488b0a9435b863702a0a25694205626359045b8427f311c"; 
 
-    if(inputHash === targetHash) {
-        if(confirm("정말 삭제하시겠습니까?")) {
-            subjects.splice(i, 1);
-            saveSubjects();
-            alert("삭제되었습니다.");
+        if(inputHash === serverHash) {
+            if(confirm("정말 삭제하시겠습니까?")) {
+                subjects.splice(i, 1);
+                saveSubjects();
+                alert("삭제되었습니다.");
+            }
+        } else {
+            alert("비밀번호가 일치하지 않습니다.");
         }
-    } else {
-        alert("비밀번호가 일치하지 않습니다.");
+    } catch (e) {
+        console.error(e);
+        alert("인증 중 오류가 발생했습니다.");
     }
   }
 
@@ -1588,6 +1618,17 @@ async function openViewer(idx) {
     viewingIndex = idx; 
 
     const sub = subjects[idx];
+    
+    // [수정] 다운로드 권한 체크 및 버튼 숨김/표시
+    const downloadBtn = document.getElementById('downloadBtn');
+    if (downloadBtn) {
+        if (sub.allowDownload === false) {
+            downloadBtn.style.display = 'none'; // 버튼 숨김
+        } else {
+            downloadBtn.style.display = 'flex'; // 버튼 표시
+        }
+    }
+
     let pdfName = sub.pdfName;
     
     if(!pdfName) return alert("등록된 PDF 파일이 없습니다.");
