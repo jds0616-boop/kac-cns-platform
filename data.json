@@ -1,7 +1,7 @@
 {
   "meta": {
     "version": "2.1",
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-04-09"
   },
   "config": {
     "iconSize": 110,
@@ -233,7 +233,7 @@
           "line1": "ICAO",
           "line2": "",
           "link": "",
-          "visible": false,
+          "visible": true,
           "subjects": [
             {
               "active": true,
@@ -256,8 +256,18 @@
           "line1": "ITU",
           "line2": "",
           "link": "",
-          "visible": false,
-          "subjects": []
+          "visible": true,
+          "subjects": [
+            {
+              "active": true,
+              "allowDownload": true,
+              "audioName": "",
+              "id": "1775721392550",
+              "link": "",
+              "name": "ITU-RR Vol_1",
+              "pdfName": "REGULATION/ITU_V1"
+            }
+          ]
         },
         {
           "id": "id_1766923156620",
@@ -844,10 +854,10 @@
       ]
     },
     {
-      "id": "CAT_1767430475699",
-      "name": "Q&A  ",
-      "code": "Q",
-      "color": "#2563eb",
+      "id": "CAT_1772177134493",
+      "name": "초기 교육 교보재",
+      "code": "I",
+      "color": "#000000",
       "access": {
         "adminOnly": false,
         "showSidebar": true,
@@ -855,49 +865,19 @@
       },
       "menus": [
         {
-          "id": "id_1767430522722",
-          "label": "항공정보통신 초기",
-          "line1": "교육생 전용",
+          "id": "id_1772177399612",
+          "label": "항공정보통신시설 초기",
+          "line1": "COMM",
           "line2": "",
-          "link": "https://jds0616-boop.github.io/CATC/index.html?code=qwet8y9",
+          "link": "",
           "visible": true,
-          "subjects": []
-        },
-        {
-          "id": "id_1767430574744",
-          "label": "항행감시시설 초기",
-          "line1": "교육생 전용",
-          "line2": "",
-          "link": "https://jds0616-boop.github.io/CATC/index.html?code=mnbv0c1",
-          "visible": true,
-          "subjects": []
-        },
-        {
-          "id": "id_1767430588952",
-          "label": "계기착륙 초기",
-          "line1": "교육생 전용",
-          "line2": "",
-          "link": "https://jds0616-boop.github.io/CATC/index.html?code=poiu2y3",
-          "visible": true,
-          "subjects": []
-        },
-        {
-          "id": "id_1767430603504",
-          "label": "전방향표지 초기",
-          "line1": "교육생 전용",
-          "line2": "",
-          "link": "https://jds0616-boop.github.io/CATC/index.html?code=trew4q5",
-          "visible": true,
-          "subjects": []
-        },
-        {
-          "id": "id_1767430782892",
-          "label": "Q&A , 퀴즈문항 관리 ",
-          "line1": "강사 전용",
-          "line2": "",
-          "link": "https://jds0616-boop.github.io/CATC/admin.html",
-          "visible": true,
-          "subjects": []
+          "subjects": [
+            {
+              "active": true,
+              "id": "1772177467131",
+              "name": "항공정보통신시설 개요 및 분류 "
+            }
+          ]
         }
       ]
     },
@@ -994,18 +974,63 @@
       ]
     },
     {
-      "id": "CAT_1772176465528",
-      "name": "항공정보통신 (초기)",
-      "code": "C",
-      "color": "#eb2442",
+      "id": "CAT_1767430475699",
+      "name": "Q&A  ",
+      "code": "Q",
+      "color": "#2563eb",
       "access": {
-        "visible": true,
         "adminOnly": false,
-        "showSidebar": true
+        "showSidebar": false,
+        "visible": false
       },
-      "menus": []
-    },
-    null
+      "menus": [
+        {
+          "id": "id_1767430522722",
+          "label": "항공정보통신 초기",
+          "line1": "교육생 전용",
+          "line2": "",
+          "link": "https://jds0616-boop.github.io/CATC/index.html?code=qwet8y9",
+          "visible": true,
+          "subjects": []
+        },
+        {
+          "id": "id_1767430574744",
+          "label": "항행감시시설 초기",
+          "line1": "교육생 전용",
+          "line2": "",
+          "link": "https://jds0616-boop.github.io/CATC/index.html?code=mnbv0c1",
+          "visible": true,
+          "subjects": []
+        },
+        {
+          "id": "id_1767430588952",
+          "label": "계기착륙 초기",
+          "line1": "교육생 전용",
+          "line2": "",
+          "link": "https://jds0616-boop.github.io/CATC/index.html?code=poiu2y3",
+          "visible": true,
+          "subjects": []
+        },
+        {
+          "id": "id_1767430603504",
+          "label": "전방향표지 초기",
+          "line1": "교육생 전용",
+          "line2": "",
+          "link": "https://jds0616-boop.github.io/CATC/index.html?code=trew4q5",
+          "visible": true,
+          "subjects": []
+        },
+        {
+          "id": "id_1767430782892",
+          "label": "Q&A , 퀴즈문항 관리 ",
+          "line1": "강사 전용",
+          "line2": "",
+          "link": "https://jds0616-boop.github.io/CATC/admin.html",
+          "visible": true,
+          "subjects": []
+        }
+      ]
+    }
   ],
   "security": {
     "admin_pw": "6bb303bfa434223a00981c7c3cba271b042a30f172565fae0e9349fb160010bd",
